@@ -175,3 +175,201 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.07);padding
   .gallery-grid{grid-template-columns:1fr}
   .gallery-item.big{grid-column:span 1;aspect-ratio:4/3}
 }
+
+
+/* ═══════════════════════════════════════════
+   MOBILE OPTIMIZATIONS — Complete Fix
+═══════════════════════════════════════════ */
+
+/* ── HERO MOBILE FIX ── */
+@media(max-width:768px){
+  /* Nav */
+  nav{padding:0 4%;height:62px}
+  .logo-text{font-size:16px;letter-spacing:1px}
+  .logo-sub{font-size:9px}
+  .logo-icon{width:36px;height:36px;font-size:14px}
+
+  /* Hero Section */
+  #home{
+    min-height:auto !important;
+    padding:90px 5% 50px !important;
+    align-items:flex-start !important;
+  }
+  #home h1{
+    font-size:52px !important;
+    letter-spacing:1px !important;
+    margin-bottom:16px !important;
+    line-height:0.9 !important;
+  }
+  #home p{
+    font-size:14px !important;
+    margin-bottom:24px !important;
+    line-height:1.6 !important;
+  }
+  /* Hide hero bg image on mobile */
+  #home > div[style*="position:absolute"][style*="right"]{
+    display:none !important;
+  }
+  /* Hero glow hide */
+  #home > div[style*="radial-gradient"]{
+    display:none !important;
+  }
+  /* Hero badge */
+  #home .hero-badge, 
+  #home > div > div[style*="inline-flex"]{
+    font-size:9px !important;
+    padding:5px 12px !important;
+    margin-bottom:14px !important;
+    flex-wrap:wrap !important;
+  }
+
+  /* Buttons */
+  .btn-primary, .btn-wa, .btn-accent, .btn-outline{
+    padding:12px 22px !important;
+    font-size:14px !important;
+    width:100% !important;
+    text-align:center !important;
+    justify-content:center !important;
+  }
+  div[style*="display:flex"][style*="gap:14px"]{
+    flex-direction:column !important;
+    gap:10px !important;
+  }
+
+  /* Stats bar */
+  .stats-bar{
+    grid-template-columns:1fr 1fr !important;
+    padding:24px 5% !important;
+    gap:0 !important;
+  }
+  .stat-num{font-size:32px !important}
+  .stat-label{font-size:10px !important}
+
+  /* Sections */
+  section{padding:50px 5% !important}
+
+  /* About snippet - image */
+  .grid-2 > div:first-child{
+    margin-bottom:40px;
+  }
+
+  /* Section titles */
+  .section-title{
+    font-size:36px !important;
+    letter-spacing:1px !important;
+  }
+  .section-sub{
+    font-size:14px !important;
+    margin-bottom:32px !important;
+  }
+  .section-tag{
+    font-size:10px !important;
+    padding:4px 12px !important;
+  }
+
+  /* Service cards */
+  .scard{padding:20px !important}
+  .scard h3{font-size:18px !important}
+  .scard p{font-size:13px !important}
+
+  /* Why cards */
+  .wcard{padding:20px !important}
+  .wcard .wicon{font-size:28px !important}
+  .wcard h4{font-size:16px !important}
+  .wcard p{font-size:13px !important}
+
+  /* Gallery */
+  .gallery-grid{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .gallery-item.big{
+    grid-column:span 1 !important;
+    aspect-ratio:4/3 !important;
+  }
+  .gallery-item.small{aspect-ratio:4/3 !important}
+
+  /* Process steps */
+  .process-steps{
+    grid-template-columns:1fr 1fr !important;
+    gap:20px !important;
+  }
+  .pnum{width:54px;height:54px;font-size:22px}
+
+  /* Page hero */
+  .page-hero{
+    min-height:200px !important;
+    padding:100px 5% 40px !important;
+  }
+  .page-hero h1{font-size:42px !important;letter-spacing:2px !important}
+  .page-hero p{font-size:13px !important}
+
+  /* Contact form */
+  .contact-form{padding:22px !important}
+  .form-group input,
+  .form-group textarea,
+  .form-group select{font-size:14px !important;padding:10px 12px !important}
+  .submit-btn{font-size:16px !important;padding:13px !important}
+
+  /* Footer */
+  footer{padding:36px 5% 20px !important}
+  .footer-grid{gap:28px !important}
+  .footer-col h5{font-size:14px !important;margin-bottom:10px !important}
+  .footer-col ul li a{font-size:13px !important}
+  .footer-contact p{font-size:13px !important}
+  .footer-bottom{font-size:11px !important;flex-direction:column;text-align:center;gap:8px}
+
+  /* WA Float button */
+  .wa-float{width:50px;height:50px;bottom:20px;right:16px}
+
+  /* CTA sections */
+  section[style*="background:linear-gradient(135deg,#ff6f00"]{
+    padding:40px 5% !important;
+  }
+  section[style*="background:linear-gradient(135deg,#ff6f00"] h2{
+    font-size:30px !important;
+  }
+  section[style*="background:linear-gradient(135deg,#ff6f00"] p{
+    font-size:14px !important;
+  }
+  section[style*="background:linear-gradient(135deg,#ff6f00"] div[style*="display:flex"]{
+    flex-direction:column !important;
+    gap:10px !important;
+    align-items:stretch !important;
+  }
+
+  /* Stats inside about */
+  div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  /* Mission/Vision/Values grid */
+  .grid-3{grid-template-columns:1fr !important}
+  .grid-4{grid-template-columns:1fr 1fr !important}
+  .grid-auto{grid-template-columns:1fr !important}
+
+  /* Pricing table on mobile */
+  table{font-size:12px !important}
+  table th, table td{padding:10px 12px !important}
+
+  /* FAQ */
+  details{padding:14px 16px !important}
+  details summary{font-size:13px !important}
+  details p{font-size:12px !important}
+
+  /* Floating badge on about image */
+  .float-badge, div[style*="position:absolute"][style*="bottom:-1"]{
+    bottom:-10px !important;
+    right:10px !important;
+    padding:12px 14px !important;
+  }
+}
+
+@media(max-width:480px){
+  #home h1{font-size:42px !important}
+  .stats-bar{grid-template-columns:1fr 1fr !important}
+  .process-steps{grid-template-columns:1fr !important}
+  .grid-4{grid-template-columns:1fr !important}
+  nav{height:58px}
+  .logo-text{font-size:14px}
+}
