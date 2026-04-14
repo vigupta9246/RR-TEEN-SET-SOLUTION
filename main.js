@@ -1,6 +1,31 @@
 /* R.R Teen Set Solution — main.js v3.0 */
 'use strict';
 
+// ── YOUTUBE CHANNEL LINK ────────────────────────
+// Add YouTube icon to footer and nav wherever needed
+document.addEventListener('DOMContentLoaded', function(){
+  var ytUrl = 'https://youtube.com/@subhashgupta6957';
+  var ytBtn = '<a href="' + ytUrl + '" target="_blank" rel="noopener" title="R.R Teen Set Solution YouTube Channel" style="display:inline-flex;align-items:center;gap:8px;background:#ff0000;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:all .3s" onmouseover=\'this.style.background=\"#cc0000\";this.style.transform=\"translateY(-2px)\"\' onmouseout=\'this.style.background=\"#ff0000\";this.style.transform=\"\"\'><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"white\"><path d=\"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z\"/></svg>YouTube Channel</a>';
+
+  // Add to footer-contact section
+  var footerContact = document.querySelector('.footer-contact');
+  if(footerContact){
+    var ytDiv = document.createElement('p');
+    ytDiv.innerHTML = '<span>▶️</span> <a href="' + ytUrl + '" target="_blank" rel="noopener" style="color:#ff4444">YouTube Channel</a>';
+    footerContact.appendChild(ytDiv);
+  }
+
+  // Add YouTube button in contact page info section
+  var cinfoItems = document.querySelectorAll('.cinfo-item');
+  if(cinfoItems.length > 3){
+    var ytItem = document.createElement('div');
+    ytItem.className = 'cinfo-item';
+    ytItem.innerHTML = '<div class="cinfo-icon">▶️</div><div><div class="cinfo-label">YouTube</div><div class="cinfo-value"><a href="' + ytUrl + '" target="_blank" rel="noopener" style="color:#ff4444">@subhashgupta6957</a></div></div>';
+    cinfoItems[cinfoItems.length-1].parentNode.insertBefore(ytItem, cinfoItems[cinfoItems.length-1].nextSibling);
+  }
+});
+
+
 // ── LOGO CLICK → HOME PAGE ──────────────────────
 document.querySelectorAll('.logo').forEach(function(logo){
   logo.addEventListener('click', function(){
