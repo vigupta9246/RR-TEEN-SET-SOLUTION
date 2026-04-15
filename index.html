@@ -270,4 +270,541 @@
 <a href="https://api.whatsapp.com/send?phone=918527258462" class="wa-float" title="WhatsApp" aria-label="WhatsApp">
   <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
-<script src="main.js"></script></body></html>
+<script src="main.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat Assistant — R.R Teen Set Solution</title>
+<style>
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+  /* ── CHAT BUBBLE (for embedding on website) ── */
+  #chat-trigger {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #0a1628, #1565c0);
+    border: none; cursor: pointer; box-shadow: 0 6px 24px rgba(21,101,192,.45);
+    display: flex; align-items: center; justify-content: center;
+    animation: bounce 3s ease infinite; transition: transform .2s;
+  }
+  #chat-trigger:hover { transform: scale(1.08); }
+  #chat-trigger svg { width: 28px; height: 28px; fill: white; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  /* Notification dot */
+  #chat-trigger::after {
+    content: '1'; position: absolute; top: 2px; right: 2px;
+    width: 20px; height: 20px; background: #ff6f00; border-radius: 50%;
+    font-size: 11px; font-weight: 700; color: white;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white; font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* ── CHAT WINDOW ── */
+  #chat-window {
+    position: fixed; bottom: 96px; right: 24px; z-index: 9998;
+    width: 370px; max-height: 580px;
+    background: white; border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    display: flex; flex-direction: column;
+    overflow: hidden; transform: scale(0) translateY(20px);
+    transform-origin: bottom right; transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    opacity: 0;
+  }
+  #chat-window.open { transform: scale(1) translateY(0); opacity: 1; }
+
+  /* Header */
+  .chat-header {
+    background: linear-gradient(135deg, #0a1628 0%, #1565c0 100%);
+    padding: 16px 18px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 3px solid #ff6f00;
+  }
+  .chat-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff6f00, #e65100);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: white; flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,.3);
+  }
+  .chat-header-info { flex: 1; }
+  .chat-header-name { font-weight: 700; font-size: 15px; color: white; }
+  .chat-header-status {
+    font-size: 11px; color: rgba(255,255,255,.65);
+    display: flex; align-items: center; gap: 5px; margin-top: 2px;
+  }
+  .online-dot {
+    width: 7px; height: 7px; background: #00e676;
+    border-radius: 50%; animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .chat-close {
+    width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.1);
+    border: none; cursor: pointer; color: white; font-size: 18px;
+    display: flex; align-items: center; justify-content: center; transition: background .2s;
+  }
+  .chat-close:hover { background: rgba(255,255,255,.2); }
+
+  /* Messages area */
+  #chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px; display: flex;
+    flex-direction: column; gap: 10px; scroll-behavior: smooth;
+  }
+  #chat-messages::-webkit-scrollbar { width: 4px; }
+  #chat-messages::-webkit-scrollbar-thumb { background: #dde; border-radius: 4px; }
+
+  /* Message bubbles */
+  .msg { display: flex; gap: 8px; align-items: flex-end; max-width: 90%; }
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #ff6f00, #e65100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+  }
+  .msg-bubble {
+    padding: 10px 14px; border-radius: 16px; font-size: 13.5px;
+    line-height: 1.55; max-width: 100%; word-wrap: break-word;
+  }
+  .msg.bot .msg-bubble {
+    background: #f0f4ff; color: #1a2a3a; border-radius: 4px 16px 16px 16px;
+    border: 1px solid #dde8ff;
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    color: white; border-radius: 16px 4px 16px 16px;
+  }
+  .msg-time { font-size: 10px; color: #aaa; margin-top: 2px; text-align: right; }
+
+  /* Typing indicator */
+  .typing-indicator {
+    display: flex; gap: 4px; padding: 12px 16px;
+    background: #f0f4ff; border-radius: 4px 16px 16px 16px;
+    border: 1px solid #dde8ff; width: fit-content;
+  }
+  .typing-dot {
+    width: 7px; height: 7px; background: #1565c0; border-radius: 50%;
+    animation: typing 1.2s ease infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: .2s; }
+  .typing-dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes typing { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-5px);opacity:1} }
+
+  /* Quick replies */
+  .quick-replies {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 0 16px 10px; margin-top: -4px;
+  }
+  .qr-btn {
+    background: white; border: 1.5px solid #1565c0; color: #1565c0;
+    padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .qr-btn:hover { background: #1565c0; color: white; }
+
+  /* Input area */
+  .chat-input-area {
+    padding: 12px 14px; border-top: 1px solid #eee;
+    display: flex; gap: 8px; align-items: flex-end; background: #fafafa;
+  }
+  #user-input {
+    flex: 1; border: 1.5px solid #dde; border-radius: 20px;
+    padding: 9px 14px; font-size: 13.5px; outline: none; resize: none;
+    font-family: inherit; max-height: 80px; line-height: 1.4;
+    transition: border-color .2s; background: white;
+  }
+  #user-input:focus { border-color: #1565c0; }
+  #user-input::placeholder { color: #aaa; }
+  #send-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    border: none; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all .2s; flex-shrink: 0;
+  }
+  #send-btn:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(21,101,192,.4); }
+  #send-btn svg { width: 17px; height: 17px; fill: white; }
+
+  /* CTA Buttons inside chat */
+  .cta-btns { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+  .cta-btn {
+    display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+    border-radius: 10px; font-size: 13px; font-weight: 700;
+    text-decoration: none; transition: all .2s; border: none; cursor: pointer;
+    font-family: inherit;
+  }
+  .cta-btn.call { background: #ff6f00; color: white; }
+  .cta-btn.call:hover { background: #e65100; }
+  .cta-btn.wa { background: #25D366; color: white; }
+  .cta-btn.wa:hover { background: #1da851; }
+  .cta-btn.form { background: #0a1628; color: white; }
+  .cta-btn.form:hover { background: #1a3a5c; }
+
+  /* Mobile responsive */
+  @media(max-width:420px){
+    #chat-window { width: calc(100vw - 24px); right: 12px; bottom: 88px; }
+    #chat-trigger { right: 16px; bottom: 16px; }
+  }
+
+  /* Demo page layout */
+  .demo-page {
+    text-align: center; padding: 40px 20px;
+  }
+  .demo-page h1 { font-size: 28px; color: #0a1628; margin-bottom: 10px; }
+  .demo-page p { color: #6b7f96; font-size: 15px; margin-bottom: 6px; }
+  .demo-badge {
+    display: inline-block; background: #e8f4fd; color: #1565c0;
+    padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+  }
+  .embed-code {
+    background: #0a1628; color: #42a5f5; padding: 16px 20px;
+    border-radius: 10px; font-family: monospace; font-size: 13px;
+    text-align: left; max-width: 500px; margin: 20px auto;
+    word-break: break-all; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- Demo page content -->
+<div class="demo-page">
+  <div class="demo-badge">✅ Live Preview</div>
+  <h1>R.R Teen Set Solution</h1>
+  <p>AI Chat Assistant — Click the blue button (bottom right) to test</p>
+  <p style="font-size:13px;color:#aaa;margin-top:6px">Embed this on your website with one script tag</p>
+  <div class="embed-code">
+    &lt;!-- Paste before &lt;/body&gt; tag --&gt;<br>
+    &lt;script src="chat-widget.js"&gt;&lt;/script&gt;
+  </div>
+</div>
+
+<!-- ── CHAT TRIGGER BUTTON ── -->
+<button id="chat-trigger" aria-label="Open Chat Assistant">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+</button>
+
+<!-- ── CHAT WINDOW ── -->
+<div id="chat-window" role="dialog" aria-label="Chat with R.R Teen Set Solution">
+  <div class="chat-header">
+    <div class="chat-avatar">RR</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">R.R Teen Set Solution</div>
+      <div class="chat-header-status">
+        <div class="online-dot"></div>
+        AI Assistant · Usually replies instantly
+      </div>
+    </div>
+    <button class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
+  </div>
+
+  <div id="chat-messages"></div>
+  <div id="quick-replies-container" class="quick-replies"></div>
+
+  <div class="chat-input-area">
+    <textarea id="user-input" placeholder="Type your message..." rows="1" aria-label="Type message"></textarea>
+    <button id="send-btn" aria-label="Send message">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ──────────────────────────────────────
+var CONFIG = {
+  businessName: 'R.R Teen Set Solution',
+  phone: '+918527258462',
+  waLink: 'https://api.whatsapp.com/send?phone=918527258462',
+  contactPage: 'contact.html',
+  botName: 'RR Assistant',
+  // SYSTEM PROMPT for Claude AI
+  systemPrompt: `You are an AI Chat Assistant for R.R Teen Set Solution — a steel fabrication and tin shed manufacturing company based in New Delhi, India.
+
+Business Details:
+- Services: Tin Shed Fabrication, Industrial Shed, Prefab Warehouse, PEB Structure, Steel Structure Fabrication
+- Location: New Delhi, serving Delhi NCR (Delhi, Noida, Gurgaon, Faridabad, Ghaziabad)
+- Phone: +91 85272 58462
+- Owner: Subhash Kumar (CEO)
+- GST: 07DJCPK0635M1Z5
+- Rating: 5.0 on IndiaMART, 500+ projects completed, 8+ years experience
+- Pricing starts at ₹180/sq.ft
+
+Your Role:
+- Help customers with shed and steel structure inquiries
+- Handle bulk order and project discussions
+- Convert visitors into leads (calls, WhatsApp, enquiry)
+
+Behavior Rules:
+- Be direct, clear, and confident — NOT robotic
+- Keep responses SHORT — 2-4 lines max
+- Mix Hindi/Hinglish naturally if user writes in Hindi
+- Always move conversation toward enquiry or call
+
+Conversation Strategy:
+1. Product/service inquiry → Ask: what type of shed? what size? which city in Delhi NCR?
+2. Buying intent shown → Push: "Share your number" or "WhatsApp pe baat karte hain"
+3. Just browsing → Show: services, GST invoice benefit, free site visit offer
+4. Price asked → NEVER give fixed price. Say: "Price depends on size and type. Share your requirement for best rate."
+5. Location outside Delhi NCR → Politely say we primarily serve Delhi NCR
+
+Lead Focus:
+- Always guide toward: Call / WhatsApp / Contact Form
+- Mention FREE site visit offer in Delhi NCR
+- Mention GST invoice as trust builder
+
+Tone: Professional, confident, slightly warm. Sales-focused but NOT pushy.
+
+Keep every response under 60 words. Use bullet points rarely. Be conversational.`
+};
+
+// ── STATE ────────────────────────────────────────
+var chatHistory = [];
+var isOpen = false;
+var isTyping = false;
+var hasOpened = false;
+
+// ── DOM REFS ─────────────────────────────────────
+var trigger   = document.getElementById('chat-trigger');
+var window_el = document.getElementById('chat-window');
+var closeBtn  = document.getElementById('chat-close');
+var messages  = document.getElementById('chat-messages');
+var qrContainer = document.getElementById('quick-replies-container');
+var input     = document.getElementById('user-input');
+var sendBtn   = document.getElementById('send-btn');
+
+// ── TOGGLE CHAT ──────────────────────────────────
+function toggleChat(){
+  isOpen = !isOpen;
+  window_el.classList.toggle('open', isOpen);
+  // Remove notification dot after first open
+  if(isOpen){
+    trigger.style.cssText += 'animation:none';
+    if(!hasOpened){ hasOpened = true; showWelcome(); }
+    input.focus();
+  }
+}
+
+trigger.addEventListener('click', toggleChat);
+closeBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleChat(); });
+
+// ── WELCOME MESSAGE ──────────────────────────────
+function showWelcome(){
+  addBotMessage("Namaste! 👋 Welcome to **R.R Teen Set Solution**.\n\nI'm your AI assistant. How can I help you today?", [
+    "Tin Shed Price?",
+    "Industrial Shed",
+    "Free Site Visit",
+    "WhatsApp Karo"
+  ]);
+}
+
+// ── ADD MESSAGES ─────────────────────────────────
+function getTime(){
+  return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function formatText(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function addBotMessage(text, quickReplies){
+  var msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.innerHTML =
+    '<div class="msg-avatar">RR</div>' +
+    '<div>' +
+      '<div class="msg-bubble">' + formatText(text) + '</div>' +
+      '<div class="msg-time">' + getTime() + '</div>' +
+    '</div>';
+  messages.appendChild(msg);
+  scrollBottom();
+
+  // Quick replies
+  qrContainer.innerHTML = '';
+  if(quickReplies && quickReplies.length){
+    quickReplies.forEach(function(qr){
+      var btn = document.createElement('button');
+      btn.className = 'qr-btn';
+      btn.textContent = qr;
+      btn.addEventListener('click', function(){
+        sendMessage(qr);
+      });
+      qrContainer.appendChild(btn);
+    });
+  }
+}
+
+function addUserMessage(text){
+  qrContainer.innerHTML = '';
+  var msg = document.createElement('div');
+  msg.className = 'msg user';
+  msg.innerHTML =
+    '<div>' +
+      '<div class="msg-bubble">' + formatText(text) + '</div>' +
+      '<div class="msg-time">' + getTime() + '</div>' +
+    '</div>';
+  messages.appendChild(msg);
+  scrollBottom();
+}
+
+function addCTAButtons(){
+  var msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.innerHTML =
+    '<div class="msg-avatar">RR</div>' +
+    '<div style="width:100%">' +
+      '<div class="cta-btns">' +
+        '<a href="tel:' + CONFIG.phone + '" class="cta-btn call">📞 Call Subhash Kumar</a>' +
+        '<a href="' + CONFIG.waLink + '&text=' + encodeURIComponent('Hello! I want to enquire about shed/steel structure.') + '" target="_blank" class="cta-btn wa">💬 WhatsApp Now</a>' +
+        '<a href="' + CONFIG.contactPage + '" class="cta-btn form">📋 Fill Enquiry Form</a>' +
+      '</div>' +
+    '</div>';
+  messages.appendChild(msg);
+  scrollBottom();
+}
+
+function showTyping(){
+  var div = document.createElement('div');
+  div.className = 'msg bot'; div.id = 'typing-msg';
+  div.innerHTML =
+    '<div class="msg-avatar">RR</div>' +
+    '<div class="typing-indicator">' +
+      '<div class="typing-dot"></div>' +
+      '<div class="typing-dot"></div>' +
+      '<div class="typing-dot"></div>' +
+    '</div>';
+  messages.appendChild(div);
+  scrollBottom();
+}
+
+function removeTyping(){
+  var t = document.getElementById('typing-msg');
+  if(t) t.remove();
+}
+
+function scrollBottom(){
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// ── SEND MESSAGE ─────────────────────────────────
+function sendMessage(text){
+  text = (text || input.value).trim();
+  if(!text || isTyping) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  addUserMessage(text);
+  chatHistory.push({ role: 'user', content: text });
+
+  // Check for CTA keywords
+  var ctaTriggers = ['whatsapp','call','contact','number','phone','enquiry','quote','visit'];
+  var lower = text.toLowerCase();
+  var isCTA = ctaTriggers.some(function(t){ return lower.includes(t); });
+
+  isTyping = true;
+  showTyping();
+
+  // Call Claude API
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 200,
+      system: CONFIG.systemPrompt,
+      messages: chatHistory
+    })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    removeTyping();
+    isTyping = false;
+
+    var reply = '';
+    if(data.content && data.content[0]){
+      reply = data.content[0].text;
+    } else {
+      reply = 'Koi issue aa gaya. Please directly call karein: +91 85272 58462';
+    }
+
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Decide quick replies based on context
+    var qrs = [];
+    var lowerReply = reply.toLowerCase();
+    if(lowerReply.includes('price') || lowerReply.includes('rate')){
+      qrs = ['Share Requirement', 'WhatsApp Karo', 'Call Now'];
+    } else if(lowerReply.includes('visit') || lowerReply.includes('site')){
+      qrs = ['Book Free Visit', 'WhatsApp Karo', 'Call Now'];
+    } else {
+      qrs = ['Price Puchna Hai', 'Site Visit Chahiye', 'WhatsApp Karo'];
+    }
+
+    addBotMessage(reply, qrs);
+
+    // Show CTA buttons if lead intent detected
+    if(isCTA || lowerReply.includes('call') || lowerReply.includes('whatsapp') || lowerReply.includes('contact')){
+      setTimeout(addCTAButtons, 400);
+    }
+  })
+  .catch(function(err){
+    removeTyping();
+    isTyping = false;
+    addBotMessage(
+      'Network issue aa gaya. Please directly contact karein:\n\n📞 +91 85272 58462\n💬 WhatsApp bhi available hai.',
+      ['WhatsApp Karo', 'Call Karen']
+    );
+    setTimeout(addCTAButtons, 400);
+    console.error('API error:', err);
+  });
+}
+
+// ── INPUT HANDLERS ───────────────────────────────
+sendBtn.addEventListener('click', function(){ sendMessage(); });
+
+input.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// Auto-resize textarea
+input.addEventListener('input', function(){
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+});
+
+// ── QUICK REPLY SPECIAL HANDLERS ─────────────────
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('qr-btn')){
+    var txt = e.target.textContent;
+    if(txt === 'WhatsApp Karo'){
+      window.open(CONFIG.waLink + '&text=' + encodeURIComponent('Hello! I want to enquire about tin shed / steel structure.'), '_blank');
+      return;
+    }
+    if(txt === 'Call Now' || txt === 'Call Karen'){
+      window.location.href = 'tel:' + CONFIG.phone;
+      return;
+    }
+    sendMessage(txt);
+  }
+});
+
+// ── AUTO OPEN after 8 seconds ─────────────────────
+setTimeout(function(){
+  if(!isOpen && !hasOpened){
+    toggleChat();
+  }
+}, 8000);
+</script>
+</body>
+  </html>
+  
+</body></html>
