@@ -1,6 +1,45 @@
 /* R.R Teen Set Solution — main.js v3.0 */
 'use strict';
 
+// ── LOGO CLICK → HOME PAGE ──────────────────────
+document.querySelectorAll('.logo').forEach(function(logo){
+  logo.style.cursor = 'pointer';
+  logo.addEventListener('click', function(){
+    window.location.href = 'index.html';
+  });
+});
+
+
+// ── MOBILE LAYOUT FIX ───────────────────────────
+(function(){
+  var mobileStyle = document.createElement('style');
+  mobileStyle.textContent = [
+    /* Hero buttons — stack properly on mobile */
+    '@media(max-width:768px){',
+      /* Fix hero section top gap */
+      '#home,section:first-of-type{padding-top:80px!important;min-height:auto!important}',
+      /* Badge text wrap fix */
+      '#home div[style*="inline-flex"]{font-size:9px!important;padding:5px 10px!important;flex-wrap:wrap!important;gap:4px!important}',
+      /* Buttons — full width stacked */
+      '.flex-gap{flex-direction:column!important;gap:10px!important}',
+      '.flex-gap .btn,.flex-gap a{width:100%!important;justify-content:center!important;text-align:center!important}',
+      /* Fix 3 buttons not aligning */
+      '#home .flex-gap{display:flex!important;flex-direction:column!important}',
+      /* Hero title size */
+      '#home h1{font-size:44px!important;letter-spacing:1px!important}',
+      /* Hero paragraph */
+      '#home p{font-size:14px!important}',
+      /* Hide ghost image on mobile */
+      '#home>div[style*="absolute"]{display:none!important}',
+    '}',
+    '@media(max-width:480px){',
+      '#home h1{font-size:38px!important}',
+    '}',
+  ].join('');
+  document.head.appendChild(mobileStyle);
+})();
+
+
 // ── SOCIAL MEDIA ICONS ──────────────────────────
 var SOCIAL = {
   youtube:   'https://youtube.com/@subhashgupta6957',
