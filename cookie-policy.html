@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Policy — R.R Teen Set Solution</title>
+  <meta name="description" content="Cookie Policy explaining how R.R Teen Set Solution uses cookies on its website.">
+  <meta name="robots" content="index, follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cookie-consent.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f8f9fc; color: #1a1f36; line-height: 1.7; }
+
+    .policy-header {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a);
+      color: white; padding: 64px 24px 48px; text-align: center;
+    }
+    .policy-header .tag {
+      display: inline-block; background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2); padding: 4px 14px;
+      border-radius: 50px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: #93c5fd; margin-bottom: 16px;
+    }
+    .policy-header h1 { font-size: clamp(26px,5vw,40px); font-weight: 700; letter-spacing: -.03em; margin-bottom: 10px; }
+    .policy-header p { font-size: 15px; color: rgba(255,255,255,.6); }
+
+    .policy-body { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #2563eb; text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 32px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .effective-date {
+      font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 32px;
+      padding: 10px; background: white; border-radius: 8px; border: 1px solid #f3f4f6;
+    }
+
+    .policy-section { margin-bottom: 40px; scroll-margin-top: 24px; }
+    .policy-section h2 {
+      font-size: 20px; font-weight: 700; letter-spacing: -.02em; color: #0f172a;
+      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid #e5e7ef;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .policy-section h2 span { font-size: 22px; }
+    .policy-section p { font-size: 14.5px; color: #374151; margin-bottom: 12px; }
+    .policy-section ul { padding-left: 20px; margin-bottom: 14px; }
+    .policy-section li { font-size: 14.5px; color: #374151; margin-bottom: 6px; line-height: 1.65; }
+    .policy-section strong { color: #1a1f36; font-weight: 600; }
+
+    /* Cookie table */
+    .cookie-table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7ef; margin: 16px 0; }
+    .cookie-table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; }
+    .cookie-table th {
+      background: #0f172a; color: white; padding: 12px 16px;
+      text-align: left; font-weight: 600; font-size: 12px;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .cookie-table th:first-child { border-radius: 0; }
+    .cookie-table td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: #374151; vertical-align: top; line-height: 1.55; }
+    .cookie-table tr:last-child td { border-bottom: none; }
+    .cookie-table tr:hover td { background: #f8f9fc; }
+    .cookie-name { font-weight: 600; color: #0f172a; font-family: 'Courier New', monospace; font-size: 12px; }
+
+    /* Category badges */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+    .badge-necessary { background: #d1fae5; color: #065f46; }
+    .badge-analytics  { background: #dbeafe; color: #1e40af; }
+    .badge-marketing  { background: #fef3c7; color: #92400e; }
+
+    /* Info box */
+    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 16px 18px; margin: 16px 0; font-size: 14px; color: #1e40af; }
+    .warning-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 16px 18px; margin: 16px 0; font-size: 14px; color: #92400e; }
+
+    /* Manage prefs CTA */
+    .manage-cta {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: 12px; padding: 24px; text-align: center; margin: 32px 0;
+    }
+    .manage-cta h3 { color: white; font-size: 16px; margin-bottom: 8px; }
+    .manage-cta p { color: rgba(255,255,255,.7); font-size: 13px; margin-bottom: 16px; }
+    .manage-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px;
+      background: white; color: #1e3a8a; border-radius: 8px; font-weight: 700;
+      font-size: 13px; border: none; cursor: pointer; transition: all .2s; font-family: 'Inter', sans-serif;
+    }
+    .manage-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+
+    .contact-box { background: white; border: 1px solid #e5e7ef; border-radius: 12px; padding: 22px 24px; margin-top: 16px; }
+    .contact-box p { font-size: 14px; color: #374151; margin-bottom: 6px; }
+
+    footer { text-align: center; padding: 28px 24px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7ef; background: white; }
+  </style>
+</head>
+<body>
+
+  <div class="policy-header">
+    <div class="tag">Legal</div>
+    <h1>Cookie Policy</h1>
+    <p>What cookies we use, why, and how to control them</p>
+  </div>
+
+  <div class="policy-body">
+    <a href="index.html" class="back-link">← Back to Website</a>
+
+    <div class="effective-date">
+      📅 Effective Date: January 1, 2026 &nbsp;·&nbsp; Last Updated: April 2026
+    </div>
+
+    <!-- 1. What are cookies -->
+    <div class="policy-section">
+      <h2><span>🍪</span> 1. What Are Cookies?</h2>
+      <p>Cookies are small text files stored on your device (computer, tablet, or mobile phone) when you visit a website. They help websites remember information about your visit — like your preferences or consent choices.</p>
+      <p>Cookies are not programs and cannot carry viruses or install software. They simply store small pieces of text that websites can read on your next visit.</p>
+    </div>
+
+    <!-- 2. How we use cookies -->
+    <div class="policy-section">
+      <h2><span>⚙️</span> 2. How We Use Cookies</h2>
+      <p>R.R Teen Set Solution uses cookies for three purposes:</p>
+      <ul>
+        <li><strong>Necessary:</strong> To make the website work (navigation, form submissions, security)</li>
+        <li><strong>Analytics:</strong> To understand how visitors use our site so we can improve it</li>
+        <li><strong>Marketing:</strong> To show relevant ads and track marketing campaign performance</li>
+      </ul>
+      <div class="info-box">
+        <strong>Your choice matters:</strong> We only load Analytics and Marketing cookies after you give explicit consent. You can accept, reject, or customize your preferences at any time.
+      </div>
+    </div>
+
+    <!-- 3. Cookies we use -->
+    <div class="policy-section">
+      <h2><span>📊</span> 3. Cookies We Use</h2>
+
+      <p style="margin-bottom:12px"><strong>🔐 Necessary Cookies</strong> — Always active, cannot be disabled</p>
+      <div class="cookie-table-wrap">
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Purpose</th><th>Duration</th><th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cookie-name">cc_preferences</span></td>
+              <td>Stores your cookie consent preferences so the banner doesn't show repeatedly</td>
+              <td>Until manually cleared</td>
+              <td><span class="badge badge-necessary">Necessary</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin:24px 0 12px"><strong>📈 Analytics Cookies</strong> — Only with your consent</p>
+      <div class="cookie-table-wrap">
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Purpose</th><th>Duration</th><th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cookie-name">_ga</span></td>
+              <td>Google Analytics — distinguishes unique visitors. Helps us count how many people visit.</td>
+              <td>2 years</td>
+              <td><span class="badge badge-analytics">Analytics</span></td>
+            </tr>
+            <tr>
+              <td><span class="cookie-name">_ga_XXXXXXXX</span></td>
+              <td>Google Analytics — maintains session state and records page view data.</td>
+              <td>2 years</td>
+              <td><span class="badge badge-analytics">Analytics</span></td>
+            </tr>
+            <tr>
+              <td><span class="cookie-name">_gid</span></td>
+              <td>Google Analytics — distinguishes users. Expires after 24 hours.</td>
+              <td>24 hours</td>
+              <td><span class="badge badge-analytics">Analytics</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin:24px 0 12px"><strong>📢 Marketing Cookies</strong> — Only with your consent</p>
+      <div class="cookie-table-wrap">
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Purpose</th><th>Duration</th><th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cookie-name">_fbp</span></td>
+              <td>Facebook Pixel — tracks website visits for Facebook/Instagram ad targeting and conversion measurement.</td>
+              <td>3 months</td>
+              <td><span class="badge badge-marketing">Marketing</span></td>
+            </tr>
+            <tr>
+              <td><span class="cookie-name">_gcl_au</span></td>
+              <td>Google Ads — conversion tracking for paid advertising campaigns.</td>
+              <td>3 months</td>
+              <td><span class="badge badge-marketing">Marketing</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warning-box" style="margin-top:16px">
+        ⚠️ <strong>Marketing cookies are currently not active</strong> on this website. This table shows what would be used if Marketing consent is given and scripts are configured.
+      </div>
+    </div>
+
+    <!-- 4. Third-party cookies -->
+    <div class="policy-section">
+      <h2><span>🌐</span> 4. Third-Party Cookies</h2>
+      <p>Some cookies on our site are set by third-party services. We do not control these cookies — they are governed by the respective company's privacy policy:</p>
+      <ul>
+        <li><strong>Google Analytics:</strong> <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:#2563eb">Google Privacy Policy</a></li>
+        <li><strong>Google Fonts:</strong> <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:#2563eb">Google Privacy Policy</a></li>
+        <li><strong>Facebook Pixel (if enabled):</strong> <a href="https://www.facebook.com/policy.php" target="_blank" rel="noopener" style="color:#2563eb">Facebook Data Policy</a></li>
+        <li><strong>WhatsApp (click-through):</strong> <a href="https://www.whatsapp.com/legal/privacy-policy" target="_blank" rel="noopener" style="color:#2563eb">WhatsApp Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <!-- 5. How to manage cookies -->
+    <div class="policy-section">
+      <h2><span>🎛️</span> 5. How to Manage Your Cookie Preferences</h2>
+
+      <div class="manage-cta">
+        <h3>Change Your Preferences Anytime</h3>
+        <p>Use our Cookie Settings panel to update your consent in seconds</p>
+        <button class="manage-btn" onclick="CookieConsent.openSettings()">⚙️ Open Cookie Settings</button>
+      </div>
+
+      <p><strong>Through your browser:</strong> You can also control cookies via your browser settings:</p>
+      <ul>
+        <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener" style="color:#2563eb">Chrome</a></li>
+        <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" target="_blank" rel="noopener" style="color:#2563eb">Firefox</a></li>
+        <li><a href="https://support.apple.com/en-gb/guide/safari/sfri11471/mac" target="_blank" rel="noopener" style="color:#2563eb">Safari</a></li>
+        <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener" style="color:#2563eb">Microsoft Edge</a></li>
+      </ul>
+      <p>Note: Blocking all cookies may affect website functionality.</p>
+    </div>
+
+    <!-- 6. Updates -->
+    <div class="policy-section">
+      <h2><span>🔄</span> 6. Updates to This Policy</h2>
+      <p>We may update this Cookie Policy when we add new services or change how we use data. When we make significant changes, we increment the version in our consent system — which will prompt you to review your preferences again.</p>
+      <p>The effective date at the top of this page shows when it was last updated.</p>
+    </div>
+
+    <!-- 7. Contact -->
+    <div class="policy-section">
+      <h2><span>📬</span> 7. Contact & Questions</h2>
+      <p>Questions about cookies or your data?</p>
+      <div class="contact-box">
+        <p><strong>R.R Teen Set Solution</strong></p>
+        <p>📞 <a href="tel:+918527258462" style="color:#2563eb">+91 85272 58462</a></p>
+        <p>💬 <a href="https://api.whatsapp.com/send?phone=918527258462" style="color:#2563eb">WhatsApp Us</a></p>
+        <p>📍 New Delhi, India</p>
+        <p><a href="privacy-policy.html" style="color:#2563eb">← Read our Privacy Policy</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    © 2026 R.R Teen Set Solution, New Delhi. &nbsp;·&nbsp;
+    <a href="privacy-policy.html" style="color:#2563eb">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="index.html" style="color:#2563eb">Back to Website</a>
+  </footer>
+
+  <script src="cookie-consent.js"></script>
+</body>
+</html>
