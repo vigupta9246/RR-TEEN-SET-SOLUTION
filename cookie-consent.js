@@ -206,20 +206,7 @@
   }
 
   // ─── FLOATING SETTINGS BUTTON ─────────────────────────────
-  function buildFloatingBtn() {
-    const el = document.createElement('button');
-    el.id = 'cc-settings-btn';
-    el.setAttribute('aria-label', 'Open cookie settings');
-    el.title = 'Cookie Settings';
-    el.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" opacity=".2"/>
-        <circle cx="8" cy="9" r="1.5"/><circle cx="15" cy="9" r="1"/><circle cx="10" cy="15" r="1.5"/>
-        <circle cx="16" cy="15" r="1"/><circle cx="12" cy="6" r="1"/>
-      </svg>
-      <span>Cookie Settings</span>`;
-    return el;
-  }
+  function buildFloatingBtn() { return null; }
 
   // ─── BANNER SHOW / HIDE ───────────────────────────────────
   function showBanner(banner) {
@@ -310,12 +297,9 @@
   let floatingBtn = null;
 
   function showFloatingBtn() {
-    if (document.getElementById('cc-settings-btn')) return;
-    floatingBtn = buildFloatingBtn();
-    document.body.appendChild(floatingBtn);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => floatingBtn.classList.add('cc-visible'));
-    });
+    // Floating button hidden — user can re-open via footer link
+    return;
+  });
     floatingBtn.addEventListener('click', () => {
       showModal(loadPrefs());
     });
