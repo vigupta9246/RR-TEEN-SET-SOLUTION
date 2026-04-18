@@ -331,3 +331,89 @@ footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.07);padding
   nav,.wa-float,#chat-trigger,#chat-win,.hamburger,#mob-menu{display:none!important}
   section{padding:20px 0}
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   STRUCTURAL FIXES v4.1
+═══════════════════════════════════════════════════════════ */
+
+/* Hero — ensure full viewport on all devices */
+section[style*="min-height:100vh"] {
+  padding-top: calc(var(--nav-h) + 40px) !important;
+  min-height: 100svh !important;
+}
+
+/* Stats bar — equal columns, no cut-off on mobile */
+@media(max-width:768px) {
+  .stats-bar {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important;
+  }
+  .stat-item {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255,255,255,.07) !important;
+    padding: 18px 12px !important;
+  }
+  .stat-item:nth-child(1),
+  .stat-item:nth-child(3) {
+    border-right: 1px solid rgba(255,255,255,.07) !important;
+  }
+  .stat-item:nth-child(3),
+  .stat-item:nth-child(4) {
+    border-bottom: none !important;
+  }
+  .stat-num { font-size: 36px !important; }
+  .stat-lbl { font-size: 10px !important; margin-top: 3px; }
+}
+
+/* Section backgrounds respect dark mode */
+[data-theme="dark"] section[style*="background:var(--gray)"],
+[data-theme="dark"] .bg-gray { background: var(--bg-alt) !important; }
+
+/* Fix inline background overrides in dark mode */
+[data-theme="dark"] section[style*="background:#f4f7fb"],
+[data-theme="dark"] section[style*="background:var(--gray)"] {
+  background: var(--bg-alt) !important;
+}
+
+/* Cookie banner — ensure above WA float and chat */
+#cc-banner { z-index: 99990 !important; }
+
+/* Chat and WA positioning — no overlap with cookie banner */
+.wa-float { bottom: 80px !important; right: 22px !important; }
+#chat-trigger { bottom: 144px !important; right: 22px !important; }
+#chat-win { bottom: 210px !important; right: 22px !important; }
+
+/* When cookie banner is visible, push floats up */
+body:has(#cc-banner.cc-visible) .wa-float { bottom: 110px !important; }
+body:has(#cc-banner.cc-visible) #chat-trigger { bottom: 174px !important; }
+
+/* Feat list items — better mobile rendering */
+@media(max-width:768px) {
+  .feat-list li { font-size: 13.5px; }
+  .flex-gap.hero-btns {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .flex-gap.hero-btns .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Dark mode toggle in nav — proper position desktop */
+@media(min-width:769px) {
+  .theme-toggle { margin-left: 8px; }
+}
+
+/* Grid sections — consistent card heights */
+.grid-auto .scard,
+.grid-3 .scard {
+  height: 100%;
+}
+
+/* Smooth section transitions for dark mode */
+section, .stats-bar, footer, nav {
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
