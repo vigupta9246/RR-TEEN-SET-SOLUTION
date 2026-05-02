@@ -601,5 +601,5 @@ footer {
 }
 
 @media print {
-  nav, .wa-float, #ch-btn, #ch-win, .hamburger, #mob-menu { display: none !important; }
+  nav, .wa-float, .hamburger, #mob-menu { display: none !important; }
 }
