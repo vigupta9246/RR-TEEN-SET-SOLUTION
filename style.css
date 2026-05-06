@@ -149,7 +149,7 @@ nav {
   background: rgba(8, 13, 20, 0.92);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-bottom: 2px solid var(--accent);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 5%;
   transition: all var(--t-base) var(--ease);
@@ -577,7 +577,7 @@ footer {
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-auto { grid-template-columns: 1fr 1fr; }
   .stats-bar { grid-template-columns: 1fr 1fr; }
-  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .stat-item { border-right: none; border-bottom: 2px solid var(--accent); }
   .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.06); }
   .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom: none; }
   .stat-num { font-size: 36px; }
@@ -602,4 +602,656 @@ footer {
 
 @media print {
   nav, .wa-float, .hamburger, #mob-menu { display: none !important; }
+}
+
+
+/* ══════════════════════════════════════════════════════
+   DESIGN FIX v6.1 — Visual Polish & Consistency
+══════════════════════════════════════════════════════ */
+
+/* ── NAV FIXES ─────────────────────────────────────── */
+nav {
+  border-bottom: 2px solid var(--accent) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,.3);
+}
+.nav-cta {
+  background: var(--accent) !important;
+  color: #fff !important;
+  padding: 9px 22px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: .3px !important;
+  transition: all .2s !important;
+  box-shadow: 0 4px 14px rgba(255,111,0,.3) !important;
+}
+.nav-cta:hover {
+  background: #e65100 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(255,111,0,.45) !important;
+}
+
+/* ── HERO SECTION FIX ───────────────────────────────── */
+/* Remove the white gap */
+section[style*="min-height:100vh"] {
+  padding-top: calc(var(--nav-h, 68px) + 36px) !important;
+  min-height: 100svh !important;
+}
+
+/* Hero H1 — clean, readable */
+section[style*="min-height:100vh"] h1 {
+  font-size: clamp(36px, 6.5vw, 80px) !important;
+  line-height: .95 !important;
+  letter-spacing: 2px !important;
+}
+
+/* Hero sub-paragraph */
+section[style*="min-height:100vh"] > div > p:first-of-type {
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+  color: rgba(255,255,255,.72) !important;
+}
+
+/* Hero CTA buttons — clean, professional */
+section[style*="min-height:100vh"] a[href="contact.html"][style*="background:#ff6f00"],
+section[style*="min-height:100vh"] a[href="contact.html"][style*="background: #ff6f00"] {
+  background: var(--accent) !important;
+  color: #fff !important;
+  padding: 14px 30px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  box-shadow: 0 8px 24px rgba(255,111,0,.38) !important;
+}
+
+section[style*="min-height:100vh"] a[href="tel:+918527258462"] {
+  padding: 14px 30px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  color: #fff !important;
+  border: 1.5px solid rgba(255,255,255,.25) !important;
+}
+
+/* ── STATS BAR FIX ──────────────────────────────────── */
+.stats-bar {
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.stat-num {
+  font-size: clamp(28px, 4vw, 44px) !important;
+  color: var(--accent) !important;
+}
+.stat-lbl {
+  color: rgba(255,255,255,.55) !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.8px !important;
+}
+
+/* ── SECTION HEADINGS — CONSISTENT ─────────────────── */
+.section-title {
+  font-family: var(--font-h, 'Bebas Neue', sans-serif) !important;
+  letter-spacing: 1.5px !important;
+}
+.section-title span { color: var(--accent) !important; }
+.section-title-white span { color: #42a5f5 !important; }
+.tag {
+  background: rgba(255,111,0,.1) !important;
+  color: var(--accent) !important;
+  border: 1px solid rgba(255,111,0,.25) !important;
+  font-size: 10.5px !important;
+  letter-spacing: 2px !important;
+}
+
+/* ── CARDS — CONSISTENT ELEVATION ──────────────────── */
+.scard, .wcard, .tcard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+}
+.scard:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.1) !important;
+  border-color: var(--accent) !important;
+}
+.wcard:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.1) !important;
+}
+
+/* ── BUTTONS — UNIFIED DESIGN SYSTEM ───────────────── */
+.btn {
+  font-family: var(--font-b, 'Nunito', sans-serif) !important;
+  font-weight: 700 !important;
+  letter-spacing: .2px !important;
+  border-radius: 10px !important;
+  transition: all .22s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+.btn-blue   { background: linear-gradient(135deg, #2196f3, #1565c0) !important; color: #fff !important; }
+.btn-orange { background: var(--accent) !important; color: #fff !important; }
+.btn-green  { background: #25D366 !important; color: #fff !important; }
+.btn-white  { background: #fff !important; color: var(--accent) !important; }
+.btn-outline-white { background: transparent !important; color: #fff !important; border: 2px solid rgba(255,255,255,.35) !important; }
+.btn:hover  { transform: translateY(-2px) !important; filter: brightness(1.08) !important; }
+
+/* ── CTA BANNER — CONSISTENT ───────────────────────── */
+.cta-banner {
+  background: linear-gradient(135deg, var(--accent), #e65100) !important;
+}
+.cta-banner h2 { color: #fff !important; }
+.cta-banner p  { color: rgba(255,255,255,.88) !important; }
+
+/* ── FAQ / DETAILS — READABLE ───────────────────────── */
+details { border-radius: 10px !important; }
+summary { font-size: 14.5px !important; font-weight: 700 !important; }
+
+/* ── FOOTER — CLEAN ─────────────────────────────────── */
+footer { background: #080d14 !important; }
+.footer-col h5 { letter-spacing: 1.5px !important; font-size: 13px !important; }
+.footer-col ul li a { font-size: 13px !important; }
+.footer-contact p { font-size: 13px !important; }
+.gst-pill { font-size: 10.5px !important; }
+
+/* ── FAB BUTTONS — POSITIONED CORRECTLY ─────────────── */
+.fab-wrap {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 22px !important;
+  z-index: 9990 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 10px !important;
+}
+.fab-call {
+  background: linear-gradient(135deg, #ff6f00, #e65100) !important;
+  box-shadow: 0 6px 20px rgba(255,111,0,.45) !important;
+}
+.fab-wa {
+  background: #25D366 !important;
+  box-shadow: 0 6px 20px rgba(37,211,102,.45) !important;
+}
+
+/* ── MOBILE TYPOGRAPHY FIX ──────────────────────────── */
+@media (max-width: 768px) {
+  section[style*="min-height:100vh"] h1 {
+    font-size: clamp(32px, 9vw, 56px) !important;
+  }
+  section[style*="min-height:100vh"] {
+    padding-top: calc(60px + 28px) !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+    padding-bottom: 48px !important;
+  }
+  .nav-cta { display: none !important; }
+  .stats-bar {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .stat-item:nth-child(odd) {
+    border-right: 1px solid rgba(255,255,255,.07) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  section[style*="min-height:100vh"] h1 {
+    font-size: clamp(28px, 10vw, 44px) !important;
+  }
+  .fab-call, .fab-wa {
+    width: 46px !important;
+    height: 46px !important;
+  }
+}
+
+/* ── DARK MODE CONSISTENCY ──────────────────────────── */
+[data-theme="dark"] {
+  --bg:         #0d1117 !important;
+  --bg-alt:     #161b22 !important;
+  --bg-card:    #1c2333 !important;
+  --text:       #e6edf3 !important;
+  --text-muted: #8b949e !important;
+  --border:     #30363d !important;
+}
+[data-theme="dark"] .scard,
+[data-theme="dark"] .wcard,
+[data-theme="dark"] .tcard {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] details {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   VISUAL DESIGN FIXES v5.1 — Color, Contrast, Typography
+═══════════════════════════════════════════════════════ */
+
+/* ── FONT CONSISTENCY ───────────────────────────────── */
+body, p, li, input, textarea, select, button {
+  font-family: 'Inter', 'Nunito', system-ui, sans-serif;
+}
+h1, h2, h3, h4 {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+/* ── HERO — fix white gap, ensure full coverage ────── */
+section[style*="min-height:100vh"] {
+  padding-top: calc(var(--nav-h, 68px) + 40px) !important;
+  min-height: 100dvh !important;
+}
+
+/* ── BUTTONS — consistent, professional ────────────── */
+a[style*="background:#ff6f00"],
+button[style*="background:#ff6f00"] {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: .3px !important;
+}
+
+/* ── SECTION BACKGROUNDS — proper contrast ─────────── */
+section { background: var(--bg); }
+section[style*="background:var(--gray)"],
+section.bg-alt { background: var(--bg-alt) !important; }
+
+/* ── DARK SECTIONS — ensure white text ─────────────── */
+section[style*="background:#0a1628"],
+section[style*="background:linear-gradient(135deg,#0a"],
+section[style*="background:linear-gradient(180deg"] {
+  color: #fff;
+}
+section[style*="background:#0a1628"] p,
+section[style*="background:linear-gradient(135deg,#0a"] p {
+  color: rgba(255,255,255,.7) !important;
+}
+
+/* ── STATS BAR ──────────────────────────────────────── */
+.stats-bar {
+  background: linear-gradient(135deg, #0a1628 0%, #111f3a 100%) !important;
+}
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  color: #ff6f00;
+  line-height: 1;
+}
+.stat-lbl {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+}
+
+/* ── SERVICE CARDS — consistent ────────────────────── */
+.scard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+}
+.scard h3 { color: var(--text) !important; font-size: 19px !important; }
+.scard p  { color: var(--text-muted) !important; font-size: 13.5px !important; }
+.scard-link { color: var(--blue) !important; }
+
+/* ── WHY CARDS ──────────────────────────────────────── */
+.wcard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.wcard h4 { color: var(--text) !important; }
+.wcard p  { color: var(--text-muted) !important; }
+
+/* ── TESTIMONIAL CARDS ──────────────────────────────── */
+.tcard { background: var(--bg-card) !important; }
+.tcard-text { color: var(--text-2) !important; }
+.tcard-name { color: var(--text) !important; }
+.tcard-loc  { color: var(--text-muted) !important; }
+
+/* ── GALLERY OVERLAYS ───────────────────────────────── */
+.gallery-overlay {
+  background: linear-gradient(0deg, rgba(10,22,40,.88) 0%, rgba(10,22,40,.15) 55%, transparent 100%) !important;
+}
+.gallery-overlay-text { color: #fff !important; font-family: 'Inter', sans-serif; }
+
+/* ── PROCESS STEPS ──────────────────────────────────── */
+.pstep h4 { color: var(--text) !important; font-size: 14px !important; }
+.pstep p  { color: var(--text-muted) !important; }
+
+/* ── CONTACT FORM ───────────────────────────────────── */
+.fgroup label { letter-spacing: .8px !important; }
+
+/* ── SECTION TITLES — proper color in light sections ── */
+section:not([style*="background:#0a1628"]):not([style*="background:linear-gradient(135deg,#0a"]):not([style*="background:linear-gradient(180deg"]) .section-title {
+  color: var(--text) !important;
+}
+section:not([style*="background:#0a1628"]):not([style*="background:linear-gradient(135deg,#0a"]) .section-sub {
+  color: var(--text-muted) !important;
+}
+.section-title span { color: #1565c0 !important; }
+
+/* ── TAG LABELS ─────────────────────────────────────── */
+.tag {
+  background: rgba(21,101,192,.08) !important;
+  color: #1565c0 !important;
+  border: 1px solid rgba(21,101,192,.18) !important;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 1.5px !important;
+}
+.tag-dark {
+  background: rgba(33,150,243,.12) !important;
+  color: #42a5f5 !important;
+  border-color: rgba(33,150,243,.25) !important;
+}
+
+/* ── CTA BANNER ─────────────────────────────────────── */
+.cta-banner h2 { letter-spacing: 1.5px !important; }
+.cta-banner p  { font-family: 'Inter', sans-serif !important; }
+
+/* ── FOOTER ─────────────────────────────────────────── */
+footer { background: #070e1c !important; }
+.footer-about p { color: rgba(255,255,255,.5) !important; }
+.footer-col h5  { color: #fff !important; font-family: 'Bebas Neue', sans-serif !important; letter-spacing: 2px !important; }
+.footer-col ul li a { color: rgba(255,255,255,.48) !important; transition: color .2s !important; }
+.footer-col ul li a:hover { color: #42a5f5 !important; }
+.footer-contact p { color: rgba(255,255,255,.5) !important; }
+.footer-contact a { color: #42a5f5 !important; }
+.footer-copy { color: rgba(255,255,255,.3) !important; font-family: 'Inter', sans-serif !important; }
+
+/* ── FAB BUTTONS — refined ──────────────────────────── */
+.fab-wrap { bottom: 28px !important; right: 24px !important; gap: 12px !important; }
+.fab-call {
+  width: 52px !important; height: 52px !important;
+  background: linear-gradient(135deg, #ff6f00, #e64a00) !important;
+  box-shadow: 0 6px 20px rgba(255,111,0,.4) !important;
+}
+.fab-wa {
+  width: 52px !important; height: 52px !important;
+  background: #25D366 !important;
+  box-shadow: 0 6px 20px rgba(37,211,102,.4) !important;
+}
+
+/* ── DARK MODE OVERRIDES ────────────────────────────── */
+[data-theme="dark"] .scard,
+[data-theme="dark"] .wcard,
+[data-theme="dark"] .tcard { 
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] .scard h3,
+[data-theme="dark"] .wcard h4,
+[data-theme="dark"] .tcard-name { color: var(--text) !important; }
+[data-theme="dark"] .scard p,
+[data-theme="dark"] .wcard p,
+[data-theme="dark"] .tcard-text { color: var(--text-muted) !important; }
+[data-theme="dark"] .tag { background: rgba(33,150,243,.12) !important; color: #42a5f5 !important; }
+[data-theme="dark"] details { background: var(--bg-card) !important; }
+[data-theme="dark"] .stats-bar { background: linear-gradient(135deg,#070e1c,#0f1f3d) !important; }
+
+/* ── MOBILE FIXES ───────────────────────────────────── */
+@media(max-width: 768px) {
+  section[style*="min-height:100vh"] {
+    padding-top: calc(var(--nav-h, 62px) + 32px) !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+  }
+  .stat-num { font-size: 34px !important; }
+  .section-title { font-size: clamp(26px, 6vw, 44px) !important; }
+  .tag { font-size: 10px !important; padding: 4px 13px !important; }
+}
+@media(max-width: 480px) {
+  section[style*="min-height:100vh"] h1 {
+    font-size: clamp(36px, 9vw, 58px) !important;
+  }
+  .fab-wrap { bottom: 20px !important; right: 16px !important; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   VISUAL POLISH v5.0 — Fix all layout & color issues
+   Based on screenshot analysis April 2026
+═══════════════════════════════════════════════════════════ */
+
+/* ── NAV — no gap below ─────────────────────────────────── */
+nav {
+  height: 66px !important;
+  border-bottom: 3px solid var(--accent) !important;
+}
+
+/* ── HERO — fill viewport properly ─────────────────────── */
+section[style*="min-height:100svh"],
+section[style*="min-height:100vh"] {
+  padding-top: 100px !important;
+  padding-bottom: 60px !important;
+}
+
+/* ── HERO H1 — better readability ──────────────────────── */
+section[style*="min-height:100svh"] h1,
+section[style*="min-height:100vh"] h1 {
+  font-size: clamp(38px, 6vw, 78px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 1.5px !important;
+  color: #fff !important;
+  margin-bottom: 20px !important;
+}
+
+/* ── HERO SUBTEXT — better contrast ────────────────────── */
+section[style*="min-height:100svh"] p,
+section[style*="min-height:100vh"] p {
+  color: rgba(255,255,255,.75) !important;
+}
+
+/* ── HERO BADGE ─────────────────────────────────────────── */
+section[style*="min-height:100svh"] > div > div:first-child > div:first-child {
+  margin-bottom: 22px;
+}
+
+/* ── HERO BUTTONS — consistent sizing ──────────────────── */
+section[style*="min-height:100svh"] a,
+section[style*="min-height:100vh"] a {
+  font-size: 14px !important;
+  padding: 14px 28px !important;
+  border-radius: 8px !important;
+  letter-spacing: .3px !important;
+}
+
+/* ── SECTION BG COLORS — consistent dark mode aware ─────── */
+section { background: var(--bg); }
+section[style*="background:var(--gray)"],
+section[style*="background:#f4f7fb"] {
+  background: var(--bg-alt) !important;
+}
+[data-theme="dark"] section[style*="background:var(--gray)"],
+[data-theme="dark"] section[style*="background:#f4f7fb"] {
+  background: var(--bg-alt) !important;
+}
+
+/* ── STATS BAR — proper colors ──────────────────────────── */
+.stats-bar {
+  background: linear-gradient(135deg, #0a1628, #0d2137) !important;
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+}
+.stat-num { color: var(--accent) !important; }
+.stat-lbl { color: rgba(255,255,255,.55) !important; }
+
+/* ── GBP BADGE — spacing fix ───────────────────────────── */
+div[style*="background:linear-gradient(135deg,#0a1628,#0d2137)"] {
+  padding: 14px 6% !important;
+}
+
+/* ── SECTION TITLES — consistent hierarchy ──────────────── */
+.section-title { color: var(--text) !important; }
+.section-title span { color: var(--blue) !important; }
+.section-sub { color: var(--text-muted) !important; line-height: 1.75 !important; }
+
+/* ── SERVICE CARDS — clean design ──────────────────────── */
+.scard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  transition: all .3s ease !important;
+}
+.scard:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.1) !important;
+  border-color: var(--sky) !important;
+}
+.scard h3 { color: var(--text) !important; }
+.scard p  { color: var(--text-muted) !important; }
+
+/* ── WHY CARDS ──────────────────────────────────────────── */
+.wcard { background: var(--bg-card) !important; border: 1px solid var(--border) !important; }
+.wcard h4 { color: var(--text) !important; font-size: 16px !important; }
+.wcard p  { color: var(--text-muted) !important; font-size: 13px !important; }
+
+/* ── TESTIMONIAL CARDS ──────────────────────────────────── */
+.tcard { background: var(--bg-card) !important; border: 1px solid var(--border) !important; }
+.tcard-text { color: var(--text-muted) !important; }
+.tcard-name { color: var(--text) !important; }
+
+/* ── CONTACT FORM — dark section ───────────────────────── */
+section[style*="background:linear-gradient(135deg,#0a1628,#1a3a5c)"] h2 {
+  color: #fff !important;
+}
+
+/* ── FOOTER — fix color issues ─────────────────────────── */
+footer {
+  background: #0a1628 !important;
+  color: rgba(255,255,255,.55) !important;
+}
+.footer-col h5 {
+  color: #fff !important;
+  font-size: 13px !important;
+  letter-spacing: 1px !important;
+  margin-bottom: 14px !important;
+}
+.footer-col ul li a {
+  color: rgba(255,255,255,.5) !important;
+  font-size: 13px !important;
+  transition: color .2s !important;
+}
+.footer-col ul li a:hover { color: var(--sky) !important; }
+.footer-contact p { color: rgba(255,255,255,.5) !important; font-size: 13px !important; }
+/* Fix red phone — make it sky blue */
+.footer-contact a { color: #60a5fa !important; }
+.footer-contact a:hover { color: #93c5fd !important; }
+.footer-copy { color: rgba(255,255,255,.3) !important; font-size: 12px !important; }
+.gst-pill {
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  color: rgba(255,255,255,.4) !important;
+  font-size: 11px !important;
+}
+/* Footer about text */
+.footer-about p { color: rgba(255,255,255,.45) !important; }
+.logo-name { letter-spacing: 1px !important; }
+
+/* ── CTA BANNER — clean orange ──────────────────────────── */
+.cta-banner {
+  background: linear-gradient(135deg, #e65100, #bf360c) !important;
+}
+.cta-banner h2 { color: #fff !important; }
+.cta-banner p  { color: rgba(255,255,255,.85) !important; }
+
+/* ── FAB BUTTONS — clean positioning ───────────────────── */
+.fab-wrap {
+  bottom: 24px !important;
+  right: 20px !important;
+  gap: 10px !important;
+}
+.fab-call {
+  background: linear-gradient(135deg, #ff6f00, #e65100) !important;
+  box-shadow: 0 6px 18px rgba(255,111,0,.4) !important;
+}
+.fab-wa {
+  background: #25D366 !important;
+  box-shadow: 0 6px 18px rgba(37,211,102,.4) !important;
+}
+.fab-btn { transition: transform .2s, box-shadow .2s !important; }
+.fab-btn:hover {
+  transform: scale(1.08) translateY(-2px) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.25) !important;
+}
+
+/* ── GALLERY — clean dark background ───────────────────── */
+section[style*="background:#0a1628"],
+section[style*="background:linear-gradient(180deg"] {
+  background: #0a1628 !important;
+}
+.gallery-item { border-radius: 12px !important; overflow: hidden !important; }
+
+/* ── PROCESS STEPS ──────────────────────────────────────── */
+.pnum { 
+  background: linear-gradient(135deg, var(--sky), var(--blue)) !important;
+  box-shadow: 0 4px 16px rgba(33,150,243,.3) !important;
+}
+.pstep h4 { color: var(--text) !important; }
+.pstep p  { color: var(--text-muted) !important; }
+
+/* ── FAQ / DETAILS ──────────────────────────────────────── */
+details {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+summary { color: var(--text) !important; }
+details p { color: var(--text-muted) !important; }
+
+/* ── DARK MODE SECTION BGs ──────────────────────────────── */
+[data-theme="dark"] .scard,
+[data-theme="dark"] .wcard,
+[data-theme="dark"] .tcard,
+[data-theme="dark"] details {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] .cta-banner { background: linear-gradient(135deg,#bf360c,#7f2200) !important; }
+[data-theme="dark"] .stats-bar  { background: #060c16 !important; }
+
+/* ── MOBILE FIXES ───────────────────────────────────────── */
+@media(max-width:768px) {
+  section[style*="min-height:100svh"],
+  section[style*="min-height:100vh"] {
+    padding-top: 90px !important;
+    padding-bottom: 48px !important;
+    min-height: auto !important;
+  }
+  section[style*="min-height:100svh"] h1,
+  section[style*="min-height:100vh"] h1 {
+    font-size: clamp(34px, 9vw, 56px) !important;
+    letter-spacing: 1px !important;
+    line-height: 1.1 !important;
+  }
+  /* Hero buttons — full width on mobile */
+  section[style*="min-height:100svh"] div[style*="display:flex"][style*="flex-wrap:wrap"],
+  section[style*="min-height:100vh"] div[style*="display:flex"][style*="flex-wrap:wrap"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  section[style*="min-height:100svh"] a,
+  section[style*="min-height:100vh"] a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+  .stats-bar   { grid-template-columns: 1fr 1fr !important; }
+  .stat-item   { padding: 16px 10px !important; }
+  .fab-wrap    { bottom: 16px !important; right: 14px !important; }
+}
+
+@media(max-width:480px) {
+  .footer-grid { grid-template-columns: 1fr !important; }
+  section[style*="min-height:100svh"] h1,
+  section[style*="min-height:100vh"] h1 {
+    font-size: clamp(30px, 10vw, 44px) !important;
+  }
 }
