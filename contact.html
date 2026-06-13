@@ -98,25 +98,45 @@
     <div class="cform">
       <h3 style="font-family:var(--font-h);font-size:26px;color:white;letter-spacing:1px;margin-bottom:6px">Send Enquiry</h3>
       <p style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:20px">We'll reply within 2 hours with a detailed quote.</p>
-      <form onsubmit="handleEnquiry(event)" novalidate>
-  <div class="frow">
-    <div class="fgroup"><label>Your Name *</label><input type="text" name="name" placeholder="Ramesh Kumar" required></div>
-    <div class="fgroup"><label>Phone / WhatsApp *</label><input type="tel" name="phone" placeholder="+91 98765 43210" required></div>
-  </div>
-  <div class="fgroup"><label>Service Required</label>
-    <select name="service">
-      <option>Tin Shed Fabrication</option><option>Industrial Shed</option>
-      <option>Prefab Warehouse</option><option>PEB Structure</option>
-      <option>Prefab Factory Shed</option><option>Agricultural Shed</option><option>Other</option>
-    </select>
-  </div>
-  <div class="frow">
-    <div class="fgroup"><label>Area (sq.ft approx)</label><input type="text" name="area" placeholder="e.g. 2000 sq.ft"></div>
-    <div class="fgroup"><label>Your City</label><input type="text" name="city" placeholder="Delhi, Noida, Gurgaon..."></div>
-  </div>
-  <div class="fgroup"><label>Additional Requirements</label><textarea name="message" placeholder="Tell us about your project..."></textarea></div>
-  <button type="submit" class="submit-btn">📲 Send Enquiry on WhatsApp →</button>
-</form>
+
+      <!-- SUCCESS MESSAGE (hidden by default) -->
+      <div id="form-success" style="display:none;background:rgba(37,211,102,.12);border:1.5px solid rgba(37,211,102,.4);border-radius:12px;padding:20px 18px;margin-bottom:20px;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">✅</div>
+        <div style="color:#25D366;font-weight:700;font-size:16px;margin-bottom:4px">Enquiry Sent Successfully!</div>
+        <div style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.6">Email hamare paas pahunch gayi.<br>Hum <strong style="color:white">2 ghante mein</strong> call/WhatsApp karenge.</div>
+        <a href="https://api.whatsapp.com/send?phone=918527258462&text=Hello!%20Maine%20website%20pe%20enquiry%20bheji%20hai." target="_blank" rel="noopener" style="display:inline-block;margin-top:14px;background:#25D366;color:white;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">💬 WhatsApp pe bhi connect karein</a>
+      </div>
+
+      <!-- ERROR MESSAGE (hidden by default) -->
+      <div id="form-error" style="display:none;background:rgba(244,67,54,.12);border:1.5px solid rgba(244,67,54,.4);border-radius:12px;padding:16px 18px;margin-bottom:20px;text-align:center">
+        <div style="color:#f44336;font-weight:700;font-size:14px;margin-bottom:4px">⚠️ Email send nahi hui</div>
+        <div style="color:rgba(255,255,255,.65);font-size:13px">Koi problem aagayi. WhatsApp se directly contact karein:</div>
+        <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">💬 WhatsApp Now</a>
+      </div>
+
+      <form id="enquiry-form" novalidate>
+        <!-- Formspree honeypot spam protection -->
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+        <div class="frow">
+          <div class="fgroup"><label>Your Name *</label><input type="text" name="name" id="f-name" placeholder="Ramesh Kumar" required></div>
+          <div class="fgroup"><label>Phone / WhatsApp *</label><input type="tel" name="phone" id="f-phone" placeholder="+91 98765 43210" required></div>
+        </div>
+        <div class="fgroup"><label>Service Required</label>
+          <select name="service">
+            <option>Tin Shed Fabrication</option><option>Industrial Shed</option>
+            <option>Prefab Warehouse</option><option>PEB Structure</option>
+            <option>Prefab Factory Shed</option><option>Agricultural Shed</option><option>Other</option>
+          </select>
+        </div>
+        <div class="frow">
+          <div class="fgroup"><label>Area (sq.ft approx)</label><input type="text" name="area" placeholder="e.g. 2000 sq.ft"></div>
+          <div class="fgroup"><label>Your City</label><input type="text" name="city" placeholder="Delhi, Noida, Gurgaon..."></div>
+        </div>
+        <div class="fgroup"><label>Additional Requirements</label><textarea name="message" placeholder="Tell us about your project..."></textarea></div>
+        <button type="submit" id="submit-btn" class="submit-btn">📧 Send Enquiry →</button>
+        <p style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-top:10px">📧 Email + 💬 WhatsApp — dono taraf se reply milegi</p>
+      </form>
     </div>
   </div>
 </section>
