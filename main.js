@@ -85,31 +85,102 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 /* ════════════════════════════════════════════════════════════
-   6. ENQUIRY FORM → WHATSAPP
+   6. ENQUIRY FORM → FORMSPREE (EMAIL) + WHATSAPP
+   Replace YOUR_FORMSPREE_ID with actual ID from formspree.io
 ════════════════════════════════════════════════════════════ */
-window.handleEnquiry=function(e){
-  e.preventDefault();
-  var f=e.target;
-  function g(n){ return ((f.querySelector('[name="'+n+'"]')||{}).value||'').trim(); }
-  var name=g('name'), phone=g('phone'), svc=g('service')||'General Enquiry', area=g('area'), city=g('city'), msg=g('message');
-  function err(field,txt){
-    var i=f.querySelector('[name="'+field+'"]'); if(!i) return;
-    i.style.borderColor='#f44336'; i.focus();
-    var s=i.parentNode.querySelector('.err-msg');
-    if(!s){s=document.createElement('span');s.className='err-msg';s.style.cssText='font-size:11px;color:#f44336;margin-top:3px;display:block';i.parentNode.appendChild(s);}
-    s.textContent=txt; setTimeout(function(){i.style.borderColor='';s.textContent='';},3000);
-  }
-  if(!name){err('name','Please enter your name');return;}
-  if(!phone||phone.replace(/\D/g,'').length<10){err('phone','Enter valid 10-digit number');return;}
-  var lines=['Hello R.R Teen Set Solution! \uD83C\uDFD7\uFE0F','','*New Website Enquiry*','\u2500'.repeat(18),'Name: '+name,'Phone: '+phone,'Service: '+svc,area?'Area: '+area:'',city?'City: '+city:'',msg?'Message: '+msg:'','','Please call me. Thank you!'].filter(Boolean).join('\n');
-  var btn=f.querySelector('button[type="submit"]'), orig=btn.textContent;
-  btn.textContent='Opening WhatsApp\u2026'; btn.disabled=true; btn.style.background='#25D366';
-  setTimeout(function(){
-    window.open('https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(lines),'_blank');
-    btn.textContent='\u2705 Sent! We will call you soon.'; f.reset();
-    setTimeout(function(){btn.textContent=orig;btn.disabled=false;btn.style.background='';},3500);
-  },400);
-};
+(function(){
+  var FORMSPREE_ID = 'xkoappra';
+  var WHATSAPP_NUM = '918527258462';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var form = document.getElementById('enquiry-form');
+    if(!form) return;
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+
+      function gv(n){ return ((form.querySelector('[name="'+n+'"]')||{}).value||'').trim(); }
+      var name=gv('name'), phone=gv('phone'), svc=gv('service')||'General Enquiry';
+      var area=gv('area'), city=gv('city'), msg=gv('message');
+
+      // Validation
+      function showErr(field, txt){
+        var inp = form.querySelector('[name="'+field+'"]'); if(!inp) return;
+        inp.style.borderColor='#f44336'; inp.focus();
+        var s = inp.parentNode.querySelector('.err-msg');
+        if(!s){ s=document.createElement('span'); s.className='err-msg'; s.style.cssText='font-size:11px;color:#f44336;margin-top:3px;display:block'; inp.parentNode.appendChild(s); }
+        s.textContent=txt; setTimeout(function(){ inp.style.borderColor=''; s.textContent=''; }, 3000);
+      }
+      if(!name){ showErr('name','Please enter your name'); return; }
+      if(!phone||phone.replace(/\D/g,'').length<10){ showErr('phone','Enter valid 10-digit number'); return; }
+
+      // Button loading state
+      var btn = document.getElementById('submit-btn');
+      var origTxt = btn.textContent;
+      btn.textContent = '⏳ Sending...';
+      btn.disabled = true;
+
+      // Build form data for Formspree
+      var formData = new FormData();
+      formData.append('name', name);
+      formData.append('phone', phone);
+      formData.append('service', svc);
+      formData.append('area', area || 'Not specified');
+      formData.append('city', city || 'Not specified');
+      formData.append('message', msg || 'No additional requirements');
+      formData.append('_subject', 'New Enquiry: '+svc+' — '+name+' ('+city+')');
+      formData.append('_replyto', '');
+
+      // Submit to Formspree
+      fetch('https://formspree.io/f/'+FORMSPREE_ID, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function(res){ return res.json().then(function(d){ return {ok:res.ok, data:d}; }); })
+      .then(function(r){
+        var successDiv = document.getElementById('form-success');
+        var errorDiv   = document.getElementById('form-error');
+
+        if(r.ok){
+          // Show success message
+          form.style.display = 'none';
+          if(successDiv) successDiv.style.display = 'block';
+
+          // Also open WhatsApp after short delay
+          var waLines = [
+            'Hello R.R Teen Set Solution! 🏗️','',
+            '*New Website Enquiry*','─'.repeat(16),
+            'Name: '+name,
+            'Phone: '+phone,
+            'Service: '+svc,
+            area?'Area: '+area:'',
+            city?'City: '+city:'',
+            msg?'Message: '+msg:'','',
+            'Please call me. Thank you!'
+          ].filter(Boolean).join('\n');
+
+          setTimeout(function(){
+            window.open('https://api.whatsapp.com/send?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(waLines),'_blank');
+          }, 1200);
+
+        } else {
+          // Formspree error — show error, still open WhatsApp
+          btn.textContent = origTxt; btn.disabled = false;
+          if(errorDiv) errorDiv.style.display = 'block';
+          setTimeout(function(){ if(errorDiv) errorDiv.style.display='none'; }, 8000);
+        }
+      })
+      .catch(function(){
+        // Network error fallback — open WhatsApp directly
+        btn.textContent = origTxt; btn.disabled = false;
+        var errorDiv = document.getElementById('form-error');
+        if(errorDiv) errorDiv.style.display = 'block';
+        setTimeout(function(){ if(errorDiv) errorDiv.style.display='none'; }, 8000);
+      });
+    });
+  });
+})();
 
 /* ════════════════════════════════════════════════════════════
    7. SOCIAL ICONS (YouTube, Facebook, Instagram)
