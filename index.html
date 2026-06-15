@@ -77,17 +77,58 @@
 </div>
 <section id="home" style="min-height:100svh;background:#0a1628;display:flex;align-items:center;padding:calc(var(--nav-h, 66px) + 40px) 6% 70px;position:relative;overflow:hidden">
 
-  <!-- Real project photo background -->
-  <div style="position:absolute;inset:0;background-image:url('images/hero-bg.jpg');background-size:cover;background-position:center center;background-repeat:no-repeat;" aria-hidden="true"></div>
+  <!-- ── HERO SLIDESHOW — 9 real project photos ── -->
+  <div id="hero-slides" aria-hidden="true" style="position:absolute;inset:0;z-index:0;">
+    <div class="hslide active" style="background-image:url('images/project-000.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-001.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-002.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-003.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-004.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-005.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-006.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-007.jpg')"></div>
+    <div class="hslide" style="background-image:url('images/project-008.jpg')"></div>
+  </div>
 
-  <!-- Dark overlay — text readable rakhe, brand color tint -->
-  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(8,18,40,0.88) 0%,rgba(10,22,48,0.82) 40%,rgba(8,18,40,0.75) 100%);pointer-events:none" aria-hidden="true"></div>
+  <!-- Slideshow dots indicator -->
+  <div id="hero-dots" aria-hidden="true" style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:3;">
+    <span class="hdot active"></span><span class="hdot"></span><span class="hdot"></span>
+    <span class="hdot"></span><span class="hdot"></span><span class="hdot"></span>
+    <span class="hdot"></span><span class="hdot"></span><span class="hdot"></span>
+  </div>
 
-  <!-- Orange accent glow (brand color) -->
-  <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 80% 60%,rgba(255,111,0,.10) 0%,transparent 55%);pointer-events:none" aria-hidden="true"></div>
+  <!-- Dark overlay — text readable -->
+  <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(8,18,40,0.87) 0%,rgba(10,22,48,0.80) 45%,rgba(8,18,40,0.72) 100%);pointer-events:none"></div>
 
-  <!-- Subtle grid overlay for steel/industrial feel -->
-  <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,.012) 80px,rgba(255,255,255,.012) 81px),repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(255,255,255,.012) 80px,rgba(255,255,255,.012) 81px);pointer-events:none" aria-hidden="true"></div>
+  <!-- Orange brand glow -->
+  <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle at 80% 60%,rgba(255,111,0,.10) 0%,transparent 55%);pointer-events:none"></div>
+
+  <!-- Grid overlay — industrial feel -->
+  <div style="position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,.012) 80px,rgba(255,255,255,.012) 81px),repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(255,255,255,.012) 80px,rgba(255,255,255,.012) 81px);pointer-events:none"></div>
+
+  <style>
+    .hslide{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:0;transition:opacity 1.2s ease-in-out;}
+    .hslide.active{opacity:1;}
+    .hdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);transition:all .4s;cursor:pointer;border:none;display:inline-block;}
+    .hdot.active{background:#ff6f00;width:24px;border-radius:4px;}
+  </style>
+
+  <script>
+    (function(){
+      var slides=document.querySelectorAll('.hslide');
+      var dots=document.querySelectorAll('.hdot');
+      var cur=0;
+      function goTo(n){
+        slides[cur].classList.remove('active');
+        dots[cur].classList.remove('active');
+        cur=(n+slides.length)%slides.length;
+        slides[cur].classList.add('active');
+        dots[cur].classList.add('active');
+      }
+      dots.forEach(function(d,i){d.addEventListener('click',function(){goTo(i);});});
+      setInterval(function(){goTo(cur+1);},3000);
+    })();
+  </script>
 
   <div style="position:relative;z-index:2;width:100%;max-width:720px">
 
