@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vigupta9246.github.io/RR-TEEN-SET-SOLUTION/sitemap.xml
