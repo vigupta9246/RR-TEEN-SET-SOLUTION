@@ -257,3 +257,42 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   });
 })();
+
+/* ════════════════════════════════════════════════════════════
+   AUTO-INJECT CALCULATOR LINK IN NAV — ALL PAGES
+   Har page ke nav mein Calculator link automatically add hoga
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+
+    /* ── Desktop Nav ── */
+    var navLinks = document.querySelector('ul.nav-links');
+    if(navLinks){
+      // Already added check
+      if(!navLinks.querySelector('a[href*="shed-cost-calculator"]')){
+        var contactLi = navLinks.querySelector('a[href="contact.html"]');
+        if(contactLi && contactLi.parentNode){
+          var li = document.createElement('li');
+          li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>';
+          navLinks.insertBefore(li, contactLi.parentNode);
+        }
+      }
+    }
+
+    /* ── Mobile Menu ── */
+    var mobMenu = document.getElementById('mob-menu');
+    if(mobMenu){
+      if(!mobMenu.querySelector('a[href*="shed-cost-calculator"]')){
+        var mobCta = mobMenu.querySelector('.mob-cta-btn');
+        if(mobCta){
+          var a = document.createElement('a');
+          a.href = 'shed-cost-calculator.html';
+          a.textContent = '🧮 Cost Calculator';
+          a.style.cssText = 'color:#ff6f00;font-weight:700';
+          mobMenu.insertBefore(a, mobCta);
+        }
+      }
+    }
+
+  });
+})();
