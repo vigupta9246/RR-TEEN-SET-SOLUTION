@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R.R Teen Set Solution — Quotation System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#ff6f00;--orange-light:#ffab40;--navy:#0a1628;--navy-2:#1a2d4a;
+  --bg:#f0f4f9;--card:#ffffff;--border:#e2e8f0;--text:#0a1628;--muted:#64748b;
+  --green:#22c55e;--red:#ef4444;--sidebar-w:240px;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%)}
+.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 24px 80px rgba(0,0,0,0.2)}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.logo-box-sm{width:44px;height:44px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--orange);font-family:'Bebas Neue',sans-serif}
+.login-title{font-size:22px;font-weight:800;color:var(--navy)}
+.login-sub{font-size:13px;color:var(--muted)}
+.field-label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.field-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;transition:border-color .2s;outline:none;color:var(--text)}
+.field-input:focus{border-color:var(--orange)}
+.field-group{margin-bottom:16px}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
+.btn-primary:hover{opacity:.9}
+#login-err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+/* SHELL */
+#app{display:none;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.logo-box-lg{width:40px;height:40px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;font-family:'Bebas Neue',sans-serif;flex-shrink:0}
+.sidebar-title{font-size:13px;font-weight:800;color:#fff;line-height:1.3}
+.sidebar-sub{font-size:11px;color:rgba(255,255,255,.5)}
+.nav-section{padding:16px 12px 8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;color:rgba(255,255,255,.65);font-size:14px;font-weight:600;cursor:pointer;border-radius:8px;margin:2px 8px;background:none;border:none;width:calc(100% - 16px);text-align:left;font-family:inherit;transition:all .15s}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-btn.active{background:var(--orange);color:#fff}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,.08)}
+.user-info{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-logout{width:100%;padding:8px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;transition:background .15s}
+.btn-logout:hover{background:rgba(255,255,255,.12);color:#fff}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;padding:32px;min-height:100vh}
+.page-header{margin-bottom:28px}
+.page-title{font-size:26px;font-weight:900;color:var(--navy)}
+.page-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.section{display:none}
+.section.active{display:block}
+/* FORM */
+.form-card{background:var(--card);border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.06);margin-bottom:24px}
+.form-section-title{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:1px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.span-2{grid-column:span 2}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:13px;font-weight:700;color:var(--text)}
+.form-input,.form-select,.form-textarea{padding:11px 13px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange)}
+.form-textarea{resize:vertical;min-height:90px}
+.form-input[readonly]{background:#f8fafc;color:var(--muted)}
+/* COST BOX */
+.cost-box{background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:14px;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.cost-label{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.cost-value{font-size:24px;font-weight:900;color:var(--orange-light)}
+.cost-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
+/* BTN */
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+.btn-save{background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff}
+.btn-save:hover{opacity:.9}
+.btn-draft{background:var(--navy);color:#fff}
+.btn-draft:hover{opacity:.85}
+.btn-reset{background:var(--border);color:var(--muted)}
+.btn-reset:hover{background:#d1d9e6}
+/* HISTORY */
+.history-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.search-box{flex:1;min-width:200px;display:flex;gap:8px}
+.search-input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none}
+.search-input:focus{border-color:var(--orange)}
+.btn-search{padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:600}
+.filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.date-input{padding:9px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.date-input:focus{border-color:var(--orange)}
+.table-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table thead th{padding:14px 16px;text-align:left;background:var(--navy);color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px}
+.data-table tbody tr:hover{background:#f8fafc}
+.data-table tbody td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.qt-id-badge{display:inline-block;background:#eff6ff;color:#1565c0;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+.badge-draft{background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.badge-final{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.action-btns{display:flex;gap:6px}
+.btn-icon{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer;font-size:14px;transition:all .15s;line-height:1}
+.btn-icon:hover{background:var(--orange);border-color:var(--orange)}
+.btn-icon.btn-danger:hover{background:var(--red);border-color:var(--red)}
+/* ANALYTICS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.stat-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:8px}
+.stat-value{font-size:28px;font-weight:900;color:var(--navy)}
+.stat-value.orange{color:var(--orange)}
+.stat-value.green{color:var(--green)}
+.type-breakdown{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.breakdown-title{font-size:15px;font-weight:800;margin-bottom:16px;color:var(--navy)}
+.type-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.type-row:last-child{border-bottom:none}
+.type-count{background:#eff6ff;color:#1565c0;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+/* MODAL */
+#preview-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:20px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative}
+.modal-header{position:sticky;top:0;background:var(--navy);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-radius:20px 20px 0 0;z-index:1;flex-wrap:wrap;gap:8px}
+.modal-title{color:#fff;font-size:16px;font-weight:700}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-modal{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-modal-pdf{background:var(--orange);color:#fff}
+.btn-modal-close{background:rgba(255,255,255,.12);color:#fff}
+#preview-content{padding:24px;position:relative}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{width:60px}
+  .sidebar-title,.sidebar-sub,.nav-section,.sidebar-footer .user-info,.nav-btn span:not(.nav-icon){display:none}
+  .sidebar-logo{padding:16px;justify-content:center}
+  .logo-box-lg{margin:0}
+  .nav-btn{justify-content:center;margin:2px 4px;width:calc(100% - 8px);padding:12px 0}
+  .main{margin-left:60px;padding:20px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+  .span-2{grid-column:span 1}
+}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr}
+  .data-table{font-size:12px}
+  .cost-box{flex-direction:column;gap:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-box-sm">RR</div>
+      <div>
+        <div class="login-title">R.R Teen Set Solution</div>
+        <div class="login-sub">Quotation Management System</div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Admin Email</label>
+      <input type="email" id="l-email" class="field-input" placeholder="admin@rrteenset.com">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <input type="password" id="l-pass" class="field-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-err"></div>
+    <button class="btn-primary" onclick="doLogin()">Login →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-box-lg">RR</div>
+        <div><div class="sidebar-title">R.R Teen Set</div><div class="sidebar-sub">Quotation System</div></div>
+      </div>
+      <div class="nav-section">MAIN</div>
+      <button class="nav-btn active" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
+      <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon">📋</span><span>History</span></button>
+      <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon">📊</span><span>Analytics</span></button>
+      <div class="nav-section">LINKS</div>
+      <button class="nav-btn" onclick="window.open('https://vigupta9246.github.io/RR-TEEN-SET-SOLUTION','_blank')"><span class="nav-icon">🌐</span><span>Main Website</span></button>
+      <div class="sidebar-footer">
+        <div class="user-info" id="user-email">admin</div>
+        <button class="btn-logout" onclick="doLogout()">🔒 Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- CREATE -->
+      <section id="create" class="section active">
+        <div class="page-header">
+          <div class="page-title" id="form-title">New Quotation</div>
+          <div class="page-sub">Fill in details to generate a professional quotation</div>
+        </div>
+        <form id="qt-form" onsubmit="return false;">
+          <div class="form-card">
+            <div class="form-section-title">📄 QUOTATION META</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Quotation ID</label><input type="text" id="f-qtid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label">Date</label><input type="date" id="f-date" class="form-input"></div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">👤 CUSTOMER DETAILS</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="f-cname" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
+              <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="f-cphone" class="form-input" placeholder="e.g. 9876543210"></div>
+              <div class="form-group span-2"><label class="form-label">Customer Address</label><input type="text" id="f-caddr" class="form-input" placeholder="e.g. Plot 12, Dwarka, New Delhi"></div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">🏗️ PROJECT DETAILS</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Project Type *</label>
+                <select id="f-ptype" class="form-select">
+                  <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
+                  <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
+                  <option>Car Parking Shed</option><option>Roofing Work</option><option>Steel Structure</option><option>Custom</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Area (sq.ft) *</label><input type="number" id="f-area" class="form-input" placeholder="e.g. 2000" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label">Rate per sq.ft (₹) *</label><input type="number" id="f-rate" class="form-input" placeholder="e.g. 220" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="f-extra" class="form-input" placeholder="e.g. 5000" oninput="recalculate()"></div>
+              <div class="form-group span-2"><label class="form-label">Notes (additional charges detail)</label><input type="text" id="f-notes" class="form-input" placeholder="e.g. Transportation, labour charges"></div>
+            </div>
+            <div class="cost-box" style="margin-top:20px;">
+              <div>
+                <div class="cost-label">Base Cost</div>
+                <div class="cost-value" id="f-base">₹0</div>
+                <div class="cost-sub">Area × Rate per sq.ft</div>
+              </div>
+              <div style="width:1px;height:60px;background:rgba(255,255,255,.1)"></div>
+              <div style="text-align:right">
+                <div class="cost-label">TOTAL AMOUNT</div>
+                <div class="cost-value" id="f-total" style="font-size:32px">₹0</div>
+                <div class="cost-sub">Base + Additional</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">📋 TERMS & CONDITIONS</div>
+            <div class="form-group"><textarea id="f-terms" class="form-textarea" rows="6"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="saveQuotation(false)">💾 Save & Finalize</button>
+            <button class="btn btn-draft" onclick="saveQuotation(true)">📌 Save as Draft</button>
+            <button class="btn btn-reset" onclick="resetForm()">🔄 Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="history" class="section">
+        <div class="page-header">
+          <div class="page-title">Quotation History</div>
+          <div class="page-sub">View, edit, download and share all quotations</div>
+        </div>
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="renderHistory(this.value)">
+          </div>
+          <div class="filter-row">
+            <label style="font-size:13px;font-weight:700;color:var(--muted)">From:</label>
+            <input type="date" id="filter-from" class="date-input" onchange="renderHistory(document.getElementById('search-input').value)">
+            <label style="font-size:13px;font-weight:700;color:var(--muted)">To:</label>
+            <input type="date" id="filter-to" class="date-input" onchange="renderHistory(document.getElementById('search-input').value)">
+          </div>
+        </div>
+        <div class="table-card">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr>
+                <th>QT ID</th><th>Customer</th><th>Project</th><th>Area</th><th>Amount</th><th>Date / Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="history-tbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section id="analytics" class="section">
+        <div class="page-header">
+          <div class="page-title">Analytics</div>
+          <div class="page-sub">Overview of all quotations and revenue</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">TOTAL QUOTATIONS</div><div class="stat-value" id="stat-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">FINALIZED</div><div class="stat-value green" id="stat-finals">—</div></div>
+          <div class="stat-card"><div class="stat-label">DRAFTS</div><div class="stat-value" id="stat-drafts">—</div></div>
+          <div class="stat-card"><div class="stat-label">TOTAL REVENUE ESTIMATE</div><div class="stat-value orange" id="stat-revenue">—</div></div>
+          <div class="stat-card"><div class="stat-label">AVERAGE QUOTE VALUE</div><div class="stat-value" id="stat-avg">—</div></div>
+          <div class="stat-card"><div class="stat-label">THIS MONTH REVENUE</div><div class="stat-value orange" id="stat-monthly">—</div></div>
+        </div>
+        <div class="type-breakdown">
+          <div class="breakdown-title">Quotations by Project Type</div>
+          <div id="type-breakdown">Loading...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="preview-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Quotation Preview</div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-pdf" onclick="downloadPreviewPDF()">📄 PDF</button>
+        <button class="btn-modal" onclick="shareEmail(window._previewId)" style="background:#1565c0;color:#fff">📧 Email</button>
+        <button class="btn-modal" onclick="shareWhatsApp(window._previewId)" style="background:#25d366;color:#fff">💬 WhatsApp</button>
+        <button class="btn-modal btn-modal-close" onclick="closePreview()">✕ Close</button>
+      </div>
+    </div>
+    <div id="preview-content"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
+  authDomain: "rr-teen-set-quotation.firebaseapp.com",
+  databaseURL: "https://rr-teen-set-quotation-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rr-teen-set-quotation",
+  storageBucket: "rr-teen-set-quotation.firebasestorage.app",
+  messagingSenderId: "871289668592",
+  appId: "1:871289668592:web:6bda2d9f255e61294f1335",
+  measurementId: "G-N28CZBQ66C"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let allQuotations = [];
+let editingId = null;
+
+// ── AUTH ────────────────────────────────────────────────────────
+onAuthStateChanged(auth, u => {
+  if (u) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email').textContent = u.email;
+    loadQuotations();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  document.getElementById('login-err').textContent = '';
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e) { document.getElementById('login-err').textContent = 'Invalid email or password.'; }
+};
+window.doLogout = () => signOut(auth);
+
+// ── NAV ─────────────────────────────────────────────────────────
+window.showSection = id => {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-section="${id}"]`).classList.add('active');
+  if (id === 'history')   loadQuotations();
+  if (id === 'analytics') renderAnalytics();
+};
+
+// ── HELPERS ─────────────────────────────────────────────────────
+const fmt = n => Math.round(n).toLocaleString('en-IN');
+function genId() {
+  return `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}`;
+}
+
+// ── CALCULATE ───────────────────────────────────────────────────
+window.recalculate = () => {
+  const area  = parseFloat(document.getElementById('f-area').value)  || 0;
+  const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
+  const extra = parseFloat(document.getElementById('f-extra').value) || 0;
+  document.getElementById('f-base').textContent  = '₹' + fmt(area * rate);
+  document.getElementById('f-total').textContent = '₹' + fmt(area * rate + extra);
+};
+
+// ── SAVE ────────────────────────────────────────────────────────
+window.saveQuotation = async isDraft => {
+  const g = id => document.getElementById(id).value;
+  const cname = g('f-cname').trim(), cphone = g('f-cphone').trim();
+  const area  = parseFloat(g('f-area')) || 0;
+  const rate  = parseFloat(g('f-rate')) || 0;
+  if (!cname || !cphone || !area || !rate) { alert('Name, phone, area aur rate required hai.'); return; }
+  const extra = parseFloat(g('f-extra')) || 0;
+  const data  = {
+    qtId: g('f-qtid'), cname, cphone, caddr: g('f-caddr'),
+    ptype: g('f-ptype'), area, rate, extra,
+    base: area*rate, total: area*rate+extra,
+    notes: g('f-notes'), terms: g('f-terms'), date: g('f-date'),
+    isDraft, updatedAt: serverTimestamp()
+  };
+  try {
+    if (editingId) {
+      await updateDoc(doc(db,'quotations',editingId), data);
+      editingId = null;
+    } else {
+      await addDoc(collection(db,'quotations'), { ...data, createdAt: serverTimestamp() });
+    }
+    alert(isDraft ? 'Draft saved!' : 'Quotation saved!');
+    resetForm(); showSection('history');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.resetForm = () => {
+  document.getElementById('qt-form').reset();
+  document.getElementById('f-qtid').value = genId();
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-terms').value = `1. Yeh quotation 30 din tak valid hai.\n2. 50% advance payment before work starts.\n3. Balance on completion.\n4. Material price variation may affect final cost.\n5. GST extra as applicable.\n6. Free site visit provided within Delhi NCR.`;
+  document.getElementById('f-base').textContent  = '₹0';
+  document.getElementById('f-total').textContent = '₹0';
+  document.getElementById('form-title').textContent = 'New Quotation';
+  editingId = null;
+};
+
+// ── LOAD & RENDER ───────────────────────────────────────────────
+window.loadQuotations = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'quotations'), orderBy('createdAt','desc')));
+    allQuotations = [];
+    snap.forEach(d => allQuotations.push({ id: d.id, ...d.data() }));
+    renderHistory('');
+  } catch(e) { console.error(e); }
+};
+
+window.renderHistory = (search='') => {
+  const tbody = document.getElementById('history-tbody');
+  const from  = document.getElementById('filter-from')?.value;
+  const to    = document.getElementById('filter-to')?.value;
+  let list = allQuotations;
+  if (search) { const s=search.toLowerCase(); list=list.filter(q=>q.cname?.toLowerCase().includes(s)||q.cphone?.includes(s)||q.qtId?.toLowerCase().includes(s)); }
+  if (from) list = list.filter(q => q.date >= from);
+  if (to)   list = list.filter(q => q.date <= to);
+  tbody.innerHTML = list.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No quotations found</td></tr>`
+    : list.map(q=>`<tr>
+        <td><span class="qt-id-badge">${q.qtId}</span></td>
+        <td><strong>${q.cname}</strong><br><small>${q.cphone}</small></td>
+        <td>${q.ptype}</td>
+        <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
+        <td><strong>₹${fmt(q.total)}</strong></td>
+        <td>${q.date||'—'}<br>${q.isDraft?'<span class="badge-draft">Draft</span>':'<span class="badge-final">Final</span>'}</td>
+        <td class="action-btns">
+          <button onclick="viewQT('${q.id}')" class="btn-icon" title="View">👁️</button>
+          <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">✏️</button>
+          <button onclick="dlPDF('${q.id}')" class="btn-icon" title="PDF">📄</button>
+          <button onclick="waShare('${q.id}')" class="btn-icon" title="WhatsApp">💬</button>
+          <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+        </td></tr>`).join('');
+};
+
+// ── EDIT / DELETE ───────────────────────────────────────────────
+window.editQT = id => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  editingId = id;
+  document.getElementById('form-title').textContent = 'Edit Quotation';
+  ['qtid','date','cname','cphone','caddr','ptype','area','rate','extra','notes','terms'].forEach(k=>{
+    const el=document.getElementById('f-'+k); if(el) el.value=q[k]||'';
+  });
+  recalculate(); showSection('create');
+};
+
+window.delQT = async id => {
+  if (!confirm('Delete this quotation?')) return;
+  await deleteDoc(doc(db,'quotations',id));
+  loadQuotations();
+};
+
+// ── BUILD QUOTATION HTML ────────────────────────────────────────
+function buildQtHTML(q) {
+  return `<div id="qt-print" style="font-family:'Nunito',Arial,sans-serif;max-width:800px;margin:0 auto;background:#fff;color:#0a1628;padding:40px;position:relative;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #ff6f00;padding-bottom:24px;margin-bottom:24px">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="width:48px;height:48px;background:#0a1628;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#ff6f00;font-family:'Bebas Neue',Arial Black,sans-serif">RR</div>
+        <div>
+          <div style="font-size:20px;font-weight:800">R.R Teen Set Solution</div>
+          <div style="font-size:12px;color:#64748b">Steel &amp; Shed Experts · Delhi NCR</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#64748b;line-height:1.8">
+        📍 New Delhi, India &nbsp;|&nbsp; 📞 +91 85272 58462<br>
+        🌐 vigupta9246.github.io/RR-TEEN-SET-SOLUTION<br>
+        🏛️ GST: 07DJCPK0635M1Z5
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:28px;font-weight:900;color:#ff6f00;letter-spacing:1px">QUOTATION</div>
+      <div style="font-size:13px;font-weight:700;background:#0a1628;color:#fff;padding:4px 12px;border-radius:20px;display:inline-block;margin-top:4px">${q.qtId}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:8px">Date: ${q.date}</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px">
+    <div style="background:#f4f7fb;border-radius:10px;padding:16px">
+      <div style="font-size:11px;font-weight:700;color:#ff6f00;letter-spacing:1px;margin-bottom:8px">BILL TO</div>
+      <div style="font-weight:700;font-size:15px">${q.cname}</div>
+      <div style="font-size:13px;color:#64748b;margin-top:4px">📞 ${q.cphone}</div>
+      ${q.caddr?`<div style="font-size:12px;color:#64748b;margin-top:4px">📍 ${q.caddr}</div>`:''}
+    </div>
+    <div style="background:#f4f7fb;border-radius:10px;padding:16px">
+      <div style="font-size:11px;font-weight:700;color:#ff6f00;letter-spacing:1px;margin-bottom:8px">PROJECT</div>
+      <div style="font-size:13px;line-height:1.8">
+        <strong>Type:</strong> ${q.ptype}<br>
+        <strong>Area:</strong> ${(q.area||0).toLocaleString('en-IN')} sq.ft<br>
+        <strong>Rate:</strong> ₹${fmt(q.rate)}/sq.ft
+      </div>
+    </div>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:14px">
+    <thead><tr style="background:#0a1628;color:#fff">
+      <th style="padding:12px 16px;text-align:left">Description</th>
+      <th style="padding:12px 16px;text-align:right">Qty</th>
+      <th style="padding:12px 16px;text-align:right">Rate</th>
+      <th style="padding:12px 16px;text-align:right">Amount</th>
+    </tr></thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #e2e8f0">
+        <td style="padding:14px 16px">${q.ptype} Construction<br><small style="color:#64748b">IS-grade steel, anti-rust coating, complete installation</small></td>
+        <td style="padding:14px 16px;text-align:right">${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
+        <td style="padding:14px 16px;text-align:right">₹${fmt(q.rate)}</td>
+        <td style="padding:14px 16px;text-align:right;font-weight:600">₹${fmt(q.base)}</td>
+      </tr>
+      ${q.extra>0?`<tr style="border-bottom:1px solid #e2e8f0">
+        <td style="padding:14px 16px">Additional Charges<br><small style="color:#64748b">${q.notes||'As discussed'}</small></td>
+        <td style="padding:14px 16px;text-align:right">—</td><td style="padding:14px 16px;text-align:right">—</td>
+        <td style="padding:14px 16px;text-align:right;font-weight:600">₹${fmt(q.extra)}</td>
+      </tr>`:''}
+    </tbody>
+    <tfoot>
+      <tr style="background:#fff3e0">
+        <td colspan="3" style="padding:14px 16px;font-weight:800;font-size:16px">TOTAL AMOUNT</td>
+        <td style="padding:14px 16px;text-align:right;font-weight:800;font-size:18px;color:#ff6f00">₹${fmt(q.total)}</td>
+      </tr>
+      <tr><td colspan="4" style="padding:8px 16px;font-size:12px;color:#64748b">*GST as applicable. Amount in INR.</td></tr>
+    </tfoot>
+  </table>
+  ${q.terms?`<div style="background:#f4f7fb;border-radius:10px;padding:16px;margin-bottom:24px">
+    <div style="font-size:11px;font-weight:700;color:#0a1628;letter-spacing:1px;margin-bottom:8px">TERMS & CONDITIONS</div>
+    <div style="font-size:12px;color:#64748b;line-height:1.8;white-space:pre-line">${q.terms}</div>
+  </div>`:''}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;border-top:1px solid #e2e8f0;padding-top:24px">
+    <div style="text-align:center">
+      <div style="height:50px;border-bottom:1px solid #0a1628;margin-bottom:8px"></div>
+      <div style="font-size:12px;color:#64748b">Customer Signature & Date</div>
+    </div>
+    <div style="text-align:center">
+      <div style="height:50px;border-bottom:1px solid #0a1628;margin-bottom:8px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
+        <span style="font-size:13px;font-weight:700;color:#ff6f00;font-style:italic">R.R Teen Set Solution</span>
+      </div>
+      <div style="font-size:12px;color:#64748b">Authorized Signature</div>
+    </div>
+  </div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:72px;font-weight:900;color:rgba(255,111,0,0.05);pointer-events:none;white-space:nowrap;user-select:none">R.R TEEN SET</div>
+  <div style="text-align:center;margin-top:28px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:16px">
+    Thank you for choosing R.R Teen Set Solution · +91 85272 58462 · Mon–Sat 9AM–7PM
+  </div>
+</div>`;
+}
+
+// ── VIEW / PDF ──────────────────────────────────────────────────
+window.viewQT = id => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  document.getElementById('preview-modal').style.display = 'flex';
+  document.getElementById('preview-content').innerHTML = buildQtHTML(q);
+  window._previewId = id;
+};
+window.closePreview = () => { document.getElementById('preview-modal').style.display='none'; };
+
+window.dlPDF = async id => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = buildQtHTML(q);
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0';
+  document.body.appendChild(wrap);
+  await html2pdf().set({
+    margin:[10,10,10,10], filename:`${q.qtId}-${q.cname}.pdf`,
+    image:{type:'jpeg',quality:.95},
+    html2canvas:{scale:2,useCORS:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(wrap).save();
+  document.body.removeChild(wrap);
+};
+window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewId); };
+
+// ── SHARE ───────────────────────────────────────────────────────
+window.waShare = id => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  const phone = q.cphone.replace(/\D/g,'');
+  const msg = encodeURIComponent(`🏗️ *R.R Teen Set Solution*\n*Quotation: ${q.qtId}*\n\nDear ${q.cname},\n\nAapke ${q.ptype} project ke liye estimated cost:\n\n📐 Area: ${(q.area||0).toLocaleString('en-IN')} sq.ft\n💰 Total: ₹${fmt(q.total)}\n📅 Date: ${q.date}\n\nFree site visit ke liye:\n📞 +91 85272 58462\n🌐 https://vigupta9246.github.io/RR-TEEN-SET-SOLUTION\n\n_GST Invoice | 500+ Projects | 8 Years Experience_`);
+  window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
+};
+window.shareEmail = id => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  window.open(`mailto:?subject=${encodeURIComponent(`Quotation ${q.qtId} - R.R Teen Set Solution`)}&body=${encodeURIComponent(`Dear ${q.cname},\n\nQuotation ID: ${q.qtId}\nProject: ${q.ptype}\nArea: ${q.area} sq.ft\nTotal: ₹${fmt(q.total)}\nDate: ${q.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`)}`,'_blank');
+};
+
+// ── ANALYTICS ───────────────────────────────────────────────────
+window.renderAnalytics = () => {
+  const finals  = allQuotations.filter(q=>!q.isDraft);
+  const drafts  = allQuotations.filter(q=>q.isDraft);
+  const revenue = finals.reduce((s,q)=>s+(q.total||0),0);
+  const month   = new Date().toISOString().slice(0,7);
+  const mRev    = finals.filter(q=>(q.date||'').startsWith(month)).reduce((s,q)=>s+(q.total||0),0);
+  document.getElementById('stat-total').textContent   = allQuotations.length;
+  document.getElementById('stat-finals').textContent  = finals.length;
+  document.getElementById('stat-drafts').textContent  = drafts.length;
+  document.getElementById('stat-revenue').textContent = '₹'+fmt(revenue);
+  document.getElementById('stat-avg').textContent     = '₹'+fmt(finals.length?revenue/finals.length:0);
+  document.getElementById('stat-monthly').textContent = '₹'+fmt(mRev);
+  const types = {};
+  finals.forEach(q=>{ types[q.ptype]=(types[q.ptype]||0)+1; });
+  document.getElementById('type-breakdown').innerHTML =
+    Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([t,n])=>
+      `<div class="type-row"><span>${t}</span><span class="type-count">${n} quotes</span></div>`
+    ).join('') || '<div style="color:#64748b;font-size:14px">No data yet</div>';
+};
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.resetForm();
+</script>
+</body>
+</html>
