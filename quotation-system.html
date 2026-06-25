@@ -483,185 +483,217 @@ window.delQT = async id => {
 
 // ── BUILD QUOTATION HTML ────────────────────────────────────────
 function buildQtHTML(q) {
-  const dateObj = q.date ? new Date(q.date) : new Date();
+  const dateObj  = q.date ? new Date(q.date+'T00:00:00') : new Date();
   const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
-  const fmtDate = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  const srNo = (idx) => String(idx+1).padStart(2,'0');
+  const fmtDate  = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const srNo     = idx => String(idx+1).padStart(2,'0');
 
   const items = [
-    { desc: `${q.ptype} — Supply & Fabrication`, sub: 'IS-2062 grade steel, anti-rust primer coating, complete structural fabrication', qty: `${(q.area||0).toLocaleString('en-IN')} sq.ft`, rate: `₹${fmt(q.rate)}`, amt: q.base }
+    { desc:`${q.ptype} — Supply, Fabrication & Erection`, sub:'IS-2062 grade structural steel | Anti-rust red oxide primer | MS purlin & rafters | GI sheet roofing/cladding | Complete civil foundation & erection work', qty:`${(q.area||0).toLocaleString('en-IN')} sq.ft`, rate:`₹${fmt(q.rate)}`, amt:q.base }
   ];
-  if (q.extra>0) items.push({ desc: 'Additional Charges', sub: q.notes||'As discussed & agreed', qty: '—', rate: '—', amt: q.extra });
+  if (q.extra>0) items.push({ desc:'Additional / Miscellaneous Charges', sub:q.notes||'As mutually discussed & agreed upon', qty:'—', rate:'—', amt:q.extra });
+
+  // Professional industry-grade T&C
+  const defaultTerms = `1. VALIDITY: This quotation is valid for 30 days from the issue date. Rates are subject to change thereafter due to material price fluctuation.
+
+2. PAYMENT TERMS: 50% advance payment required before commencement of work. 40% upon material delivery at site. Balance 10% on completion & handover.
+
+3. SCOPE OF WORK: Includes supply of IS-grade structural steel, fabrication, transportation to site, erection & installation as per agreed drawings. Civil/foundation work included unless stated otherwise.
+
+4. MATERIAL STANDARD: All structural steel conforming to IS:2062. GI sheets conforming to IS:277. Anti-corrosion primer applied before dispatch.
+
+5. DESIGN & DRAWINGS: Basic structural design included. Detailed architectural/MEP drawings, if required, will be charged separately.
+
+6. TAXES: GST @ applicable rate shall be charged extra on the above quoted amount. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).
+
+7. VARIATIONS: Any addition or alteration in scope of work during execution will be charged on actual basis with prior written approval.
+
+8. FORCE MAJEURE: Company shall not be liable for delays caused by reasons beyond control including natural calamities, government orders, or material shortage.
+
+9. DISPUTE RESOLUTION: Any disputes shall be subject to jurisdiction of courts in New Delhi only.
+
+10. ACCEPTANCE: This quotation shall be considered accepted upon receipt of advance payment or written confirmation.`;
+
+  const termsToUse = (q.terms && q.terms.trim().length > 20) ? q.terms : defaultTerms;
+
+  // Blue circular stamp SVG
+  const stampSVG = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#1565c0" stroke-width="2.5"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#1565c0" stroke-width="1"/>
+    <path id="top-arc" d="M 12,50 A 38,38 0 0,1 88,50" fill="none"/>
+    <path id="bot-arc" d="M 16,58 A 38,38 0 0,0 84,58" fill="none"/>
+    <text font-size="9" font-weight="800" fill="#1565c0" font-family="Arial" letter-spacing="1.5">
+      <textPath href="#top-arc" startOffset="8%">R.R TEEN SET SOLUTION</textPath>
+    </text>
+    <text font-size="7.5" font-weight="700" fill="#1565c0" font-family="Arial" letter-spacing="1">
+      <textPath href="#bot-arc" startOffset="10%">NEW DELHI · INDIA</textPath>
+    </text>
+    <text x="50" y="44" text-anchor="middle" font-size="13" font-weight="900" fill="#1565c0" font-family="Arial Black">RR</text>
+    <text x="50" y="55" text-anchor="middle" font-size="6.5" font-weight="700" fill="#1565c0" font-family="Arial" letter-spacing="1">AUTHORIZED</text>
+    <text x="50" y="63" text-anchor="middle" font-size="6" font-weight="600" fill="#1565c0" font-family="Arial">Est. 2016</text>
+  </svg>`;
 
   return `
-<div id="qt-print" style="font-family:'Segoe UI',Arial,sans-serif;width:794px;min-height:1123px;background:#fff;color:#1a1a2e;position:relative;overflow:hidden;margin:0 auto;">
+<div id="qt-print" style="font-family:'Segoe UI',Arial,sans-serif;width:794px;min-height:1123px;background:#fff;color:#1a1a2e;position:relative;overflow:hidden;margin:0 auto;box-sizing:border-box;">
 
-  <!-- TOP COLOR BAR -->
+  <!-- TOP BAR -->
   <div style="height:8px;background:linear-gradient(90deg,#0a1628 0%,#ff6f00 50%,#ffab40 100%);"></div>
 
   <!-- HEADER -->
-  <div style="padding:32px 40px 24px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #e8ecf0;">
-    <!-- Company Info -->
+  <div style="padding:28px 40px 22px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #e8ecf0;">
     <div style="display:flex;gap:16px;align-items:flex-start;">
-      <div style="width:64px;height:64px;background:#0a1628;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <div style="width:66px;height:66px;background:#0a1628;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:900;color:#ff6f00;font-family:Arial Black,sans-serif;letter-spacing:-1px;line-height:1;">RR</div>
-          <div style="font-size:6px;color:rgba(255,255,255,0.6);letter-spacing:1px;line-height:1;margin-top:2px;">TEEN SET</div>
+          <div style="font-size:24px;font-weight:900;color:#ff6f00;font-family:Arial Black,sans-serif;letter-spacing:-1px;line-height:1;">RR</div>
+          <div style="font-size:5.5px;color:rgba(255,255,255,0.65);letter-spacing:1.5px;line-height:1;margin-top:3px;">TEEN SET</div>
         </div>
       </div>
       <div>
-        <div style="font-size:22px;font-weight:800;color:#0a1628;letter-spacing:-0.5px;line-height:1.1;">R.R Teen Set Solution</div>
-        <div style="font-size:11px;color:#ff6f00;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:4px 0 8px;">Steel & Shed Fabrication Experts</div>
-        <div style="font-size:11.5px;color:#5a6a7a;line-height:1.9;">
+        <div style="font-size:21px;font-weight:900;color:#0a1628;letter-spacing:-0.5px;line-height:1.1;">R.R Teen Set Solution</div>
+        <div style="font-size:10.5px;color:#ff6f00;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin:4px 0 8px;">Steel & Shed Fabrication Experts</div>
+        <div style="font-size:11px;color:#5a6a7a;line-height:1.95;">
           <span>📍 New Delhi, Delhi NCR, India</span><br>
-          <span>📞 +91 85272 58462 &nbsp;|&nbsp; 🌐 vigupta9246.github.io/RR-TEEN-SET-SOLUTION</span><br>
-          <span>🏛️ GSTIN: 07DJCPK0635M1Z5</span>
+          <span>📞 +91 85272 58462 &nbsp;|&nbsp; 🌐 www.rrteensetsolution.com</span><br>
+          <span>🏛️ GSTIN: 07DJCPK0635M1Z5 &nbsp;|&nbsp; Est. 2016 &nbsp;|&nbsp; 500+ Projects Completed</span>
         </div>
       </div>
     </div>
-    <!-- Quotation Label -->
     <div style="text-align:right;">
-      <div style="font-size:32px;font-weight:900;color:#0a1628;letter-spacing:3px;line-height:1;">QUOTATION</div>
-      <div style="margin-top:10px;background:#0a1628;color:#fff;padding:6px 16px;border-radius:6px;display:inline-block;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;">REFERENCE NO.</div>
-        <div style="font-size:16px;font-weight:800;color:#ffab40;letter-spacing:1px;">${q.qtId}</div>
+      <div style="font-size:30px;font-weight:900;color:#0a1628;letter-spacing:4px;line-height:1;">QUOTATION</div>
+      <div style="margin-top:10px;background:#0a1628;color:#fff;padding:7px 18px;border-radius:7px;display:inline-block;">
+        <div style="font-size:9px;color:rgba(255,255,255,0.45);letter-spacing:2.5px;margin-bottom:2px;">REFERENCE NO.</div>
+        <div style="font-size:17px;font-weight:800;color:#ffab40;letter-spacing:1.5px;">${q.qtId}</div>
       </div>
-      <div style="margin-top:10px;font-size:11.5px;color:#5a6a7a;line-height:1.8;">
-        <div><strong style="color:#0a1628;">Issue Date:</strong> &nbsp;${fmtDate(dateObj)}</div>
-        <div><strong style="color:#0a1628;">Valid Till:</strong> &nbsp;${fmtDate(validTill)}</div>
+      <div style="margin-top:10px;font-size:11.5px;color:#5a6a7a;line-height:2;">
+        <div><strong style="color:#0a1628;font-size:11px;">Issue Date :</strong> &nbsp;${fmtDate(dateObj)}</div>
+        <div><strong style="color:#0a1628;font-size:11px;">Valid Till &nbsp;:</strong> &nbsp;<span style="color:#c0392b;font-weight:700;">${fmtDate(validTill)}</span></div>
       </div>
     </div>
   </div>
 
-  <!-- BILL TO + PROJECT INFO -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0 40px 24px;border:1px solid #e8ecf0;border-radius:10px;overflow:hidden;margin-top:24px;">
-    <div style="padding:18px 24px;border-right:1px solid #e8ecf0;">
-      <div style="font-size:9px;font-weight:800;color:#ff6f00;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-        <div style="width:16px;height:2px;background:#ff6f00;"></div> PREPARED FOR
+  <!-- BILL TO + PROJECT SCOPE -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin:20px 40px;border:1.5px solid #e8ecf0;border-radius:10px;overflow:hidden;">
+    <div style="padding:18px 22px;border-right:1.5px solid #e8ecf0;">
+      <div style="font-size:8.5px;font-weight:800;color:#ff6f00;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+        <div style="width:18px;height:2px;background:#ff6f00;border-radius:2px;"></div>PREPARED FOR
       </div>
-      <div style="font-size:17px;font-weight:800;color:#0a1628;">${q.cname}</div>
-      <div style="font-size:12px;color:#5a6a7a;margin-top:6px;line-height:1.8;">
+      <div style="font-size:16px;font-weight:800;color:#0a1628;">${q.cname}</div>
+      <div style="font-size:12px;color:#5a6a7a;margin-top:6px;line-height:2;">
         <div>📞 ${q.cphone}</div>
         ${q.caddr?`<div>📍 ${q.caddr}</div>`:''}
       </div>
     </div>
-    <div style="padding:18px 24px;background:#fafbfc;">
-      <div style="font-size:9px;font-weight:800;color:#ff6f00;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-        <div style="width:16px;height:2px;background:#ff6f00;"></div> PROJECT SCOPE
+    <div style="padding:18px 22px;background:#fafbfc;">
+      <div style="font-size:8.5px;font-weight:800;color:#ff6f00;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+        <div style="width:18px;height:2px;background:#ff6f00;border-radius:2px;"></div>PROJECT SCOPE
       </div>
-      <div style="font-size:17px;font-weight:800;color:#0a1628;">${q.ptype}</div>
+      <div style="font-size:16px;font-weight:800;color:#0a1628;">${q.ptype}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-        <div style="background:#fff;border:1px solid #e8ecf0;border-radius:6px;padding:8px 12px;">
-          <div style="font-size:9px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">TOTAL AREA</div>
-          <div style="font-size:14px;font-weight:800;color:#0a1628;">${(q.area||0).toLocaleString('en-IN')} <span style="font-size:11px;font-weight:600;color:#5a6a7a;">sq.ft</span></div>
+        <div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:7px;padding:9px 12px;">
+          <div style="font-size:8px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">TOTAL AREA</div>
+          <div style="font-size:15px;font-weight:800;color:#0a1628;margin-top:2px;">${(q.area||0).toLocaleString('en-IN')} <span style="font-size:10px;font-weight:600;color:#5a6a7a;">sq.ft</span></div>
         </div>
-        <div style="background:#fff;border:1px solid #e8ecf0;border-radius:6px;padding:8px 12px;">
-          <div style="font-size:9px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">RATE / SQ.FT</div>
-          <div style="font-size:14px;font-weight:800;color:#0a1628;">₹${fmt(q.rate)}</div>
+        <div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:7px;padding:9px 12px;">
+          <div style="font-size:8px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">RATE / SQ.FT</div>
+          <div style="font-size:15px;font-weight:800;color:#0a1628;margin-top:2px;">₹${fmt(q.rate)}</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- LINE ITEMS TABLE -->
-  <div style="margin:0 40px 24px;">
-    <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+  <!-- LINE ITEMS -->
+  <div style="margin:0 40px 20px;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead>
         <tr style="background:#0a1628;color:#fff;">
-          <th style="padding:11px 14px;text-align:center;font-weight:700;letter-spacing:0.5px;width:40px;">#</th>
-          <th style="padding:11px 14px;text-align:left;font-weight:700;letter-spacing:0.5px;">DESCRIPTION</th>
-          <th style="padding:11px 14px;text-align:center;font-weight:700;letter-spacing:0.5px;width:120px;">QUANTITY</th>
-          <th style="padding:11px 14px;text-align:right;font-weight:700;letter-spacing:0.5px;width:100px;">UNIT RATE</th>
-          <th style="padding:11px 14px;text-align:right;font-weight:700;letter-spacing:0.5px;width:110px;">AMOUNT</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;letter-spacing:0.5px;width:36px;">#</th>
+          <th style="padding:10px 12px;text-align:left;font-weight:700;letter-spacing:0.5px;">DESCRIPTION OF WORK</th>
+          <th style="padding:10px 12px;text-align:center;font-weight:700;letter-spacing:0.5px;width:110px;">QUANTITY</th>
+          <th style="padding:10px 12px;text-align:right;font-weight:700;letter-spacing:0.5px;width:95px;">UNIT RATE</th>
+          <th style="padding:10px 12px;text-align:right;font-weight:700;letter-spacing:0.5px;width:105px;">AMOUNT (₹)</th>
         </tr>
       </thead>
       <tbody>
         ${items.map((item,i)=>`
         <tr style="border-bottom:1px solid #e8ecf0;background:${i%2===0?'#fff':'#fafbfc'};">
-          <td style="padding:14px;text-align:center;color:#8a9aaa;font-weight:700;font-size:11px;">${srNo(i)}</td>
-          <td style="padding:14px;">
-            <div style="font-weight:700;color:#0a1628;font-size:13px;">${item.desc}</div>
-            <div style="font-size:11px;color:#8a9aaa;margin-top:3px;">${item.sub}</div>
+          <td style="padding:14px 12px;text-align:center;color:#8a9aaa;font-weight:700;font-size:10px;">${srNo(i)}</td>
+          <td style="padding:14px 12px;">
+            <div style="font-weight:700;color:#0a1628;font-size:12.5px;">${item.desc}</div>
+            <div style="font-size:10.5px;color:#8a9aaa;margin-top:4px;line-height:1.6;">${item.sub}</div>
           </td>
-          <td style="padding:14px;text-align:center;color:#0a1628;font-weight:600;">${item.qty}</td>
-          <td style="padding:14px;text-align:right;color:#0a1628;font-weight:600;">${item.rate}</td>
-          <td style="padding:14px;text-align:right;font-weight:700;color:#0a1628;">₹${fmt(item.amt)}</td>
+          <td style="padding:14px 12px;text-align:center;color:#0a1628;font-weight:600;">${item.qty}</td>
+          <td style="padding:14px 12px;text-align:right;color:#0a1628;font-weight:600;">${item.rate}</td>
+          <td style="padding:14px 12px;text-align:right;font-weight:700;color:#0a1628;">₹${fmt(item.amt)}</td>
         </tr>`).join('')}
       </tbody>
     </table>
-
     <!-- TOTALS -->
-    <div style="display:flex;justify-content:flex-end;margin-top:0;">
-      <div style="width:320px;border:1px solid #e8ecf0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">
-        <div style="display:flex;justify-content:space-between;padding:11px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
+    <div style="display:flex;justify-content:flex-end;">
+      <div style="width:300px;border:1.5px solid #e8ecf0;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
           <span style="font-size:12px;color:#5a6a7a;">Sub Total</span>
           <span style="font-size:12px;font-weight:600;color:#0a1628;">₹${fmt(q.base)}</span>
         </div>
-        ${q.extra>0?`<div style="display:flex;justify-content:space-between;padding:11px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
+        ${q.extra>0?`<div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
           <span style="font-size:12px;color:#5a6a7a;">Additional Charges</span>
           <span style="font-size:12px;font-weight:600;color:#0a1628;">₹${fmt(q.extra)}</span>
         </div>`:''}
-        <div style="display:flex;justify-content:space-between;padding:11px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
-          <span style="font-size:12px;color:#5a6a7a;">GST</span>
-          <span style="font-size:11px;color:#8a9aaa;font-style:italic;">As applicable</span>
+        <div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
+          <span style="font-size:12px;color:#5a6a7a;">GST (as applicable)</span>
+          <span style="font-size:11px;color:#8a9aaa;font-style:italic;">Extra</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#0a1628;">
-          <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px;">TOTAL AMOUNT</span>
-          <span style="font-size:20px;font-weight:900;color:#ffab40;">₹${fmt(q.total)}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;background:#0a1628;">
+          <span style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.75);letter-spacing:1px;">GRAND TOTAL</span>
+          <span style="font-size:19px;font-weight:900;color:#ffab40;">₹${fmt(q.total)}</span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- TERMS -->
-  ${q.terms?`
-  <div style="margin:0 40px 24px;border:1px solid #e8ecf0;border-radius:8px;overflow:hidden;">
-    <div style="background:#fafbfc;padding:10px 18px;border-bottom:1px solid #e8ecf0;">
-      <span style="font-size:9px;font-weight:800;color:#0a1628;letter-spacing:2px;text-transform:uppercase;">Terms & Conditions</span>
+  <div style="margin:0 40px 20px;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
+    <div style="background:#0a1628;padding:9px 18px;">
+      <span style="font-size:9px;font-weight:800;color:#ffab40;letter-spacing:2.5px;text-transform:uppercase;">Terms &amp; Conditions</span>
     </div>
-    <div style="padding:14px 18px;">
-      <div style="font-size:11.5px;color:#5a6a7a;line-height:2;white-space:pre-line;">${q.terms}</div>
+    <div style="padding:14px 18px;columns:2;column-gap:24px;">
+      ${termsToUse.split('\n').filter(l=>l.trim()).map(line=>`
+        <div style="font-size:10.5px;color:#5a6a7a;line-height:1.7;margin-bottom:5px;break-inside:avoid;">${line.trim()}</div>
+      `).join('')}
     </div>
-  </div>`:''}
+  </div>
 
   <!-- SIGNATURE -->
-  <div style="margin:0 40px;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-    <div style="border:1px solid #e8ecf0;border-radius:8px;padding:20px 24px;text-align:center;">
-      <div style="height:52px;margin-bottom:12px;"></div>
+  <div style="margin:0 40px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="border:1.5px solid #e8ecf0;border-radius:8px;padding:18px 22px;text-align:center;">
+      <div style="height:56px;margin-bottom:10px;"></div>
       <div style="border-top:1.5px solid #c8d0da;padding-top:10px;">
         <div style="font-size:11px;font-weight:700;color:#0a1628;">Customer Acceptance</div>
-        <div style="font-size:10px;color:#8a9aaa;margin-top:2px;">Signature & Date</div>
+        <div style="font-size:10px;color:#8a9aaa;margin-top:2px;">Name, Signature &amp; Date</div>
       </div>
     </div>
-    <div style="border:1px solid #e8ecf0;border-radius:8px;padding:20px 24px;text-align:center;background:#fafbfc;">
-      <div style="height:52px;margin-bottom:12px;display:flex;align-items:flex-end;justify-content:center;">
-        <div style="text-align:center;">
-          <div style="font-size:10px;color:#ff6f00;font-weight:700;letter-spacing:1px;">R.R TEEN SET SOLUTION</div>
-          <div style="width:120px;height:1.5px;background:linear-gradient(90deg,transparent,#ff6f00,transparent);margin:4px auto 0;"></div>
-        </div>
+    <div style="border:1.5px solid #1565c0;border-radius:8px;padding:18px 22px;text-align:center;background:#f0f5ff;position:relative;">
+      <div style="height:56px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;">
+        ${stampSVG}
       </div>
-      <div style="border-top:1.5px solid #c8d0da;padding-top:10px;">
-        <div style="font-size:11px;font-weight:700;color:#0a1628;">Authorized Signatory</div>
-        <div style="font-size:10px;color:#8a9aaa;margin-top:2px;">For R.R Teen Set Solution</div>
+      <div style="border-top:1.5px solid #1565c0;padding-top:10px;">
+        <div style="font-size:11px;font-weight:800;color:#0a1628;">Subhash Kumar</div>
+        <div style="font-size:10px;color:#1565c0;font-weight:700;margin-top:1px;">Proprietor & Authorized Signatory</div>
+        <div style="font-size:9.5px;color:#8a9aaa;margin-top:1px;">For R.R Teen Set Solution</div>
       </div>
     </div>
   </div>
 
   <!-- FOOTER -->
-  <div style="margin:28px 40px 0;padding:16px 0;border-top:1px solid #e8ecf0;display:flex;justify-content:space-between;align-items:center;">
-    <div style="font-size:10px;color:#8a9aaa;">
-      This is a computer-generated quotation. &nbsp;|&nbsp; Valid for 30 days from issue date.
-    </div>
-    <div style="font-size:10px;color:#8a9aaa;">
-      Page 1 of 1 &nbsp;|&nbsp; ${q.qtId}
-    </div>
+  <div style="margin:0 40px;padding:12px 0;border-top:1px solid #e8ecf0;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:9.5px;color:#8a9aaa;">Computer generated quotation · No signature required if digitally shared · www.rrteensetsolution.com</div>
+    <div style="font-size:9.5px;color:#8a9aaa;">Ref: ${q.qtId} &nbsp;|&nbsp; Page 1 of 1</div>
   </div>
 
   <!-- BOTTOM BAR -->
-  <div style="height:5px;background:linear-gradient(90deg,#0a1628 0%,#ff6f00 50%,#ffab40 100%);margin-top:16px;"></div>
+  <div style="height:5px;background:linear-gradient(90deg,#0a1628 0%,#ff6f00 50%,#ffab40 100%);margin-top:12px;"></div>
 
   <!-- WATERMARK -->
-  <div style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:88px;font-weight:900;color:rgba(10,22,40,0.028);pointer-events:none;white-space:nowrap;user-select:none;letter-spacing:4px;">R.R TEEN SET</div>
+  <div style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(10,22,40,0.025);pointer-events:none;white-space:nowrap;user-select:none;letter-spacing:6px;">R.R TEEN SET</div>
 
 </div>`;
 }
@@ -677,25 +709,62 @@ window.closePreview = () => { document.getElementById('preview-modal').style.dis
 
 window.dlPDF = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  // Build in a visible off-screen container so html2canvas can render it properly
   const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;';
   wrap.innerHTML = buildQtHTML(q);
-  wrap.style.cssText = 'position:fixed;left:-9999px;top:0';
   document.body.appendChild(wrap);
-  await html2pdf().set({
-    margin:[10,10,10,10], filename:`${q.qtId}-${q.cname}.pdf`,
-    image:{type:'jpeg',quality:.95},
-    html2canvas:{scale:2,useCORS:true},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-  }).from(wrap).save();
-  document.body.removeChild(wrap);
+  // Small delay so browser paints the element before capture
+  await new Promise(r => setTimeout(r, 300));
+  try {
+    await html2pdf().set({
+      margin: 0,
+      filename: `${q.qtId}-${q.cname}.pdf`,
+      image: { type:'jpeg', quality:0.97 },
+      html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false },
+      jsPDF: { unit:'px', format:[794,1123], orientation:'portrait' }
+    }).from(wrap.firstElementChild).save();
+  } finally {
+    document.body.removeChild(wrap);
+  }
 };
 window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewId); };
 
 // ── SHARE ───────────────────────────────────────────────────────
 window.waShare = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
-  const phone = q.cphone.replace(/\D/g,'');
-  const msg = encodeURIComponent(`🏗️ *R.R Teen Set Solution*\n*Quotation: ${q.qtId}*\n\nDear ${q.cname},\n\nAapke ${q.ptype} project ke liye estimated cost:\n\n📐 Area: ${(q.area||0).toLocaleString('en-IN')} sq.ft\n💰 Total: ₹${fmt(q.total)}\n📅 Date: ${q.date}\n\nFree site visit ke liye:\n📞 +91 85272 58462\n🌐 https://vigupta9246.github.io/RR-TEEN-SET-SOLUTION\n\n_GST Invoice | 500+ Projects | 8 Years Experience_`);
+  // Format phone — add 91 if 10 digit Indian number
+  let phone = q.cphone.replace(/\D/g,'');
+  if (phone.length === 10) phone = '91' + phone;
+  const dateObj   = q.date ? new Date(q.date+'T00:00:00') : new Date();
+  const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
+  const fmtD = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const msg = encodeURIComponent(
+`🏗️ *R.R Teen Set Solution*
+📋 *Quotation: ${q.qtId}*
+
+Namaste ${q.cname} Ji,
+
+Aapke *${q.ptype}* project ke liye hamara quotation:
+
+━━━━━━━━━━━━━━━━
+📐 Area      : ${(q.area||0).toLocaleString('en-IN')} sq.ft
+💵 Rate       : ₹${fmt(q.rate)}/sq.ft
+💰 *Total     : ₹${fmt(q.total)}*
+📅 Issue Date : ${fmtD(dateObj)}
+⏳ Valid Till  : ${fmtD(validTill)}
+━━━━━━━━━━━━━━━━
+
+✅ GST Invoice provided
+✅ IS-2062 Grade Steel
+✅ Free Site Visit included
+✅ 8+ Years Experience | 500+ Projects
+
+📞 Call/WhatsApp: *+91 85272 58462*
+🌐 www.rrteensetsolution.com
+
+_Please download the PDF quotation from our system for complete details & terms._`
+  );
   window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
 };
 window.shareEmail = id => {
