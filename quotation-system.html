@@ -222,6 +222,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               <div class="form-group"><label class="form-label">Area (sq.ft) *</label><input type="number" id="f-area" class="form-input" placeholder="e.g. 2000" oninput="recalculate()"></div>
               <div class="form-group"><label class="form-label">Rate per sq.ft (₹) *</label><input type="number" id="f-rate" class="form-input" placeholder="e.g. 220" oninput="recalculate()"></div>
               <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="f-extra" class="form-input" placeholder="e.g. 5000" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label">GST %</label>
+                <select id="f-gst" class="form-select" onchange="recalculate()">
+                  <option value="0">0% — Not Applicable</option>
+                  <option value="18">18% — Standard GST</option>
+                </select>
+              </div>
               <div class="form-group span-2"><label class="form-label">Notes (additional charges detail)</label><input type="text" id="f-notes" class="form-input" placeholder="e.g. Transportation, labour charges"></div>
             </div>
             <div class="cost-box" style="margin-top:20px;">
@@ -231,10 +237,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
                 <div class="cost-sub">Area × Rate per sq.ft</div>
               </div>
               <div style="width:1px;height:60px;background:rgba(255,255,255,.1)"></div>
+              <div>
+                <div class="cost-label">GST Amount</div>
+                <div class="cost-value" id="f-gst-amount" style="font-size:20px">₹0</div>
+                <div class="cost-sub" id="f-gst-label">@ 0%</div>
+              </div>
+              <div style="width:1px;height:60px;background:rgba(255,255,255,.1)"></div>
               <div style="text-align:right">
-                <div class="cost-label">TOTAL AMOUNT</div>
+                <div class="cost-label">GRAND TOTAL</div>
                 <div class="cost-value" id="f-total" style="font-size:32px">₹0</div>
-                <div class="cost-sub">Base + Additional</div>
+                <div class="cost-sub">Base + Additional + GST</div>
               </div>
             </div>
           </div>
@@ -378,7 +390,8 @@ window.showSection = id => {
 // ── HELPERS ─────────────────────────────────────────────────────
 const fmt = n => Math.round(n).toLocaleString('en-IN');
 function genId() {
-  return `QT-${new Date().getFullYear()}-${String(Math.floor(Math.random()*900)+100)}`;
+  const now = Date.now();
+  return `QT-${new Date().getFullYear()}-${String(now).slice(-4)}`;
 }
 
 // ── CALCULATE ───────────────────────────────────────────────────
@@ -386,8 +399,15 @@ window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
   const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
   const extra = parseFloat(document.getElementById('f-extra').value) || 0;
-  document.getElementById('f-base').textContent  = '₹' + fmt(area * rate);
-  document.getElementById('f-total').textContent = '₹' + fmt(area * rate + extra);
+  const gstPct = parseFloat(document.getElementById('f-gst').value) || 0;
+  const base   = area * rate;
+  const subtotal = base + extra;
+  const gstAmt = Math.round(subtotal * gstPct / 100);
+  const grand  = subtotal + gstAmt;
+  document.getElementById('f-base').textContent       = '₹' + fmt(base);
+  document.getElementById('f-gst-amount').textContent = '₹' + fmt(gstAmt);
+  document.getElementById('f-gst-label').textContent  = '@ ' + gstPct + '%';
+  document.getElementById('f-total').textContent      = '₹' + fmt(grand);
 };
 
 // ── SAVE ────────────────────────────────────────────────────────
@@ -397,11 +417,20 @@ window.saveQuotation = async isDraft => {
   const area  = parseFloat(g('f-area')) || 0;
   const rate  = parseFloat(g('f-rate')) || 0;
   if (!cname || !cphone || !area || !rate) { alert('Name, phone, area aur rate required hai.'); return; }
-  const extra = parseFloat(g('f-extra')) || 0;
+  // Phone validation — must be 10 digits
+  const phoneDigits = cphone.replace(/\D/g,'');
+  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  const extra  = parseFloat(g('f-extra')) || 0;
+  const gstPct = parseFloat(g('f-gst')) || 0;
+  const base   = area * rate;
+  const subtotal = base + extra;
+  const gstAmt = Math.round(subtotal * gstPct / 100);
+  const total  = subtotal + gstAmt;
   const data  = {
     qtId: g('f-qtid'), cname, cphone, caddr: g('f-caddr'),
     ptype: g('f-ptype'), area, rate, extra,
-    base: area*rate, total: area*rate+extra,
+    gstPct, gstAmt,
+    base: area*rate, total,
     notes: g('f-notes'), terms: g('f-terms'), date: g('f-date'),
     isDraft, updatedAt: serverTimestamp()
   };
@@ -421,9 +450,12 @@ window.resetForm = () => {
   document.getElementById('qt-form').reset();
   document.getElementById('f-qtid').value = genId();
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('f-terms').value = `1. Yeh quotation 30 din tak valid hai.\n2. 50% advance payment before work starts.\n3. Balance on completion.\n4. Material price variation may affect final cost.\n5. GST extra as applicable.\n6. Free site visit provided within Delhi NCR.`;
-  document.getElementById('f-base').textContent  = '₹0';
-  document.getElementById('f-total').textContent = '₹0';
+  document.getElementById('f-gst').value = '0';
+  document.getElementById('f-terms').value = `1. VALIDITY: This quotation is valid for 30 days from the issue date. Rates are subject to revision thereafter due to material price fluctuation.\n2. PAYMENT TERMS: 50% advance payment required before commencement of work. 40% upon material delivery at site. Balance 10% on completion & handover.\n3. SCOPE OF WORK: Includes supply of IS-grade structural steel, fabrication, transportation to site, erection & installation as per agreed drawings. Civil/foundation work included unless stated otherwise.\n4. MATERIAL STANDARD: All structural steel conforming to IS:2062. GI sheets conforming to IS:277. Anti-corrosion primer applied before dispatch.\n5. TAXES: GST at applicable rate shall be charged extra. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).\n6. VARIATIONS: Any addition or alteration in scope during execution will be charged on actual basis with prior written approval.\n7. FORCE MAJEURE: Company shall not be liable for delays caused by reasons beyond control including natural calamities, government orders, or material shortage.\n8. DISPUTE RESOLUTION: Any disputes shall be subject to jurisdiction of courts in New Delhi only.\n9. SITE CONDITIONS: Client to ensure clear access to site, power supply, and water availability during erection work.\n10. ACCEPTANCE: This quotation shall be considered accepted upon receipt of advance payment or written confirmation.`;
+  document.getElementById('f-base').textContent       = '₹0';
+  document.getElementById('f-gst-amount').textContent = '₹0';
+  document.getElementById('f-gst-label').textContent  = '@ 0%';
+  document.getElementById('f-total').textContent      = '₹0';
   document.getElementById('form-title').textContent = 'New Quotation';
   editingId = null;
 };
@@ -459,7 +491,7 @@ window.renderHistory = (search='') => {
           <button onclick="viewQT('${q.id}')" class="btn-icon" title="View">👁️</button>
           <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">✏️</button>
           <button onclick="dlPDF('${q.id}')" class="btn-icon" title="PDF">📄</button>
-          <button onclick="waShare('${q.id}')" class="btn-icon" title="WhatsApp">💬</button>
+          <button onclick="shareWhatsApp('${q.id}')" class="btn-icon" title="WhatsApp">💬</button>
           <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
         </td></tr>`).join('');
 };
@@ -472,6 +504,9 @@ window.editQT = id => {
   ['qtid','date','cname','cphone','caddr','ptype','area','rate','extra','notes','terms'].forEach(k=>{
     const el=document.getElementById('f-'+k); if(el) el.value=q[k]||'';
   });
+  // Restore GST
+  const gstEl = document.getElementById('f-gst');
+  if (gstEl) gstEl.value = q.gstPct || 0;
   recalculate(); showSection('create');
 };
 
@@ -493,8 +528,10 @@ function buildQtHTML(q) {
   ];
   if (q.extra>0) items.push({ desc:'Additional / Miscellaneous Charges', sub:q.notes||'As mutually discussed & agreed upon', qty:'—', rate:'—', amt:q.extra });
 
+  const gstLine = (q.gstPct>0) ? `6. TAXES: GST @ ${q.gstPct}% has been applied on the quoted amount. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).` : `6. TAXES: GST at applicable rate shall be charged extra on the above quoted amount. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).`;
+
   // Professional industry-grade T&C
-  const defaultTerms = `1. VALIDITY: This quotation is valid for 30 days from the issue date. Rates are subject to change thereafter due to material price fluctuation.
+  const defaultTerms = `1. VALIDITY: This quotation is valid for 30 days from the issue date. Rates are subject to revision thereafter due to material price fluctuation.
 
 2. PAYMENT TERMS: 50% advance payment required before commencement of work. 40% upon material delivery at site. Balance 10% on completion & handover.
 
@@ -504,15 +541,17 @@ function buildQtHTML(q) {
 
 5. DESIGN & DRAWINGS: Basic structural design included. Detailed architectural/MEP drawings, if required, will be charged separately.
 
-6. TAXES: GST @ applicable rate shall be charged extra on the above quoted amount. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).
+${gstLine}
 
 7. VARIATIONS: Any addition or alteration in scope of work during execution will be charged on actual basis with prior written approval.
 
 8. FORCE MAJEURE: Company shall not be liable for delays caused by reasons beyond control including natural calamities, government orders, or material shortage.
 
-9. DISPUTE RESOLUTION: Any disputes shall be subject to jurisdiction of courts in New Delhi only.
+9. SITE CONDITIONS: Client to ensure clear access to site, power supply, and water availability during erection work.
 
-10. ACCEPTANCE: This quotation shall be considered accepted upon receipt of advance payment or written confirmation.`;
+10. DISPUTE RESOLUTION: Any disputes shall be subject to jurisdiction of courts in New Delhi only.
+
+11. ACCEPTANCE: This quotation shall be considered accepted upon receipt of advance payment or written confirmation.`;
 
   const termsToUse = (q.terms && q.terms.trim().length > 20) ? q.terms : defaultTerms;
 
@@ -638,10 +677,13 @@ function buildQtHTML(q) {
           <span style="font-size:12px;color:#5a6a7a;">Additional Charges</span>
           <span style="font-size:12px;font-weight:600;color:#0a1628;">₹${fmt(q.extra)}</span>
         </div>`:''}
-        <div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
+        ${(q.gstPct>0&&q.gstAmt>0)?`<div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fffbf0;border-bottom:1px solid #e8ecf0;">
+          <span style="font-size:12px;color:#5a6a7a;">GST @ ${q.gstPct}%</span>
+          <span style="font-size:12px;font-weight:600;color:#e65100;">₹${fmt(q.gstAmt)}</span>
+        </div>`:`<div style="display:flex;justify-content:space-between;padding:10px 16px;background:#fafbfc;border-bottom:1px solid #e8ecf0;">
           <span style="font-size:12px;color:#5a6a7a;">GST (as applicable)</span>
           <span style="font-size:11px;color:#8a9aaa;font-style:italic;">Extra</span>
-        </div>
+        </div>`}
         <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;background:#0a1628;">
           <span style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.75);letter-spacing:1px;">GRAND TOTAL</span>
           <span style="font-size:19px;font-weight:900;color:#ffab40;">₹${fmt(q.total)}</span>
@@ -731,7 +773,7 @@ window.dlPDF = async id => {
 window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewId); };
 
 // ── SHARE ───────────────────────────────────────────────────────
-window.waShare = id => {
+window.shareWhatsApp = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   // Format phone — add 91 if 10 digit Indian number
   let phone = q.cphone.replace(/\D/g,'');
