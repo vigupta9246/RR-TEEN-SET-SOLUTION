@@ -182,11 +182,11 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 /* ═══════════════════════════════════════════════════════
    STATS BAR
 ═══════════════════════════════════════════════════════ */
-.stats-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; }
-.stat-item { border-right:1px solid rgba(255,255,255,.07); padding:16px; }
+.stats-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; border-bottom:2px solid rgba(215,153,34,.4); }
+.stat-item { border-right:1px solid rgba(197,203,227,.18); padding:16px; }
 .stat-item:last-child { border-right:none; }
 .stat-num  { font-family:var(--font-h); font-size:44px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-.stat-lbl  { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:1.5px; margin-top:5px; }
+.stat-lbl  { font-size:11px; color:rgba(239,226,186,.65); text-transform:uppercase; letter-spacing:1.5px; margin-top:5px; }
 
 /* ═══════════════════════════════════════════════════════
    CARDS
@@ -382,8 +382,8 @@ footer { background:var(--navy); border-top:1px solid rgba(255,255,255,.07); pad
   .grid-3  { grid-template-columns:1fr 1fr; }
   .grid-auto { grid-template-columns:1fr 1fr; }
   .stats-bar { grid-template-columns:1fr 1fr; padding:24px 5%; }
-  .stat-item { border-right:none; border-bottom:1px solid rgba(255,255,255,.06); padding:14px; }
-  .stat-item:nth-child(odd)  { border-right:1px solid rgba(255,255,255,.06); }
+  .stat-item { border-right:none; border-bottom:1px solid rgba(197,203,227,.18); padding:14px; }
+  .stat-item:nth-child(odd)  { border-right:1px solid rgba(197,203,227,.18); }
   .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom:none; }
   .stat-num { font-size:34px; }
   .gallery-grid { grid-template-columns:1fr 1fr; }
