@@ -35,6 +35,11 @@
   --radius-sm: 8px;
   --nav-h:     66px;
   --t:         .3s ease;
+
+  /* Aliases used across inner pages (about/contact/services etc.) */
+  --light: #f7f3e8;
+  --muted: var(--text-muted);
+  --gray:  var(--bg-alt);
 }
 
 /* ── DARK MODE ──────────────────────────────────────── */
