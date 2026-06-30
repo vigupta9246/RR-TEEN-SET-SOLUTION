@@ -6,8 +6,8 @@
 /* ── DESIGN TOKENS ─────────────────────────────────── */
 :root {
   /* Brand */
-  --navy:    #0a1628;
-  --steel:   #0f2540;
+  --navy:    #16264f;
+  --steel:   #213d72;
   --blue:    #4056a1;
   --sky:     #5c71b0;
   --accent:  #f13c20;
@@ -182,7 +182,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 /* ═══════════════════════════════════════════════════════
    STATS BAR
 ═══════════════════════════════════════════════════════ */
-.stats-bar { background:linear-gradient(135deg,#06101e,#0a1e38); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; }
+.stats-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; }
 .stat-item { border-right:1px solid rgba(255,255,255,.07); padding:16px; }
 .stat-item:last-child { border-right:none; }
 .stat-num  { font-family:var(--font-h); font-size:44px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
@@ -336,7 +336,7 @@ footer { background:var(--navy); border-top:1px solid rgba(255,255,255,.07); pad
 /* ═══════════════════════════════════════════════════════
    GBP BAR
 ═══════════════════════════════════════════════════════ */
-.gbp-bar { background:linear-gradient(135deg,#06101e,#0a1e38); padding:14px 6%; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,.05); }
+.gbp-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:14px 6%; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; border-bottom:1px solid rgba(255,255,255,.05); }
 
 /* ═══════════════════════════════════════════════════════
    ANIMATIONS
