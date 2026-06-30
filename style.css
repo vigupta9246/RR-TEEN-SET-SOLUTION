@@ -58,7 +58,7 @@
 
 /* ── RESET ──────────────────────────────────────────── */
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; font-size:16px; -webkit-text-size-adjust:100%; }
+html { scroll-behavior:smooth; font-size:16px; -webkit-text-size-adjust:100%; overflow-x:hidden; max-width:100%; }
 body {
   font-family: var(--font-b);
   color: var(--text);
@@ -151,14 +151,14 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
 #mob-menu { display:none; position:fixed; top:var(--nav-h); left:0; right:0; background:rgba(10,22,40,.99); border-bottom:2px solid var(--accent); padding:16px 5%; z-index:999; flex-direction:column; gap:2px; max-height:calc(100vh - var(--nav-h)); overflow-y:auto; }
 #mob-menu.open { display:flex; }
-#mob-menu a { display:block; padding:12px 0; color:rgba(255,255,255,.8); font-size:14px; font-weight:600; border-bottom:1px solid rgba(255,255,255,.06); text-transform:uppercase; letter-spacing:.5px; }
+#mob-menu a { display:block; padding:14px 0; min-height:46px; color:rgba(255,255,255,.8); font-size:14px; font-weight:600; border-bottom:1px solid rgba(255,255,255,.06); text-transform:uppercase; letter-spacing:.5px; }
 #mob-menu a:hover { color:var(--accent); }
 .mob-cta-btn { background:var(--accent)!important; text-align:center; border-radius:8px; padding:13px!important; color:#fff!important; margin-top:8px!important; border-bottom:none!important; }
 
 /* ═══════════════════════════════════════════════════════
    BUTTONS
 ═══════════════════════════════════════════════════════ */
-.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; border-radius:var(--radius-sm); font-weight:700; font-size:14px; transition:all .25s; cursor:pointer; border:none; font-family:var(--font-b); white-space:nowrap; line-height:1; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 28px; min-height:46px; border-radius:var(--radius-sm); font-weight:700; font-size:14px; transition:all .25s; cursor:pointer; border:none; font-family:var(--font-b); white-space:nowrap; line-height:1; }
 .btn-blue   { background:linear-gradient(135deg,var(--sky),var(--blue)); color:#fff; box-shadow:var(--shadow-blue); }
 .btn-blue:hover   { transform:translateY(-2px); box-shadow:0 18px 40px rgba(64,86,161,.28); color:#fff; }
 .btn-orange { background:linear-gradient(135deg,var(--accent-2),var(--accent)); color:#fff; box-shadow:var(--shadow-accent); }
@@ -251,7 +251,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .cform { background:rgba(255,255,255,.06); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:34px; }
 .fgroup { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
 .fgroup label { font-size:11px; font-weight:700; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:1px; }
-.fgroup input, .fgroup textarea, .fgroup select { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:var(--radius-sm); padding:11px 14px; color:#fff; font-size:14px; font-family:var(--font-b); outline:none; transition:border var(--t); width:100%; }
+.fgroup input, .fgroup textarea, .fgroup select { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:var(--radius-sm); padding:13px 14px; min-height:46px; color:#fff; font-size:14px; font-family:var(--font-b); outline:none; transition:border var(--t); width:100%; }
 .fgroup input::placeholder, .fgroup textarea::placeholder { color:rgba(255,255,255,.3); }
 .fgroup input:focus, .fgroup textarea:focus, .fgroup select:focus { border-color:var(--sky); }
 .fgroup select option { background:var(--navy); }
@@ -410,6 +410,19 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
   section { padding:44px 5%; }
   #home { padding-left:4%; padding-right:4%; }
   h1 { font-size:clamp(36px,9vw,56px); }
+}
+
+@media(max-width:768px) {
+  .fgroup input, .fgroup textarea, .fgroup select,
+  .lead-fields input, #sl-loc { font-size:16px!important; }
+}
+
+@media(max-width:380px) {
+  .btn { font-size:13px; padding:12px 18px; }
+  .logo-tag { display:none; }
+  .frow, .lead-fields { grid-template-columns:1fr!important; }
+  .stype-grid { gap:8px; }
+  .cinfo-item, .footer-contact p { gap:10px; }
 }
 
 @media print {

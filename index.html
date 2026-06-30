@@ -79,14 +79,14 @@
   <!-- ── HERO SLIDESHOW — 9 real project photos ── -->
   <div id="hero-slides" aria-hidden="true" style="position:absolute;inset:0;z-index:0;">
     <div class="hslide active" style="background-image:url('images/project-000.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-001.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-002.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-003.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-004.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-005.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-006.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-007.jpg')"></div>
-    <div class="hslide" style="background-image:url('images/project-008.jpg')"></div>
+    <div class="hslide" data-bg="images/project-001.jpg"></div>
+    <div class="hslide" data-bg="images/project-002.jpg"></div>
+    <div class="hslide" data-bg="images/project-003.jpg"></div>
+    <div class="hslide" data-bg="images/project-004.jpg"></div>
+    <div class="hslide" data-bg="images/project-005.jpg"></div>
+    <div class="hslide" data-bg="images/project-006.jpg"></div>
+    <div class="hslide" data-bg="images/project-007.jpg"></div>
+    <div class="hslide" data-bg="images/project-008.jpg"></div>
   </div>
 
   <!-- Slideshow dots indicator -->
@@ -126,6 +126,17 @@
       }
       dots.forEach(function(d,i){d.addEventListener('click',function(){goTo(i);});});
       setInterval(function(){goTo(cur+1);},3000);
+
+      // Lazy-load remaining slide backgrounds after first paint so they
+      // don't compete with the critical above-fold content on mobile.
+      function loadDeferredSlides(){
+        slides.forEach(function(s){
+          var bg = s.getAttribute('data-bg');
+          if (bg) { s.style.backgroundImage = "url('" + bg + "')"; s.removeAttribute('data-bg'); }
+        });
+      }
+      if (document.readyState === 'complete') { loadDeferredSlides(); }
+      else { window.addEventListener('load', loadDeferredSlides); }
     })();
   </script>
 
