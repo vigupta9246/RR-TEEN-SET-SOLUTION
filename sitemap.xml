@@ -250,20 +250,4 @@
     <priority>0.3</priority>
   </url>
 
-  <!-- TOOLS -->
-  <url>
-    <loc>https://rrteensetsolution.com/shed-cost-calculator.html</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- NEW GUIDE PAGE -->
-  <url>
-    <loc>https://rrteensetsolution.com/tin-shed-types-delhi-ncr.html</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-
 </urlset>
