@@ -396,6 +396,7 @@ window.showSection = id => {
 
 // ── HELPERS ─────────────────────────────────────────────────────
 const fmt = n => Math.round(n).toLocaleString('en-IN');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function genId() {
   const now = Date.now();
   return `QT-${new Date().getFullYear()}-${String(now).slice(-4)}`;
@@ -489,7 +490,7 @@ window.renderHistory = (search='') => {
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No quotations found</td></tr>`
     : list.map(q=>`<tr>
         <td><span class="qt-id-badge">${q.qtId}</span></td>
-        <td><strong>${q.cname}</strong><br><small>${q.cphone}</small></td>
+        <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
         <td>${q.ptype}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
         <td><strong>₹${fmt(q.total)}</strong></td>
@@ -538,7 +539,7 @@ function buildQtHTML(q) {
   ];
   if (q.extra>0) items.push({
     desc:'Additional / Miscellaneous Charges',
-    sub:q.notes||'As mutually discussed &amp; agreed upon',
+    sub:q.notes?esc(q.notes):'As mutually discussed &amp; agreed upon',
     qty:'&mdash;', rate:'&mdash;', amt:q.extra
   });
 
@@ -561,7 +562,7 @@ function buildQtHTML(q) {
   ];
 
   const userTerms = (q.terms && q.terms.trim().length > 20)
-    ? q.terms.split('\n').filter(l=>l.trim())
+    ? q.terms.split('\n').filter(l=>l.trim()).map(esc)
     : termsList;
 
   const half = Math.ceil(userTerms.length/2);
@@ -619,10 +620,10 @@ function buildQtHTML(q) {
       <tr>
         <td style="width:50%;padding:14px 18px;vertical-align:top;border-right:1.5px solid #e8ecf0;">
           <div style="font-size:8px;font-weight:800;color:#000000;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">PREPARED FOR</div>
-          <div style="font-size:15px;font-weight:800;color:#000000;">${q.cname}</div>
+          <div style="font-size:15px;font-weight:800;color:#000000;">${esc(q.cname)}</div>
           <div style="font-size:11px;color:#5a6a7a;margin-top:5px;line-height:1.8;">
-            <div>Tel: ${q.cphone}</div>
-            ${q.caddr?`<div>Address: ${q.caddr}</div>`:''}
+            <div>Tel: ${esc(q.cphone)}</div>
+            ${q.caddr?`<div>Address: ${esc(q.caddr)}</div>`:''}
           </div>
         </td>
         <td style="width:50%;padding:14px 18px;vertical-align:top;background:#ffffff;">
