@@ -213,6 +213,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="f-cname" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
               <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="f-cphone" class="form-input" placeholder="e.g. 9876543210"></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" id="f-cemail" class="form-input" placeholder="e.g. ramesh@email.com"></div>
               <div class="form-group span-2"><label class="form-label">Customer Address</label><input type="text" id="f-caddr" class="form-input" placeholder="e.g. Plot 12, Dwarka, New Delhi"></div>
             </div>
           </div>
@@ -229,6 +230,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               <div class="form-group"><label class="form-label">Area (sq.ft) *</label><input type="number" id="f-area" class="form-input" placeholder="e.g. 2000" oninput="recalculate()"></div>
               <div class="form-group"><label class="form-label">Rate per sq.ft (₹) *</label><input type="number" id="f-rate" class="form-input" placeholder="e.g. 220" oninput="recalculate()"></div>
               <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="f-extra" class="form-input" placeholder="e.g. 5000" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label">Discount (₹)</label><input type="number" id="f-discount" class="form-input" placeholder="e.g. 3000" oninput="recalculate()"></div>
               <div class="form-group"><label class="form-label">GST %</label>
                 <select id="f-gst" class="form-select" onchange="recalculate()">
                   <option value="0">0% — Not Applicable</option>
@@ -256,6 +258,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
                 <div class="cost-sub">Base + Additional + GST</div>
               </div>
             </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">💳 PAYMENT DETAILS (optional — shown on quotation if filled)</div>
+            <div class="form-group"><textarea id="f-payment" class="form-textarea" rows="3" placeholder="e.g. Bank: HDFC Bank, A/C: 1234567890, IFSC: HDFC0001234&#10;UPI: rrteenset@upi"></textarea></div>
           </div>
           <div class="form-card">
             <div class="form-section-title">📋 TERMS & CONDITIONS</div>
@@ -407,9 +413,10 @@ window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
   const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
   const extra = parseFloat(document.getElementById('f-extra').value) || 0;
+  const discount = parseFloat(document.getElementById('f-discount').value) || 0;
   const gstPct = parseFloat(document.getElementById('f-gst').value) || 0;
   const base   = area * rate;
-  const subtotal = base + extra;
+  const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const grand  = subtotal + gstAmt;
   document.getElementById('f-base').textContent       = '₹' + fmt(base);
@@ -429,17 +436,18 @@ window.saveQuotation = async isDraft => {
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
   const extra  = parseFloat(g('f-extra')) || 0;
+  const discount = parseFloat(g('f-discount')) || 0;
   const gstPct = parseFloat(g('f-gst')) || 0;
   const base   = area * rate;
-  const subtotal = base + extra;
+  const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const total  = subtotal + gstAmt;
   const data  = {
-    qtId: g('f-qtid'), cname, cphone, caddr: g('f-caddr'),
-    ptype: g('f-ptype'), area, rate, extra,
+    qtId: g('f-qtid'), cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
+    ptype: g('f-ptype'), area, rate, extra, discount,
     gstPct, gstAmt,
     base: area*rate, total,
-    notes: g('f-notes'), terms: g('f-terms'), date: g('f-date'),
+    notes: g('f-notes'), terms: g('f-terms'), payment: g('f-payment'), date: g('f-date'),
     isDraft, updatedAt: serverTimestamp()
   };
   try {
@@ -509,7 +517,7 @@ window.editQT = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   editingId = id;
   document.getElementById('form-title').textContent = 'Edit Quotation';
-  ['qtid','date','cname','cphone','caddr','ptype','area','rate','extra','notes','terms'].forEach(k=>{
+  ['qtid','date','cname','cphone','cemail','caddr','ptype','area','rate','extra','discount','notes','terms','payment'].forEach(k=>{
     const el=document.getElementById('f-'+k); if(el) el.value=q[k]||'';
   });
   // Restore GST
@@ -528,9 +536,13 @@ window.delQT = async id => {
 function buildQtHTML(q) {
   const dateObj   = q.date ? new Date(q.date+'T00:00:00') : new Date();
   const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
+  const daysLeft  = Math.ceil((validTill - new Date()) / 86400000);
   const fmtDate   = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
   const srNo      = idx => String(idx+1).padStart(2,'0');
   const R         = '&#8377;';
+  const weeksMin  = Math.max(1, Math.round(((q.area||0)/1000)*2));
+  const weeksMax  = Math.max(2, Math.round(((q.area||0)/1000)*3));
+  const timelineText = `${weeksMin}-${weeksMax} weeks`;
 
   const items = [
     { desc:`${q.ptype} &mdash; Supply, Fabrication &amp; Erection`,
@@ -608,6 +620,7 @@ function buildQtHTML(q) {
           <div style="margin-top:8px;font-size:11px;color:#5a6a7a;line-height:1.9;">
             <div><strong style="color:#000000;">Issue Date :</strong> &nbsp;${fmtDate(dateObj)}</div>
             <div><strong style="color:#000000;">Valid Till &nbsp;:</strong> &nbsp;<span style="color:#000000;font-weight:700;">${fmtDate(validTill)}</span></div>
+            ${daysLeft>=0?`<div style="margin-top:4px;display:inline-block;background:${daysLeft<=7?'#fdecea':'#eef7ee'};color:${daysLeft<=7?'#c0392b':'#1e7d32'};font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:12px;">${daysLeft===0?'Expires today':daysLeft+' day'+(daysLeft===1?'':'s')+' left'}</div>`:`<div style="margin-top:4px;display:inline-block;background:#f1f1f1;color:#8a9aaa;font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:12px;">Expired</div>`}
           </div>
         </td>
       </tr>
@@ -623,6 +636,7 @@ function buildQtHTML(q) {
           <div style="font-size:15px;font-weight:800;color:#000000;">${esc(q.cname)}</div>
           <div style="font-size:11px;color:#5a6a7a;margin-top:5px;line-height:1.8;">
             <div>Tel: ${esc(q.cphone)}</div>
+            ${q.cemail?`<div>Email: ${esc(q.cemail)}</div>`:''}
             ${q.caddr?`<div>Address: ${esc(q.caddr)}</div>`:''}
           </div>
         </td>
@@ -638,6 +652,12 @@ function buildQtHTML(q) {
               <td style="background:#fff;border:1.5px solid #e8ecf0;border-radius:6px;padding:7px 10px;vertical-align:top;">
                 <div style="font-size:7.5px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">RATE / SQ.FT</div>
                 <div style="font-size:13px;font-weight:800;color:#000000;margin-top:2px;">${R}${fmt(q.rate)}</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="background:#fff;border:1.5px solid #e8ecf0;border-radius:6px;padding:7px 10px;vertical-align:top;">
+                <div style="font-size:7.5px;color:#8a9aaa;font-weight:700;letter-spacing:1px;">ESTIMATED COMPLETION</div>
+                <div style="font-size:13px;font-weight:800;color:#000000;margin-top:2px;">${timelineText} <span style="font-size:9px;color:#5a6a7a;font-weight:600;">from advance receipt</span></div>
               </td>
             </tr>
           </table>
@@ -683,6 +703,10 @@ function buildQtHTML(q) {
         <td style="padding:9px 14px;font-size:11px;color:#5a6a7a;border-bottom:1px solid #e8ecf0;">Additional Charges</td>
         <td style="padding:9px 14px;font-size:11px;font-weight:600;color:#000000;text-align:right;border-bottom:1px solid #e8ecf0;">${R}${fmt(q.extra)}</td>
       </tr>`:''}
+      ${q.discount>0?`<tr style="background:#ffffff;">
+        <td style="padding:9px 14px;font-size:11px;color:#c0392b;border-bottom:1px solid #e8ecf0;">Discount</td>
+        <td style="padding:9px 14px;font-size:11px;font-weight:600;color:#c0392b;text-align:right;border-bottom:1px solid #e8ecf0;">&minus;${R}${fmt(q.discount)}</td>
+      </tr>`:''}
       ${(q.gstPct>0&&q.gstAmt>0)?`<tr style="background:#ffffff;">
         <td style="padding:9px 14px;font-size:11px;color:#000000;border-bottom:1px solid #e8ecf0;">GST @ ${q.gstPct}%</td>
         <td style="padding:9px 14px;font-size:11px;font-weight:600;color:#000000;text-align:right;border-bottom:1px solid #e8ecf0;">${R}${fmt(q.gstAmt)}</td>
@@ -696,6 +720,14 @@ function buildQtHTML(q) {
       </tr>
     </table>
   </div>
+
+  ${q.payment?`<!-- PAYMENT DETAILS -->
+  <div style="margin:0 36px 12px;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
+    <div style="background:#ffffff;padding:8px 16px;border-bottom:1.5px solid #000000;">
+      <span style="font-size:9px;font-weight:800;color:#000000;letter-spacing:2.5px;text-transform:uppercase;">Payment Details</span>
+    </div>
+    <div style="padding:10px 16px;font-size:10px;color:#5a6a7a;line-height:1.8;white-space:pre-line;">${esc(q.payment)}</div>
+  </div>`:''}
 
   <!-- TERMS & CONDITIONS — 2 column table (no CSS columns) -->
   <div style="margin:0 36px 12px;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
@@ -839,7 +871,7 @@ _Please download the PDF quotation from our system for complete details & terms.
 };
 window.shareEmail = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
-  window.open(`mailto:?subject=${encodeURIComponent(`Quotation ${q.qtId} - R.R Teen Set Solution`)}&body=${encodeURIComponent(`Dear ${q.cname},\n\nQuotation ID: ${q.qtId}\nProject: ${q.ptype}\nArea: ${q.area} sq.ft\nTotal: ₹${fmt(q.total)}\nDate: ${q.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`)}`,'_blank');
+  window.open(`mailto:${encodeURIComponent(q.cemail||'')}?subject=${encodeURIComponent(`Quotation ${q.qtId} - R.R Teen Set Solution`)}&body=${encodeURIComponent(`Dear ${q.cname},\n\nQuotation ID: ${q.qtId}\nProject: ${q.ptype}\nArea: ${q.area} sq.ft\nTotal: ₹${fmt(q.total)}\nDate: ${q.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`)}`,'_blank');
 };
 
 // ── ANALYTICS ───────────────────────────────────────────────────
