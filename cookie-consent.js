@@ -299,10 +299,6 @@
   function showFloatingBtn() {
     // Floating button hidden — user can re-open via footer link
     return;
-  });
-    floatingBtn.addEventListener('click', () => {
-      showModal(loadPrefs());
-    });
   }
 
   // ─── INIT ─────────────────────────────────────────────────
