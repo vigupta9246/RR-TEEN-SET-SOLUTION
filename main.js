@@ -279,20 +279,29 @@ document.addEventListener('DOMContentLoaded',function(){
       }
     }
 
-    /* ── Mobile Menu ── */
-    var mobMenu = document.getElementById('mob-menu');
-    if(mobMenu){
-      if(!mobMenu.querySelector('a[href*="shed-cost-calculator"]')){
-        var mobCta = mobMenu.querySelector('.mob-cta-btn');
-        if(mobCta){
-          var a = document.createElement('a');
-          a.href = 'shed-cost-calculator.html';
-          a.textContent = '🧮 Cost Calculator';
-          a.style.cssText = 'color:#ff6f00;font-weight:700';
-          mobMenu.insertBefore(a, mobCta);
-        }
-      }
-    }
-
   });
 })();
+
+/* ════════════════════════════════════════════════════════════
+   9. CALL & WHATSAPP CLICK TRACKING (GA4)
+   Fires a GA4 event every time someone taps a Call or WhatsApp
+   button anywhere on the site. View live in GA4 → Reports →
+   Realtime, or historically in Reports → Engagement → Events.
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[href^="tel:"], a[href*="wa.me"], a[href*="api.whatsapp.com"]');
+    if(!link) return;
+    var isCall = link.href.indexOf('tel:') === 0;
+    var eventName = isCall ? 'call_click' : 'whatsapp_click';
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, {
+        'event_category': 'engagement',
+        'event_label': isCall ? link.href.replace('tel:','') : 'whatsapp',
+        'page_path': location.pathname,
+        'page_title': document.title
+      });
+    }
+  }, true);
+})();
+
