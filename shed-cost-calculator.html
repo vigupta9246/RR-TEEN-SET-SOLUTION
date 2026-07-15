@@ -484,6 +484,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     </div>
   </div>
 
+  <!-- PDF DOWNLOAD CTA -->
+  <button class="cta-wa" id="pdf-download-btn" onclick="downloadQuotePDF()" style="background:linear-gradient(135deg,#16264f,#28407c);margin-bottom:10px;border:none;cursor:pointer">📄 PDF Quote Download Karein</button>
+
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
     <p class="lead-title">📧 Detailed quote email/WhatsApp pe chahiye?</p>
@@ -647,6 +650,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp">💬</a>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="main.js"></script>
 <script src="cookie-consent.js"></script>
 
@@ -793,6 +797,126 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     setTimeout(function(){
       window.open('https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg),'_blank');
     },800);
+  };
+
+  /* ── PDF QUOTE DOWNLOAD ── */
+  window.downloadQuotePDF=function(){
+    if(typeof window.jspdf==='undefined'){alert('PDF library load ho rahi hai, thodi der mein try karein.');return;}
+    var len=+document.getElementById('sl-len').value||50;
+    var wid=+document.getElementById('sl-wid').value||40;
+    var ht=+document.getElementById('sl-ht').value||14;
+    var locSel=document.getElementById('sl-loc');
+    var locLabel=locSel.options[locSel.selectedIndex].text;
+    var loc=+locSel.value||1;
+    var area=len*wid;
+    var r=R[curType];
+    var lo=Math.round(r.low*area*loc),hi=Math.round(r.high*area*loc);
+    var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
+    var lLo=lo-mLo,lHi=hi-mHi;
+    var today=new Date();
+    var dateStr=today.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    var validTill=new Date(today.getTime()+7*24*60*60*1000).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF({unit:'pt',format:'a4'});
+    var pw=doc.internal.pageSize.getWidth();
+    var navy=[10,22,40],orange=[255,111,0],gray=[90,100,115];
+
+    /* Header band */
+    doc.setFillColor(navy[0],navy[1],navy[2]);
+    doc.rect(0,0,pw,90,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(20);
+    doc.text('R.R Teen Set Solution',40,38);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    doc.setTextColor(255,193,102);
+    doc.text('Steel & Shed Fabrication Experts | Delhi NCR',40,56);
+    doc.setTextColor(220,225,235);
+    doc.setFontSize(9);
+    doc.text('GST No: 07DJCPK0635M1Z5   |   +91 85272 58462',40,72);
+
+    doc.setTextColor(navy[0],navy[1],navy[2]);
+    var y=125;
+    doc.setFont('helvetica','bold');doc.setFontSize(15);
+    doc.text('Estimated Cost Quote',40,y);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.setTextColor(gray[0],gray[1],gray[2]);
+    doc.text('Generated: '+dateStr+'   |   Valid till: '+validTill,40,y+16);
+
+    /* Shed details box */
+    y+=42;
+    doc.setDrawColor(230,230,230);
+    doc.setFillColor(247,243,232);
+    doc.roundedRect(40,y,pw-80,110,6,6,'F');
+    var by=y+26,lx=58,rx=pw/2+10;
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('Shed Type',lx,by);doc.text('Location',rx,by);
+    doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+    doc.text(r.label,lx,by+16);doc.text(locLabel,rx,by+16);
+
+    by+=38;
+    doc.setFont('helvetica','bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('Dimensions',lx,by);doc.text('Total Area',rx,by);
+    doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+    doc.text(len+' ft (L) x '+wid+' ft (W) x '+ht+' ft (H)',lx,by+16);
+    doc.text(area.toLocaleString('en-IN')+' sq.ft',rx,by+16);
+
+    /* Result banner */
+    y+=132;
+    doc.setFillColor(navy[0],navy[1],navy[2]);
+    doc.roundedRect(40,y,pw-80,64,6,6,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text('ESTIMATED COST RANGE',58,y+22);
+    doc.setFont('helvetica','bold');doc.setFontSize(22);
+    doc.setTextColor(255,140,0);
+    doc.text(fmt(lo)+'  -  '+fmt(hi),58,y+48);
+
+    /* Breakdown table */
+    y+=90;
+    doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.setFont('helvetica','bold');doc.setFontSize(11);
+    doc.text('Cost Breakdown',40,y);
+    y+=14;
+    var rows=[
+      ['Rate applied','Rs.'+r.low+' - Rs.'+r.high+' / sq.ft'],
+      ['Material cost (approx.)',fmt(mLo)+' - '+fmt(mHi)],
+      ['Labour + installation (approx.)',fmt(lLo)+' - '+fmt(lHi)],
+      ['GST (extra, as applicable)','18%']
+    ];
+    doc.setFontSize(10);
+    rows.forEach(function(row,i){
+      var ry=y+i*22;
+      doc.setFillColor(i%2===0?255:247,i%2===0?255:243,i%2===0?255:232);
+      doc.rect(40,ry-13,pw-80,20,'F');
+      doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+      doc.text(row[0],52,ry);
+      doc.setFont('helvetica','bold');doc.setTextColor(navy[0],navy[1],navy[2]);
+      doc.text(row[1],pw-52,ry,{align:'right'});
+    });
+
+    /* Footer */
+    var fy=y+rows.length*22+30;
+    doc.setDrawColor(230,230,230);
+    doc.line(40,fy,pw-40,fy);
+    fy+=18;
+    doc.setFont('helvetica','italic');doc.setFontSize(8.5);
+    doc.setTextColor(120,120,120);
+    var disclaimer='This is a planning-stage estimate only. Final cost will be confirmed after a free site visit, based on soil condition, design complexity and site access. GST @18% extra. Rates as per 2026 Delhi NCR market.';
+    var split=doc.splitTextToSize(disclaimer,pw-80);
+    doc.text(split,40,fy);
+    fy+=split.length*11+14;
+    doc.setFont('helvetica','bold');doc.setFontSize(10);
+    doc.setTextColor(navy[0],navy[1],navy[2]);
+    doc.text('Book your FREE site visit:',40,fy);
+    doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+    doc.text('Call/WhatsApp +91 85272 58462   |   rrteensetsolution@gmail.com   |   rrteensetsolution.com',40,fy+15);
+
+    doc.save('RR-Teen-Set-Solution-Shed-Quote-'+curType+'-'+Date.now()+'.pdf');
+
+    if(typeof gtag==='function'){gtag('event','pdf_quote_download',{shed_type:curType,area:area});}
   };
 
   /* ── SHARE FUNCTIONS ── */
