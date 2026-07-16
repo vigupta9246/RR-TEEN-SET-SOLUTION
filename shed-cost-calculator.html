@@ -294,18 +294,56 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .lead-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .lead-fields input{background:#ffffff!important;border:1px solid rgba(10,22,40,.15)!important;color:#0a1628!important;border-radius:10px!important;padding:12px 14px!important;font-size:13px!important;box-sizing:border-box;width:100%}
 .lead-fields input::placeholder{color:rgba(10,22,40,.35)!important}
-.lead-submit{width:100%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(255,111,0,.3);letter-spacing:.3px}
-.lead-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,111,0,.4)}
+/* ══════════════════════════════════════════
+   ACTION BUTTONS — original animated system
+══════════════════════════════════════════ */
+.xbtn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;border-radius:14px;padding:16px 18px;font-size:14px;font-weight:700;text-decoration:none;box-sizing:border-box;cursor:pointer;letter-spacing:.2px;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;margin-bottom:10px;isolation:isolate}
+.xbtn:last-child{margin-bottom:0}
+.xbtn:active{transform:scale(.96)}
+.xbtn .xbtn-icon{position:relative;display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:2}
+.xbtn .xbtn-label{position:relative;z-index:2}
+.xbtn .xbtn-arrow{position:relative;z-index:2;font-size:13px;transition:transform .3s ease}
+.xbtn:hover .xbtn-arrow{transform:translateX(4px)}
+.xbtn::before{content:'';position:absolute;top:0;left:-60%;width:35%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);transition:left .65s cubic-bezier(.22,1,.36,1);z-index:1;pointer-events:none}
+.xbtn:hover::before{left:130%}
+.xbtn-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:xripple .6s ease-out;pointer-events:none;z-index:1}
+@keyframes xripple{to{transform:scale(2.6);opacity:0}}
+
+/* WhatsApp variant — pulsing dot to draw the eye */
+.xbtn-wa{background:linear-gradient(135deg,#25D366,#1fb955);color:#fff;box-shadow:0 4px 16px rgba(37,211,102,.28)}
+.xbtn-wa:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.4);color:#fff}
+.xbtn-wa:hover .xbtn-icon{transform:scale(1.18) rotate(-8deg)}
+.xbtn-wa .xbtn-dot{position:absolute;top:9px;right:12px;width:8px;height:8px;border-radius:50%;background:#fff;opacity:.9;z-index:2;animation:xpulsedot 1.8s ease-out infinite}
+@keyframes xpulsedot{0%{box-shadow:0 0 0 0 rgba(255,255,255,.65)}70%{box-shadow:0 0 0 10px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+
+/* Call variant — outline with icon "ring" shake */
+.xbtn-call{background:#ffffff;border:1.5px solid rgba(10,22,40,.15);color:rgba(10,22,40,.75);box-shadow:0 2px 10px rgba(10,22,40,.04)}
+.xbtn-call:hover{border-color:#ff6f00;color:#ff6f00;transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,111,0,.15)}
+.xbtn-call:hover .xbtn-icon{animation:xring .5s ease}
+@keyframes xring{0%,100%{transform:rotate(0)}20%{transform:rotate(-16deg)}40%{transform:rotate(13deg)}60%{transform:rotate(-9deg)}80%{transform:rotate(5deg)}}
+
+/* PDF variant — navy gradient, doc-icon drop bounce */
+.xbtn-pdf{background:linear-gradient(135deg,#16264f,#28407c);color:#fff;box-shadow:0 4px 16px rgba(22,38,79,.3)}
+.xbtn-pdf:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(22,38,79,.42)}
+.xbtn-pdf:hover .xbtn-icon{animation:xdrop .55s ease}
+@keyframes xdrop{0%{transform:translateY(-4px)}55%{transform:translateY(3px)}100%{transform:translateY(0)}}
+.xbtn-pdf.is-loading{pointer-events:none;opacity:.8}
+.xbtn-pdf.is-loading .xbtn-icon{animation:xspin .8s linear infinite}
+@keyframes xspin{to{transform:rotate(360deg)}}
+
+/* Submit / lead variant — orange gradient */
+.xbtn-submit{background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;box-shadow:0 4px 16px rgba(255,111,0,.3)}
+.xbtn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,111,0,.42)}
+.xbtn-submit:hover .xbtn-icon{animation:xdrop .55s ease}
+
+/* Small/inline size for the share row */
+.xbtn-sm{width:auto;padding:11px 20px;font-size:12px;border-radius:11px;margin-bottom:0}
 .lead-success{display:none;background:rgba(37,211,102,.08);border:1.5px solid rgba(37,211,102,.25);border-radius:12px;padding:18px;text-align:center}
 .lead-success-icon{font-size:32px;margin-bottom:8px}
 .lead-success-msg{font-size:14px;color:#1fa855;font-weight:700;margin:0 0 4px}
 .lead-success-sub{font-size:12px;color:rgba(10,22,40,.55);margin:0}
 
 /* CTAs */
-.cta-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#25D366,#20ba5a);color:#fff;border:none;border-radius:12px;padding:15px;font-size:14px;font-weight:700;text-decoration:none;box-sizing:border-box;margin-bottom:10px;box-shadow:0 4px 16px rgba(37,211,102,.25);letter-spacing:.3px;transition:all .2s}
-.cta-wa:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,211,102,.35);color:#fff}
-.cta-call{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#ffffff;border:1px solid rgba(10,22,40,.15);color:rgba(10,22,40,.7);border-radius:12px;padding:13px;font-size:13px;font-weight:600;text-decoration:none;box-sizing:border-box;transition:all .2s}
-.cta-call:hover{border-color:#ff6f00;color:#ff6f00}
 .cta-disclaimer{font-size:10px;color:rgba(10,22,40,.4);text-align:center;margin:12px 0 0;line-height:1.7}
 
 /* Rate table section */
@@ -338,11 +376,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .share-title{font-size:15px;font-weight:700;color:#0a1628;margin:0 0 5px}
 .share-sub{font-size:12px;color:rgba(10,22,40,.5);margin:0 0 16px}
 .share-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.share-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;letter-spacing:.2px}
-.share-btn:hover{transform:translateY(-1px)}
-.share-wa{background:linear-gradient(135deg,#25D366,#20ba5a);color:#fff;box-shadow:0 3px 12px rgba(37,211,102,.2)}
-.share-copy{background:#ffffff;color:rgba(10,22,40,.7);border:1px solid rgba(10,22,40,.15)}
 .copy-confirm{display:none;font-size:11px;color:#1fa855;margin-top:8px;font-weight:600}
+
+/* Floating call/WhatsApp buttons — subtle life without being distracting */
+.fab-wrap .fab-btn{transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease}
+.fab-wrap .fab-btn:hover{transform:scale(1.12) translateY(-3px)}
+.fab-wrap .fab-wa{animation:xfabglow 2.6s ease-in-out infinite}
+@keyframes xfabglow{0%,100%{box-shadow:0 4px 14px rgba(37,211,102,.35)}50%{box-shadow:0 4px 26px rgba(37,211,102,.7)}}
 </style>
 </head>
 <body>
@@ -485,7 +525,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 
   <!-- PDF DOWNLOAD CTA -->
-  <button class="cta-wa" id="pdf-download-btn" onclick="downloadQuotePDF()" style="background:linear-gradient(135deg,#16264f,#28407c);margin-bottom:10px;border:none;cursor:pointer">📄 PDF Quote Download Karein</button>
+  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon">📄</span><span class="xbtn-label">PDF Quote Download Karein</span></button>
 
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
@@ -496,7 +536,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
         <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
         <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
       </div>
-      <button class="lead-submit" onclick="submitLead()">📩 Free Quote Bhejo →</button>
+      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon">📩</span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
     </div>
     <div class="lead-success" id="lead-success">
       <div class="lead-success-icon">✅</div>
@@ -510,15 +550,15 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <p class="share-title">🔗 Is tool ko share karein</p>
     <p class="share-sub">Apne contacts ko bhi yeh free calculator share karein</p>
     <div class="share-btns">
-      <button class="share-btn share-wa" onclick="shareWA()">💬 WhatsApp pe share</button>
-      <button class="share-btn share-copy" onclick="copyLink()">🔗 Link copy karein</button>
+      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe share</span></button>
+      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon">🔗</span><span class="xbtn-label">Link copy karein</span></button>
     </div>
     <p class="copy-confirm" id="copy-confirm">✅ Link copied!</p>
   </div>
 
   <!-- WHATSAPP + CALL CTA -->
-  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="cta-wa">💬 WhatsApp pe seedha baat karein</a>
-  <a href="tel:+918527258462" class="cta-call">📞 Call करें — +91 85272 58462</a>
+  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
+  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon">📞</span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
   <p class="cta-disclaimer">⚠️ Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
 
 </div>
@@ -759,6 +799,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     if(n>=100000)return '₹'+(n/100000).toFixed(1)+'L';
     return '₹'+Math.round(n).toLocaleString('en-IN');
   }
+  /* jsPDF's built-in fonts don't have the ₹ glyph — it renders as a broken superscript.
+     Use "Rs." for anything drawn inside the PDF itself. */
+  function fmtPDF(n){
+    if(n>=10000000)return 'Rs. '+(n/10000000).toFixed(1)+' Cr';
+    if(n>=100000)return 'Rs. '+(n/100000).toFixed(1)+' L';
+    return 'Rs. '+Math.round(n).toLocaleString('en-IN');
+  }
 
   /* ── CALCULATE RESULT ── */
   window.calcResult=function(){
@@ -802,6 +849,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── PDF QUOTE DOWNLOAD ── */
   window.downloadQuotePDF=function(){
     if(typeof window.jspdf==='undefined'){alert('PDF library load ho rahi hai, thodi der mein try karein.');return;}
+    var pdfBtn=document.getElementById('pdf-download-btn');
+    if(pdfBtn)pdfBtn.classList.add('is-loading');
     var len=+document.getElementById('sl-len').value||50;
     var wid=+document.getElementById('sl-wid').value||40;
     var ht=+document.getElementById('sl-ht').value||14;
@@ -870,9 +919,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     doc.setTextColor(255,255,255);
     doc.setFont('helvetica','normal');doc.setFontSize(9);
     doc.text('ESTIMATED COST RANGE',58,y+22);
-    doc.setFont('helvetica','bold');doc.setFontSize(22);
+    doc.setFont('helvetica','bold');doc.setFontSize(18);
     doc.setTextColor(255,140,0);
-    doc.text(fmt(lo)+'  -  '+fmt(hi),58,y+48);
+    doc.text(fmtPDF(lo)+'  –  '+fmtPDF(hi),58,y+48);
 
     /* Breakdown table */
     y+=90;
@@ -882,8 +931,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     y+=14;
     var rows=[
       ['Rate applied','Rs.'+r.low+' - Rs.'+r.high+' / sq.ft'],
-      ['Material cost (approx.)',fmt(mLo)+' - '+fmt(mHi)],
-      ['Labour + installation (approx.)',fmt(lLo)+' - '+fmt(lHi)],
+      ['Material cost (approx.)',fmtPDF(mLo)+' - '+fmtPDF(mHi)],
+      ['Labour + installation (approx.)',fmtPDF(lLo)+' - '+fmtPDF(lHi)],
       ['GST (extra, as applicable)','18%']
     ];
     doc.setFontSize(10);
@@ -917,6 +966,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     doc.save('RR-Teen-Set-Solution-Shed-Quote-'+curType+'-'+Date.now()+'.pdf');
 
     if(typeof gtag==='function'){gtag('event','pdf_quote_download',{shed_type:curType,area:area});}
+    if(pdfBtn)setTimeout(function(){pdfBtn.classList.remove('is-loading');},400);
   };
 
   /* ── SHARE FUNCTIONS ── */
@@ -933,6 +983,21 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   /* ── FAQ TOGGLE ── */
   window.toggleFAQ=function(el){el.classList.toggle('open');};
+
+  /* ── BUTTON RIPPLE (adds a tactile click feel to every action button) ── */
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.xbtn');
+    if(!btn)return;
+    var rect=btn.getBoundingClientRect();
+    var size=Math.max(rect.width,rect.height);
+    var ripple=document.createElement('span');
+    ripple.className='xbtn-ripple';
+    ripple.style.width=ripple.style.height=size+'px';
+    ripple.style.left=(e.clientX-rect.left-size/2)+'px';
+    ripple.style.top=(e.clientY-rect.top-size/2)+'px';
+    btn.appendChild(ripple);
+    setTimeout(function(){ripple.remove();},650);
+  });
 
   /* ── INIT ── */
   calcDraw();
