@@ -104,6 +104,19 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .qt-id-badge{display:inline-block;background:#eff6ff;color:#1565c0;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
 .badge-draft{background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
 .badge-final{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.badge-unpaid{background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.badge-partial{background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.badge-paid{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.balance-due{color:var(--red);font-weight:800}
+.balance-clear{color:var(--green);font-weight:800}
+/* PAYMENT MODAL */
+#payment-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px}
+.pay-modal-box{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:28px}
+.pay-modal-title{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.pay-modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.pay-history{margin-top:16px;border-top:1px solid var(--border);padding-top:12px;max-height:140px;overflow-y:auto}
+.pay-history-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--border)}
+.load-qt-row{display:flex;gap:10px;align-items:end;margin-bottom:20px;flex-wrap:wrap}
 .action-btns{display:flex;gap:6px}
 .btn-icon{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer;font-size:14px;transition:all .15s;line-height:1}
 .btn-icon:hover{background:var(--orange);border-color:var(--orange)}
@@ -187,6 +200,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <button class="nav-btn active" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
       <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon">📋</span><span>History</span></button>
       <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon">📊</span><span>Analytics</span></button>
+      <div class="nav-section">BILLING</div>
+      <button class="nav-btn" data-section="invoice-create" onclick="showSection('invoice-create')"><span class="nav-icon">🧾</span><span>New Invoice</span></button>
+      <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon">💳</span><span>Invoices &amp; Payments</span></button>
       <div class="nav-section">LINKS</div>
       <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon">🌐</span><span>Main Website</span></button>
       <div class="sidebar-footer">
@@ -325,6 +341,135 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
           <div id="type-breakdown">Loading...</div>
         </div>
       </section>
+
+      <!-- INVOICE CREATE -->
+      <section id="invoice-create" class="section">
+        <div class="page-header">
+          <div class="page-title" id="inv-form-title">New Invoice</div>
+          <div class="page-sub">Generate an invoice — load from an existing quotation or fill manually</div>
+        </div>
+        <div class="form-card">
+          <div class="form-section-title">⚡ QUICK LOAD FROM QUOTATION</div>
+          <div class="load-qt-row">
+            <div class="form-group" style="flex:1;min-width:220px">
+              <label class="form-label">Select Finalized Quotation</label>
+              <select id="inv-load-qt" class="form-select">
+                <option value="">— Select a quotation to auto-fill —</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-draft" onclick="loadQuotationIntoInvoice()">⬇️ Load Details</button>
+          </div>
+        </div>
+        <form id="inv-form" onsubmit="return false;">
+          <div class="form-card">
+            <div class="form-section-title">🧾 INVOICE META</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Invoice ID</label><input type="text" id="i-invid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Due Date</label><input type="date" id="i-duedate" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Linked Quotation ID</label><input type="text" id="i-qtref" class="form-input" placeholder="e.g. QT-2026-1234"></div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">👤 CUSTOMER DETAILS</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="i-cname" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
+              <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="i-cphone" class="form-input" placeholder="e.g. 9876543210"></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" id="i-cemail" class="form-input" placeholder="e.g. ramesh@email.com"></div>
+              <div class="form-group span-2"><label class="form-label">Customer Address</label><input type="text" id="i-caddr" class="form-input" placeholder="e.g. Plot 12, Dwarka, New Delhi"></div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">🏗️ PROJECT &amp; AMOUNT</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Project Type</label>
+                <select id="i-ptype" class="form-select">
+                  <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
+                  <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
+                  <option>Car Parking Shed</option><option>Roofing Work</option><option>Steel Structure</option><option>Custom</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Description</label><input type="text" id="i-desc" class="form-input" placeholder="e.g. Supply, Fabrication & Erection"></div>
+              <div class="form-group"><label class="form-label">Base Amount (₹) *</label><input type="number" id="i-base" class="form-input" placeholder="e.g. 440000" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="i-extra" class="form-input" placeholder="e.g. 5000" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label">Discount (₹)</label><input type="number" id="i-discount" class="form-input" placeholder="e.g. 3000" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label">GST %</label>
+                <select id="i-gst" class="form-select" onchange="recalculateInvoice()">
+                  <option value="0">0% — Not Applicable</option>
+                  <option value="18">18% — Standard GST</option>
+                </select>
+              </div>
+            </div>
+            <div class="cost-box" style="margin-top:20px;">
+              <div>
+                <div class="cost-label">Subtotal</div>
+                <div class="cost-value" id="i-sub">₹0</div>
+              </div>
+              <div style="width:1px;height:60px;background:rgba(255,255,255,.1)"></div>
+              <div>
+                <div class="cost-label">GST Amount</div>
+                <div class="cost-value" id="i-gst-amount" style="font-size:20px">₹0</div>
+                <div class="cost-sub" id="i-gst-label">@ 0%</div>
+              </div>
+              <div style="width:1px;height:60px;background:rgba(255,255,255,.1)"></div>
+              <div style="text-align:right">
+                <div class="cost-label">INVOICE TOTAL</div>
+                <div class="cost-value" id="i-total" style="font-size:32px">₹0</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">💳 BANK / PAYMENT INFO (shown on invoice)</div>
+            <div class="form-group"><textarea id="i-payment" class="form-textarea" rows="3" placeholder="e.g. Bank: HDFC Bank, A/C: 1234567890, IFSC: HDFC0001234&#10;UPI: rrteenset@upi"></textarea></div>
+          </div>
+          <div class="form-card">
+            <div class="form-section-title">📝 NOTES</div>
+            <div class="form-group"><textarea id="i-notes" class="form-textarea" rows="3" placeholder="Any additional notes for this invoice"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="saveInvoice()">💾 Save Invoice</button>
+            <button class="btn btn-reset" onclick="resetInvoiceForm()">🔄 Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- INVOICES & PAYMENTS -->
+      <section id="invoices" class="section">
+        <div class="page-header">
+          <div class="page-title">Invoices &amp; Payments</div>
+          <div class="page-sub">Track invoice status, record payments and view balance due</div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card"><div class="stat-label">TOTAL INVOICED</div><div class="stat-value" id="inv-stat-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">TOTAL RECEIVED</div><div class="stat-value green" id="inv-stat-received">—</div></div>
+          <div class="stat-card"><div class="stat-label">TOTAL DUE</div><div class="stat-value" id="inv-stat-due" style="color:var(--red)">—</div></div>
+          <div class="stat-card"><div class="stat-label">FULLY PAID</div><div class="stat-value orange" id="inv-stat-paid">—</div></div>
+        </div>
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="renderInvoices(this.value)">
+          </div>
+          <div class="filter-row">
+            <label style="font-size:13px;font-weight:700;color:var(--muted)">Status:</label>
+            <select id="inv-filter-status" class="form-select" style="padding:9px 12px;font-size:13px" onchange="renderInvoices(document.getElementById('inv-search-input').value)">
+              <option value="">All</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="partial">Partial</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-card">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr>
+                <th>Invoice ID</th><th>Customer</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="invoices-tbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -345,11 +490,34 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
 </div>
 
+<!-- PAYMENT MODAL -->
+<div id="payment-modal">
+  <div class="pay-modal-box">
+    <div class="pay-modal-title">Record Payment</div>
+    <div class="pay-modal-sub" id="pay-modal-sub">Invoice —</div>
+    <div class="form-grid">
+      <div class="form-group span-2"><label class="form-label">Amount Received (₹) *</label><input type="number" id="pay-amount" class="form-input" placeholder="e.g. 100000"></div>
+      <div class="form-group"><label class="form-label">Mode</label>
+        <select id="pay-mode" class="form-select">
+          <option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Date</label><input type="date" id="pay-date" class="form-input"></div>
+      <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="pay-note" class="form-input" placeholder="e.g. Advance payment"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-save" onclick="savePayment()">💾 Save Payment</button>
+      <button class="btn btn-reset" onclick="closePaymentModal()">✕ Cancel</button>
+    </div>
+    <div class="pay-history" id="pay-history"></div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -369,6 +537,9 @@ const db   = getFirestore(app);
 
 let allQuotations = [];
 let editingId = null;
+let allInvoices = [];
+let editingInvoiceId = null;
+let activePaymentInvoiceId = null;
 
 // ── AUTH ────────────────────────────────────────────────────────
 onAuthStateChanged(auth, u => {
@@ -400,6 +571,8 @@ window.showSection = id => {
   document.querySelector(`[data-section="${id}"]`).classList.add('active');
   if (id === 'history')   loadQuotations();
   if (id === 'analytics') renderAnalytics();
+  if (id === 'invoices')  loadInvoices();
+  if (id === 'invoice-create') populateQuotationDropdown();
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
@@ -408,6 +581,10 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 function genId() {
   const now = Date.now();
   return `QT-${new Date().getFullYear()}-${String(now).slice(-4)}`;
+}
+function genInvId() {
+  const now = Date.now();
+  return `INV-${new Date().getFullYear()}-${String(now).slice(-4)}`;
 }
 
 // ── CALCULATE ───────────────────────────────────────────────────
@@ -897,8 +1074,398 @@ window.renderAnalytics = () => {
     ).join('') || '<div style="color:#64748b;font-size:14px">No data yet</div>';
 };
 
+// ══════════════════════════════════════════════════════════════
+// INVOICES & PAYMENTS MODULE
+// ══════════════════════════════════════════════════════════════
+
+// ── QUICK LOAD FROM QUOTATION ──────────────────────────────────
+window.populateQuotationDropdown = async () => {
+  if (allQuotations.length === 0) {
+    try {
+      const snap = await getDocs(query(collection(db,'quotations'), orderBy('createdAt','desc')));
+      allQuotations = [];
+      snap.forEach(d => allQuotations.push({ id: d.id, ...d.data() }));
+    } catch(e) { console.error(e); }
+  }
+  const sel = document.getElementById('inv-load-qt');
+  const finals = allQuotations.filter(q => !q.isDraft);
+  sel.innerHTML = '<option value="">— Select a quotation to auto-fill —</option>' +
+    finals.map(q => `<option value="${q.id}">${q.qtId} — ${esc(q.cname)} — ₹${fmt(q.total)}</option>`).join('');
+};
+
+window.loadQuotationIntoInvoice = () => {
+  const id = document.getElementById('inv-load-qt').value;
+  if (!id) { alert('Pehle ek quotation select karo.'); return; }
+  const q = allQuotations.find(x => x.id === id); if (!q) return;
+  document.getElementById('i-qtref').value = q.qtId;
+  document.getElementById('i-cname').value  = q.cname || '';
+  document.getElementById('i-cphone').value = q.cphone || '';
+  document.getElementById('i-cemail').value = q.cemail || '';
+  document.getElementById('i-caddr').value  = q.caddr || '';
+  document.getElementById('i-ptype').value  = q.ptype || 'Tin Shed';
+  document.getElementById('i-desc').value   = `${q.ptype} — Supply, Fabrication & Erection (${(q.area||0).toLocaleString('en-IN')} sq.ft)`;
+  document.getElementById('i-base').value   = q.base || (q.area*q.rate) || 0;
+  document.getElementById('i-extra').value  = q.extra || 0;
+  document.getElementById('i-discount').value = q.discount || 0;
+  document.getElementById('i-gst').value    = q.gstPct || 0;
+  document.getElementById('i-payment').value = q.payment || '';
+  recalculateInvoice();
+};
+
+// ── CALCULATE ───────────────────────────────────────────────────
+window.recalculateInvoice = () => {
+  const base   = parseFloat(document.getElementById('i-base').value)     || 0;
+  const extra  = parseFloat(document.getElementById('i-extra').value)    || 0;
+  const discount = parseFloat(document.getElementById('i-discount').value) || 0;
+  const gstPct = parseFloat(document.getElementById('i-gst').value)      || 0;
+  const subtotal = base + extra - discount;
+  const gstAmt = Math.round(subtotal * gstPct / 100);
+  const grand  = subtotal + gstAmt;
+  document.getElementById('i-sub').textContent        = '₹' + fmt(subtotal);
+  document.getElementById('i-gst-amount').textContent = '₹' + fmt(gstAmt);
+  document.getElementById('i-gst-label').textContent   = '@ ' + gstPct + '%';
+  document.getElementById('i-total').textContent      = '₹' + fmt(grand);
+};
+
+// ── SAVE INVOICE ────────────────────────────────────────────────
+window.saveInvoice = async () => {
+  const g = id => document.getElementById(id).value;
+  const cname = g('i-cname').trim(), cphone = g('i-cphone').trim();
+  const base  = parseFloat(g('i-base')) || 0;
+  if (!cname || !cphone || !base) { alert('Name, phone aur base amount required hai.'); return; }
+  const phoneDigits = cphone.replace(/\D/g,'');
+  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  const extra  = parseFloat(g('i-extra')) || 0;
+  const discount = parseFloat(g('i-discount')) || 0;
+  const gstPct = parseFloat(g('i-gst')) || 0;
+  const subtotal = base + extra - discount;
+  const gstAmt = Math.round(subtotal * gstPct / 100);
+  const total  = subtotal + gstAmt;
+  const data = {
+    invId: g('i-invid'), qtRef: g('i-qtref'), date: g('i-date'), dueDate: g('i-duedate'),
+    cname, cphone, cemail: g('i-cemail'), caddr: g('i-caddr'),
+    ptype: g('i-ptype'), desc: g('i-desc'),
+    base, extra, discount, gstPct, gstAmt, total,
+    payment: g('i-payment'), notes: g('i-notes'),
+    updatedAt: serverTimestamp()
+  };
+  try {
+    if (editingInvoiceId) {
+      await updateDoc(doc(db,'invoices',editingInvoiceId), data);
+      editingInvoiceId = null;
+    } else {
+      await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdAt: serverTimestamp() });
+    }
+    alert('Invoice saved!');
+    resetInvoiceForm(); showSection('invoices');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.resetInvoiceForm = () => {
+  document.getElementById('inv-form').reset();
+  document.getElementById('i-invid').value = genInvId();
+  document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
+  const due = new Date(); due.setDate(due.getDate()+15);
+  document.getElementById('i-duedate').value = due.toISOString().split('T')[0];
+  document.getElementById('i-gst').value = '0';
+  document.getElementById('i-sub').textContent        = '₹0';
+  document.getElementById('i-gst-amount').textContent = '₹0';
+  document.getElementById('i-gst-label').textContent  = '@ 0%';
+  document.getElementById('i-total').textContent      = '₹0';
+  document.getElementById('inv-form-title').textContent = 'New Invoice';
+  editingInvoiceId = null;
+};
+
+// ── LOAD & RENDER INVOICES ─────────────────────────────────────
+window.loadInvoices = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'invoices'), orderBy('createdAt','desc')));
+    allInvoices = [];
+    snap.forEach(d => allInvoices.push({ id: d.id, ...d.data() }));
+    renderInvoices('');
+  } catch(e) { console.error(e); }
+};
+
+function invoiceStatusOf(inv) {
+  const paid = inv.amountPaid || 0;
+  if (paid <= 0) return 'unpaid';
+  if (paid >= inv.total) return 'paid';
+  return 'partial';
+}
+
+window.renderInvoices = (search='') => {
+  const tbody = document.getElementById('invoices-tbody');
+  const statusFilter = document.getElementById('inv-filter-status')?.value;
+  let list = allInvoices;
+  if (search) { const s=search.toLowerCase(); list=list.filter(i=>i.cname?.toLowerCase().includes(s)||i.cphone?.includes(s)||i.invId?.toLowerCase().includes(s)); }
+  if (statusFilter) list = list.filter(i => invoiceStatusOf(i) === statusFilter);
+
+  tbody.innerHTML = list.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No invoices found</td></tr>`
+    : list.map(i => {
+        const paid = i.amountPaid || 0;
+        const balance = Math.max(0, (i.total||0) - paid);
+        const status = invoiceStatusOf(i);
+        const badge = status === 'paid' ? '<span class="badge-paid">Paid</span>'
+                    : status === 'partial' ? '<span class="badge-partial">Partial</span>'
+                    : '<span class="badge-unpaid">Unpaid</span>';
+        return `<tr>
+        <td><span class="qt-id-badge">${i.invId}</span>${i.qtRef?`<br><small style="color:#94a3b8">from ${esc(i.qtRef)}</small>`:''}</td>
+        <td><strong>${esc(i.cname)}</strong><br><small>${esc(i.cphone)}</small></td>
+        <td><strong>₹${fmt(i.total)}</strong></td>
+        <td>₹${fmt(paid)}</td>
+        <td class="${balance>0?'balance-due':'balance-clear'}">₹${fmt(balance)}</td>
+        <td>${badge}<br><small>${i.date||'—'}</small></td>
+        <td class="action-btns">
+          <button onclick="viewInvoice('${i.id}')" class="btn-icon" title="Preview">👁️</button>
+          <button onclick="editInvoice('${i.id}')" class="btn-icon" title="Edit">✏️</button>
+          <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">💰</button>
+          <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">📥</button>
+          <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">📲</button>
+          <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+        </td></tr>`;
+      }).join('');
+
+  // Stats
+  const totalInvoiced = allInvoices.reduce((s,i)=>s+(i.total||0),0);
+  const totalReceived = allInvoices.reduce((s,i)=>s+(i.amountPaid||0),0);
+  const totalDue = Math.max(0, totalInvoiced - totalReceived);
+  const fullyPaid = allInvoices.filter(i=>invoiceStatusOf(i)==='paid').length;
+  const statTotalEl = document.getElementById('inv-stat-total');
+  if (statTotalEl) {
+    statTotalEl.textContent = '₹'+fmt(totalInvoiced);
+    document.getElementById('inv-stat-received').textContent = '₹'+fmt(totalReceived);
+    document.getElementById('inv-stat-due').textContent = '₹'+fmt(totalDue);
+    document.getElementById('inv-stat-paid').textContent = fullyPaid;
+  }
+};
+
+// ── EDIT / DELETE INVOICE ──────────────────────────────────────
+window.editInvoice = id => {
+  const i = allInvoices.find(x=>x.id===id); if (!i) return;
+  editingInvoiceId = id;
+  document.getElementById('inv-form-title').textContent = 'Edit Invoice';
+  ['invid','qtref','date','duedate','cname','cphone','cemail','caddr','ptype','desc','base','extra','discount','payment','notes'].forEach(k=>{
+    const el=document.getElementById('i-'+k); if(el) el.value=i[k]||'';
+  });
+  document.getElementById('i-gst').value = i.gstPct || 0;
+  recalculateInvoice(); showSection('invoice-create');
+};
+
+window.delInvoice = async id => {
+  if (!confirm('Delete this invoice? Its payment records will remain but be unlinked.')) return;
+  await deleteDoc(doc(db,'invoices',id));
+  loadInvoices();
+};
+
+// ── PAYMENT MODAL ───────────────────────────────────────────────
+window.openPaymentModal = async id => {
+  const inv = allInvoices.find(x=>x.id===id); if (!inv) return;
+  activePaymentInvoiceId = id;
+  const paid = inv.amountPaid || 0;
+  const balance = Math.max(0, (inv.total||0) - paid);
+  document.getElementById('pay-modal-sub').innerHTML =
+    `${esc(inv.invId)} — ${esc(inv.cname)}<br>Total: ₹${fmt(inv.total)} &nbsp;|&nbsp; Paid: ₹${fmt(paid)} &nbsp;|&nbsp; <strong style="color:var(--red)">Balance: ₹${fmt(balance)}</strong>`;
+  document.getElementById('pay-amount').value = balance > 0 ? balance : '';
+  document.getElementById('pay-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pay-note').value = '';
+  document.getElementById('pay-history').innerHTML = 'Loading payment history...';
+  document.getElementById('payment-modal').style.display = 'flex';
+  try {
+    const snap = await getDocs(query(collection(db,'payments'), where('invoiceId','==', id), orderBy('createdAt','desc')));
+    const rows = [];
+    snap.forEach(d => rows.push(d.data()));
+    document.getElementById('pay-history').innerHTML = rows.length
+      ? rows.map(p => `<div class="pay-history-row"><span>${p.date||''} · ${esc(p.mode||'')}</span><strong>₹${fmt(p.amount)}</strong></div>`).join('')
+      : '<div style="font-size:12.5px;color:#94a3b8">No payments recorded yet.</div>';
+  } catch(e) { document.getElementById('pay-history').innerHTML = ''; console.error(e); }
+};
+
+window.closePaymentModal = () => {
+  document.getElementById('payment-modal').style.display = 'none';
+  activePaymentInvoiceId = null;
+};
+
+window.savePayment = async () => {
+  if (!activePaymentInvoiceId) return;
+  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+  if (amount <= 0) { alert('Valid payment amount daalo.'); return; }
+  const mode = document.getElementById('pay-mode').value;
+  const date = document.getElementById('pay-date').value;
+  const note = document.getElementById('pay-note').value;
+  const inv = allInvoices.find(x=>x.id===activePaymentInvoiceId); if (!inv) return;
+  try {
+    await addDoc(collection(db,'payments'), {
+      invoiceId: activePaymentInvoiceId, invId: inv.invId, amount, mode, date, note,
+      createdAt: serverTimestamp()
+    });
+    const newPaid = (inv.amountPaid || 0) + amount;
+    const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= inv.total ? 'paid' : 'partial');
+    await updateDoc(doc(db,'invoices',activePaymentInvoiceId), { amountPaid: newPaid, status: newStatus });
+    alert('Payment recorded!');
+    closePaymentModal();
+    loadInvoices();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── BUILD INVOICE HTML (for view / PDF) ────────────────────────
+function buildInvHTML(i) {
+  const dateObj  = i.date ? new Date(i.date+'T00:00:00') : new Date();
+  const dueObj   = i.dueDate ? new Date(i.dueDate+'T00:00:00') : null;
+  const fmtDate  = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const R = '&#8377;';
+  const paid = i.amountPaid || 0;
+  const balance = Math.max(0, (i.total||0) - paid);
+  const status = invoiceStatusOf(i);
+  const statusColor = status==='paid' ? '#166534' : status==='partial' ? '#92400e' : '#991b1b';
+  const statusBg    = status==='paid' ? '#dcfce7' : status==='partial' ? '#fef3c7' : '#fee2e2';
+  const statusText  = status==='paid' ? 'PAID' : status==='partial' ? 'PARTIALLY PAID' : 'UNPAID';
+
+  return `
+<div id="inv-print" style="font-family:Arial,Helvetica,sans-serif;width:794px;background:#ffffff;color:#1a1a2e;box-sizing:border-box;margin:0;padding:0;">
+  <div style="height:3px;background:#000000;"></div>
+  <div style="padding:20px 36px 16px;border-bottom:2px solid #e8ecf0;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:top;width:60%;">
+          <table style="border-collapse:collapse;">
+            <tr>
+              <td style="vertical-align:middle;padding-right:14px;">
+                <img src="https://rrteensetsolution.com/images/rr-logo-original.png" alt="R.R Teen Set Solution" style="width:60px;height:60px;object-fit:contain;">
+              </td>
+              <td style="vertical-align:middle;">
+                <div style="font-size:19px;font-weight:900;color:#000000;letter-spacing:-0.5px;line-height:1.2;">R.R Teen Set Solution</div>
+                <div style="font-size:9px;color:#000000;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:4px 0 6px;">Steel &amp; Shed Fabrication Experts</div>
+                <div style="font-size:10px;color:#5a6a7a;line-height:1.8;">
+                  New Delhi, Delhi NCR, India<br>
+                  Tel: +91 85272 58462 &nbsp;|&nbsp; www.rrteensetsolution.com<br>
+                  GSTIN: 07DJCPK0635M1Z5
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td style="vertical-align:top;text-align:right;width:40%;">
+          <div style="font-size:28px;font-weight:900;color:#000000;letter-spacing:4px;line-height:1;">INVOICE</div>
+          <div style="margin-top:8px;display:inline-block;background:#ffffff;border:1.5px solid #000000;color:#000;padding:6px 16px;border-radius:6px;">
+            <div style="font-size:8px;color:#000000;letter-spacing:2px;margin-bottom:2px;">INVOICE NO.</div>
+            <div style="font-size:15px;font-weight:800;color:#000000;letter-spacing:1px;">${i.invId}</div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#5a6a7a;line-height:1.9;">
+            <div><strong style="color:#000000;">Invoice Date :</strong> &nbsp;${fmtDate(dateObj)}</div>
+            ${dueObj?`<div><strong style="color:#000000;">Due Date &nbsp;:</strong> &nbsp;${fmtDate(dueObj)}</div>`:''}
+            ${i.qtRef?`<div><strong style="color:#000000;">Ref Quotation :</strong> &nbsp;${esc(i.qtRef)}</div>`:''}
+            <div style="margin-top:4px;display:inline-block;background:${statusBg};color:${statusColor};font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:12px;">${statusText}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin:14px 36px;">
+    <table style="width:100%;border-collapse:collapse;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
+      <tr>
+        <td style="width:50%;padding:14px 18px;vertical-align:top;border-right:1.5px solid #e8ecf0;">
+          <div style="font-size:8px;font-weight:800;color:#000000;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">BILLED TO</div>
+          <div style="font-size:15px;font-weight:800;color:#000000;">${esc(i.cname)}</div>
+          <div style="font-size:11px;color:#5a6a7a;margin-top:5px;line-height:1.8;">
+            <div>Tel: ${esc(i.cphone)}</div>
+            ${i.cemail?`<div>Email: ${esc(i.cemail)}</div>`:''}
+            ${i.caddr?`<div>Address: ${esc(i.caddr)}</div>`:''}
+          </div>
+        </td>
+        <td style="width:50%;padding:14px 18px;vertical-align:top;">
+          <div style="font-size:8px;font-weight:800;color:#000000;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">PROJECT</div>
+          <div style="font-size:15px;font-weight:800;color:#000000;">${i.ptype||''}</div>
+          <div style="font-size:11px;color:#5a6a7a;margin-top:6px;">${esc(i.desc||'')}</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin:0 36px 14px;">
+    <table style="width:300px;margin-left:auto;border:1.5px solid #e8ecf0;border-collapse:collapse;">
+      <tr><td style="padding:9px 14px;font-size:11px;color:#5a6a7a;border-bottom:1px solid #e8ecf0;">Base Amount</td><td style="padding:9px 14px;font-size:11px;font-weight:600;text-align:right;border-bottom:1px solid #e8ecf0;">${R}${fmt(i.base)}</td></tr>
+      ${i.extra>0?`<tr><td style="padding:9px 14px;font-size:11px;color:#5a6a7a;border-bottom:1px solid #e8ecf0;">Additional</td><td style="padding:9px 14px;font-size:11px;font-weight:600;text-align:right;border-bottom:1px solid #e8ecf0;">${R}${fmt(i.extra)}</td></tr>`:''}
+      ${i.discount>0?`<tr><td style="padding:9px 14px;font-size:11px;color:#c0392b;border-bottom:1px solid #e8ecf0;">Discount</td><td style="padding:9px 14px;font-size:11px;font-weight:600;color:#c0392b;text-align:right;border-bottom:1px solid #e8ecf0;">&minus;${R}${fmt(i.discount)}</td></tr>`:''}
+      ${i.gstPct>0?`<tr><td style="padding:9px 14px;font-size:11px;border-bottom:1px solid #e8ecf0;">GST @ ${i.gstPct}%</td><td style="padding:9px 14px;font-size:11px;font-weight:600;text-align:right;border-bottom:1px solid #e8ecf0;">${R}${fmt(i.gstAmt)}</td></tr>`:''}
+      <tr style="border-top:2.5px solid #000000;"><td style="padding:11px 14px;font-size:11px;font-weight:700;">GRAND TOTAL</td><td style="padding:11px 14px;font-size:16px;font-weight:900;text-align:right;">${R}${fmt(i.total)}</td></tr>
+      <tr><td style="padding:9px 14px;font-size:11px;color:#166534;">Amount Paid</td><td style="padding:9px 14px;font-size:11px;font-weight:700;color:#166534;text-align:right;">${R}${fmt(paid)}</td></tr>
+      <tr><td style="padding:9px 14px;font-size:12px;font-weight:800;color:#991b1b;">BALANCE DUE</td><td style="padding:9px 14px;font-size:16px;font-weight:900;color:#991b1b;text-align:right;">${R}${fmt(balance)}</td></tr>
+    </table>
+  </div>
+
+  ${i.payment?`<div style="margin:0 36px 12px;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
+    <div style="background:#ffffff;padding:8px 16px;border-bottom:1.5px solid #000000;"><span style="font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;">Payment Details</span></div>
+    <div style="padding:10px 16px;font-size:10px;color:#5a6a7a;line-height:1.8;white-space:pre-line;">${esc(i.payment)}</div>
+  </div>`:''}
+  ${i.notes?`<div style="margin:0 36px 12px;font-size:10px;color:#5a6a7a;"><strong>Notes:</strong> ${esc(i.notes)}</div>`:''}
+
+  <div style="margin:0 36px;padding:9px 0;border-top:1px solid #e8ecf0;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="font-size:8.5px;color:#aaa;">Computer generated invoice &nbsp;·&nbsp; www.rrteensetsolution.com</td>
+        <td style="font-size:8.5px;color:#aaa;text-align:right;">Ref: ${i.invId}</td>
+      </tr>
+    </table>
+  </div>
+  <div style="height:3px;background:#000000;margin-top:8px;"></div>
+</div>`;
+}
+
+// ── VIEW / PDF / SHARE INVOICE ─────────────────────────────────
+window.viewInvoice = id => {
+  const i = allInvoices.find(x=>x.id===id); if (!i) return;
+  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Invoice ${i.invId}</title>
+<style>@media print{body{margin:0}} body{margin:0;padding:24px;background:#f0f4f9;display:flex;justify-content:center;}</style>
+</head><body>${buildInvHTML(i)}</body></html>`;
+  const blob = new Blob([fullHTML], { type: 'text/html' });
+  window.open(URL.createObjectURL(blob), '_blank');
+};
+
+window.dlInvoicePDF = id => {
+  const i = allInvoices.find(x=>x.id===id); if (!i) return;
+  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${i.invId}</title>
+<style>@page{size:A4;margin:0;} @media print{body{margin:0}} body{margin:0;padding:0;background:#fff;}</style>
+</head><body onload="window.print()">${buildInvHTML(i)}</body></html>`;
+  const blob = new Blob([fullHTML], { type: 'text/html' });
+  window.open(URL.createObjectURL(blob), '_blank');
+};
+
+window.shareInvoiceWhatsApp = id => {
+  const i = allInvoices.find(x=>x.id===id); if (!i) return;
+  let phone = i.cphone.replace(/\D/g,'');
+  if (phone.length === 10) phone = '91' + phone;
+  const paid = i.amountPaid || 0;
+  const balance = Math.max(0, (i.total||0) - paid);
+  const dateObj = i.date ? new Date(i.date+'T00:00:00') : new Date();
+  const fmtD = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const msg = encodeURIComponent(
+`🧾 *R.R Teen Set Solution*
+📋 *Invoice: ${i.invId}*
+
+Namaste ${i.cname} Ji,
+
+Aapke *${i.ptype||'project'}* ka invoice:
+
+━━━━━━━━━━━━━━━━
+💰 *Total       : ₹${fmt(i.total)}*
+✅ Paid         : ₹${fmt(paid)}
+⏳ Balance Due  : ₹${fmt(balance)}
+📅 Invoice Date : ${fmtD(dateObj)}
+━━━━━━━━━━━━━━━━
+
+📞 Call/WhatsApp: *+91 85272 58462*
+🌐 www.rrteensetsolution.com
+
+_Please download the PDF invoice from our system for complete details._`
+  );
+  window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
+};
+
 // ── INIT ─────────────────────────────────────────────────────────
 window.resetForm();
+window.resetInvoiceForm();
 </script>
 </body>
 </html>
