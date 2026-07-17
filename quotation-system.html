@@ -200,6 +200,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <button class="nav-btn active" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
       <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon">📋</span><span>History</span></button>
       <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon">📊</span><span>Analytics</span></button>
+      <div class="nav-section">CRM</div>
+      <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon">📞</span><span>Leads</span></button>
+      <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon">👥</span><span>Customers</span></button>
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="showSection('invoice-create')"><span class="nav-icon">🧾</span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon">💳</span><span>Invoices &amp; Payments</span></button>
@@ -339,6 +342,79 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="type-breakdown">
           <div class="breakdown-title">Quotations by Project Type</div>
           <div id="type-breakdown">Loading...</div>
+        </div>
+      </section>
+
+      <!-- LEADS -->
+      <section id="leads" class="section">
+        <div class="page-header">
+          <div class="page-title">Leads</div>
+          <div class="page-sub">Inquiry capture karo, track karo, phir quotation mein convert karo</div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-section-title">➕ NEW LEAD</div>
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="form-group"><label class="form-label">Name *</label><input type="text" id="ld-name" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
+            <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="ld-phone" class="form-input" placeholder="e.g. 9876543210"></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" id="ld-email" class="form-input" placeholder="e.g. ramesh@email.com"></div>
+            <div class="form-group"><label class="form-label">Address / Area</label><input type="text" id="ld-addr" class="form-input" placeholder="e.g. Najafgarh, Delhi"></div>
+            <div class="form-group">
+              <label class="form-label">Project Type</label>
+              <select id="ld-ptype" class="form-select">
+                <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
+                <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
+                <option>Car Parking Shed</option><option>Roofing Work</option><option>Steel Structure</option><option>Custom</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Source</label>
+              <select id="ld-source" class="form-select">
+                <option>Website</option><option>WhatsApp</option><option>Phone Call</option><option>Referral</option><option>Walk-in</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="ld-notes" class="form-input" placeholder="e.g. Budget ~5 lakh, site visit next week chahiye"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="saveLead()">💾 Save Lead</button>
+            <button class="btn btn-reset" onclick="resetLeadForm()">🔄 Reset</button>
+          </div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="renderLeads(this.value)">
+          </div>
+          <select id="lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderLeads(document.getElementById('lead-search-input').value)">
+            <option value="">All Status</option>
+            <option>New</option><option>Contacted</option><option>Site Visit</option><option>Quoted</option><option>Won</option><option>Lost</option>
+          </select>
+        </div>
+
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="leads-tbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section id="customers" class="section">
+        <div class="page-header">
+          <div class="page-title">Customers</div>
+          <div class="page-sub">Unified customer database — auto-built jab bhi quotation save hota hai</div>
+        </div>
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomers(this.value)">
+          </div>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Quotations</th><th>Total Value</th><th>Last Activity</th></tr></thead>
+            <tbody id="customers-tbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+          </table>
         </div>
       </section>
 
@@ -540,6 +616,9 @@ let editingId = null;
 let allInvoices = [];
 let editingInvoiceId = null;
 let activePaymentInvoiceId = null;
+let allLeads = [];
+let editingLeadId = null;
+let allCustomers = [];
 
 // ── AUTH ────────────────────────────────────────────────────────
 onAuthStateChanged(auth, u => {
@@ -573,6 +652,8 @@ window.showSection = id => {
   if (id === 'analytics') renderAnalytics();
   if (id === 'invoices')  loadInvoices();
   if (id === 'invoice-create') populateQuotationDropdown();
+  if (id === 'leads')     loadLeads();
+  if (id === 'customers') loadCustomers();
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
@@ -636,6 +717,7 @@ window.saveQuotation = async isDraft => {
     } else {
       await addDoc(collection(db,'quotations'), { ...data, createdAt: serverTimestamp() });
     }
+    await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
     alert(isDraft ? 'Draft saved!' : 'Quotation saved!');
     resetForm(); showSection('history');
   } catch(e) { alert('Error: ' + e.message); }
@@ -653,6 +735,167 @@ window.resetForm = () => {
   document.getElementById('f-total').textContent      = '₹0';
   document.getElementById('form-title').textContent = 'New Quotation';
   editingId = null;
+};
+
+// ── LEADS ───────────────────────────────────────────────────────
+window.saveLead = async () => {
+  const g = id => document.getElementById(id).value;
+  const name = g('ld-name').trim(), phone = g('ld-phone').trim();
+  if (!name || !phone) { alert('Name aur phone required hai.'); return; }
+  const phoneDigits = phone.replace(/\D/g,'');
+  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  const data = {
+    name, phone: phoneDigits, email: g('ld-email'), addr: g('ld-addr'),
+    ptype: g('ld-ptype'), source: g('ld-source'), notes: g('ld-notes'),
+    updatedAt: serverTimestamp()
+  };
+  try {
+    if (editingLeadId) {
+      await updateDoc(doc(db,'leads',editingLeadId), data);
+      editingLeadId = null;
+    } else {
+      await addDoc(collection(db,'leads'), { ...data, status: 'New', createdAt: serverTimestamp() });
+    }
+    alert('Lead saved!');
+    resetLeadForm(); loadLeads();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.resetLeadForm = () => {
+  ['ld-name','ld-phone','ld-email','ld-addr','ld-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ld-ptype').selectedIndex = 0;
+  document.getElementById('ld-source').selectedIndex = 0;
+  editingLeadId = null;
+};
+
+window.loadLeads = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'leads'), orderBy('createdAt','desc')));
+    allLeads = [];
+    snap.forEach(d => allLeads.push({ id: d.id, ...d.data() }));
+    renderLeads('');
+  } catch(e) { console.error(e); }
+};
+
+window.renderLeads = (search='') => {
+  const tbody = document.getElementById('leads-tbody');
+  const statusFilter = document.getElementById('lead-filter-status')?.value;
+  let list = allLeads;
+  if (search) { const s=search.toLowerCase(); list=list.filter(l=>l.name?.toLowerCase().includes(s)||l.phone?.includes(s)); }
+  if (statusFilter) list = list.filter(l => l.status === statusFilter);
+  tbody.innerHTML = list.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No leads found</td></tr>`
+    : list.map(l=>`<tr>
+        <td><strong>${esc(l.name)}</strong></td>
+        <td>${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
+        <td>${esc(l.ptype||'—')}</td>
+        <td>${esc(l.source||'—')}</td>
+        <td>
+          <select onchange="updateLeadStatus('${l.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
+            ${['New','Contacted','Site Visit','Quoted','Won','Lost'].map(s=>`<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td class="action-btns">
+          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation">📝</button>
+          <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">✏️</button>
+          <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+        </td></tr>`).join('');
+};
+
+window.updateLeadStatus = async (id, status) => {
+  await updateDoc(doc(db,'leads',id), { status, updatedAt: serverTimestamp() });
+  const l = allLeads.find(x=>x.id===id); if (l) l.status = status;
+};
+
+window.editLead = id => {
+  const l = allLeads.find(x=>x.id===id); if (!l) return;
+  editingLeadId = id;
+  document.getElementById('ld-name').value = l.name||'';
+  document.getElementById('ld-phone').value = l.phone||'';
+  document.getElementById('ld-email').value = l.email||'';
+  document.getElementById('ld-addr').value = l.addr||'';
+  if (l.ptype) document.getElementById('ld-ptype').value = l.ptype;
+  if (l.source) document.getElementById('ld-source').value = l.source;
+  document.getElementById('ld-notes').value = l.notes||'';
+  showSection('leads');
+  window.scrollTo(0,0);
+};
+
+window.delLead = async id => {
+  if (!confirm('Delete this lead?')) return;
+  await deleteDoc(doc(db,'leads',id));
+  loadLeads();
+};
+
+window.convertLeadToQuotation = async id => {
+  const l = allLeads.find(x=>x.id===id); if (!l) return;
+  resetForm();
+  document.getElementById('f-cname').value = l.name||'';
+  document.getElementById('f-cphone').value = l.phone||'';
+  document.getElementById('f-cemail').value = l.email||'';
+  document.getElementById('f-caddr').value = l.addr||'';
+  if (l.ptype) document.getElementById('f-ptype').value = l.ptype;
+  try {
+    await updateDoc(doc(db,'leads',id), { status: 'Quoted', updatedAt: serverTimestamp() });
+    l.status = 'Quoted';
+  } catch(e) { console.error(e); }
+  showSection('create');
+  window.scrollTo(0,0);
+};
+
+// ── CUSTOMERS (auto-built master record) ─────────────────────────
+async function upsertCustomer({ name, phone, email, addr }) {
+  if (!phone) return;
+  try {
+    const snap = await getDocs(query(collection(db,'customers'), where('phone','==',phone)));
+    if (!snap.empty) {
+      const d = snap.docs[0];
+      const existing = d.data();
+      await updateDoc(doc(db,'customers',d.id), {
+        name: name || existing.name,
+        email: email || existing.email,
+        addr: addr || existing.addr,
+        totalQuotations: (existing.totalQuotations||0) + 1,
+        lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
+      });
+    } else {
+      await addDoc(collection(db,'customers'), {
+        name, phone, email: email||'', addr: addr||'',
+        totalQuotations: 1, totalInvoices: 0,
+        createdAt: serverTimestamp(), lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
+      });
+    }
+  } catch(e) { console.error('Customer upsert failed:', e); }
+}
+
+window.loadCustomers = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'customers'), orderBy('lastActivity','desc')));
+    allCustomers = [];
+    snap.forEach(d => allCustomers.push({ id: d.id, ...d.data() }));
+    renderCustomers('');
+  } catch(e) { console.error(e); }
+};
+
+window.renderCustomers = (search='') => {
+  const tbody = document.getElementById('customers-tbody');
+  let list = allCustomers;
+  if (search) { const s=search.toLowerCase(); list=list.filter(c=>c.name?.toLowerCase().includes(s)||c.phone?.includes(s)); }
+  tbody.innerHTML = list.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No customers yet — quotation save karte hi yahan auto-add ho jayenge</td></tr>`
+    : list.map(c=>{
+        const custQuotes = allQuotations.filter(q => (q.cphone||'').replace(/\D/g,'') === c.phone);
+        const totalValue = custQuotes.reduce((sum,q)=>sum+(q.total||0),0);
+        const lastDate = c.lastActivity?.toDate ? c.lastActivity.toDate().toLocaleDateString('en-IN') : '—';
+        return `<tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td>${esc(c.phone)}</td>
+        <td>${esc(c.addr||'—')}</td>
+        <td>${custQuotes.length || c.totalQuotations || 0}</td>
+        <td><strong>₹${fmt(totalValue)}</strong></td>
+        <td>${lastDate}</td>
+        </tr>`;
+      }).join('');
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
