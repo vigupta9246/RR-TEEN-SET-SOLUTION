@@ -323,4 +323,18 @@ function loadYTVideo(el){
   }
 }
 
+/* ════════════════════════════════════════════════════════════
+   11. VIDEO SLIDER NAVIGATION
+   Scrolls the video carousel left/right using native scroll-snap
+   — no external library, keeps things fast and simple.
+════════════════════════════════════════════════════════════ */
+function scrollVideoSlider(sliderId, direction){
+  var el = document.getElementById(sliderId);
+  if (!el) return;
+  var card = el.querySelector('.video-card');
+  var step = card ? card.offsetWidth + 16 : 236;
+  el.scrollBy({ left: direction * step, behavior: 'smooth' });
+}
+
+
 
