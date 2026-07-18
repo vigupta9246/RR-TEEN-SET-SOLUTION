@@ -305,3 +305,22 @@ document.addEventListener('DOMContentLoaded',function(){
   }, true);
 })();
 
+/* ════════════════════════════════════════════════════════════
+   10. LAZY-LOAD YOUTUBE FACADE
+   Loads a lightweight thumbnail instead of the full YouTube
+   iframe. The real embed only loads when the user clicks play —
+   keeps page weight and load time low.
+════════════════════════════════════════════════════════════ */
+function loadYTVideo(el){
+  var id = el.getAttribute('data-video-id');
+  var title = el.getAttribute('data-video-title') || 'YouTube video player';
+  var wrap = document.createElement('div');
+  wrap.style.cssText = el.style.cssText;
+  wrap.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + id + '?autoplay=1" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:inherit"></iframe>';
+  el.replaceWith(wrap);
+  if (typeof gtag === 'function') {
+    gtag('event', 'video_play', { 'event_category': 'engagement', 'event_label': id });
+  }
+}
+
+
