@@ -131,6 +131,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .stat-value.green{color:var(--green)}
 .type-breakdown{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
 .breakdown-title{font-size:15px;font-weight:800;margin-bottom:16px;color:var(--navy)}
+.followup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);font-size:13px}
+.followup-row:last-child{border-bottom:none}
+.followup-row a.btn-icon{text-decoration:none;flex-shrink:0}
 .type-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
 .type-row:last-child{border-bottom:none}
 .type-count{background:#eff6ff;color:#1565c0;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
@@ -197,7 +200,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div><div class="sidebar-title">R.R Teen Set</div><div class="sidebar-sub">Quotation System</div></div>
       </div>
       <div class="nav-section">MAIN</div>
-      <button class="nav-btn active" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
+      <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"><span class="nav-icon">🏠</span><span>Dashboard</span></button>
+      <button class="nav-btn" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
       <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon">📋</span><span>History</span></button>
       <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon">📊</span><span>Analytics</span></button>
       <div class="nav-section">CRM</div>
@@ -218,8 +222,35 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     </aside>
 
     <main class="main">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active">
+        <div class="page-header">
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Business ka pura overview — ek jagah</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card" data-requires="leads"><div class="stat-label">OPEN LEADS</div><div class="stat-value" id="dash-open-leads">—</div></div>
+          <div class="stat-card" data-requires="quotations"><div class="stat-label">QUOTATIONS PENDING</div><div class="stat-value" id="dash-pending-qt">—</div></div>
+          <div class="stat-card" data-requires="quotations"><div class="stat-label">THIS MONTH WON</div><div class="stat-value green" id="dash-won-month">—</div></div>
+          <div class="stat-card" data-requires="invoices"><div class="stat-label">TOTAL OUTSTANDING</div><div class="stat-value" id="dash-outstanding" style="color:var(--red)">—</div></div>
+          <div class="stat-card" data-requires="quotations"><div class="stat-label">CONVERSION RATE</div><div class="stat-value orange" id="dash-conversion">—</div></div>
+          <div class="stat-card" data-requires="quotations"><div class="stat-label">FOLLOW-UPS DUE</div><div class="stat-value" id="dash-followup-count">—</div></div>
+        </div>
+
+        <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
+          <div class="breakdown-title">🔔 Needs Follow-up (quotation sent 3+ din se, koi jawaab nahi)</div>
+          <div id="dash-followup-list">Loading...</div>
+        </div>
+
+        <div class="type-breakdown" data-requires="invoices">
+          <div class="breakdown-title">⚠️ Overdue Payments (invoice 7+ din se pending)</div>
+          <div id="dash-overdue-list">Loading...</div>
+        </div>
+      </section>
+
       <!-- CREATE -->
-      <section id="create" class="section active">
+      <section id="create" class="section">
         <div class="page-header">
           <div class="page-title" id="form-title">New Quotation</div>
           <div class="page-sub">Fill in details to generate a professional quotation</div>
@@ -664,9 +695,9 @@ let allTeam = [];
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['create','history','analytics','leads','customers','invoice-create','invoices','team'],
-  Sales:    ['create','history','leads','customers'],
-  Accounts: ['invoice-create','invoices','customers','analytics']
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team'],
+  Sales:    ['dashboard','create','history','leads','customers'],
+  Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 
@@ -678,7 +709,6 @@ onAuthStateChanged(auth, async u => {
     document.getElementById('user-email').textContent = u.email;
     await loadCurrentUserRole(u);
     applyRolePermissions();
-    loadQuotations();
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
@@ -797,6 +827,105 @@ window.changeTeamRole = async (uid, role) => {
   } catch(e) { alert('Error: ' + e.message); }
 };
 
+// ── DASHBOARD (role-aware — only reads what the role is allowed to read) ──
+const ROLE_READ_ACCESS = {
+  Admin:    { quotations: true,  leads: true,  invoices: true  },
+  Sales:    { quotations: true,  leads: true,  invoices: false },
+  Accounts: { quotations: false, leads: false, invoices: true  }
+};
+
+function daysSince(dateVal) {
+  if (!dateVal) return 0;
+  const d = dateVal?.toDate ? dateVal.toDate() : new Date(dateVal);
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+function waLink(phone, message) {
+  const digits = (phone||'').replace(/\D/g,'');
+  return `https://wa.me/91${digits}?text=${encodeURIComponent(message)}`;
+}
+
+window.loadDashboard = async () => {
+  const access = ROLE_READ_ACCESS[currentUserRole] || {};
+
+  // Show/hide cards & panels this role isn't allowed to see data for
+  document.querySelectorAll('#dashboard [data-requires]').forEach(el => {
+    el.style.display = access[el.getAttribute('data-requires')] ? '' : 'none';
+  });
+
+  try {
+    if (access.leads) {
+      const leadSnap = await getDocs(collection(db,'leads'));
+      const leads = []; leadSnap.forEach(d=>leads.push({id:d.id,...d.data()}));
+      const openLeads = leads.filter(l => !['Won','Lost'].includes(l.status));
+      document.getElementById('dash-open-leads').textContent = openLeads.length;
+    }
+
+    if (access.quotations) {
+      const qtSnap = await getDocs(collection(db,'quotations'));
+      const quotes = []; qtSnap.forEach(d=>quotes.push({id:d.id,...d.data()}));
+      const finalized = quotes.filter(q => !q.isDraft);
+      const pending = finalized.filter(q => ['Pending','Sent'].includes(q.dealStatus||'Pending'));
+      const won = finalized.filter(q => q.dealStatus === 'Won');
+      const lost = finalized.filter(q => q.dealStatus === 'Lost');
+      const now = new Date();
+      const wonThisMonth = won.filter(q => {
+        const d = q.updatedAt?.toDate ? q.updatedAt.toDate() : new Date(q.date||now);
+        return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+      });
+      const wonRevenue = wonThisMonth.reduce((s,q)=>s+(q.total||0),0);
+      const convRate = (won.length+lost.length) > 0 ? Math.round(won.length/(won.length+lost.length)*100) : 0;
+
+      document.getElementById('dash-pending-qt').textContent = pending.length;
+      document.getElementById('dash-won-month').textContent = '₹' + fmt(wonRevenue);
+      document.getElementById('dash-conversion').textContent = convRate + '%';
+
+      const followups = pending
+        .map(q => ({ ...q, days: daysSince(q.updatedAt || q.date) }))
+        .filter(q => q.days >= 3)
+        .sort((a,b) => b.days - a.days)
+        .slice(0, 10);
+
+      document.getElementById('dash-followup-count').textContent = followups.length;
+      document.getElementById('dash-followup-list').innerHTML = followups.length === 0
+        ? '<div style="padding:16px;color:#64748b;font-size:13px">Sab follow-up clear hain 🎉</div>'
+        : followups.map(q => {
+            const msg = `Namaste ${q.cname}, R.R Teen Set Solution se. Aapki quotation ${q.qtId} (₹${fmt(q.total)}) abhi pending hai. Koi query ho to zaroor bataiye, hum madad ke liye taiyar hain. Dhanyawad!`;
+            return `<div class="followup-row">
+              <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
+                <br><small style="color:#94a3b8">${q.days} din se pending</small></div>
+              <a href="${waLink(q.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
+            </div>`;
+          }).join('');
+    }
+
+    if (access.invoices) {
+      const invSnap = await getDocs(collection(db,'invoices'));
+      const invoices = []; invSnap.forEach(d=>invoices.push({id:d.id,...d.data()}));
+      const unpaid = invoices.filter(i => invoiceStatusOf(i) !== 'paid');
+      const outstanding = unpaid.reduce((s,i)=>s+((i.total||0)-(i.amountPaid||0)),0);
+      document.getElementById('dash-outstanding').textContent = '₹' + fmt(outstanding);
+
+      const overdue = unpaid
+        .map(i => ({ ...i, days: daysSince(i.date), due: (i.total||0)-(i.amountPaid||0) }))
+        .filter(i => i.days >= 7)
+        .sort((a,b) => b.days - a.days)
+        .slice(0, 10);
+
+      document.getElementById('dash-overdue-list').innerHTML = overdue.length === 0
+        ? '<div style="padding:16px;color:#64748b;font-size:13px">Koi overdue payment nahi hai 🎉</div>'
+        : overdue.map(i => {
+            const msg = `Namaste ${i.cname}, R.R Teen Set Solution se. Aapke invoice ${i.invId} ka ₹${fmt(i.due)} payment abhi due hai. Kripya jald bhugtan kar dijiye. Dhanyawad!`;
+            return `<div class="followup-row">
+              <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
+                <br><small style="color:#94a3b8">${i.days} din se overdue</small></div>
+              <a href="${waLink(i.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
+            </div>`;
+          }).join('');
+    }
+  } catch(e) { console.error('Dashboard load error:', e); }
+};
+
 window.doLogin = async () => {
   const email = document.getElementById('l-email').value.trim();
   const pass  = document.getElementById('l-pass').value;
@@ -812,6 +941,7 @@ window.showSection = id => {
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-section="${id}"]`).classList.add('active');
+  if (id === 'dashboard') loadDashboard();
   if (id === 'history')   loadQuotations();
   if (id === 'analytics') renderAnalytics();
   if (id === 'invoices')  loadInvoices();
