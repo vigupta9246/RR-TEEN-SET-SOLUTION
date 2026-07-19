@@ -10,7 +10,6 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, follow">
 <title>R.R Teen Set Solution — Quotation System</title>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -207,10 +206,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="showSection('invoice-create')"><span class="nav-icon">🧾</span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon">💳</span><span>Invoices &amp; Payments</span></button>
+      <div class="nav-section">ADMIN</div>
+      <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon">🛡️</span><span>Team</span></button>
       <div class="nav-section">LINKS</div>
       <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon">🌐</span><span>Main Website</span></button>
       <div class="sidebar-footer">
         <div class="user-info" id="user-email">admin</div>
+        <div class="user-info" id="user-role-badge" style="font-size:11px;opacity:0.75;margin-top:-6px">—</div>
         <button class="btn-logout" onclick="doLogout()">🔒 Logout</button>
       </div>
     </aside>
@@ -228,6 +230,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Quotation ID</label><input type="text" id="f-qtid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label">Date</label><input type="date" id="f-date" class="form-input"></div>
+              <input type="hidden" id="f-leadid" value="">
             </div>
           </div>
           <div class="form-card">
@@ -547,6 +550,42 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
           </div>
         </div>
       </section>
+
+      <!-- TEAM (Admin only) -->
+      <section id="team" class="section">
+        <div class="page-header">
+          <div class="page-title">Team</div>
+          <div class="page-sub">Manage staff logins &amp; access levels — Admin, Sales, Accounts</div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-section-title">➕ ADD TEAM MEMBER</div>
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="tm-name" class="form-input" placeholder="e.g. Priya Sales"></div>
+            <div class="form-group"><label class="form-label">Email *</label><input type="email" id="tm-email" class="form-input" placeholder="e.g. priya@rrteenset.com"></div>
+            <div class="form-group"><label class="form-label">Temporary Password *</label><input type="text" id="tm-pass" class="form-input" placeholder="Min 6 characters"></div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select id="tm-role" class="form-select">
+                <option>Sales</option><option>Accounts</option><option>Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="addTeamMember()">💾 Create Login</button>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:10px">
+            Sales → New Quotation, History, Leads, Customers &nbsp;|&nbsp; Accounts → Invoices, Customers, Analytics &nbsp;|&nbsp; Admin → Everything
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+            <tbody id="team-tbody"><tr><td colspan="4" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -591,10 +630,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -620,19 +659,143 @@ let activePaymentInvoiceId = null;
 let allLeads = [];
 let editingLeadId = null;
 let allCustomers = [];
+let currentUserRole = null;
+let allTeam = [];
+
+// Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
+const ROLE_PERMISSIONS = {
+  Admin:    ['create','history','analytics','leads','customers','invoice-create','invoices','team'],
+  Sales:    ['create','history','leads','customers'],
+  Accounts: ['invoice-create','invoices','customers','analytics']
+};
+const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 
 // ── AUTH ────────────────────────────────────────────────────────
-onAuthStateChanged(auth, u => {
+onAuthStateChanged(auth, async u => {
   if (u) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('user-email').textContent = u.email;
+    await loadCurrentUserRole(u);
+    applyRolePermissions();
     loadQuotations();
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
+    currentUserRole = null;
   }
 });
+
+async function loadCurrentUserRole(u) {
+  try {
+    const ref = doc(db, 'users', u.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      currentUserRole = snap.data().role || 'Sales';
+    } else {
+      // First-ever login for this account — bootstrap. Known admin email = Admin, else default Sales.
+      currentUserRole = (u.email === ADMIN_EMAIL) ? 'Admin' : 'Sales';
+      await setDoc(ref, { email: u.email, name: u.email.split('@')[0], role: currentUserRole, createdAt: serverTimestamp() });
+    }
+  } catch(e) {
+    console.error('Role load failed, defaulting to Admin for safety:', e);
+    currentUserRole = 'Admin';
+  }
+  document.getElementById('user-role-badge').textContent = currentUserRole;
+}
+
+function applyRolePermissions() {
+  const allowed = ROLE_PERMISSIONS[currentUserRole] || [];
+  document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
+    const sec = btn.getAttribute('data-section');
+    btn.style.display = allowed.includes(sec) ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-section').forEach(h => {
+    // hide a category header if none of the buttons under it (until next header) are visible
+    let el = h.nextElementSibling, anyVisible = false;
+    while (el && !el.classList.contains('nav-section')) {
+      if (el.classList.contains('nav-btn') && el.style.display !== 'none') anyVisible = true;
+      el = el.nextElementSibling;
+    }
+    h.style.display = anyVisible ? '' : 'none';
+  });
+  // If current active section isn't allowed for this role, jump to the first allowed one
+  const activeBtn = document.querySelector('.nav-btn.active');
+  const activeSection = activeBtn?.getAttribute('data-section');
+  if (!activeSection || !allowed.includes(activeSection)) {
+    showSection(allowed[0] || 'create');
+  }
+}
+
+// ── TEAM / ROLES (Admin only) ────────────────────────────────────
+// Creates the new login on a throwaway secondary Firebase app instance so the
+// currently logged-in Admin's own session is never touched or signed out.
+async function createTeamMemberAuth(email, pass) {
+  const secondaryApp = initializeApp(firebaseConfig, 'Secondary-' + Date.now());
+  const secondaryAuth = getAuth(secondaryApp);
+  try {
+    const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+    const uid = cred.user.uid;
+    await signOut(secondaryAuth);
+    await deleteApp(secondaryApp);
+    return uid;
+  } catch(e) {
+    try { await deleteApp(secondaryApp); } catch(_) {}
+    throw e;
+  }
+}
+
+window.addTeamMember = async () => {
+  const g = id => document.getElementById(id).value;
+  const name = g('tm-name').trim(), email = g('tm-email').trim(), pass = g('tm-pass'), role = g('tm-role');
+  if (!name || !email || !pass) { alert('Naam, email aur password required hai.'); return; }
+  if (pass.length < 6) { alert('Password kam se kam 6 characters ka hona chahiye.'); return; }
+  try {
+    const uid = await createTeamMemberAuth(email, pass);
+    await setDoc(doc(db, 'users', uid), { name, email, role, createdAt: serverTimestamp() });
+    alert(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`);
+    document.getElementById('tm-name').value = '';
+    document.getElementById('tm-email').value = '';
+    document.getElementById('tm-pass').value = '';
+    loadTeam();
+  } catch(e) {
+    if (e.code === 'auth/email-already-in-use') alert('Ye email pehle se registered hai.');
+    else alert('Error: ' + e.message);
+  }
+};
+
+window.loadTeam = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt','desc')));
+    allTeam = [];
+    snap.forEach(d => allTeam.push({ id: d.id, ...d.data() }));
+    renderTeam();
+  } catch(e) { console.error(e); }
+};
+
+window.renderTeam = () => {
+  const tbody = document.getElementById('team-tbody');
+  tbody.innerHTML = allTeam.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">No team members yet</td></tr>`
+    : allTeam.map(t => `<tr>
+        <td><strong>${esc(t.name||'—')}</strong></td>
+        <td>${esc(t.email||'—')}</td>
+        <td>
+          <select onchange="changeTeamRole('${t.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px" ${t.email===ADMIN_EMAIL?'disabled title="Primary admin role fixed"':''}>
+            ${['Admin','Sales','Accounts'].map(r=>`<option ${t.role===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+        </td>
+        <td>${t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('en-IN') : '—'}</td>
+      </tr>`).join('');
+};
+
+window.changeTeamRole = async (uid, role) => {
+  try {
+    await updateDoc(doc(db,'users',uid), { role, updatedAt: serverTimestamp() });
+    const t = allTeam.find(x=>x.id===uid); if (t) t.role = role;
+    alert('Role updated!');
+  } catch(e) { alert('Error: ' + e.message); }
+};
 
 window.doLogin = async () => {
   const email = document.getElementById('l-email').value.trim();
@@ -655,6 +818,7 @@ window.showSection = id => {
   if (id === 'invoice-create') populateQuotationDropdown();
   if (id === 'leads')     loadLeads();
   if (id === 'customers') loadCustomers();
+  if (id === 'team')      loadTeam();
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
@@ -709,8 +873,13 @@ window.saveQuotation = async isDraft => {
     gstPct, gstAmt,
     base: area*rate, total,
     notes: g('f-notes'), terms: g('f-terms'), payment: g('f-payment'), date: g('f-date'),
+    sourceLeadId: g('f-leadid') || null,
     isDraft, updatedAt: serverTimestamp()
   };
+  if (!isDraft) {
+    const existing = editingId ? allQuotations.find(x=>x.id===editingId) : null;
+    if (!existing || !existing.dealStatus) data.dealStatus = 'Pending';
+  }
   try {
     if (editingId) {
       await updateDoc(doc(db,'quotations',editingId), data);
@@ -836,6 +1005,7 @@ window.convertLeadToQuotation = async id => {
   document.getElementById('f-cemail').value = l.email||'';
   document.getElementById('f-caddr').value = l.addr||'';
   if (l.ptype) document.getElementById('f-ptype').value = l.ptype;
+  document.getElementById('f-leadid').value = id;
   try {
     await updateDoc(doc(db,'leads',id), { status: 'Quoted', updatedAt: serverTimestamp() });
     l.status = 'Quoted';
@@ -925,7 +1095,10 @@ window.renderHistory = (search='') => {
         <td>${q.ptype}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
         <td><strong>₹${fmt(q.total)}</strong></td>
-        <td>${q.date||'—'}<br>${q.isDraft?'<span class="badge-draft">Draft</span>':'<span class="badge-final">Final</span>'}</td>
+        <td>${q.date||'—'}<br>${q.isDraft?'<span class="badge-draft">Draft</span>':`
+          <select onchange="updateDealStatus('${q.id}',this.value)" class="form-select" style="padding:3px 6px;font-size:11px;max-width:110px">
+            ${['Pending','Sent','Won','Lost'].map(s=>`<option ${(q.dealStatus||'Pending')===s?'selected':''}>${s}</option>`).join('')}
+          </select>`}</td>
         <td class="action-btns">
           <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview">👁️</button>
           <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">✏️</button>
@@ -936,6 +1109,39 @@ window.renderHistory = (search='') => {
 };
 
 // ── EDIT / DELETE ───────────────────────────────────────────────
+window.updateDealStatus = async (id, dealStatus) => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  try {
+    const updates = { dealStatus, updatedAt: serverTimestamp() };
+
+    if (dealStatus === 'Won' && !q.invoiceGenerated) {
+      const invData = {
+        invId: genInvId(), qtRef: q.qtId, date: new Date().toISOString().split('T')[0], dueDate: '',
+        cname: q.cname, cphone: q.cphone, cemail: q.cemail||'', caddr: q.caddr||'',
+        ptype: q.ptype, desc: `${q.ptype} — Supply, Fabrication & Erection (${(q.area||0).toLocaleString('en-IN')} sq.ft)`,
+        base: q.base || (q.area*q.rate) || 0, extra: q.extra||0, discount: q.discount||0,
+        gstPct: q.gstPct||0, gstAmt: q.gstAmt||0, total: q.total||0,
+        payment: q.payment||'', notes: '', amountPaid: 0, status: 'unpaid',
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      };
+      await addDoc(collection(db,'invoices'), invData);
+      updates.invoiceGenerated = true;
+      await upsertCustomer({ name: q.cname, phone: (q.cphone||'').replace(/\D/g,''), email: q.cemail, addr: q.caddr });
+    }
+
+    if ((dealStatus === 'Won' || dealStatus === 'Lost') && q.sourceLeadId) {
+      try { await updateDoc(doc(db,'leads',q.sourceLeadId), { status: dealStatus, updatedAt: serverTimestamp() }); } catch(e) {}
+    }
+
+    await updateDoc(doc(db,'quotations',id), updates);
+    Object.assign(q, updates);
+    if (dealStatus === 'Won' && updates.invoiceGenerated) {
+      alert('Deal Won! 🎉 Invoice auto-generated — check Invoices & Payments tab.');
+    }
+    renderHistory(document.getElementById('search-input')?.value || '');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
 window.editQT = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   editingId = id;
@@ -943,6 +1149,7 @@ window.editQT = id => {
   ['qtid','date','cname','cphone','cemail','caddr','ptype','area','rate','extra','discount','notes','terms','payment'].forEach(k=>{
     const el=document.getElementById('f-'+k); if(el) el.value=q[k]||'';
   });
+  document.getElementById('f-leadid').value = q.sourceLeadId || '';
   // Restore GST
   const gstEl = document.getElementById('f-gst');
   if (gstEl) gstEl.value = q.gstPct || 0;
