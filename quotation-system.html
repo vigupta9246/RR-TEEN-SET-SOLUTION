@@ -1034,21 +1034,23 @@ const fmt = n => Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function genId() {
   const now = Date.now();
-  return `QT-${new Date().getFullYear()}-${String(now).slice(-4)}`;
+  const rand = Math.random().toString(36).slice(2,4).toUpperCase();
+  return `QT-${new Date().getFullYear()}-${String(now).slice(-6)}${rand}`;
 }
 function genInvId() {
   const now = Date.now();
-  return `INV-${new Date().getFullYear()}-${String(now).slice(-4)}`;
+  const rand = Math.random().toString(36).slice(2,4).toUpperCase();
+  return `INV-${new Date().getFullYear()}-${String(now).slice(-6)}${rand}`;
 }
 
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
   const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
-  const extra = parseFloat(document.getElementById('f-extra').value) || 0;
-  const discount = parseFloat(document.getElementById('f-discount').value) || 0;
+  const extra = Math.max(0, parseFloat(document.getElementById('f-extra').value) || 0);
+  const base   = Math.max(0, area) * Math.max(0, rate);
+  const discount = Math.min(Math.max(0, parseFloat(document.getElementById('f-discount').value) || 0), base + extra);
   const gstPct = parseFloat(document.getElementById('f-gst').value) || 0;
-  const base   = area * rate;
   const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const grand  = subtotal + gstAmt;
@@ -1065,13 +1067,18 @@ window.saveQuotation = async isDraft => {
   const area  = parseFloat(g('f-area')) || 0;
   const rate  = parseFloat(g('f-rate')) || 0;
   if (!cname || !cphone || !area || !rate) { alert('Name, phone, area aur rate required hai.'); return; }
+  if (area <= 0 || rate <= 0) { alert('Area aur rate 0 se zyada hone chahiye.'); return; }
   // Phone validation — must be 10 digits
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
-  const extra  = parseFloat(g('f-extra')) || 0;
-  const discount = parseFloat(g('f-discount')) || 0;
-  const gstPct = parseFloat(g('f-gst')) || 0;
+  const extra  = Math.max(0, parseFloat(g('f-extra')) || 0);
   const base   = area * rate;
+  let discount = Math.max(0, parseFloat(g('f-discount')) || 0);
+  if (discount > base + extra) {
+    alert(`Discount (₹${fmt(discount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`);
+    discount = base + extra;
+  }
+  const gstPct = parseFloat(g('f-gst')) || 0;
   const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const total  = subtotal + gstAmt;
@@ -1251,7 +1258,17 @@ async function upsertCustomer({ name, phone, email, addr }) {
 
 window.loadCustomers = async () => {
   try {
-    allCustomers = await fetchCached('customers', 'customers', 'lastActivity');
+    // Ensure quotations are loaded too (cached — free if already fetched
+    // this session) so per-customer totals aren't silently wrong/zero
+    // when someone opens Customers tab directly without visiting History first.
+    // Skipped for Accounts role — they have no Firestore read access to
+    // quotations, so their Customers view simply won't show quote totals.
+    const canReadQuotes = (ROLE_READ_ACCESS[currentUserRole]||{}).quotations;
+    const [customers] = await Promise.all([
+      fetchCached('customers', 'customers', 'lastActivity'),
+      canReadQuotes ? fetchCached('quotations', 'quotations').then(q => allQuotations = q) : Promise.resolve()
+    ]);
+    allCustomers = customers;
     renderCustomers('');
   } catch(e) { console.error(e); }
 };
@@ -1296,7 +1313,7 @@ window.renderHistory = (search='') => {
   tbody.innerHTML = list.length === 0
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No quotations found</td></tr>`
     : list.map(q=>`<tr>
-        <td><span class="qt-id-badge">${q.qtId}</span></td>
+        <td><span class="qt-id-badge">${esc(q.qtId)}</span></td>
         <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
         <td>${q.ptype}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
@@ -1453,7 +1470,7 @@ function buildQtHTML(q) {
           <div style="font-size:28px;font-weight:900;color:#000000;letter-spacing:4px;line-height:1;">QUOTATION</div>
           <div style="margin-top:8px;display:inline-block;background:#ffffff;border:1.5px solid #000000;color:#000;padding:6px 16px;border-radius:6px;">
             <div style="font-size:8px;color:#000000;letter-spacing:2px;margin-bottom:2px;">REFERENCE NO.</div>
-            <div style="font-size:15px;font-weight:800;color:#000000;letter-spacing:1px;">${q.qtId}</div>
+            <div style="font-size:15px;font-weight:800;color:#000000;letter-spacing:1px;">${esc(q.qtId)}</div>
           </div>
           <div style="margin-top:8px;font-size:11px;color:#5a6a7a;line-height:1.9;">
             <div><strong style="color:#000000;">Issue Date :</strong> &nbsp;${fmtDate(dateObj)}</div>
@@ -1612,7 +1629,7 @@ function buildQtHTML(q) {
     <table style="width:100%;border-collapse:collapse;">
       <tr>
         <td style="font-size:8.5px;color:#aaa;">Computer generated quotation &nbsp;&middot;&nbsp; No signature required if digitally shared &nbsp;&middot;&nbsp; www.rrteensetsolution.com</td>
-        <td style="font-size:8.5px;color:#aaa;text-align:right;">Ref: ${q.qtId} &nbsp;|&nbsp; Page 1 of 1</td>
+        <td style="font-size:8.5px;color:#aaa;text-align:right;">Ref: ${esc(q.qtId)} &nbsp;|&nbsp; Page 1 of 1</td>
       </tr>
     </table>
   </div>
@@ -1739,17 +1756,17 @@ window.renderAnalytics = () => {
 
 // ── QUICK LOAD FROM QUOTATION ──────────────────────────────────
 window.populateQuotationDropdown = async () => {
-  if (allQuotations.length === 0) {
-    try {
-      const snap = await getDocs(query(collection(db,'quotations'), orderBy('createdAt','desc')));
-      allQuotations = [];
-      snap.forEach(d => allQuotations.push({ id: d.id, ...d.data() }));
-    } catch(e) { console.error(e); }
-  }
   const sel = document.getElementById('inv-load-qt');
+  try {
+    allQuotations = await fetchCached('quotations', 'quotations');
+  } catch(e) {
+    console.error('Could not load quotations (likely no read access for this role):', e);
+    sel.innerHTML = '<option value="">— Not available for your role —</option>';
+    return;
+  }
   const finals = allQuotations.filter(q => !q.isDraft);
   sel.innerHTML = '<option value="">— Select a quotation to auto-fill —</option>' +
-    finals.map(q => `<option value="${q.id}">${q.qtId} — ${esc(q.cname)} — ₹${fmt(q.total)}</option>`).join('');
+    finals.map(q => `<option value="${q.id}">${esc(q.qtId)} — ${esc(q.cname)} — ₹${fmt(q.total)}</option>`).join('');
 };
 
 window.loadQuotationIntoInvoice = () => {
@@ -1773,9 +1790,9 @@ window.loadQuotationIntoInvoice = () => {
 
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculateInvoice = () => {
-  const base   = parseFloat(document.getElementById('i-base').value)     || 0;
-  const extra  = parseFloat(document.getElementById('i-extra').value)    || 0;
-  const discount = parseFloat(document.getElementById('i-discount').value) || 0;
+  const base   = Math.max(0, parseFloat(document.getElementById('i-base').value)     || 0);
+  const extra  = Math.max(0, parseFloat(document.getElementById('i-extra').value)    || 0);
+  const discount = Math.min(Math.max(0, parseFloat(document.getElementById('i-discount').value) || 0), base + extra);
   const gstPct = parseFloat(document.getElementById('i-gst').value)      || 0;
   const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
@@ -1792,10 +1809,15 @@ window.saveInvoice = async () => {
   const cname = g('i-cname').trim(), cphone = g('i-cphone').trim();
   const base  = parseFloat(g('i-base')) || 0;
   if (!cname || !cphone || !base) { alert('Name, phone aur base amount required hai.'); return; }
+  if (base <= 0) { alert('Base amount 0 se zyada hona chahiye.'); return; }
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
-  const extra  = parseFloat(g('i-extra')) || 0;
-  const discount = parseFloat(g('i-discount')) || 0;
+  const extra  = Math.max(0, parseFloat(g('i-extra')) || 0);
+  let discount = Math.max(0, parseFloat(g('i-discount')) || 0);
+  if (discount > base + extra) {
+    alert(`Discount (₹${fmt(discount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`);
+    discount = base + extra;
+  }
   const gstPct = parseFloat(g('i-gst')) || 0;
   const subtotal = base + extra - discount;
   const gstAmt = Math.round(subtotal * gstPct / 100);
@@ -1868,7 +1890,7 @@ window.renderInvoices = (search='') => {
                     : status === 'partial' ? '<span class="badge-partial">Partial</span>'
                     : '<span class="badge-unpaid">Unpaid</span>';
         return `<tr>
-        <td><span class="qt-id-badge">${i.invId}</span>${i.qtRef?`<br><small style="color:#94a3b8">from ${esc(i.qtRef)}</small>`:''}</td>
+        <td><span class="qt-id-badge">${esc(i.invId)}</span>${i.qtRef?`<br><small style="color:#94a3b8">from ${esc(i.qtRef)}</small>`:''}</td>
         <td><strong>${esc(i.cname)}</strong><br><small>${esc(i.cphone)}</small></td>
         <td><strong>₹${fmt(i.total)}</strong></td>
         <td>₹${fmt(paid)}</td>
@@ -1953,6 +1975,11 @@ window.savePayment = async () => {
   const date = document.getElementById('pay-date').value;
   const note = document.getElementById('pay-note').value;
   const inv = allInvoices.find(x=>x.id===activePaymentInvoiceId); if (!inv) return;
+  const balance = Math.max(0, (inv.total||0) - (inv.amountPaid||0));
+  if (amount > balance) {
+    alert(`Ye amount (₹${fmt(amount)}) invoice ki balance (₹${fmt(balance)}) se zyada hai. Kripya sahi amount daalein.`);
+    return;
+  }
   try {
     await addDoc(collection(db,'payments'), {
       invoiceId: activePaymentInvoiceId, invId: inv.invId, amount, mode, date, note,
@@ -2009,7 +2036,7 @@ function buildInvHTML(i) {
           <div style="font-size:28px;font-weight:900;color:#000000;letter-spacing:4px;line-height:1;">INVOICE</div>
           <div style="margin-top:8px;display:inline-block;background:#ffffff;border:1.5px solid #000000;color:#000;padding:6px 16px;border-radius:6px;">
             <div style="font-size:8px;color:#000000;letter-spacing:2px;margin-bottom:2px;">INVOICE NO.</div>
-            <div style="font-size:15px;font-weight:800;color:#000000;letter-spacing:1px;">${i.invId}</div>
+            <div style="font-size:15px;font-weight:800;color:#000000;letter-spacing:1px;">${esc(i.invId)}</div>
           </div>
           <div style="margin-top:8px;font-size:11px;color:#5a6a7a;line-height:1.9;">
             <div><strong style="color:#000000;">Invoice Date :</strong> &nbsp;${fmtDate(dateObj)}</div>
@@ -2065,7 +2092,7 @@ function buildInvHTML(i) {
     <table style="width:100%;border-collapse:collapse;">
       <tr>
         <td style="font-size:8.5px;color:#aaa;">Computer generated invoice &nbsp;·&nbsp; www.rrteensetsolution.com</td>
-        <td style="font-size:8.5px;color:#aaa;text-align:right;">Ref: ${i.invId}</td>
+        <td style="font-size:8.5px;color:#aaa;text-align:right;">Ref: ${esc(i.invId)}</td>
       </tr>
     </table>
   </div>
