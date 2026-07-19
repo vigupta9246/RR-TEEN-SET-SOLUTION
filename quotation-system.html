@@ -60,7 +60,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .page-title{font-size:26px;font-weight:900;color:var(--navy)}
 .page-sub{font-size:14px;color:var(--muted);margin-top:4px}
 .section{display:none}
-.section.active{display:block}
+.section.active{display:block;animation:sectionIn .35s ease both}
+@keyframes sectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 /* FORM */
 .form-card{background:var(--card);border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.06);margin-bottom:24px}
 .form-section-title{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:1px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -124,16 +125,38 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-icon.btn-whatsapp:hover{background:#25d366;border-color:#25d366}
 /* ANALYTICS */
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
-.stat-card{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.stat-card{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .2s ease,box-shadow .2s ease;animation:cardIn .4s ease both}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.1)}
+.stat-card:nth-child(1){animation-delay:0ms} .stat-card:nth-child(2){animation-delay:60ms} .stat-card:nth-child(3){animation-delay:120ms}
+.stat-card:nth-child(4){animation-delay:180ms} .stat-card:nth-child(5){animation-delay:240ms} .stat-card:nth-child(6){animation-delay:300ms}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.stat-card.stat-alert{animation:cardIn .4s ease both,alertPulse 2s ease-in-out infinite}
+@keyframes alertPulse{0%,100%{box-shadow:0 2px 12px rgba(0,0,0,.05)}50%{box-shadow:0 0 0 6px rgba(241,60,32,.12)}}
 .stat-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:8px}
 .stat-value{font-size:28px;font-weight:900;color:var(--navy)}
 .stat-value.orange{color:var(--orange)}
 .stat-value.green{color:var(--green)}
 .type-breakdown{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
 .breakdown-title{font-size:15px;font-weight:800;margin-bottom:16px;color:var(--navy)}
-.followup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);font-size:13px}
+.followup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);font-size:13px;transition:background .15s}
+.followup-row:hover{background:#f8fafc}
 .followup-row:last-child{border-bottom:none}
+.reveal-row{animation:cardIn .35s ease both}
 .followup-row a.btn-icon{text-decoration:none;flex-shrink:0}
+
+/* SKELETON LOADERS — replaces plain "Loading..." text everywhere */
+.skel{display:inline-block;background:linear-gradient(90deg,#e8ecf3 25%,#f4f6fa 37%,#e8ecf3 63%);background-size:400% 100%;animation:skelShimmer 1.4s ease infinite;border-radius:6px;vertical-align:middle}
+@keyframes skelShimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.skel-num{width:56px;height:26px}
+.skel-line{display:block;height:11px;border-radius:4px}
+.skel-icon{width:28px;height:28px;border-radius:7px}
+
+/* Table rows fade in on render, and nav buttons feel snappier */
+.data-table tbody tr{animation:cardIn .3s ease both}
+.nav-btn{transition:background .15s ease,transform .12s ease,color .15s ease}
+.nav-btn:active{transform:scale(.97)}
+.btn:active,.btn-icon:active{transform:scale(.95)}
+.btn-icon{transition:all .15s ease,transform .1s ease}
 .type-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
 .type-row:last-child{border-bottom:none}
 .type-count{background:#eff6ff;color:#1565c0;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
@@ -354,7 +377,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               <thead><tr>
                 <th>QT ID</th><th>Customer</th><th>Project</th><th>Area</th><th>Amount</th><th>Date / Status</th><th>Actions</th>
               </tr></thead>
-              <tbody id="history-tbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+              <tbody id="history-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -429,7 +452,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="table-card">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="leads-tbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+            <tbody id="leads-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
         </div>
       </section>
@@ -448,7 +471,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="table-card">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Quotations</th><th>Total Value</th><th>Last Activity</th></tr></thead>
-            <tbody id="customers-tbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+            <tbody id="customers-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
         </div>
       </section>
@@ -576,7 +599,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               <thead><tr>
                 <th>Invoice ID</th><th>Customer</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Actions</th>
               </tr></thead>
-              <tbody id="invoices-tbody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+              <tbody id="invoices-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -613,7 +636,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="table-card">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
-            <tbody id="team-tbody"><tr><td colspan="4" style="text-align:center;padding:40px;color:#64748b">Loading...</td></tr></tbody>
+            <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr></tbody>
           </table>
         </div>
       </section>
@@ -700,6 +723,21 @@ const ROLE_PERMISSIONS = {
   Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
+
+// ── PERFORMANCE: short-lived cache so switching tabs repeatedly doesn't
+// re-download the whole collection every single click. Any save/delete/
+// status-change invalidates the relevant key immediately so data is never stale.
+const _cache = { quotations:{data:null,ts:0}, leads:{data:null,ts:0}, invoices:{data:null,ts:0}, customers:{data:null,ts:0} };
+const CACHE_TTL = 45000; // 45s
+async function fetchCached(key, colName, orderField='createdAt') {
+  const c = _cache[key];
+  if (c.data && (Date.now() - c.ts) < CACHE_TTL) return c.data;
+  const snap = await getDocs(query(collection(db,colName), orderBy(orderField,'desc')));
+  const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+  c.data = list; c.ts = Date.now();
+  return list;
+}
+function invalidateCache(key) { if (_cache[key]) _cache[key].ts = 0; }
 
 // ── AUTH ────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async u => {
@@ -852,18 +890,24 @@ window.loadDashboard = async () => {
   document.querySelectorAll('#dashboard [data-requires]').forEach(el => {
     el.style.display = access[el.getAttribute('data-requires')] ? '' : 'none';
   });
+  showDashboardSkeleton(access);
 
   try {
+    // Fetch everything this role can see IN PARALLEL (not one-by-one) and
+    // via the shared cache — if History/Leads/Invoices were opened recently
+    // in this session, this reuses that data instead of re-downloading it.
+    const [leads, quotes, invoices] = await Promise.all([
+      access.leads     ? fetchCached('leads', 'leads')           : Promise.resolve([]),
+      access.quotations? fetchCached('quotations', 'quotations') : Promise.resolve([]),
+      access.invoices  ? fetchCached('invoices', 'invoices')     : Promise.resolve([]),
+    ]);
+
     if (access.leads) {
-      const leadSnap = await getDocs(collection(db,'leads'));
-      const leads = []; leadSnap.forEach(d=>leads.push({id:d.id,...d.data()}));
       const openLeads = leads.filter(l => !['Won','Lost'].includes(l.status));
-      document.getElementById('dash-open-leads').textContent = openLeads.length;
+      animateCount('dash-open-leads', openLeads.length);
     }
 
     if (access.quotations) {
-      const qtSnap = await getDocs(collection(db,'quotations'));
-      const quotes = []; qtSnap.forEach(d=>quotes.push({id:d.id,...d.data()}));
       const finalized = quotes.filter(q => !q.isDraft);
       const pending = finalized.filter(q => ['Pending','Sent'].includes(q.dealStatus||'Pending'));
       const won = finalized.filter(q => q.dealStatus === 'Won');
@@ -876,7 +920,7 @@ window.loadDashboard = async () => {
       const wonRevenue = wonThisMonth.reduce((s,q)=>s+(q.total||0),0);
       const convRate = (won.length+lost.length) > 0 ? Math.round(won.length/(won.length+lost.length)*100) : 0;
 
-      document.getElementById('dash-pending-qt').textContent = pending.length;
+      animateCount('dash-pending-qt', pending.length);
       document.getElementById('dash-won-month').textContent = '₹' + fmt(wonRevenue);
       document.getElementById('dash-conversion').textContent = convRate + '%';
 
@@ -886,12 +930,13 @@ window.loadDashboard = async () => {
         .sort((a,b) => b.days - a.days)
         .slice(0, 10);
 
-      document.getElementById('dash-followup-count').textContent = followups.length;
+      animateCount('dash-followup-count', followups.length);
+      document.getElementById('dash-followup-count').closest('.stat-card').classList.toggle('stat-alert', followups.length > 0);
       document.getElementById('dash-followup-list').innerHTML = followups.length === 0
         ? '<div style="padding:16px;color:#64748b;font-size:13px">Sab follow-up clear hain 🎉</div>'
-        : followups.map(q => {
+        : followups.map((q,i) => {
             const msg = `Namaste ${q.cname}, R.R Teen Set Solution se. Aapki quotation ${q.qtId} (₹${fmt(q.total)}) abhi pending hai. Koi query ho to zaroor bataiye, hum madad ke liye taiyar hain. Dhanyawad!`;
-            return `<div class="followup-row">
+            return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                 <br><small style="color:#94a3b8">${q.days} din se pending</small></div>
               <a href="${waLink(q.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
@@ -900,8 +945,6 @@ window.loadDashboard = async () => {
     }
 
     if (access.invoices) {
-      const invSnap = await getDocs(collection(db,'invoices'));
-      const invoices = []; invSnap.forEach(d=>invoices.push({id:d.id,...d.data()}));
       const unpaid = invoices.filter(i => invoiceStatusOf(i) !== 'paid');
       const outstanding = unpaid.reduce((s,i)=>s+((i.total||0)-(i.amountPaid||0)),0);
       document.getElementById('dash-outstanding').textContent = '₹' + fmt(outstanding);
@@ -914,9 +957,9 @@ window.loadDashboard = async () => {
 
       document.getElementById('dash-overdue-list').innerHTML = overdue.length === 0
         ? '<div style="padding:16px;color:#64748b;font-size:13px">Koi overdue payment nahi hai 🎉</div>'
-        : overdue.map(i => {
+        : overdue.map((i,idx) => {
             const msg = `Namaste ${i.cname}, R.R Teen Set Solution se. Aapke invoice ${i.invId} ka ₹${fmt(i.due)} payment abhi due hai. Kripya jald bhugtan kar dijiye. Dhanyawad!`;
-            return `<div class="followup-row">
+            return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${i.days} din se overdue</small></div>
               <a href="${waLink(i.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
@@ -925,6 +968,41 @@ window.loadDashboard = async () => {
     }
   } catch(e) { console.error('Dashboard load error:', e); }
 };
+
+function showDashboardSkeleton(access) {
+  ['dash-open-leads','dash-pending-qt','dash-won-month','dash-outstanding','dash-conversion','dash-followup-count'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.textContent === '—') el.innerHTML = '<span class="skel skel-num"></span>';
+  });
+  if (access.quotations) document.getElementById('dash-followup-list').innerHTML = skeletonRows(3);
+  if (access.invoices)   document.getElementById('dash-overdue-list').innerHTML = skeletonRows(3);
+}
+
+function skeletonRows(n) {
+  return Array.from({length:n}).map(() => `
+    <div class="followup-row">
+      <div style="flex:1"><span class="skel skel-line" style="width:60%"></span><span class="skel skel-line" style="width:40%;margin-top:6px"></span></div>
+      <span class="skel skel-icon"></span>
+    </div>`).join('');
+}
+
+// Animated count-up for stat numbers — small detail, makes the dashboard feel alive
+function animateCount(elId, target, prefix='', suffix='') {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const isPercent = false;
+  let start = 0;
+  const duration = 600;
+  const startTime = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = Math.round(start + (target - start) * eased);
+    el.textContent = prefix + val.toLocaleString('en-IN') + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
 
 window.doLogin = async () => {
   const email = document.getElementById('l-email').value.trim();
@@ -1018,6 +1096,7 @@ window.saveQuotation = async isDraft => {
       await addDoc(collection(db,'quotations'), { ...data, createdAt: serverTimestamp() });
     }
     await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
+    invalidateCache('quotations');
     alert(isDraft ? 'Draft saved!' : 'Quotation saved!');
     resetForm(); showSection('history');
   } catch(e) { alert('Error: ' + e.message); }
@@ -1057,6 +1136,7 @@ window.saveLead = async () => {
       await addDoc(collection(db,'leads'), { ...data, status: 'New', createdAt: serverTimestamp() });
     }
     alert('Lead saved!');
+    invalidateCache('leads');
     resetLeadForm(); loadLeads();
   } catch(e) { alert('Error: ' + e.message); }
 };
@@ -1070,9 +1150,7 @@ window.resetLeadForm = () => {
 
 window.loadLeads = async () => {
   try {
-    const snap = await getDocs(query(collection(db,'leads'), orderBy('createdAt','desc')));
-    allLeads = [];
-    snap.forEach(d => allLeads.push({ id: d.id, ...d.data() }));
+    allLeads = await fetchCached('leads', 'leads');
     renderLeads('');
   } catch(e) { console.error(e); }
 };
@@ -1124,6 +1202,7 @@ window.editLead = id => {
 window.delLead = async id => {
   if (!confirm('Delete this lead?')) return;
   await deleteDoc(doc(db,'leads',id));
+  invalidateCache('leads');
   loadLeads();
 };
 
@@ -1167,13 +1246,12 @@ async function upsertCustomer({ name, phone, email, addr }) {
       });
     }
   } catch(e) { console.error('Customer upsert failed:', e); }
+  invalidateCache('customers');
 }
 
 window.loadCustomers = async () => {
   try {
-    const snap = await getDocs(query(collection(db,'customers'), orderBy('lastActivity','desc')));
-    allCustomers = [];
-    snap.forEach(d => allCustomers.push({ id: d.id, ...d.data() }));
+    allCustomers = await fetchCached('customers', 'customers', 'lastActivity');
     renderCustomers('');
   } catch(e) { console.error(e); }
 };
@@ -1202,9 +1280,7 @@ window.renderCustomers = (search='') => {
 // ── LOAD & RENDER ───────────────────────────────────────────────
 window.loadQuotations = async () => {
   try {
-    const snap = await getDocs(query(collection(db,'quotations'), orderBy('createdAt','desc')));
-    allQuotations = [];
-    snap.forEach(d => allQuotations.push({ id: d.id, ...d.data() }));
+    allQuotations = await fetchCached('quotations', 'quotations');
     renderHistory('');
   } catch(e) { console.error(e); }
 };
@@ -1257,10 +1333,11 @@ window.updateDealStatus = async (id, dealStatus) => {
       await addDoc(collection(db,'invoices'), invData);
       updates.invoiceGenerated = true;
       await upsertCustomer({ name: q.cname, phone: (q.cphone||'').replace(/\D/g,''), email: q.cemail, addr: q.caddr });
+      invalidateCache('invoices');
     }
 
     if ((dealStatus === 'Won' || dealStatus === 'Lost') && q.sourceLeadId) {
-      try { await updateDoc(doc(db,'leads',q.sourceLeadId), { status: dealStatus, updatedAt: serverTimestamp() }); } catch(e) {}
+      try { await updateDoc(doc(db,'leads',q.sourceLeadId), { status: dealStatus, updatedAt: serverTimestamp() }); invalidateCache('leads'); } catch(e) {}
     }
 
     await updateDoc(doc(db,'quotations',id), updates);
@@ -1289,6 +1366,7 @@ window.editQT = id => {
 window.delQT = async id => {
   if (!confirm('Delete this quotation?')) return;
   await deleteDoc(doc(db,'quotations',id));
+  invalidateCache('quotations');
   loadQuotations();
 };
 
@@ -1738,6 +1816,7 @@ window.saveInvoice = async () => {
       await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdAt: serverTimestamp() });
     }
     alert('Invoice saved!');
+    invalidateCache('invoices');
     resetInvoiceForm(); showSection('invoices');
   } catch(e) { alert('Error: ' + e.message); }
 };
@@ -1760,9 +1839,7 @@ window.resetInvoiceForm = () => {
 // ── LOAD & RENDER INVOICES ─────────────────────────────────────
 window.loadInvoices = async () => {
   try {
-    const snap = await getDocs(query(collection(db,'invoices'), orderBy('createdAt','desc')));
-    allInvoices = [];
-    snap.forEach(d => allInvoices.push({ id: d.id, ...d.data() }));
+    allInvoices = await fetchCached('invoices', 'invoices');
     renderInvoices('');
   } catch(e) { console.error(e); }
 };
@@ -1836,6 +1913,7 @@ window.editInvoice = id => {
 window.delInvoice = async id => {
   if (!confirm('Delete this invoice? Its payment records will remain but be unlinked.')) return;
   await deleteDoc(doc(db,'invoices',id));
+  invalidateCache('invoices');
   loadInvoices();
 };
 
@@ -1884,6 +1962,7 @@ window.savePayment = async () => {
     const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= inv.total ? 'paid' : 'partial');
     await updateDoc(doc(db,'invoices',activePaymentInvoiceId), { amountPaid: newPaid, status: newStatus });
     alert('Payment recorded!');
+    invalidateCache('invoices');
     closePaymentModal();
     loadInvoices();
   } catch(e) { alert('Error: ' + e.message); }
