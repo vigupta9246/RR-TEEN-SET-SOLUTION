@@ -153,6 +153,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* Table rows fade in on render, and nav buttons feel snappier */
 .data-table tbody tr{animation:cardIn .3s ease both}
+.pagination-wrap{display:flex;justify-content:center;padding:16px}
+.pagination{display:flex;align-items:center;gap:14px}
+.pagination button{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);transition:all .15s}
+.pagination button:hover:not(:disabled){background:var(--orange);color:#fff;border-color:var(--orange)}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.pagination-info{font-size:12.5px;color:var(--muted);font-weight:600}
 .nav-btn{transition:background .15s ease,transform .12s ease,color .15s ease}
 .nav-btn:active{transform:scale(.97)}
 .btn:active,.btn-icon:active{transform:scale(.95)}
@@ -235,6 +241,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon">💳</span><span>Invoices &amp; Payments</span></button>
       <div class="nav-section">ADMIN</div>
       <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon">🛡️</span><span>Team</span></button>
+      <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon">🗑️</span><span>Deleted Items</span></button>
       <div class="nav-section">LINKS</div>
       <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon">🌐</span><span>Main Website</span></button>
       <div class="sidebar-footer">
@@ -379,6 +386,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               </tr></thead>
               <tbody id="history-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
+            <div id="history-pagination" class="pagination-wrap"></div>
           </div>
         </div>
       </section>
@@ -454,6 +462,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <thead><tr><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="leads-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
+            <div id="leads-pagination" class="pagination-wrap"></div>
         </div>
       </section>
 
@@ -473,6 +482,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Quotations</th><th>Total Value</th><th>Last Activity</th></tr></thead>
             <tbody id="customers-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
+            <div id="customers-pagination" class="pagination-wrap"></div>
         </div>
       </section>
 
@@ -498,7 +508,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
           <div class="form-card">
             <div class="form-section-title">🧾 INVOICE META</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Invoice ID</label><input type="text" id="i-invid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label">Invoice ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="i-invid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
               <div class="form-group"><label class="form-label">Due Date</label><input type="date" id="i-duedate" class="form-input"></div>
               <div class="form-group"><label class="form-label">Linked Quotation ID</label><input type="text" id="i-qtref" class="form-input" placeholder="e.g. QT-2026-1234"></div>
@@ -601,6 +611,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
               </tr></thead>
               <tbody id="invoices-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
+            <div id="invoices-pagination" class="pagination-wrap"></div>
           </div>
         </div>
       </section>
@@ -638,6 +649,36 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
             <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- DELETED ITEMS (Admin only) -->
+      <section id="deleted-items" class="section">
+        <div class="page-header">
+          <div class="page-title">Deleted Items</div>
+          <div class="page-sub">Leads, quotations aur invoices jo delete kiye gaye hain — restore ya permanently remove karein</div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItems(this.value)">
+          </div>
+          <select id="deleted-filter-type" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderDeletedItems(document.getElementById('deleted-search-input').value)">
+            <option value="">All Types</option>
+            <option value="lead">Leads</option>
+            <option value="quotation">Quotations</option>
+            <option value="invoice">Invoices</option>
+          </select>
+        </div>
+
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr>
+              <th>Type</th><th>ID</th><th>Customer</th><th>Deleted On</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="deleted-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
+          </table>
+          <div id="deleted-pagination" class="pagination-wrap"></div>
         </div>
       </section>
     </main>
@@ -687,7 +728,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp, runTransaction }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -715,10 +756,11 @@ let editingLeadId = null;
 let allCustomers = [];
 let currentUserRole = null;
 let allTeam = [];
+let allDeletedItems = [];
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items'],
   Sales:    ['dashboard','create','history','leads','customers'],
   Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
 };
@@ -738,6 +780,50 @@ async function fetchCached(key, colName, orderField='createdAt') {
   return list;
 }
 function invalidateCache(key) { if (_cache[key]) _cache[key].ts = 0; }
+
+// Shows a visible error row instead of silently leaving a table empty
+// on a failed fetch (e.g. network issue, permission error).
+function showLoadError(tbodyId, colspan, err) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const msg = err?.code === 'permission-denied'
+    ? 'Aapke role ko is data ka access nahi hai.'
+    : 'Data load nahi ho paaya — internet check karke page refresh karein.';
+  tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;padding:32px;color:var(--red)">⚠️ ${msg}</td></tr>`;
+}
+
+// ── PAGINATION (client-side — keeps large tables fast to render) ──────
+const PAGE_SIZE = 20;
+const _pageState = { leads:1, history:1, customers:1, invoices:1, deleted:1 };
+
+function paginateList(list, key, keepPage) {
+  if (!keepPage) _pageState[key] = 1;
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  if (_pageState[key] > totalPages) _pageState[key] = totalPages;
+  const start = (_pageState[key]-1) * PAGE_SIZE;
+  return { pageItems: list.slice(start, start+PAGE_SIZE), page: _pageState[key], totalPages, total: list.length };
+}
+
+function renderPaginationControls(containerId, key, page, totalPages, total) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="pagination">
+    <button ${page<=1?'disabled':''} onclick="_gotoPage('${key}',${page-1})">← Prev</button>
+    <span class="pagination-info">Page ${page} of ${totalPages} &middot; ${total} total</span>
+    <button ${page>=totalPages?'disabled':''} onclick="_gotoPage('${key}',${page+1})">Next →</button>
+  </div>`;
+}
+
+window._gotoPage = (key, page) => {
+  _pageState[key] = page;
+  if (key === 'leads')     renderLeads(document.getElementById('lead-search-input')?.value || '', true);
+  if (key === 'history')   renderHistory(document.getElementById('search-input')?.value || '', true);
+  if (key === 'customers') renderCustomers(document.getElementById('cust-search-input')?.value || '', true);
+  if (key === 'invoices')  renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
+  if (key === 'deleted')   renderDeletedItems(document.getElementById('deleted-search-input')?.value || '', true);
+  window.scrollTo({top: document.querySelector('.section.active .table-card')?.offsetTop - 80 || 0, behavior:'smooth'});
+};
 
 // ── AUTH ────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async u => {
@@ -838,7 +924,7 @@ window.loadTeam = async () => {
     allTeam = [];
     snap.forEach(d => allTeam.push({ id: d.id, ...d.data() }));
     renderTeam();
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); showLoadError('team-tbody', 4, e); }
 };
 
 window.renderTeam = () => {
@@ -857,12 +943,86 @@ window.renderTeam = () => {
       </tr>`).join('');
 };
 
+// ── DELETED ITEMS (Admin only — view, restore, or permanently remove) ──
+// Reuses the same fetchCached lists as the main tabs (Leads/History/
+// Invoices), so opening this panel doesn't cost extra reads if those
+// tabs were already visited this session.
+window.loadDeletedItems = async () => {
+  try {
+    const [leads, quotes, invoices] = await Promise.all([
+      fetchCached('leads', 'leads'),
+      fetchCached('quotations', 'quotations'),
+      fetchCached('invoices', 'invoices')
+    ]);
+    allLeads = leads; allQuotations = quotes; allInvoices = invoices;
+    allDeletedItems = [
+      ...leads.filter(l => l.deleted).map(l => ({ type:'lead', id:l.id, label:l.name||'—', sub:l.phone||'—', deletedAt:l.deletedAt })),
+      ...quotes.filter(q => q.deleted).map(q => ({ type:'quotation', id:q.id, label:q.cname||'—', sub:q.qtId||'—', deletedAt:q.deletedAt })),
+      ...invoices.filter(i => i.deleted).map(i => ({ type:'invoice', id:i.id, label:i.cname||'—', sub:i.invId||'—', deletedAt:i.deletedAt }))
+    ].sort((a,b) => (b.deletedAt?.toMillis?.()||0) - (a.deletedAt?.toMillis?.()||0));
+    renderDeletedItems('');
+  } catch(e) { console.error(e); showLoadError('deleted-tbody', 5, e); }
+};
+
+const TYPE_LABEL = { lead:'📞 Lead', quotation:'📋 Quotation', invoice:'💳 Invoice' };
+const TYPE_COLLECTION = { lead:'leads', quotation:'quotations', invoice:'invoices' };
+
+window.renderDeletedItems = (search='', keepPage=false) => {
+  const tbody = document.getElementById('deleted-tbody');
+  const typeFilter = document.getElementById('deleted-filter-type')?.value;
+  let list = allDeletedItems;
+  if (typeFilter) list = list.filter(x => x.type === typeFilter);
+  if (search) { const s = search.toLowerCase(); list = list.filter(x => x.label.toLowerCase().includes(s) || x.sub.toLowerCase().includes(s)); }
+
+  const { pageItems, page, totalPages, total } = paginateList(list, 'deleted', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Koi deleted item nahi hai 🎉</td></tr>`
+    : pageItems.map(x => `<tr>
+        <td>${TYPE_LABEL[x.type]}</td>
+        <td><span class="qt-id-badge">${esc(x.sub)}</span></td>
+        <td>${esc(x.label)}</td>
+        <td>${x.deletedAt?.toDate ? x.deletedAt.toDate().toLocaleString('en-IN') : '—'}</td>
+        <td class="action-btns">
+          <button onclick="restoreItem('${x.type}','${x.id}')" class="btn-icon" title="Restore">♻️</button>
+          <button onclick="permanentlyDeleteItem('${x.type}','${x.id}')" class="btn-icon btn-danger" title="Delete Permanently">🗑️</button>
+        </td>
+      </tr>`).join('');
+  _pageState.deleted = page;
+  renderPaginationControls('deleted-pagination', 'deleted', page, totalPages, total);
+};
+
+window.restoreItem = async (type, id) => {
+  if (!confirm(`Is ${TYPE_LABEL[type].split(' ')[1]} ko restore kar diya jaaye? Ye wapas apni normal list mein dikhne lagega.`)) return;
+  try {
+    await updateDoc(doc(db, TYPE_COLLECTION[type], id), { deleted: false, deletedAt: null });
+    invalidateCache(TYPE_COLLECTION[type]);
+    alert('Restore ho gaya!');
+    loadDeletedItems();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.permanentlyDeleteItem = async (type, id) => {
+  if (!confirm(`⚠️ Ye ${TYPE_LABEL[type].split(' ')[1]} PERMANENTLY delete ho jayega — is baar restore NAHI ho sakega. Pakka?`)) return;
+  if (!confirm('Confirm karein — yeh action undo nahi ho sakta.')) return;
+  try {
+    await deleteDoc(doc(db, TYPE_COLLECTION[type], id));
+    invalidateCache(TYPE_COLLECTION[type]);
+    alert('Permanently deleted.');
+    loadDeletedItems();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
 window.changeTeamRole = async (uid, role) => {
+  const t = allTeam.find(x=>x.id===uid);
+  const warning = role === 'Admin'
+    ? `⚠️ Ye "${t?.name||t?.email}" ko FULL ADMIN access de dega — sab kuch (team management, delete, sabhi data). Confirm karein?`
+    : `"${t?.name||t?.email}" ka role "${role}" kar diya jaaye?`;
+  if (!confirm(warning)) { renderTeam(); return; } // reset dropdown visually
   try {
     await updateDoc(doc(db,'users',uid), { role, updatedAt: serverTimestamp() });
-    const t = allTeam.find(x=>x.id===uid); if (t) t.role = role;
+    if (t) t.role = role;
     alert('Role updated!');
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { alert('Error: ' + e.message); renderTeam(); }
 };
 
 // ── DASHBOARD (role-aware — only reads what the role is allowed to read) ──
@@ -903,12 +1063,12 @@ window.loadDashboard = async () => {
     ]);
 
     if (access.leads) {
-      const openLeads = leads.filter(l => !['Won','Lost'].includes(l.status));
+      const openLeads = leads.filter(l => !l.deleted && !['Won','Lost'].includes(l.status));
       animateCount('dash-open-leads', openLeads.length);
     }
 
     if (access.quotations) {
-      const finalized = quotes.filter(q => !q.isDraft);
+      const finalized = quotes.filter(q => !q.isDraft && !q.deleted);
       const pending = finalized.filter(q => ['Pending','Sent'].includes(q.dealStatus||'Pending'));
       const won = finalized.filter(q => q.dealStatus === 'Won');
       const lost = finalized.filter(q => q.dealStatus === 'Lost');
@@ -945,7 +1105,7 @@ window.loadDashboard = async () => {
     }
 
     if (access.invoices) {
-      const unpaid = invoices.filter(i => invoiceStatusOf(i) !== 'paid');
+      const unpaid = invoices.filter(i => !i.deleted && invoiceStatusOf(i) !== 'paid');
       const outstanding = unpaid.reduce((s,i)=>s+((i.total||0)-(i.amountPaid||0)),0);
       document.getElementById('dash-outstanding').textContent = '₹' + fmt(outstanding);
 
@@ -966,7 +1126,13 @@ window.loadDashboard = async () => {
             </div>`;
           }).join('');
     }
-  } catch(e) { console.error('Dashboard load error:', e); }
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+    ['dash-followup-list','dash-overdue-list'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px">⚠️ Data load nahi ho paaya — page refresh karein.</div>';
+    });
+  }
 };
 
 function showDashboardSkeleton(access) {
@@ -1027,6 +1193,7 @@ window.showSection = id => {
   if (id === 'leads')     loadLeads();
   if (id === 'customers') loadCustomers();
   if (id === 'team')      loadTeam();
+  if (id === 'deleted-items') loadDeletedItems();
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
@@ -1037,10 +1204,33 @@ function genId() {
   const rand = Math.random().toString(36).slice(2,4).toUpperCase();
   return `QT-${new Date().getFullYear()}-${String(now).slice(-6)}${rand}`;
 }
-function genInvId() {
-  const now = Date.now();
-  const rand = Math.random().toString(36).slice(2,4).toUpperCase();
-  return `INV-${new Date().getFullYear()}-${String(now).slice(-6)}${rand}`;
+// NOTE: invoices no longer use a random/timestamp ID — see
+// getNextInvoiceNumber() below for the GST-compliant sequential version.
+// CGST Rule 46 requires tax invoices to carry a consecutive serial
+// number. A random/timestamp-based ID (like genInvId above) does NOT
+// satisfy this. This uses a Firestore transaction on a single counter
+// doc (counters/invoices) so two invoices created at the same moment
+// by different users can never collide or skip — the counter resets
+// to 1 automatically at the start of each calendar year.
+// NOTE: only call this at the moment of actually SAVING a new invoice,
+// never just to preview a number on the form — previewing early can
+// cause a save to be abandoned and leave a "reserved" number unused,
+// which is fine for GST (gaps are allowed) but calling it twice for
+// the same invoice would waste a number, so call it exactly once.
+async function getNextInvoiceNumber() {
+  const year = new Date().getFullYear();
+  const counterRef = doc(db, 'counters', 'invoices');
+  const seq = await runTransaction(db, async (tx) => {
+    const snap = await tx.get(counterRef);
+    let next = 1;
+    if (snap.exists()) {
+      const d = snap.data();
+      next = (d.year === year) ? (d.seq + 1) : 1;
+    }
+    tx.set(counterRef, { year, seq: next }, { merge: true });
+    return next;
+  });
+  return `INV-${year}-${String(seq).padStart(4,'0')}`;
 }
 
 // ── CALCULATE ───────────────────────────────────────────────────
@@ -1048,10 +1238,10 @@ window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
   const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
   const extra = Math.max(0, parseFloat(document.getElementById('f-extra').value) || 0);
-  const base   = Math.max(0, area) * Math.max(0, rate);
+  const base   = Math.round(Math.max(0, area) * Math.max(0, rate));
   const discount = Math.min(Math.max(0, parseFloat(document.getElementById('f-discount').value) || 0), base + extra);
   const gstPct = parseFloat(document.getElementById('f-gst').value) || 0;
-  const subtotal = base + extra - discount;
+  const subtotal = Math.round(base + extra - discount);
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const grand  = subtotal + gstAmt;
   document.getElementById('f-base').textContent       = '₹' + fmt(base);
@@ -1072,21 +1262,21 @@ window.saveQuotation = async isDraft => {
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
   const extra  = Math.max(0, parseFloat(g('f-extra')) || 0);
-  const base   = area * rate;
+  const base   = Math.round(area * rate);
   let discount = Math.max(0, parseFloat(g('f-discount')) || 0);
   if (discount > base + extra) {
     alert(`Discount (₹${fmt(discount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`);
     discount = base + extra;
   }
   const gstPct = parseFloat(g('f-gst')) || 0;
-  const subtotal = base + extra - discount;
+  const subtotal = Math.round(base + extra - discount);
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const total  = subtotal + gstAmt;
   const data  = {
     qtId: g('f-qtid'), cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
     ptype: g('f-ptype'), area, rate, extra, discount,
     gstPct, gstAmt,
-    base: area*rate, total,
+    base, total,
     notes: g('f-notes'), terms: g('f-terms'), payment: g('f-payment'), date: g('f-date'),
     sourceLeadId: g('f-leadid') || null,
     isDraft, updatedAt: serverTimestamp()
@@ -1159,18 +1349,19 @@ window.loadLeads = async () => {
   try {
     allLeads = await fetchCached('leads', 'leads');
     renderLeads('');
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); showLoadError('leads-tbody', 6, e); }
 };
 
-window.renderLeads = (search='') => {
+window.renderLeads = (search='', keepPage=false) => {
   const tbody = document.getElementById('leads-tbody');
   const statusFilter = document.getElementById('lead-filter-status')?.value;
-  let list = allLeads;
+  let list = allLeads.filter(l => !l.deleted);
   if (search) { const s=search.toLowerCase(); list=list.filter(l=>l.name?.toLowerCase().includes(s)||l.phone?.includes(s)); }
   if (statusFilter) list = list.filter(l => l.status === statusFilter);
-  tbody.innerHTML = list.length === 0
+  const { pageItems, page, totalPages, total } = paginateList(list, 'leads', keepPage);
+  tbody.innerHTML = pageItems.length === 0
     ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No leads found</td></tr>`
-    : list.map(l=>`<tr>
+    : pageItems.map(l=>`<tr>
         <td><strong>${esc(l.name)}</strong></td>
         <td>${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
         <td>${esc(l.ptype||'—')}</td>
@@ -1185,6 +1376,7 @@ window.renderLeads = (search='') => {
           <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">✏️</button>
           <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
         </td></tr>`).join('');
+  renderPaginationControls('leads-pagination', 'leads', page, totalPages, total);
 };
 
 window.updateLeadStatus = async (id, status) => {
@@ -1207,8 +1399,8 @@ window.editLead = id => {
 };
 
 window.delLead = async id => {
-  if (!confirm('Delete this lead?')) return;
-  await deleteDoc(doc(db,'leads',id));
+  if (!confirm('Delete this lead? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)')) return;
+  await updateDoc(doc(db,'leads',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('leads');
   loadLeads();
 };
@@ -1270,17 +1462,18 @@ window.loadCustomers = async () => {
     ]);
     allCustomers = customers;
     renderCustomers('');
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); showLoadError('customers-tbody', 6, e); }
 };
 
-window.renderCustomers = (search='') => {
+window.renderCustomers = (search='', keepPage=false) => {
   const tbody = document.getElementById('customers-tbody');
   let list = allCustomers;
   if (search) { const s=search.toLowerCase(); list=list.filter(c=>c.name?.toLowerCase().includes(s)||c.phone?.includes(s)); }
-  tbody.innerHTML = list.length === 0
+  const { pageItems, page, totalPages, total } = paginateList(list, 'customers', keepPage);
+  tbody.innerHTML = pageItems.length === 0
     ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No customers yet — quotation save karte hi yahan auto-add ho jayenge</td></tr>`
-    : list.map(c=>{
-        const custQuotes = allQuotations.filter(q => (q.cphone||'').replace(/\D/g,'') === c.phone);
+    : pageItems.map(c=>{
+        const custQuotes = allQuotations.filter(q => !q.deleted && (q.cphone||'').replace(/\D/g,'') === c.phone);
         const totalValue = custQuotes.reduce((sum,q)=>sum+(q.total||0),0);
         const lastDate = c.lastActivity?.toDate ? c.lastActivity.toDate().toLocaleDateString('en-IN') : '—';
         return `<tr>
@@ -1292,6 +1485,7 @@ window.renderCustomers = (search='') => {
         <td>${lastDate}</td>
         </tr>`;
       }).join('');
+  renderPaginationControls('customers-pagination', 'customers', page, totalPages, total);
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
@@ -1299,20 +1493,21 @@ window.loadQuotations = async () => {
   try {
     allQuotations = await fetchCached('quotations', 'quotations');
     renderHistory('');
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); showLoadError('history-tbody', 7, e); }
 };
 
-window.renderHistory = (search='') => {
+window.renderHistory = (search='', keepPage=false) => {
   const tbody = document.getElementById('history-tbody');
   const from  = document.getElementById('filter-from')?.value;
   const to    = document.getElementById('filter-to')?.value;
-  let list = allQuotations;
+  let list = allQuotations.filter(q => !q.deleted);
   if (search) { const s=search.toLowerCase(); list=list.filter(q=>q.cname?.toLowerCase().includes(s)||q.cphone?.includes(s)||q.qtId?.toLowerCase().includes(s)); }
   if (from) list = list.filter(q => q.date >= from);
   if (to)   list = list.filter(q => q.date <= to);
-  tbody.innerHTML = list.length === 0
+  const { pageItems, page, totalPages, total } = paginateList(list, 'history', keepPage);
+  tbody.innerHTML = pageItems.length === 0
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No quotations found</td></tr>`
-    : list.map(q=>`<tr>
+    : pageItems.map(q=>`<tr>
         <td><span class="qt-id-badge">${esc(q.qtId)}</span></td>
         <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
         <td>${q.ptype}</td>
@@ -1329,6 +1524,7 @@ window.renderHistory = (search='') => {
           <button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">📲</button>
           <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
         </td></tr>`).join('');
+  renderPaginationControls('history-pagination', 'history', page, totalPages, total);
 };
 
 // ── EDIT / DELETE ───────────────────────────────────────────────
@@ -1338,8 +1534,9 @@ window.updateDealStatus = async (id, dealStatus) => {
     const updates = { dealStatus, updatedAt: serverTimestamp() };
 
     if (dealStatus === 'Won' && !q.invoiceGenerated) {
+      const invId = await getNextInvoiceNumber();
       const invData = {
-        invId: genInvId(), qtRef: q.qtId, date: new Date().toISOString().split('T')[0], dueDate: '',
+        invId, qtRef: q.qtId, date: new Date().toISOString().split('T')[0], dueDate: '',
         cname: q.cname, cphone: q.cphone, cemail: q.cemail||'', caddr: q.caddr||'',
         ptype: q.ptype, desc: `${q.ptype} — Supply, Fabrication & Erection (${(q.area||0).toLocaleString('en-IN')} sq.ft)`,
         base: q.base || (q.area*q.rate) || 0, extra: q.extra||0, discount: q.discount||0,
@@ -1381,8 +1578,8 @@ window.editQT = id => {
 };
 
 window.delQT = async id => {
-  if (!confirm('Delete this quotation?')) return;
-  await deleteDoc(doc(db,'quotations',id));
+  if (!confirm('Delete this quotation? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)')) return;
+  await updateDoc(doc(db,'quotations',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('quotations');
   loadQuotations();
 };
@@ -1648,7 +1845,7 @@ window.viewQT = id => {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Quotation ${q.qtId} — R.R Teen Set Solution</title>
+<title>Quotation ${esc(q.qtId)} — R.R Teen Set Solution</title>
 <style>
   @media print { body{margin:0} }
   body{margin:0;padding:24px;background:#f0f4f9;display:flex;justify-content:center;}
@@ -1670,7 +1867,7 @@ window.dlPDF = id => {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>${q.qtId}</title>
+<title>${esc(q.qtId)}</title>
 <style>
   @page { size: A4; margin: 0; }
   @media print { body{margin:0} }
@@ -1731,8 +1928,8 @@ window.shareEmail = id => {
 
 // ── ANALYTICS ───────────────────────────────────────────────────
 window.renderAnalytics = () => {
-  const finals  = allQuotations.filter(q=>!q.isDraft);
-  const drafts  = allQuotations.filter(q=>q.isDraft);
+  const finals  = allQuotations.filter(q=>!q.isDraft && !q.deleted);
+  const drafts  = allQuotations.filter(q=>q.isDraft && !q.deleted);
   const revenue = finals.reduce((s,q)=>s+(q.total||0),0);
   const month   = new Date().toISOString().slice(0,7);
   const mRev    = finals.filter(q=>(q.date||'').startsWith(month)).reduce((s,q)=>s+(q.total||0),0);
@@ -1764,7 +1961,7 @@ window.populateQuotationDropdown = async () => {
     sel.innerHTML = '<option value="">— Not available for your role —</option>';
     return;
   }
-  const finals = allQuotations.filter(q => !q.isDraft);
+  const finals = allQuotations.filter(q => !q.isDraft && !q.deleted);
   sel.innerHTML = '<option value="">— Select a quotation to auto-fill —</option>' +
     finals.map(q => `<option value="${q.id}">${esc(q.qtId)} — ${esc(q.cname)} — ₹${fmt(q.total)}</option>`).join('');
 };
@@ -1794,7 +1991,7 @@ window.recalculateInvoice = () => {
   const extra  = Math.max(0, parseFloat(document.getElementById('i-extra').value)    || 0);
   const discount = Math.min(Math.max(0, parseFloat(document.getElementById('i-discount').value) || 0), base + extra);
   const gstPct = parseFloat(document.getElementById('i-gst').value)      || 0;
-  const subtotal = base + extra - discount;
+  const subtotal = Math.round(base + extra - discount);
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const grand  = subtotal + gstAmt;
   document.getElementById('i-sub').textContent        = '₹' + fmt(subtotal);
@@ -1807,7 +2004,7 @@ window.recalculateInvoice = () => {
 window.saveInvoice = async () => {
   const g = id => document.getElementById(id).value;
   const cname = g('i-cname').trim(), cphone = g('i-cphone').trim();
-  const base  = parseFloat(g('i-base')) || 0;
+  const base  = Math.round(parseFloat(g('i-base')) || 0);
   if (!cname || !cphone || !base) { alert('Name, phone aur base amount required hai.'); return; }
   if (base <= 0) { alert('Base amount 0 se zyada hona chahiye.'); return; }
   const phoneDigits = cphone.replace(/\D/g,'');
@@ -1819,11 +2016,11 @@ window.saveInvoice = async () => {
     discount = base + extra;
   }
   const gstPct = parseFloat(g('i-gst')) || 0;
-  const subtotal = base + extra - discount;
+  const subtotal = Math.round(base + extra - discount);
   const gstAmt = Math.round(subtotal * gstPct / 100);
   const total  = subtotal + gstAmt;
   const data = {
-    invId: g('i-invid'), qtRef: g('i-qtref'), date: g('i-date'), dueDate: g('i-duedate'),
+    qtRef: g('i-qtref'), date: g('i-date'), dueDate: g('i-duedate'),
     cname, cphone, cemail: g('i-cemail'), caddr: g('i-caddr'),
     ptype: g('i-ptype'), desc: g('i-desc'),
     base, extra, discount, gstPct, gstAmt, total,
@@ -1832,12 +2029,14 @@ window.saveInvoice = async () => {
   };
   try {
     if (editingInvoiceId) {
+      data.invId = g('i-invid'); // editing never renumbers — GST invoice numbers must stay fixed once issued
       await updateDoc(doc(db,'invoices',editingInvoiceId), data);
       editingInvoiceId = null;
     } else {
+      data.invId = await getNextInvoiceNumber(); // assigned atomically, exactly once, right before save
       await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdAt: serverTimestamp() });
     }
-    alert('Invoice saved!');
+    alert(`Invoice saved! (${data.invId})`);
     invalidateCache('invoices');
     resetInvoiceForm(); showSection('invoices');
   } catch(e) { alert('Error: ' + e.message); }
@@ -1845,7 +2044,8 @@ window.saveInvoice = async () => {
 
 window.resetInvoiceForm = () => {
   document.getElementById('inv-form').reset();
-  document.getElementById('i-invid').value = genInvId();
+  document.getElementById('i-invid').value = '';
+  document.getElementById('i-invid').placeholder = 'Auto-assigned on save (sequential)';
   document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
   const due = new Date(); due.setDate(due.getDate()+15);
   document.getElementById('i-duedate').value = due.toISOString().split('T')[0];
@@ -1863,7 +2063,7 @@ window.loadInvoices = async () => {
   try {
     allInvoices = await fetchCached('invoices', 'invoices');
     renderInvoices('');
-  } catch(e) { console.error(e); }
+  } catch(e) { console.error(e); showLoadError('invoices-tbody', 7, e); }
 };
 
 function invoiceStatusOf(inv) {
@@ -1873,16 +2073,17 @@ function invoiceStatusOf(inv) {
   return 'partial';
 }
 
-window.renderInvoices = (search='') => {
+window.renderInvoices = (search='', keepPage=false) => {
   const tbody = document.getElementById('invoices-tbody');
   const statusFilter = document.getElementById('inv-filter-status')?.value;
-  let list = allInvoices;
+  let list = allInvoices.filter(i => !i.deleted);
   if (search) { const s=search.toLowerCase(); list=list.filter(i=>i.cname?.toLowerCase().includes(s)||i.cphone?.includes(s)||i.invId?.toLowerCase().includes(s)); }
   if (statusFilter) list = list.filter(i => invoiceStatusOf(i) === statusFilter);
 
-  tbody.innerHTML = list.length === 0
+  const { pageItems, page, totalPages, total } = paginateList(list, 'invoices', keepPage);
+  tbody.innerHTML = pageItems.length === 0
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No invoices found</td></tr>`
-    : list.map(i => {
+    : pageItems.map(i => {
         const paid = i.amountPaid || 0;
         const balance = Math.max(0, (i.total||0) - paid);
         const status = invoiceStatusOf(i);
@@ -1905,12 +2106,14 @@ window.renderInvoices = (search='') => {
           <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
         </td></tr>`;
       }).join('');
+  renderPaginationControls('invoices-pagination', 'invoices', page, totalPages, total);
 
-  // Stats
-  const totalInvoiced = allInvoices.reduce((s,i)=>s+(i.total||0),0);
-  const totalReceived = allInvoices.reduce((s,i)=>s+(i.amountPaid||0),0);
+  // Stats (overall totals — excludes deleted, but not affected by search/status filter)
+  const activeInvoices = allInvoices.filter(i => !i.deleted);
+  const totalInvoiced = activeInvoices.reduce((s,i)=>s+(i.total||0),0);
+  const totalReceived = activeInvoices.reduce((s,i)=>s+(i.amountPaid||0),0);
   const totalDue = Math.max(0, totalInvoiced - totalReceived);
-  const fullyPaid = allInvoices.filter(i=>invoiceStatusOf(i)==='paid').length;
+  const fullyPaid = activeInvoices.filter(i=>invoiceStatusOf(i)==='paid').length;
   const statTotalEl = document.getElementById('inv-stat-total');
   if (statTotalEl) {
     statTotalEl.textContent = '₹'+fmt(totalInvoiced);
@@ -1933,8 +2136,8 @@ window.editInvoice = id => {
 };
 
 window.delInvoice = async id => {
-  if (!confirm('Delete this invoice? Its payment records will remain but be unlinked.')) return;
-  await deleteDoc(doc(db,'invoices',id));
+  if (!confirm('Delete this invoice? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai. Payment records saath rahenge.)')) return;
+  await updateDoc(doc(db,'invoices',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('invoices');
   loadInvoices();
 };
@@ -2103,7 +2306,7 @@ function buildInvHTML(i) {
 // ── VIEW / PDF / SHARE INVOICE ─────────────────────────────────
 window.viewInvoice = id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
-  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Invoice ${i.invId}</title>
+  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Invoice ${esc(i.invId)}</title>
 <style>@media print{body{margin:0}} body{margin:0;padding:24px;background:#f0f4f9;display:flex;justify-content:center;}</style>
 </head><body>${buildInvHTML(i)}</body></html>`;
   const blob = new Blob([fullHTML], { type: 'text/html' });
@@ -2112,7 +2315,7 @@ window.viewInvoice = id => {
 
 window.dlInvoicePDF = id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
-  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${i.invId}</title>
+  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(i.invId)}</title>
 <style>@page{size:A4;margin:0;} @media print{body{margin:0}} body{margin:0;padding:0;background:#fff;}</style>
 </head><body onload="window.print()">${buildInvHTML(i)}</body></html>`;
   const blob = new Blob([fullHTML], { type: 'text/html' });
