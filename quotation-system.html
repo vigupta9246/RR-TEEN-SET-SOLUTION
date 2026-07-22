@@ -6,7 +6,7 @@
 <link rel="shortcut icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#20262c">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2029,7 +2029,7 @@ window.viewQT = id => {
 <title>Quotation ${esc(q.qtId)} — R.R Teen Set Solution</title>
 <style>
   @media print { body{margin:0} }
-  body{margin:0;padding:24px;background:#f0f4f9;display:flex;justify-content:center;}
+  body{margin:0;padding:24px;background:#eef1f2;display:flex;justify-content:center;}
 </style>
 </head>
 <body>
@@ -2488,7 +2488,7 @@ function buildInvHTML(i) {
 window.viewInvoice = id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
   const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Invoice ${esc(i.invId)}</title>
-<style>@media print{body{margin:0}} body{margin:0;padding:24px;background:#f0f4f9;display:flex;justify-content:center;}</style>
+<style>@media print{body{margin:0}} body{margin:0;padding:24px;background:#eef1f2;display:flex;justify-content:center;}</style>
 </head><body>${buildInvHTML(i)}</body></html>`;
   const blob = new Blob([fullHTML], { type: 'text/html' });
   window.open(URL.createObjectURL(blob), '_blank');
