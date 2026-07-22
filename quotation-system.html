@@ -11,151 +11,166 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>R.R Teen Set Solution — Quotation System</title>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --orange:#ff6f00;--orange-light:#ffab40;--navy:#0a1628;--navy-2:#1a2d4a;
-  --bg:#f0f4f9;--card:#ffffff;--border:#e2e8f0;--text:#0a1628;--muted:#64748b;
-  --green:#22c55e;--red:#ef4444;--sidebar-w:240px;
+  --orange:#d9480f;--orange-light:#e8590c;--navy:#20262c;--navy-2:#2b333b;
+  --bg:#eef1f2;--card:#ffffff;--border:#dde2e5;--text:#20262c;--muted:#667077;
+  --green:#2f6d4f;--red:#b23a2e;--sidebar-w:240px;
+  --steel:#8b969e;--steel-line:#c7cfd3;
 }
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.mono{font-family:'IBM Plex Mono',monospace}
+.display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px}
+/* Signature: corrugated galvanized-sheet ridge pattern, used sparingly as an accent band */
+.corrugated{background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.09) 0px,rgba(255,255,255,.09) 2px,transparent 2px,transparent 9px)}
+.corrugated-line{height:5px;background:repeating-linear-gradient(90deg,var(--steel-line) 0px,var(--steel-line) 2px,transparent 2px,transparent 10px);opacity:.8}
 /* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
-.login-card{background:#fff;border-radius:20px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(10,22,40,0.10);border:1px solid var(--border)}
+.login-card{background:#fff;border-radius:3px;padding:0 0 40px;width:100%;max-width:400px;box-shadow:0 1px 3px rgba(32,38,44,.08),0 12px 32px rgba(32,38,44,.10);border:1px solid var(--border);overflow:hidden}
+.login-card-top{height:6px}
+.login-card-body{padding:40px 40px 0}
 .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
-.logo-box-sm{width:44px;height:44px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--orange);font-family:'Bebas Neue',sans-serif}
-.login-title{font-size:22px;font-weight:800;color:var(--navy)}
-.login-sub{font-size:13px;color:var(--muted)}
-.field-label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)}
-.field-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;transition:border-color .2s;outline:none;color:var(--text)}
+.logo-box-sm{width:44px;height:44px;background:var(--navy);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--orange-light);font-family:'Oswald',sans-serif;letter-spacing:.5px}
+.login-title{font-size:21px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px}
+.login-sub{font-size:12.5px;color:var(--muted)}
+.field-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+.field-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:2px;font-size:15px;font-family:inherit;transition:border-color .2s;outline:none;color:var(--text)}
 .field-input:focus{border-color:var(--orange)}
 .field-group{margin-bottom:16px}
-.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
-.btn-primary:hover{opacity:.9}
+.btn-primary{width:100%;padding:13px;background:var(--orange);color:#fff;border:none;border-radius:2px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:background .15s;text-transform:uppercase;letter-spacing:.5px}
+.btn-primary:hover{background:var(--orange-light)}
+.btn-primary:active{transform:translateY(1px)}
 #login-err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
 /* SHELL */
 #app{display:none;min-height:100vh}
 .shell{display:flex;min-height:100vh}
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);background:#ffffff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
-.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-box-lg{width:40px;height:40px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;font-family:'Bebas Neue',sans-serif;flex-shrink:0}
-.sidebar-title{font-size:13px;font-weight:800;color:var(--navy);line-height:1.3}
-.sidebar-sub{font-size:11px;color:var(--muted)}
-.nav-section{padding:16px 12px 8px;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:1.5px}
-.nav-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;color:#475569;font-size:14px;font-weight:600;cursor:pointer;border-radius:8px;margin:2px 8px;background:none;border:none;width:calc(100% - 16px);text-align:left;font-family:inherit;transition:all .15s}
-.nav-btn:hover{background:rgba(10,22,40,.05);color:var(--navy)}
-.nav-btn.active{background:var(--orange);color:#fff}
-.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-logo{padding:20px 20px;background:var(--navy);display:flex;align-items:center;gap:10px;position:relative}
+.sidebar-logo::after{content:'';display:block;position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 2px,transparent 2px,transparent 10px)}
+.logo-box-lg{width:38px;height:38px;background:var(--orange);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:'Oswald',sans-serif;flex-shrink:0;letter-spacing:.5px}
+.sidebar-title{font-size:12.5px;font-weight:700;color:#fff;line-height:1.3;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.6px}
+.sidebar-sub{font-size:10.5px;color:rgba(255,255,255,.55)}
+.nav-section{padding:18px 16px 6px;font-size:10px;font-weight:700;color:#9aa5ab;letter-spacing:1.5px;font-family:'Oswald',sans-serif}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:11px 16px;color:#475569;font-size:13.5px;font-weight:600;cursor:pointer;border-radius:2px;margin:1px 8px;background:none;border:none;border-left:3px solid transparent;width:calc(100% - 16px);text-align:left;font-family:inherit;transition:all .12s}
+.nav-btn:hover{background:var(--bg);color:var(--navy)}
+.nav-btn.active{background:var(--bg);color:var(--navy);border-left-color:var(--orange);font-weight:700}
+.nav-icon{width:20px;text-align:center;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
 .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
 .user-info{font-size:11px;color:var(--muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn-logout{width:100%;padding:8px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;transition:background .15s}
-.btn-logout:hover{background:#e8ecf3;color:var(--navy)}
+.btn-logout{width:100%;padding:9px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:2px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-logout:hover{background:#e2e7e9;color:var(--navy)}
 /* MAIN */
 .main{margin-left:var(--sidebar-w);flex:1;padding:32px;min-height:100vh}
-.page-header{margin-bottom:28px}
-.page-title{font-size:26px;font-weight:900;color:var(--navy)}
-.page-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.page-header{margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);position:relative}
+.page-header::after{content:'';display:block;width:56px;height:3px;background:var(--orange);margin-top:14px}
+.page-title{font-size:25px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px}
+.page-sub{font-size:13.5px;color:var(--muted);margin-top:4px}
 .section{display:none}
 .section.active{display:block;animation:sectionIn .35s ease both}
 @keyframes sectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 /* FORM */
-.form-card{background:var(--card);border-radius:16px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.06);margin-bottom:24px}
-.form-section-title{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:1px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.form-card{background:var(--card);border-radius:3px;padding:32px;box-shadow:0 1px 2px rgba(32,38,44,.06),0 1px 12px rgba(32,38,44,.04);border:1px solid var(--border);margin-bottom:24px}
+.form-section-title{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:1.2px;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;text-transform:uppercase}
+.form-section-title .ic{stroke:var(--orange);width:15px;height:15px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .span-2{grid-column:span 2}
 .form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:13px;font-weight:700;color:var(--text)}
-.form-input,.form-select,.form-textarea{padding:11px 13px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
+.form-label{font-size:12.5px;font-weight:700;color:var(--text)}
+.form-input,.form-select,.form-textarea{padding:11px 13px;border:1.5px solid var(--border);border-radius:2px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .2s}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange)}
 .form-textarea{resize:vertical;min-height:90px}
 .form-input[readonly]{background:#f8fafc;color:var(--muted)}
 /* COST BOX */
-.cost-box{background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:14px;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.cost-label{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px}
-.cost-value{font-size:24px;font-weight:900;color:var(--orange-light)}
-.cost-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
+.cost-box{background:var(--navy);border-radius:3px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;position:relative;overflow:hidden;border-left:4px solid var(--orange)}
+.cost-label{font-size:12px;color:rgba(255,255,255,.55);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.cost-value{font-size:25px;font-weight:700;color:var(--orange-light);font-family:'IBM Plex Mono',monospace}
+.cost-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px}
 /* BTN */
 .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
-.btn-save{background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff}
-.btn-save:hover{opacity:.9}
+.btn{padding:11px 22px;border-radius:2px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .12s;display:inline-flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.4px}
+.btn:active{transform:translateY(1px)}
+.btn-save{background:var(--orange);color:#fff}
+.btn-save:hover{background:var(--orange-light)}
 .btn-draft{background:var(--navy);color:#fff}
-.btn-draft:hover{opacity:.85}
-.btn-reset{background:var(--border);color:var(--muted)}
-.btn-reset:hover{background:#d1d9e6}
+.btn-draft:hover{background:var(--navy-2)}
+.btn-reset{background:#fff;color:var(--muted);border:1.5px solid var(--border)}
+.btn-reset:hover{background:var(--bg);color:var(--text)}
 /* HISTORY */
 .history-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
 .search-box{flex:1;min-width:200px;display:flex;gap:8px}
-.search-input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none}
+.search-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:2px;font-size:14px;font-family:inherit;outline:none}
 .search-input:focus{border-color:var(--orange)}
-.btn-search{padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:600}
+.btn-search{padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.btn-search:hover{background:var(--orange-light)}
 .filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.date-input{padding:9px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.date-input{padding:9px 12px;border:1.5px solid var(--border);border-radius:2px;font-size:13px;font-family:inherit;outline:none}
 .date-input:focus{border-color:var(--orange)}
-.table-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.data-table{width:100%;border-collapse:collapse;font-size:14px}
-.data-table thead th{padding:14px 16px;text-align:left;background:var(--navy);color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px}
-.data-table tbody tr:hover{background:#f8fafc}
-.data-table tbody td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
-.qt-id-badge{display:inline-block;background:#eff6ff;color:#1565c0;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
-.badge-draft{background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.badge-final{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.badge-unpaid{background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.badge-partial{background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.badge-paid{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
-.balance-due{color:var(--red);font-weight:800}
-.balance-clear{color:var(--green);font-weight:800}
+.table-card{background:var(--card);border-radius:3px;overflow:hidden;border:1px solid var(--border);box-shadow:0 1px 2px rgba(32,38,44,.05)}
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.data-table thead th{padding:13px 16px;text-align:left;background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'Oswald',sans-serif}
+.data-table tbody tr:hover{background:#f7f9f9}
+.data-table tbody td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.qt-id-badge{display:inline-block;background:var(--bg);color:var(--navy);font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;font-family:'IBM Plex Mono',monospace;border:1px solid var(--border)}
+.badge-draft{background:#fdeee3;color:#9a4a10;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px}
+.badge-final{background:#e4efe8;color:#265f42;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px}
+.badge-unpaid{background:#f7e5e2;color:#8f3226;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px}
+.badge-partial{background:#fdeee3;color:#9a4a10;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px}
+.badge-paid{background:#e4efe8;color:#265f42;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px}
+.balance-due{color:var(--red);font-weight:700;font-family:'IBM Plex Mono',monospace}
+.balance-clear{color:var(--green);font-weight:700;font-family:'IBM Plex Mono',monospace}
 /* PAYMENT MODAL */
-#payment-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px}
-.pay-modal-box{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:28px}
-.pay-modal-title{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:4px}
+#payment-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(32,38,44,.6);align-items:center;justify-content:center;padding:20px}
+.pay-modal-box{background:#fff;border-radius:3px;width:100%;max-width:420px;padding:28px;border-top:4px solid var(--orange)}
+.pay-modal-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:4px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.4px}
 .pay-modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
 .pay-history{margin-top:16px;border-top:1px solid var(--border);padding-top:12px;max-height:140px;overflow-y:auto}
-.pay-history-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--border)}
+.pay-history-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--border);font-family:'IBM Plex Mono',monospace}
 .load-qt-row{display:flex;gap:10px;align-items:end;margin-bottom:20px;flex-wrap:wrap}
 .action-btns{display:flex;gap:6px}
-.btn-icon{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer;font-size:14px;transition:all .15s;line-height:1}
-.btn-icon:hover{background:var(--orange);border-color:var(--orange)}
-.btn-icon.btn-danger:hover{background:var(--red);border-color:var(--red)}
-.btn-icon.btn-whatsapp:hover{background:#25d366;border-color:#25d366}
+.btn-icon{background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:6px 8px;cursor:pointer;transition:all .15s;line-height:1;display:inline-flex;align-items:center;justify-content:center;color:var(--navy)}
+.btn-icon:hover{background:var(--orange);border-color:var(--orange);color:#fff}
+.btn-icon.btn-danger:hover{background:var(--red);border-color:var(--red);color:#fff}
+.btn-icon.btn-whatsapp:hover{background:#25d366;border-color:#25d366;color:#fff}
 /* ANALYTICS */
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
-.stat-card{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .2s ease,box-shadow .2s ease;animation:cardIn .4s ease both}
-.stat-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.1)}
+.stat-card{background:var(--card);border-radius:3px;padding:22px 24px;border:1px solid var(--border);border-left:3px solid var(--steel-line);box-shadow:0 1px 2px rgba(32,38,44,.04);animation:cardIn .4s ease both}
 .stat-card:nth-child(1){animation-delay:0ms} .stat-card:nth-child(2){animation-delay:60ms} .stat-card:nth-child(3){animation-delay:120ms}
 .stat-card:nth-child(4){animation-delay:180ms} .stat-card:nth-child(5){animation-delay:240ms} .stat-card:nth-child(6){animation-delay:300ms}
-@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.stat-card.stat-alert{animation:cardIn .4s ease both,alertPulse 2s ease-in-out infinite}
-@keyframes alertPulse{0%,100%{box-shadow:0 2px 12px rgba(0,0,0,.05)}50%{box-shadow:0 0 0 6px rgba(241,60,32,.12)}}
-.stat-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:8px}
-.stat-value{font-size:28px;font-weight:900;color:var(--navy)}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stat-card.stat-alert{animation:cardIn .4s ease both,alertPulse 2s ease-in-out infinite;border-left-color:var(--red)}
+@keyframes alertPulse{0%,100%{box-shadow:0 1px 2px rgba(32,38,44,.04)}50%{box-shadow:0 0 0 4px rgba(178,58,46,.12)}}
+.stat-label{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.8px;margin-bottom:8px;text-transform:uppercase;font-family:'Oswald',sans-serif}
+.stat-value{font-size:26px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace}
 .stat-value.orange{color:var(--orange)}
 .stat-value.green{color:var(--green)}
-.type-breakdown{background:var(--card);border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
-.breakdown-title{font-size:15px;font-weight:800;margin-bottom:16px;color:var(--navy)}
+.type-breakdown{background:var(--card);border-radius:3px;padding:24px;border:1px solid var(--border)}
+.breakdown-title{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--navy);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:8px}
+.breakdown-title .ic{stroke:var(--orange)}
 .followup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);font-size:13px;transition:background .15s}
-.followup-row:hover{background:#f8fafc}
+.followup-row:hover{background:#f7f9f9}
 .followup-row:last-child{border-bottom:none}
 .reveal-row{animation:cardIn .35s ease both}
 .followup-row a.btn-icon{text-decoration:none;flex-shrink:0}
 
 /* SKELETON LOADERS — replaces plain "Loading..." text everywhere */
-.skel{display:inline-block;background:linear-gradient(90deg,#e8ecf3 25%,#f4f6fa 37%,#e8ecf3 63%);background-size:400% 100%;animation:skelShimmer 1.4s ease infinite;border-radius:6px;vertical-align:middle}
+.skel{display:inline-block;background:linear-gradient(90deg,#e4e8ea 25%,#eef1f2 37%,#e4e8ea 63%);background-size:400% 100%;animation:skelShimmer 1.4s ease infinite;border-radius:2px;vertical-align:middle}
 @keyframes skelShimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 .skel-num{width:56px;height:26px}
-.skel-line{display:block;height:11px;border-radius:4px}
+.skel-line{display:block;height:11px;border-radius:2px}
 .skel-icon{width:28px;height:28px;border-radius:7px}
 
 /* Table rows fade in on render, and nav buttons feel snappier */
 .data-table tbody tr{animation:cardIn .3s ease both}
 .pagination-wrap{display:flex;justify-content:center;padding:16px}
 .pagination{display:flex;align-items:center;gap:14px}
-.pagination button{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);transition:all .15s}
+.pagination button{padding:8px 16px;border-radius:2px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);transition:all .15s}
 .pagination button:hover:not(:disabled){background:var(--orange);color:#fff;border-color:var(--orange)}
 .pagination button:disabled{opacity:.4;cursor:not-allowed}
 .pagination-info{font-size:12.5px;color:var(--muted);font-weight:600}
@@ -165,16 +180,19 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-icon{transition:all .15s ease,transform .1s ease}
 .type-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
 .type-row:last-child{border-bottom:none}
-.type-count{background:#eff6ff;color:#1565c0;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.type-count{background:var(--bg);color:var(--navy);font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:2px;font-family:'IBM Plex Mono',monospace;border:1px solid var(--border)}
 /* MODAL */
-#preview-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px}
-.modal-box{background:#fff;border-radius:20px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative}
-.modal-header{position:sticky;top:0;background:var(--navy);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-radius:20px 20px 0 0;z-index:1;flex-wrap:wrap;gap:8px}
-.modal-title{color:#fff;font-size:16px;font-weight:700}
+#preview-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(32,38,44,.65);align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:3px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative}
+.modal-header{position:sticky;top:0;background:var(--navy);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;z-index:1;flex-wrap:wrap;gap:8px;border-bottom:3px solid var(--orange)}
+.modal-title{color:#fff;font-size:15px;font-weight:700;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px}
 .modal-actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn-modal{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-modal{padding:8px 14px;border-radius:2px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.3px}
+.btn-modal .ic{width:13px;height:13px}
 .btn-modal-pdf{background:var(--orange);color:#fff}
+.btn-modal-pdf:hover{background:var(--orange-light)}
 .btn-modal-close{background:rgba(255,255,255,.12);color:#fff}
+.btn-modal-close:hover{background:rgba(255,255,255,.2)}
 #preview-content{padding:24px;position:relative}
 /* RESPONSIVE */
 @media(max-width:900px){
@@ -200,23 +218,26 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">
-      <img src="images/rr-logo-original.png" alt="R.R Teen Set Solution" style="height:44px;width:auto;object-fit:contain;">
-      <div>
-        <div class="login-title">R.R Teen Set Solution</div>
-        <div class="login-sub">Quotation Management System</div>
+    <div class="login-card-top corrugated" style="background:var(--navy)"></div>
+    <div class="login-card-body">
+      <div class="login-logo">
+        <img src="images/rr-logo-original.png" alt="R.R Teen Set Solution" style="height:44px;width:auto;object-fit:contain;">
+        <div>
+          <div class="login-title">R.R Teen Set Solution</div>
+          <div class="login-sub">Quotation Management System</div>
+        </div>
       </div>
+      <div class="field-group">
+        <label class="field-label">Admin Email</label>
+        <input type="email" id="l-email" class="field-input" placeholder="admin@rrteenset.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input type="password" id="l-pass" class="field-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="login-err"></div>
+      <button class="btn-primary" onclick="doLogin()">Login →</button>
     </div>
-    <div class="field-group">
-      <label class="field-label">Admin Email</label>
-      <input type="email" id="l-email" class="field-input" placeholder="admin@rrteenset.com">
-    </div>
-    <div class="field-group">
-      <label class="field-label">Password</label>
-      <input type="password" id="l-pass" class="field-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div id="login-err"></div>
-    <button class="btn-primary" onclick="doLogin()">Login →</button>
   </div>
 </div>
 
@@ -229,25 +250,25 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div><div class="sidebar-title">R.R Teen Set</div><div class="sidebar-sub">Quotation System</div></div>
       </div>
       <div class="nav-section">MAIN</div>
-      <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"><span class="nav-icon">🏠</span><span>Dashboard</span></button>
-      <button class="nav-btn" data-section="create" onclick="showSection('create')"><span class="nav-icon">📝</span><span>New Quotation</span></button>
-      <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon">📋</span><span>History</span></button>
-      <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon">📊</span><span>Analytics</span></button>
+      <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></span><span>Dashboard</span></button>
+      <button class="nav-btn" data-section="create" onclick="showSection('create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg></span><span>New Quotation</span></button>
+      <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg></span><span>History</span></button>
+      <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg></span><span>Analytics</span></button>
       <div class="nav-section">CRM</div>
-      <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon">📞</span><span>Leads</span></button>
-      <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon">👥</span><span>Customers</span></button>
+      <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
+      <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
       <div class="nav-section">BILLING</div>
-      <button class="nav-btn" data-section="invoice-create" onclick="showSection('invoice-create')"><span class="nav-icon">🧾</span><span>New Invoice</span></button>
-      <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon">💳</span><span>Invoices &amp; Payments</span></button>
+      <button class="nav-btn" data-section="invoice-create" onclick="showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
+      <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
       <div class="nav-section">ADMIN</div>
-      <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon">🛡️</span><span>Team</span></button>
-      <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon">🗑️</span><span>Deleted Items</span></button>
+      <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
+      <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
       <div class="nav-section">LINKS</div>
-      <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon">🌐</span><span>Main Website</span></button>
+      <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg></span><span>Main Website</span></button>
       <div class="sidebar-footer">
         <div class="user-info" id="user-email">admin</div>
         <div class="user-info" id="user-role-badge" style="font-size:11px;opacity:0.75;margin-top:-6px">—</div>
-        <button class="btn-logout" onclick="doLogout()">🔒 Logout</button>
+        <button class="btn-logout" onclick="doLogout()"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg> Logout</button>
       </div>
     </aside>
 
@@ -269,12 +290,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
-          <div class="breakdown-title">🔔 Needs Follow-up (quotation sent 3+ din se, koi jawaab nahi)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Needs Follow-up (quotation sent 3+ din se, koi jawaab nahi)</div>
           <div id="dash-followup-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" data-requires="invoices">
-          <div class="breakdown-title">⚠️ Overdue Payments (invoice 7+ din se pending)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Overdue Payments (invoice 7+ din se pending)</div>
           <div id="dash-overdue-list">Loading...</div>
         </div>
       </section>
@@ -287,7 +308,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
         <form id="qt-form" onsubmit="return false;">
           <div class="form-card">
-            <div class="form-section-title">📄 QUOTATION META</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Quotation ID</label><input type="text" id="f-qtid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label">Date</label><input type="date" id="f-date" class="form-input"></div>
@@ -295,7 +316,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">👤 CUSTOMER DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="f-cname" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
               <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="f-cphone" class="form-input" placeholder="e.g. 9876543210"></div>
@@ -304,7 +325,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">🏗️ PROJECT DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Project Type *</label>
                 <select id="f-ptype" class="form-select">
@@ -346,17 +367,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">💳 PAYMENT DETAILS (optional — shown on quotation if filled)</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> PAYMENT DETAILS (optional — shown on quotation if filled)</div>
             <div class="form-group"><textarea id="f-payment" class="form-textarea" rows="3" placeholder="e.g. Bank: HDFC Bank, A/C: 1234567890, IFSC: HDFC0001234&#10;UPI: rrteenset@upi"></textarea></div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">📋 TERMS & CONDITIONS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg> TERMS &amp; CONDITIONS</div>
             <div class="form-group"><textarea id="f-terms" class="form-textarea" rows="6"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveQuotation(false)">💾 Save & Finalize</button>
-            <button class="btn btn-draft" onclick="saveQuotation(true)">📌 Save as Draft</button>
-            <button class="btn btn-reset" onclick="resetForm()">🔄 Reset</button>
+            <button class="btn btn-save" onclick="saveQuotation(false)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save &amp; Finalize</button>
+            <button class="btn btn-draft" onclick="saveQuotation(true)"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Save as Draft</button>
+            <button class="btn btn-reset" onclick="resetForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </form>
       </section>
@@ -419,7 +440,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
 
         <div class="form-card">
-          <div class="form-section-title">➕ NEW LEAD</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW LEAD</div>
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label">Name *</label><input type="text" id="ld-name" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
             <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="ld-phone" class="form-input" placeholder="e.g. 9876543210"></div>
@@ -442,8 +463,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="ld-notes" class="form-input" placeholder="e.g. Budget ~5 lakh, site visit next week chahiye"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveLead()">💾 Save Lead</button>
-            <button class="btn btn-reset" onclick="resetLeadForm()">🔄 Reset</button>
+            <button class="btn btn-save" onclick="saveLead()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
+            <button class="btn btn-reset" onclick="resetLeadForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </div>
 
@@ -493,7 +514,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
           <div class="page-sub">Generate an invoice — load from an existing quotation or fill manually</div>
         </div>
         <div class="form-card">
-          <div class="form-section-title">⚡ QUICK LOAD FROM QUOTATION</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg> QUICK LOAD FROM QUOTATION</div>
           <div class="load-qt-row">
             <div class="form-group" style="flex:1;min-width:220px">
               <label class="form-label">Select Finalized Quotation</label>
@@ -501,12 +522,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
                 <option value="">— Select a quotation to auto-fill —</option>
               </select>
             </div>
-            <button type="button" class="btn btn-draft" onclick="loadQuotationIntoInvoice()">⬇️ Load Details</button>
+            <button type="button" class="btn btn-draft" onclick="loadQuotationIntoInvoice()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Load Details</button>
           </div>
         </div>
         <form id="inv-form" onsubmit="return false;">
           <div class="form-card">
-            <div class="form-section-title">🧾 INVOICE META</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> INVOICE META</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Invoice ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="i-invid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
@@ -515,7 +536,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">👤 CUSTOMER DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="i-cname" class="form-input" placeholder="e.g. Ramesh Sharma"></div>
               <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="i-cphone" class="form-input" placeholder="e.g. 9876543210"></div>
@@ -524,7 +545,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">🏗️ PROJECT &amp; AMOUNT</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT &amp; AMOUNT</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Project Type</label>
                 <select id="i-ptype" class="form-select">
@@ -563,16 +584,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">💳 BANK / PAYMENT INFO (shown on invoice)</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> BANK / PAYMENT INFO (shown on invoice)</div>
             <div class="form-group"><textarea id="i-payment" class="form-textarea" rows="3" placeholder="e.g. Bank: HDFC Bank, A/C: 1234567890, IFSC: HDFC0001234&#10;UPI: rrteenset@upi"></textarea></div>
           </div>
           <div class="form-card">
-            <div class="form-section-title">📝 NOTES</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="13" x2="14" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg> NOTES</div>
             <div class="form-group"><textarea id="i-notes" class="form-textarea" rows="3" placeholder="Any additional notes for this invoice"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveInvoice()">💾 Save Invoice</button>
-            <button class="btn btn-reset" onclick="resetInvoiceForm()">🔄 Reset</button>
+            <button class="btn btn-save" onclick="saveInvoice()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Invoice</button>
+            <button class="btn btn-reset" onclick="resetInvoiceForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </form>
       </section>
@@ -624,7 +645,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         </div>
 
         <div class="form-card">
-          <div class="form-section-title">➕ ADD TEAM MEMBER</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD TEAM MEMBER</div>
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="tm-name" class="form-input" placeholder="e.g. Priya Sales"></div>
             <div class="form-group"><label class="form-label">Email *</label><input type="email" id="tm-email" class="form-input" placeholder="e.g. priya@rrteenset.com"></div>
@@ -637,7 +658,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="addTeamMember()">💾 Create Login</button>
+            <button class="btn btn-save" onclick="addTeamMember()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
           </div>
           <div style="font-size:12px;color:#64748b;margin-top:10px">
             Sales → New Quotation, History, Leads, Customers &nbsp;|&nbsp; Accounts → Invoices, Customers, Analytics &nbsp;|&nbsp; Admin → Everything
@@ -691,10 +712,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="modal-header">
       <div class="modal-title">Quotation Preview</div>
       <div class="modal-actions">
-        <button class="btn-modal btn-modal-pdf" onclick="downloadPreviewPDF()">📄 PDF</button>
-        <button class="btn-modal" onclick="shareEmail(window._previewId)" style="background:#1565c0;color:#fff">📧 Email</button>
-        <button class="btn-modal" onclick="shareWhatsApp(window._previewId)" style="background:#25d366;color:#fff">💬 WhatsApp</button>
-        <button class="btn-modal btn-modal-close" onclick="closePreview()">✕ Close</button>
+        <button class="btn-modal btn-modal-pdf" onclick="downloadPreviewPDF()"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> PDF</button>
+        <button class="btn-modal" onclick="shareEmail(window._previewId)" style="background:#1565c0;color:#fff"><svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg> Email</button>
+        <button class="btn-modal" onclick="shareWhatsApp(window._previewId)" style="background:#25d366;color:#fff"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> WhatsApp</button>
+        <button class="btn-modal btn-modal-close" onclick="closePreview()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
       </div>
     </div>
     <div id="preview-content"></div>
@@ -717,8 +738,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="pay-note" class="form-input" placeholder="e.g. Advance payment"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="savePayment()">💾 Save Payment</button>
-      <button class="btn btn-reset" onclick="closePaymentModal()">✕ Cancel</button>
+      <button class="btn btn-save" onclick="savePayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-reset" onclick="closePaymentModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
     <div class="pay-history" id="pay-history"></div>
   </div>
@@ -758,6 +779,39 @@ let currentUserRole = null;
 let allTeam = [];
 let allDeletedItems = [];
 
+// ── ICONS — flat line-icon set (replaces emoji throughout the UI) ──────
+const ICONS = {
+  home:     `<svg viewBox="0 0 24 24" class="ic"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>`,
+  plusCirc: `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  list:     `<svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg>`,
+  chart:    `<svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg>`,
+  phone:    `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg>`,
+  users:    `<svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg>`,
+  receipt:  `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg>`,
+  wallet:   `<svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg>`,
+  shield:   `<svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg>`,
+  trash:    `<svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg>`,
+  globe:    `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg>`,
+  lock:     `<svg viewBox="0 0 24 24" class="ic"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>`,
+  bell:     `<svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+  alert:    `<svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`,
+  plus:     `<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  save:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg>`,
+  refresh:  `<svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg>`,
+  pin:      `<svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>`,
+  zap:      `<svg viewBox="0 0 24 24" class="ic"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg>`,
+  edit:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 17.5 15.5 6l2.5 2.5L6.5 20H4Z"/><line x1="14" y1="7.5" x2="16.5" y2="10"/></svg>`,
+  fileText: `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg>`,
+  mail:     `<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
+  chat:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg>`,
+  close:    `<svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>`,
+  eye:      `<svg viewBox="0 0 24 24" class="ic"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="2.6"/></svg>`,
+  download: `<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg>`,
+  restore:  `<svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>`,
+  coin:     `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`,
+  building: `<svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>`
+};
+
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
   Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items'],
@@ -789,7 +843,7 @@ function showLoadError(tbodyId, colspan, err) {
   const msg = err?.code === 'permission-denied'
     ? 'Aapke role ko is data ka access nahi hai.'
     : 'Data load nahi ho paaya — internet check karke page refresh karein.';
-  tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;padding:32px;color:var(--red)">⚠️ ${msg}</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;padding:32px;color:var(--red);display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> ${msg}</td></tr>`;
 }
 
 // ── PAGINATION (client-side — keeps large tables fast to render) ──────
@@ -964,7 +1018,7 @@ window.loadDeletedItems = async () => {
   } catch(e) { console.error(e); showLoadError('deleted-tbody', 5, e); }
 };
 
-const TYPE_LABEL = { lead:'📞 Lead', quotation:'📋 Quotation', invoice:'💳 Invoice' };
+const TYPE_LABEL = { lead:`${ICONS.phone} Lead`, quotation:`${ICONS.fileText} Quotation`, invoice:`${ICONS.receipt} Invoice` };
 const TYPE_COLLECTION = { lead:'leads', quotation:'quotations', invoice:'invoices' };
 
 window.renderDeletedItems = (search='', keepPage=false) => {
@@ -976,15 +1030,15 @@ window.renderDeletedItems = (search='', keepPage=false) => {
 
   const { pageItems, page, totalPages, total } = paginateList(list, 'deleted', keepPage);
   tbody.innerHTML = pageItems.length === 0
-    ? `<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Koi deleted item nahi hai 🎉</td></tr>`
+    ? `<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Koi deleted item nahi hai</td></tr>`
     : pageItems.map(x => `<tr>
         <td>${TYPE_LABEL[x.type]}</td>
         <td><span class="qt-id-badge">${esc(x.sub)}</span></td>
         <td>${esc(x.label)}</td>
         <td>${x.deletedAt?.toDate ? x.deletedAt.toDate().toLocaleString('en-IN') : '—'}</td>
         <td class="action-btns">
-          <button onclick="restoreItem('${x.type}','${x.id}')" class="btn-icon" title="Restore">♻️</button>
-          <button onclick="permanentlyDeleteItem('${x.type}','${x.id}')" class="btn-icon btn-danger" title="Delete Permanently">🗑️</button>
+          <button onclick="restoreItem('${x.type}','${x.id}')" class="btn-icon" title="Restore">${ICONS.restore}</button>
+          <button onclick="permanentlyDeleteItem('${x.type}','${x.id}')" class="btn-icon btn-danger" title="Delete Permanently">${ICONS.trash}</button>
         </td>
       </tr>`).join('');
   _pageState.deleted = page;
@@ -1093,13 +1147,13 @@ window.loadDashboard = async () => {
       animateCount('dash-followup-count', followups.length);
       document.getElementById('dash-followup-count').closest('.stat-card').classList.toggle('stat-alert', followups.length > 0);
       document.getElementById('dash-followup-list').innerHTML = followups.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px">Sab follow-up clear hain 🎉</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Sab follow-up clear hain</div>'
         : followups.map((q,i) => {
             const msg = `Namaste ${q.cname}, R.R Teen Set Solution se. Aapki quotation ${q.qtId} (₹${fmt(q.total)}) abhi pending hai. Koi query ho to zaroor bataiye, hum madad ke liye taiyar hain. Dhanyawad!`;
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                 <br><small style="color:#94a3b8">${q.days} din se pending</small></div>
-              <a href="${waLink(q.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
+              <a href="${waLink(q.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -1116,13 +1170,13 @@ window.loadDashboard = async () => {
         .slice(0, 10);
 
       document.getElementById('dash-overdue-list').innerHTML = overdue.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px">Koi overdue payment nahi hai 🎉</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Koi overdue payment nahi hai</div>'
         : overdue.map((i,idx) => {
             const msg = `Namaste ${i.cname}, R.R Teen Set Solution se. Aapke invoice ${i.invId} ka ₹${fmt(i.due)} payment abhi due hai. Kripya jald bhugtan kar dijiye. Dhanyawad!`;
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${i.days} din se overdue</small></div>
-              <a href="${waLink(i.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder">📲</a>
+              <a href="${waLink(i.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -1130,7 +1184,7 @@ window.loadDashboard = async () => {
     console.error('Dashboard load error:', e);
     ['dash-followup-list','dash-overdue-list'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px">⚠️ Data load nahi ho paaya — page refresh karein.</div>';
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Data load nahi ho paaya — page refresh karein.</div>';
     });
   }
 };
@@ -1372,9 +1426,9 @@ window.renderLeads = (search='', keepPage=false) => {
           </select>
         </td>
         <td class="action-btns">
-          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation">📝</button>
-          <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">✏️</button>
-          <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation">${ICONS.fileText}</button>
+          <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`).join('');
   renderPaginationControls('leads-pagination', 'leads', page, totalPages, total);
 };
@@ -1481,7 +1535,7 @@ window.renderCustomers = (search='', keepPage=false) => {
         <td>${esc(c.phone)}</td>
         <td>${esc(c.addr||'—')}</td>
         <td>${custQuotes.length || c.totalQuotations || 0}</td>
-        <td><strong>₹${fmt(totalValue)}</strong></td>
+        <td><strong class="mono">₹${fmt(totalValue)}</strong></td>
         <td>${lastDate}</td>
         </tr>`;
       }).join('');
@@ -1512,17 +1566,17 @@ window.renderHistory = (search='', keepPage=false) => {
         <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
         <td>${q.ptype}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
-        <td><strong>₹${fmt(q.total)}</strong></td>
+        <td><strong class="mono">₹${fmt(q.total)}</strong></td>
         <td>${q.date||'—'}<br>${q.isDraft?'<span class="badge-draft">Draft</span>':`
           <select onchange="updateDealStatus('${q.id}',this.value)" class="form-select" style="padding:3px 6px;font-size:11px;max-width:110px">
             ${['Pending','Sent','Won','Lost'].map(s=>`<option ${(q.dealStatus||'Pending')===s?'selected':''}>${s}</option>`).join('')}
           </select>`}</td>
         <td class="action-btns">
-          <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview">👁️</button>
-          <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">✏️</button>
-          <button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">📥</button>
-          <button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">📲</button>
-          <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+          <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview">${ICONS.eye}</button>
+          <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
+          <button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
+          <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`).join('');
   renderPaginationControls('history-pagination', 'history', page, totalPages, total);
 };
@@ -2093,17 +2147,17 @@ window.renderInvoices = (search='', keepPage=false) => {
         return `<tr>
         <td><span class="qt-id-badge">${esc(i.invId)}</span>${i.qtRef?`<br><small style="color:#94a3b8">from ${esc(i.qtRef)}</small>`:''}</td>
         <td><strong>${esc(i.cname)}</strong><br><small>${esc(i.cphone)}</small></td>
-        <td><strong>₹${fmt(i.total)}</strong></td>
+        <td><strong class="mono">₹${fmt(i.total)}</strong></td>
         <td>₹${fmt(paid)}</td>
         <td class="${balance>0?'balance-due':'balance-clear'}">₹${fmt(balance)}</td>
         <td>${badge}<br><small>${i.date||'—'}</small></td>
         <td class="action-btns">
-          <button onclick="viewInvoice('${i.id}')" class="btn-icon" title="Preview">👁️</button>
-          <button onclick="editInvoice('${i.id}')" class="btn-icon" title="Edit">✏️</button>
-          <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">💰</button>
-          <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">📥</button>
-          <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">📲</button>
-          <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">🗑️</button>
+          <button onclick="viewInvoice('${i.id}')" class="btn-icon" title="Preview">${ICONS.eye}</button>
+          <button onclick="editInvoice('${i.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
+          <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
+          <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
+          <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`;
       }).join('');
   renderPaginationControls('invoices-pagination', 'invoices', page, totalPages, total);
@@ -2160,7 +2214,7 @@ window.openPaymentModal = async id => {
     const rows = [];
     snap.forEach(d => rows.push(d.data()));
     document.getElementById('pay-history').innerHTML = rows.length
-      ? rows.map(p => `<div class="pay-history-row"><span>${p.date||''} · ${esc(p.mode||'')}</span><strong>₹${fmt(p.amount)}</strong></div>`).join('')
+      ? rows.map(p => `<div class="pay-history-row"><span>${p.date||''} · ${esc(p.mode||'')}</span><strong class="mono">₹${fmt(p.amount)}</strong></div>`).join('')
       : '<div style="font-size:12.5px;color:#94a3b8">No payments recorded yet.</div>';
   } catch(e) { document.getElementById('pay-history').innerHTML = ''; console.error(e); }
 };
