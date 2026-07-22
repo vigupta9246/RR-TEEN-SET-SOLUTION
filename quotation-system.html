@@ -1019,6 +1019,7 @@ window.loadDeletedItems = async () => {
 };
 
 const TYPE_LABEL = { lead:`${ICONS.phone} Lead`, quotation:`${ICONS.fileText} Quotation`, invoice:`${ICONS.receipt} Invoice` };
+const TYPE_NAME = { lead:'Lead', quotation:'Quotation', invoice:'Invoice' }; // plain text for use in confirm()/alert() — TYPE_LABEL now contains SVG markup, so splitting it on spaces would grab a fragment of an SVG attribute instead of the word "Lead"/"Quotation"/"Invoice"
 const TYPE_COLLECTION = { lead:'leads', quotation:'quotations', invoice:'invoices' };
 
 window.renderDeletedItems = (search='', keepPage=false) => {
@@ -1046,7 +1047,7 @@ window.renderDeletedItems = (search='', keepPage=false) => {
 };
 
 window.restoreItem = async (type, id) => {
-  if (!confirm(`Is ${TYPE_LABEL[type].split(' ')[1]} ko restore kar diya jaaye? Ye wapas apni normal list mein dikhne lagega.`)) return;
+  if (!confirm(`Is ${TYPE_NAME[type]} ko restore kar diya jaaye? Ye wapas apni normal list mein dikhne lagega.`)) return;
   try {
     await updateDoc(doc(db, TYPE_COLLECTION[type], id), { deleted: false, deletedAt: null });
     invalidateCache(TYPE_COLLECTION[type]);
@@ -1056,7 +1057,7 @@ window.restoreItem = async (type, id) => {
 };
 
 window.permanentlyDeleteItem = async (type, id) => {
-  if (!confirm(`⚠️ Ye ${TYPE_LABEL[type].split(' ')[1]} PERMANENTLY delete ho jayega — is baar restore NAHI ho sakega. Pakka?`)) return;
+  if (!confirm(`⚠️ Ye ${TYPE_NAME[type]} PERMANENTLY delete ho jayega — is baar restore NAHI ho sakega. Pakka?`)) return;
   if (!confirm('Confirm karein — yeh action undo nahi ho sakta.')) return;
   try {
     await deleteDoc(doc(db, TYPE_COLLECTION[type], id));
@@ -1564,7 +1565,7 @@ window.renderHistory = (search='', keepPage=false) => {
     : pageItems.map(q=>`<tr>
         <td><span class="qt-id-badge">${esc(q.qtId)}</span></td>
         <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
-        <td>${q.ptype}</td>
+        <td>${esc(q.ptype)}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
         <td><strong class="mono">₹${fmt(q.total)}</strong></td>
         <td>${q.date||'—'}<br>${q.isDraft?'<span class="badge-draft">Draft</span>':`
@@ -1748,7 +1749,7 @@ function buildQtHTML(q) {
         </td>
         <td style="width:50%;padding:14px 18px;vertical-align:top;background:#ffffff;">
           <div style="font-size:8px;font-weight:800;color:#000000;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">PROJECT SCOPE</div>
-          <div style="font-size:15px;font-weight:800;color:#000000;">${q.ptype}</div>
+          <div style="font-size:15px;font-weight:800;color:#000000;">${esc(q.ptype)}</div>
           <table style="width:100%;border-collapse:separate;border-spacing:6px;margin-top:6px;">
             <tr>
               <td style="background:#fff;border:1.5px solid #e8ecf0;border-radius:6px;padding:7px 10px;vertical-align:top;">
@@ -2320,7 +2321,7 @@ function buildInvHTML(i) {
         </td>
         <td style="width:50%;padding:14px 18px;vertical-align:top;">
           <div style="font-size:8px;font-weight:800;color:#000000;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">PROJECT</div>
-          <div style="font-size:15px;font-weight:800;color:#000000;">${i.ptype||''}</div>
+          <div style="font-size:15px;font-weight:800;color:#000000;">${esc(i.ptype||'')}</div>
           <div style="font-size:11px;color:#5a6a7a;margin-top:6px;">${esc(i.desc||'')}</div>
         </td>
       </tr>
