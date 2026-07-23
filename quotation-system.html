@@ -374,6 +374,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
       <div class="nav-section">ADMIN</div>
       <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
       <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
+      <button class="nav-btn" data-section="activity-log" onclick="showSection('activity-log')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span>Activity Log</span></button>
       <div class="nav-section">LINKS</div>
       <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg></span><span>Main Website</span></button>
       <div class="sidebar-footer">
@@ -813,6 +814,39 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div id="deleted-pagination" class="pagination-wrap"></div>
         </div>
       </section>
+
+      <!-- ACTIVITY LOG (Admin only) — audit trail for sensitive actions:
+           role changes, permanent deletes, restores, team member creation.
+           Log entries are write-once (Firestore rules deny update/delete). -->
+      <section id="activity-log" class="section">
+        <div class="page-header">
+          <div class="page-title">Activity Log</div>
+          <div class="page-sub">Sensitive actions ka audit trail — role changes, permanent deletes, restores, naye logins</div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="activity-search-input" class="search-input" placeholder="Search by user, action, details..." oninput="renderActivityLog(this.value)">
+          </div>
+          <select id="activity-filter-action" class="form-select" style="padding:9px 12px;font-size:13px;max-width:200px" onchange="renderActivityLog(document.getElementById('activity-search-input').value)">
+            <option value="">All Actions</option>
+            <option value="role_change">Role Change</option>
+            <option value="team_member_added">Team Member Added</option>
+            <option value="permanent_delete">Permanent Delete</option>
+            <option value="restore">Restore</option>
+          </select>
+        </div>
+
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr>
+              <th>When</th><th>By</th><th>Action</th><th>Details</th>
+            </tr></thead>
+            <tbody id="activity-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td></tr></tbody>
+          </table>
+          <div id="activity-pagination" class="pagination-wrap"></div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -925,7 +959,7 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items','activity-log'],
   Sales:    ['dashboard','create','history','leads','customers'],
   Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
 };
@@ -946,6 +980,33 @@ async function fetchCached(key, colName, orderField='createdAt') {
 }
 function invalidateCache(key) { if (_cache[key]) _cache[key].ts = 0; }
 
+// ── ACTIVITY LOG (audit trail) ──────────────────────────────────
+// Fire-and-forget write for sensitive actions: role changes, permanent
+// deletes, restores, team member creation. Entries are write-once — the
+// Firestore rules deny update/delete on this collection, so this can never
+// be edited or erased after the fact, even by Admin. A failure here must
+// NEVER block the action itself (e.g. a role change should still go through
+// even if logging fails), so errors are swallowed after a console warning.
+async function logActivity(action, details) {
+  try {
+    await addDoc(collection(db, 'activityLog'), {
+      action,
+      details,
+      actorEmail: auth.currentUser?.email || 'unknown',
+      actorRole: currentUserRole || 'unknown',
+      createdAt: serverTimestamp()
+    });
+  } catch(e) {
+    console.warn('Activity log write failed (action still proceeded):', e);
+  }
+}
+const ACTIVITY_LABEL = {
+  role_change: 'Role Change',
+  team_member_added: 'Team Member Added',
+  permanent_delete: 'Permanent Delete',
+  restore: 'Restore'
+};
+
 // Shows a visible error row instead of silently leaving a table empty
 // on a failed fetch (e.g. network issue, permission error).
 function showLoadError(tbodyId, colspan, err) {
@@ -959,7 +1020,7 @@ function showLoadError(tbodyId, colspan, err) {
 
 // ── PAGINATION (client-side — keeps large tables fast to render) ──────
 const PAGE_SIZE = 20;
-const _pageState = { leads:1, history:1, customers:1, invoices:1, deleted:1 };
+const _pageState = { leads:1, history:1, customers:1, invoices:1, deleted:1, activity:1 };
 
 function paginateList(list, key, keepPage) {
   if (!keepPage) _pageState[key] = 1;
@@ -987,6 +1048,7 @@ window._gotoPage = (key, page) => {
   if (key === 'customers') renderCustomers(document.getElementById('cust-search-input')?.value || '', true);
   if (key === 'invoices')  renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
   if (key === 'deleted')   renderDeletedItems(document.getElementById('deleted-search-input')?.value || '', true);
+  if (key === 'activity')  renderActivityLog(document.getElementById('activity-search-input')?.value || '', true);
   window.scrollTo({top: document.querySelector('.section.active .table-card')?.offsetTop - 80 || 0, behavior:'smooth'});
 };
 
@@ -1085,6 +1147,7 @@ window.addTeamMember = async () => {
     await setDoc(doc(db, 'invited', email), { role, invitedAt: serverTimestamp(), invitedBy: auth.currentUser?.email || null });
     const uid = await createTeamMemberAuth(email, pass);
     await setDoc(doc(db, 'users', uid), { name, email, role, createdAt: serverTimestamp() });
+    logActivity('team_member_added', `${name} (${email}) added as ${role}`);
     alert(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`);
     document.getElementById('tm-name').value = '';
     document.getElementById('tm-email').value = '';
@@ -1175,6 +1238,7 @@ window.restoreItem = async (type, id) => {
   try {
     await updateDoc(doc(db, TYPE_COLLECTION[type], id), { deleted: false, deletedAt: null });
     invalidateCache(TYPE_COLLECTION[type]);
+    logActivity('restore', `${TYPE_NAME[type]} restored (id: ${id})`);
     alert('Restore ho gaya!');
     loadDeletedItems();
   } catch(e) { alert('Error: ' + e.message); }
@@ -1186,9 +1250,55 @@ window.permanentlyDeleteItem = async (type, id) => {
   try {
     await deleteDoc(doc(db, TYPE_COLLECTION[type], id));
     invalidateCache(TYPE_COLLECTION[type]);
+    logActivity('permanent_delete', `${TYPE_NAME[type]} permanently deleted (id: ${id})`);
     alert('Permanently deleted.');
     loadDeletedItems();
   } catch(e) { alert('Error: ' + e.message); }
+};
+
+// ── ACTIVITY LOG PAGE (Admin only) ──────────────────────────────
+// Loaded fresh each time (not run through fetchCached) since this is a
+// low-traffic Admin-only screen and staleness here matters more than the
+// extra read cost — an audit trail that lags 45s behind isn't useful.
+// Capped at the most recent 300 entries so the read stays bounded even
+// once the log has years of history; older entries are still in Firestore,
+// just not pulled into this view.
+let allActivity = [];
+window.loadActivityLog = async () => {
+  try {
+    const snap = await getDocs(query(collection(db,'activityLog'), orderBy('createdAt','desc')));
+    allActivity = [];
+    let n = 0;
+    snap.forEach(d => { if (n < 300) { allActivity.push({ id: d.id, ...d.data() }); n++; } });
+    renderActivityLog('');
+  } catch(e) { console.error(e); showLoadError('activity-tbody', 4, e); }
+};
+
+window.renderActivityLog = (search='', keepPage=false) => {
+  const tbody = document.getElementById('activity-tbody');
+  const actionFilter = document.getElementById('activity-filter-action')?.value;
+  let list = allActivity;
+  if (actionFilter) list = list.filter(x => x.action === actionFilter);
+  if (search) {
+    const s = search.toLowerCase();
+    list = list.filter(x =>
+      (x.actorEmail||'').toLowerCase().includes(s) ||
+      (x.details||'').toLowerCase().includes(s) ||
+      (ACTIVITY_LABEL[x.action]||x.action||'').toLowerCase().includes(s)
+    );
+  }
+
+  const { pageItems, page, totalPages, total } = paginateList(list, 'activity', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">Koi activity record nahi hai</td></tr>`
+    : pageItems.map(x => `<tr>
+        <td class="mono" style="font-size:12px">${x.createdAt?.toDate ? x.createdAt.toDate().toLocaleString('en-IN') : '—'}</td>
+        <td>${esc(x.actorEmail||'—')}<br><small style="color:#94a3b8">${esc(x.actorRole||'')}</small></td>
+        <td><span class="qt-id-badge">${esc(ACTIVITY_LABEL[x.action]||x.action||'—')}</span></td>
+        <td style="font-size:12.5px">${esc(x.details||'—')}</td>
+      </tr>`).join('');
+  _pageState.activity = page;
+  renderPaginationControls('activity-pagination', 'activity', page, totalPages, total);
 };
 
 window.changeTeamRole = async (uid, role) => {
@@ -1198,8 +1308,10 @@ window.changeTeamRole = async (uid, role) => {
     : `"${t?.name||t?.email}" ka role "${role}" kar diya jaaye?`;
   if (!confirm(warning)) { renderTeam(); return; } // reset dropdown visually
   try {
+    const oldRole = t?.role || 'unknown';
     await updateDoc(doc(db,'users',uid), { role, updatedAt: serverTimestamp() });
     if (t) t.role = role;
+    logActivity('role_change', `${t?.name||t?.email||uid}: ${oldRole} → ${role}`);
     alert('Role updated!');
   } catch(e) { alert('Error: ' + e.message); renderTeam(); }
 };
@@ -1388,6 +1500,7 @@ window.showSection = id => {
   if (id === 'customers') loadCustomers();
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
+  if (id === 'activity-log') loadActivityLog();
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
