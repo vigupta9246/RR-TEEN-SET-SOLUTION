@@ -760,7 +760,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="tm-name" class="form-input" placeholder="e.g. Priya Sales"></div>
             <div class="form-group"><label class="form-label">Email *</label><input type="email" id="tm-email" class="form-input" placeholder="e.g. priya@rrteenset.com"></div>
-            <div class="form-group"><label class="form-label">Temporary Password *</label><input type="text" id="tm-pass" class="form-input" placeholder="Min 6 characters"></div>
+            <div class="form-group"><label class="form-label">Temporary Password *</label><input type="text" id="tm-pass" class="form-input" placeholder="Min 8 characters" minlength="8"></div>
             <div class="form-group">
               <label class="form-label">Role</label>
               <select id="tm-role" class="form-select">
@@ -1017,10 +1017,16 @@ async function loadCurrentUserRole(u) {
       await setDoc(ref, { email: u.email, name: u.email.split('@')[0], role: currentUserRole, createdAt: serverTimestamp() });
     }
   } catch(e) {
-    console.error('Role load failed, defaulting to Admin for safety:', e);
-    currentUserRole = 'Admin';
+    // SECURITY: never default to Admin here. Firestore rules are the real
+    // gate (a client-side variable can't grant real access), but the old
+    // 'Admin' fallback still meant the UI would light up every nav item and
+    // show misleading "permission-denied" errors everywhere instead of a
+    // clear message. Default to zero sections and tell the user to retry.
+    console.error('Role load failed — defaulting to NO ACCESS, not Admin:', e);
+    currentUserRole = null;
+    alert('Aapka role load nahi ho paaya (network/permission issue). Kripya page refresh karke dobara try karein.');
   }
-  document.getElementById('user-role-badge').textContent = currentUserRole;
+  document.getElementById('user-role-badge').textContent = currentUserRole || 'Unknown';
 }
 
 function applyRolePermissions() {
@@ -1068,8 +1074,15 @@ window.addTeamMember = async () => {
   const g = id => document.getElementById(id).value;
   const name = g('tm-name').trim(), email = g('tm-email').trim(), pass = g('tm-pass'), role = g('tm-role');
   if (!name || !email || !pass) { alert('Naam, email aur password required hai.'); return; }
-  if (pass.length < 6) { alert('Password kam se kam 6 characters ka hona chahiye.'); return; }
+  if (pass.length < 8) { alert('Password kam se kam 8 characters ka hona chahiye.'); return; }
   try {
+    // SECURITY: write the invite doc FIRST, before the Auth account even
+    // exists. The Firestore rules now require invited/{email} to exist (with
+    // the matching role) before a users/{uid} doc for that email can ever be
+    // created — including by the user themself on first login. This closes
+    // the hole where anyone with a Firebase Auth account (even one made
+    // outside this app) could previously self-assign a 'Sales' role.
+    await setDoc(doc(db, 'invited', email), { role, invitedAt: serverTimestamp(), invitedBy: auth.currentUser?.email || null });
     const uid = await createTeamMemberAuth(email, pass);
     await setDoc(doc(db, 'users', uid), { name, email, role, createdAt: serverTimestamp() });
     alert(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`);
