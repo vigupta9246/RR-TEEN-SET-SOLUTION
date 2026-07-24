@@ -507,6 +507,13 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="page-sub">Fill in details to generate a professional quotation</div>
         </div>
         <form id="qt-form" onsubmit="return false;">
+          <div class="form-card" style="border-left:3px solid var(--orange)">
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="2.5"/></svg> AI DRAFT <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--muted);letter-spacing:0">(beta — customer ka message ya job description paste karo, form auto-fill ho jayega)</span></div>
+            <textarea id="ai-draft-input" class="form-input" rows="3" style="resize:vertical;font-family:inherit" placeholder="e.g. Ramesh Sharma, 9876543210, Dwarka Delhi mein 2000 sq ft ka tin shed chahiye, quotation bhej do"></textarea>
+            <button type="button" class="btn-search" style="margin-top:10px" onclick="aiDraftQuotation()" id="ai-draft-btn">
+              <svg viewBox="0 0 24 24" class="ic" style="stroke:#fff"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="2.5"/></svg> Draft with AI
+            </button>
+          </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
@@ -630,6 +637,17 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
         <div class="type-breakdown">
           <div class="breakdown-title">Quotations by Project Type</div>
           <div id="type-breakdown">Loading...</div>
+        </div>
+
+        <div class="type-breakdown" id="team-performance-panel" style="display:none;margin-top:20px">
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.3c2.4.4 4 2.4 4 5.7"/></svg> Team Performance</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Sirf naye records count hote hain (jo is feature ke aane ke baad bane) — purane records "Legacy Data" row mein dikhenge, kisi member ko attribute nahi honge.</div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Team Member</th><th>Quotations</th><th>Won</th><th>Lost</th><th>Conversion</th><th>Revenue Closed</th></tr></thead>
+              <tbody id="team-perf-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:#64748b">Loading...</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -1003,6 +1021,8 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, creat
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp, runTransaction }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFunctions, httpsCallable }
+  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
@@ -1018,6 +1038,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
+const functions = getFunctions(app); // used by AI-assisted quotation drafting
 
 // ── ERROR REPORTING (console + Sentry when configured) ─────────
 function reportError(...args) {
@@ -1249,6 +1270,7 @@ const ROLE_PERMISSIONS = {
   Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
+const BRANCH = 'Delhi'; // single branch today — tagged on every new record so a 2nd branch later needs only a picker UI, not a data migration
 
 // ── PERFORMANCE: short-lived cache so switching tabs repeatedly doesn't
 // re-download the whole collection every single click. Any save/delete/
@@ -1870,6 +1892,44 @@ async function getNextInvoiceNumber() {
   return `INV-${year}-${String(seq).padStart(4,'0')}`;
 }
 
+window.aiDraftQuotation = async () => {
+  const input = document.getElementById('ai-draft-input').value.trim();
+  if (!input) { toast('Pehle description likho ya paste karo.', 'warning'); return; }
+  const btn = document.getElementById('ai-draft-btn');
+  btn.disabled = true; btn.style.opacity = '0.6';
+  toast('AI se draft ban raha hai...', 'warning', 3000);
+  try {
+    const draftFn = httpsCallable(functions, 'aiDraftQuotation');
+    const result = await draftFn({ description: input });
+    const d = result.data || {};
+    if (d.cname)  document.getElementById('f-cname').value  = d.cname;
+    if (d.cphone) document.getElementById('f-cphone').value = d.cphone.replace(/\D/g,'');
+    if (d.cemail) document.getElementById('f-cemail').value = d.cemail;
+    if (d.caddr)  document.getElementById('f-caddr').value  = d.caddr;
+    if (d.ptype) {
+      const ptypeSelect = document.getElementById('f-ptype');
+      const isValid = Array.from(ptypeSelect.options).some(o => o.value === d.ptype);
+      if (isValid) ptypeSelect.value = d.ptype;
+    }
+    if (d.area) document.getElementById('f-area').value = d.area;
+    if (d.rate) document.getElementById('f-rate').value = d.rate;
+    if (d.notes) document.getElementById('f-notes').value = d.notes;
+    recalculate();
+    toast('Form AI se fill ho gaya — save karne se pehle values zaroor verify kar lo!', 'success', 5500);
+  } catch (e) {
+    reportError(e);
+    if (e.code === 'functions/not-found' || e.code === 'functions/internal' || e.code === 'functions/unavailable') {
+      toast('AI drafting abhi setup nahi hai — Cloud Function deploy karni hogi.', 'error', 6000);
+    } else if (e.code === 'functions/unauthenticated') {
+      toast('Session expire ho gaya — dobara login karo.', 'error');
+    } else {
+      toast('AI draft mein error: ' + e.message, 'error');
+    }
+  } finally {
+    btn.disabled = false; btn.style.opacity = '1';
+  }
+};
+
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
@@ -1923,7 +1983,7 @@ window.saveQuotation = async isDraft => {
       await updateDoc(doc(db,'quotations',editingId), data);
       editingId = null;
     } else {
-      await addDoc(collection(db,'quotations'), { ...data, createdAt: serverTimestamp() });
+      await addDoc(collection(db,'quotations'), { ...data, createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
     }
     await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
     invalidateCache('quotations');
@@ -1963,7 +2023,7 @@ window.saveLead = async () => {
       await updateDoc(doc(db,'leads',editingLeadId), data);
       editingLeadId = null;
     } else {
-      await addDoc(collection(db,'leads'), { ...data, status: 'New', createdAt: serverTimestamp() });
+      await addDoc(collection(db,'leads'), { ...data, status: 'New', createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
     }
     toast('Lead saved!', 'success');
     invalidateCache('leads');
@@ -2183,6 +2243,8 @@ window.updateDealStatus = async (id, dealStatus) => {
         base: q.base || (q.area*q.rate) || 0, extra: q.extra||0, discount: q.discount||0,
         gstPct: q.gstPct||0, gstAmt: q.gstAmt||0, total: q.total||0,
         payment: q.payment||'', notes: '', amountPaid: 0, status: 'unpaid',
+        createdBy: auth.currentUser?.email || null,
+        branch: BRANCH,
         createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       };
       await addDoc(collection(db,'invoices'), invData);
@@ -2571,7 +2633,49 @@ window.renderAnalytics = () => {
     Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([t,n])=>
       `<div class="type-row"><span>${t}</span><span class="type-count">${n} quotes</span></div>`
     ).join('') || '<div style="color:#64748b;font-size:14px">No data yet</div>';
+
+  renderTeamPerformance(finals);
 };
+
+// ── TEAM PERFORMANCE (Admin-only — needs the full team list, which
+// Firestore rules restrict to Admin, so this panel simply stays hidden
+// for Sales/Accounts rather than showing a permission error) ──────
+async function renderTeamPerformance(finals) {
+  const panel = document.getElementById('team-performance-panel');
+  if (currentUserRole !== 'Admin') { panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  if (allTeam.length === 0) await loadTeam();
+
+  const byMember = {}; // email -> { quotations, won, lost, revenue }
+  const bump = (email) => (byMember[email] ||= { quotations: 0, won: 0, lost: 0, revenue: 0 });
+
+  finals.forEach(q => {
+    const key = q.createdBy || '__legacy__';
+    const m = bump(key);
+    m.quotations++;
+    if (q.dealStatus === 'Won') { m.won++; m.revenue += (q.total || 0); }
+    if (q.dealStatus === 'Lost') m.lost++;
+  });
+
+  const rows = Object.entries(byMember).map(([email, m]) => {
+    const decided = m.won + m.lost;
+    const conv = decided > 0 ? Math.round((m.won / decided) * 100) : 0;
+    const member = allTeam.find(t => t.email === email);
+    const label = email === '__legacy__' ? 'Legacy Data (pre-tracking)' : (member?.name || email);
+    return { label, email, ...m, conv };
+  }).sort((a,b) => b.revenue - a.revenue);
+
+  document.getElementById('team-perf-tbody').innerHTML = rows.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:20px;color:#64748b">No data yet</td></tr>`
+    : rows.map(r => `<tr>
+        <td><strong>${esc(r.label)}</strong>${r.email!=='__legacy__' && r.email ? `<br><small>${esc(r.email)}</small>`:''}</td>
+        <td>${r.quotations}</td>
+        <td class="balance-clear">${r.won}</td>
+        <td class="balance-due">${r.lost}</td>
+        <td>${r.conv}%</td>
+        <td class="mono">₹${fmt(r.revenue)}</td>
+      </tr>`).join('');
+}
 
 // ══════════════════════════════════════════════════════════════
 // INVOICES & PAYMENTS MODULE
@@ -2656,7 +2760,7 @@ window.saveInvoice = async () => {
       editingInvoiceId = null;
     } else {
       data.invId = await getNextInvoiceNumber(); // assigned atomically, exactly once, right before save
-      await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdAt: serverTimestamp() });
+      await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
     }
     toast(`Invoice saved! (${data.invId})`, 'success');
     invalidateCache('invoices');
