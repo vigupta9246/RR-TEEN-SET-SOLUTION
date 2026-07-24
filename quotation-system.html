@@ -14,6 +14,30 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
+<!-- Real PDF generation (replaces browser print-to-PDF): loaded synchronously so
+     window.jspdf / window.html2canvas are ready before the module script runs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="calc.js"></script>
+<!-- Error monitoring (Sentry). Replace SENTRY_DSN below with your project's
+     DSN from sentry.io (free tier is enough) — until then this loads but
+     sends nothing, and the app works exactly as before either way. -->
+<script src="https://browser.sentry-cdn.com/7.120.0/bundle.min.js" crossorigin="anonymous"></script>
+<script>
+  const SENTRY_DSN = ''; // ← paste your Sentry DSN here, e.g. 'https://abc123@o000.ingest.sentry.io/000'
+  if (window.Sentry && SENTRY_DSN) {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      environment: location.hostname === 'localhost' ? 'development' : 'production',
+      tracesSampleRate: 0.1,
+      beforeSend(event) {
+        // Never let form field values / customer data leak into error reports
+        if (event.request) delete event.request.data;
+        return event;
+      }
+    });
+  }
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -116,6 +140,9 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .search-input:focus{border-color:var(--orange)}
 .btn-search{padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
 .btn-search:hover{background:var(--orange-light)}
+.btn-export{padding:10px 16px;background:var(--navy);color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.4px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn-export:hover{background:var(--navy-2)}
+.btn-export .ic{width:14px;height:14px;stroke:#fff}
 .filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .date-input{padding:9px 12px;border:1.5px solid var(--border);border-radius:2px;font-size:13px;font-family:inherit;outline:none}
 .date-input:focus{border-color:var(--orange)}
@@ -139,6 +166,32 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .pay-modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
 .pay-history{margin-top:16px;border-top:1px solid var(--border);padding-top:12px;max-height:140px;overflow-y:auto}
 .pay-history-row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--border);font-family:'IBM Plex Mono',monospace}
+/* TOASTS — replaces window.alert() */
+#toast-container{position:fixed;top:20px;right:20px;z-index:400;display:flex;flex-direction:column;gap:10px;max-width:360px;width:calc(100% - 40px)}
+.toast{display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:3px;padding:13px 14px;box-shadow:0 8px 28px rgba(32,38,44,.18);border-left:4px solid var(--steel-line);font-size:13.5px;color:var(--text);animation:toastIn .25s ease both;line-height:1.4}
+.toast.toast-out{animation:toastOut .2s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(24px)}}
+.toast-success{border-left-color:var(--green)}
+.toast-error{border-left-color:var(--red)}
+.toast-warning{border-left-color:var(--orange)}
+.toast-icon{flex-shrink:0;width:18px;height:18px;margin-top:1px}
+.toast-success .toast-icon{stroke:var(--green)}
+.toast-error .toast-icon{stroke:var(--red)}
+.toast-warning .toast-icon{stroke:var(--orange)}
+.toast-body{flex:1}
+.toast-close{background:none;border:none;cursor:pointer;color:var(--muted);flex-shrink:0;padding:0;line-height:1;font-size:16px}
+.toast-close:hover{color:var(--text)}
+@media(max-width:600px){#toast-container{top:auto;bottom:16px;right:16px;left:16px;max-width:none;width:auto}}
+/* CONFIRM MODAL — replaces window.confirm() */
+#confirm-modal{display:none;position:fixed;inset:0;z-index:220;background:rgba(32,38,44,.65);align-items:center;justify-content:center;padding:20px}
+.confirm-box{background:#fff;border-radius:3px;width:100%;max-width:420px;padding:26px;border-top:4px solid var(--orange);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.confirm-box.confirm-danger{border-top-color:var(--red)}
+.confirm-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:10px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.4px}
+.confirm-msg{font-size:14px;color:var(--text);line-height:1.55;margin-bottom:22px;white-space:pre-line}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end}
+.confirm-box.confirm-danger #confirm-ok-btn{background:var(--red)}
+.confirm-box.confirm-danger #confirm-ok-btn:hover{background:#951f16}
 .load-qt-row{display:flex;gap:10px;align-items:end;margin-bottom:20px;flex-wrap:wrap}
 .action-btns{display:flex;gap:6px}
 .btn-icon{background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:6px 8px;cursor:pointer;transition:all .15s;line-height:1;display:inline-flex;align-items:center;justify-content:center;color:var(--navy)}
@@ -201,14 +254,33 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .btn-modal-close{background:rgba(255,255,255,.12);color:#fff}
 .btn-modal-close:hover{background:rgba(255,255,255,.2)}
 #preview-content{padding:24px;position:relative}
+/* MOBILE TOPBAR (hidden on desktop) */
+.mobile-topbar{display:none}
+#sidebar-overlay{display:none}
+
 /* RESPONSIVE */
 @media(max-width:900px){
-  .sidebar{width:60px}
-  .sidebar-title,.sidebar-sub,.nav-section,.sidebar-footer .user-info,.nav-btn span:not(.nav-icon){display:none}
-  .sidebar-logo{padding:16px;justify-content:center}
-  .logo-box-lg{margin:0}
-  .nav-btn{justify-content:center;margin:2px 4px;width:calc(100% - 8px);padding:12px 0}
-  .main{margin-left:60px;padding:20px}
+  .mobile-topbar{
+    display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:110;
+    background:var(--navy);padding:12px 16px;box-shadow:0 2px 10px rgba(0,0,0,.15)
+  }
+  .hamburger-btn{
+    background:rgba(255,255,255,.08);border:none;border-radius:2px;width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0
+  }
+  .hamburger-btn .ic{stroke:#fff;width:20px;height:20px}
+  .mobile-topbar-title{color:#fff;font-size:13.5px;font-weight:700;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .sidebar{
+    transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.25);
+    width:min(78vw,280px)
+  }
+  .sidebar.open{transform:translateX(0);z-index:120}
+  .main{margin-left:0;padding:20px}
+  #sidebar-overlay{
+    display:none;position:fixed;inset:0;background:rgba(15,18,21,.55);z-index:99
+  }
+  #sidebar-overlay.open{display:block}
   .stats-grid{grid-template-columns:1fr 1fr}
   .form-grid,.form-grid-3{grid-template-columns:1fr}
   .span-2{grid-column:span 1}
@@ -217,6 +289,9 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   .stats-grid{grid-template-columns:1fr}
   .data-table{font-size:12px}
   .cost-box{flex-direction:column;gap:12px}
+  .main{padding:16px}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{width:100%;justify-content:center}
 }
 </style>
 </head>
@@ -354,6 +429,13 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
 <!-- APP -->
 <div id="app">
+  <div class="mobile-topbar">
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+      <svg viewBox="0 0 24 24" class="ic"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+    <div class="mobile-topbar-title" id="mobile-topbar-title">R.R Teen Set Solution</div>
+  </div>
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="shell">
     <aside class="sidebar">
       <div class="sidebar-logo">
@@ -394,11 +476,17 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
         <div class="stats-grid">
           <div class="stat-card" data-requires="leads"><div class="stat-label">OPEN LEADS</div><div class="stat-value" id="dash-open-leads">—</div></div>
+          <div class="stat-card" data-requires="leads"><div class="stat-label">LEADS NEED FOLLOW-UP</div><div class="stat-value" id="dash-stale-leads-count">—</div></div>
           <div class="stat-card" data-requires="quotations"><div class="stat-label">QUOTATIONS PENDING</div><div class="stat-value" id="dash-pending-qt">—</div></div>
           <div class="stat-card" data-requires="quotations"><div class="stat-label">THIS MONTH WON</div><div class="stat-value green" id="dash-won-month">—</div></div>
           <div class="stat-card" data-requires="invoices"><div class="stat-label">TOTAL OUTSTANDING</div><div class="stat-value" id="dash-outstanding" style="color:var(--red)">—</div></div>
           <div class="stat-card" data-requires="quotations"><div class="stat-label">CONVERSION RATE</div><div class="stat-value orange" id="dash-conversion">—</div></div>
           <div class="stat-card" data-requires="quotations"><div class="stat-label">FOLLOW-UPS DUE</div><div class="stat-value" id="dash-followup-count">—</div></div>
+        </div>
+
+        <div class="type-breakdown" style="margin-bottom:20px" data-requires="leads">
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg> Leads Needing Follow-up (2+ din se New/Contacted/Site Visit mein hai)</div>
+          <div id="dash-stale-leads-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
@@ -510,6 +598,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
             <label style="font-size:13px;font-weight:700;color:var(--muted)">To:</label>
             <input type="date" id="filter-to" class="date-input" onchange="renderHistory(document.getElementById('search-input').value)">
           </div>
+          <button class="btn-export" onclick="exportHistoryCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto">
@@ -588,12 +677,13 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
             <option value="">All Status</option>
             <option>New</option><option>Contacted</option><option>Site Visit</option><option>Quoted</option><option>Won</option><option>Lost</option>
           </select>
+          <button class="btn-export" onclick="exportLeadsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
 
         <div class="table-card">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="leads-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
+            <thead><tr><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Age</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="leads-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
             <div id="leads-pagination" class="pagination-wrap"></div>
         </div>
@@ -609,6 +699,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="search-box">
             <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomers(this.value)">
           </div>
+          <button class="btn-export" onclick="exportCustomersCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <table class="data-table">
@@ -735,6 +826,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
               <option value="paid">Paid</option>
             </select>
           </div>
+          <button class="btn-export" onclick="exportInvoicesCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto">
@@ -890,6 +982,21 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   </div>
 </div>
 
+<!-- TOAST CONTAINER -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- CONFIRM MODAL (replaces window.confirm) -->
+<div id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Confirm</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-reset" id="confirm-cancel-btn">Cancel</button>
+      <button class="btn btn-save" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail }
@@ -912,7 +1019,185 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
+// ── ERROR REPORTING (console + Sentry when configured) ─────────
+function reportError(...args) {
+  console.error(...args);
+  if (!window.Sentry) return;
+  const err = args.find(a => a instanceof Error);
+  if (err) Sentry.captureException(err);
+  else Sentry.captureMessage(args.map(String).join(' '), 'error');
+}
+
+// ── TOAST (replaces window.alert) ──────────────────────────────
+// type: 'success' | 'error' | 'warning'
+const TOAST_ICONS = {
+  success: `<svg viewBox="0 0 24 24" class="ic toast-icon"><path d="M20 6 9 17l-5-5"/></svg>`,
+  error:   `<svg viewBox="0 0 24 24" class="ic toast-icon"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>`,
+  warning: `<svg viewBox="0 0 24 24" class="ic toast-icon"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`
+};
+window.toast = (message, type = 'success', duration = 4200) => {
+  const container = document.getElementById('toast-container');
+  if (!container) { console.warn('Toast:', message); return; }
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `${TOAST_ICONS[type] || TOAST_ICONS.success}<div class="toast-body">${esc(message)}</div><button class="toast-close" aria-label="Dismiss">&times;</button>`;
+  const remove = () => { el.classList.add('toast-out'); setTimeout(() => el.remove(), 200); };
+  el.querySelector('.toast-close').onclick = remove;
+  container.appendChild(el);
+  setTimeout(remove, duration);
+};
+
+// ── CONFIRM MODAL (replaces window.confirm) ────────────────────
+// Usage: if (!(await confirmDialog('Are you sure?'))) return;
+// Optional 2nd arg: { title, danger, confirmText, cancelText }
+window.confirmDialog = (message, opts = {}) => {
+  const { title = 'Please Confirm', danger = false, confirmText = 'Confirm', cancelText = 'Cancel' } = opts;
+  return new Promise(resolve => {
+    const modal = document.getElementById('confirm-modal');
+    const box = modal.querySelector('.confirm-box');
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = message;
+    box.classList.toggle('confirm-danger', !!danger);
+    const okBtn = document.getElementById('confirm-ok-btn');
+    const cancelBtn = document.getElementById('confirm-cancel-btn');
+    okBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    modal.style.display = 'flex';
+    const cleanup = (result) => {
+      modal.style.display = 'none';
+      okBtn.onclick = null; cancelBtn.onclick = null;
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+    document.addEventListener('keydown', onKey);
+  });
+};
+
 let allQuotations = [];
+
+// ── REAL PDF GENERATION (replaces window.print() → "Save as PDF") ──
+// Renders the same 794px-wide (A4 @96dpi) HTML template used for the
+// on-screen preview into an offscreen canvas, then embeds that into an
+// actual downloadable .pdf file — no print dialog, no manual "Save as
+// PDF" step, consistent output across every browser/OS. Paginates
+// automatically if content ever runs past one A4 page.
+async function generateRealPDF(innerHTML, filename) {
+  if (!window.html2canvas || !window.jspdf) {
+    toast('PDF library load nahi ho payi — internet connection check karke page refresh karein.', 'error');
+    return false;
+  }
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#ffffff';
+  container.innerHTML = innerHTML;
+  document.body.appendChild(container);
+  try {
+    await new Promise(r => setTimeout(r, 60)); // let fonts/images settle before capture
+    const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgH = (canvas.height * pageW) / canvas.width;
+    let heightLeft = imgH, position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+    heightLeft -= pageH;
+    while (heightLeft > 0) {
+      position -= pageH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+      heightLeft -= pageH;
+    }
+    pdf.save(filename);
+    return true;
+  } catch (e) {
+    reportError('PDF generation failed:', e);
+    toast('PDF banane mein error aaya: ' + e.message, 'error');
+    return false;
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+// ── CSV EXPORT (self-serve backup) ──────────────────────────────
+// Generic: rows = array of objects, columns = [[header, keyOrFn], ...]
+function toCSV(rows, columns) {
+  const escCell = v => {
+    const s = v === null || v === undefined ? '' : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const header = columns.map(c => escCell(c[0])).join(',');
+  const body = rows.map(row =>
+    columns.map(c => escCell(typeof c[1] === 'function' ? c[1](row) : row[c[1]])).join(',')
+  ).join('\n');
+  return header + '\n' + body;
+}
+function downloadCSV(filename, csvContent) {
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM so Excel reads ₹/Hindi text correctly
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+const csvDate = () => new Date().toISOString().split('T')[0];
+const fbDate = ts => ts?.toDate ? ts.toDate().toLocaleDateString('en-IN') : '';
+
+window.exportHistoryCSV = () => {
+  const rows = allQuotations.filter(q => !q.deleted);
+  if (!rows.length) { toast('Export karne ke liye koi quotation nahi hai.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Quotation ID','qtId'], ['Date','date'], ['Customer Name','cname'], ['Phone','cphone'],
+    ['Email','cemail'], ['Address','caddr'], ['Project Type','ptype'], ['Area (sq.ft)','area'],
+    ['Rate/sq.ft','rate'], ['Base Amount','base'], ['Additional','extra'], ['Discount','discount'],
+    ['GST %','gstPct'], ['GST Amount','gstAmt'], ['Total','total'],
+    ['Draft?', q => q.isDraft ? 'Yes' : 'No'], ['Deal Status','dealStatus'], ['Notes','notes']
+  ]);
+  downloadCSV(`quotations_${csvDate()}.csv`, csv);
+  toast('Quotations CSV downloaded!', 'success');
+};
+
+window.exportLeadsCSV = () => {
+  const rows = allLeads.filter(l => !l.deleted);
+  if (!rows.length) { toast('Export karne ke liye koi lead nahi hai.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['Phone','phone'], ['Email','email'], ['Address/Area','addr'],
+    ['Project Type','ptype'], ['Source','source'], ['Status','status'], ['Notes','notes'],
+    ['Created', l => fbDate(l.createdAt)]
+  ]);
+  downloadCSV(`leads_${csvDate()}.csv`, csv);
+  toast('Leads CSV downloaded!', 'success');
+};
+
+window.exportCustomersCSV = () => {
+  const rows = allCustomers;
+  if (!rows.length) { toast('Export karne ke liye koi customer nahi hai.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['Phone','phone'], ['Email','email'], ['Address','addr'],
+    ['Total Quotations','totalQuotations'], ['Total Invoices','totalInvoices'],
+    ['Last Activity', c => fbDate(c.lastActivity)]
+  ]);
+  downloadCSV(`customers_${csvDate()}.csv`, csv);
+  toast('Customers CSV downloaded!', 'success');
+};
+
+window.exportInvoicesCSV = () => {
+  const rows = allInvoices.filter(i => !i.deleted);
+  if (!rows.length) { toast('Export karne ke liye koi invoice nahi hai.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Invoice ID','invId'], ['Quotation Ref','qtRef'], ['Date','date'], ['Due Date','dueDate'],
+    ['Customer Name','cname'], ['Phone','cphone'], ['Email','cemail'], ['Address','caddr'],
+    ['Project Type','ptype'], ['Description','desc'], ['Base Amount','base'], ['Additional','extra'],
+    ['Discount','discount'], ['GST %','gstPct'], ['GST Amount','gstAmt'], ['Total','total'],
+    ['Amount Paid','amountPaid'], ['Balance Due', i => Math.max(0,(i.total||0)-(i.amountPaid||0))],
+    ['Status', i => invoiceStatusOf(i)], ['Notes','notes']
+  ]);
+  downloadCSV(`invoices_${csvDate()}.csv`, csv);
+  toast('Invoices CSV downloaded!', 'success');
+};
 let editingId = null;
 let allInvoices = [];
 let editingInvoiceId = null;
@@ -1060,10 +1345,15 @@ onAuthStateChanged(auth, async u => {
     document.getElementById('user-email').textContent = u.email;
     await loadCurrentUserRole(u);
     applyRolePermissions();
+    if (window.Sentry) {
+      Sentry.setUser({ email: u.email });
+      Sentry.setTag('role', currentUserRole || 'unknown');
+    }
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
     currentUserRole = null;
+    if (window.Sentry) Sentry.setUser(null);
   }
 });
 
@@ -1084,9 +1374,9 @@ async function loadCurrentUserRole(u) {
     // 'Admin' fallback still meant the UI would light up every nav item and
     // show misleading "permission-denied" errors everywhere instead of a
     // clear message. Default to zero sections and tell the user to retry.
-    console.error('Role load failed — defaulting to NO ACCESS, not Admin:', e);
+    reportError('Role load failed — defaulting to NO ACCESS, not Admin:', e);
     currentUserRole = null;
-    alert('Aapka role load nahi ho paaya (network/permission issue). Kripya page refresh karke dobara try karein.');
+    toast('Aapka role load nahi ho paaya (network/permission issue). Kripya page refresh karke dobara try karein.', 'error');
   }
   document.getElementById('user-role-badge').textContent = currentUserRole || 'Unknown';
 }
@@ -1135,8 +1425,8 @@ async function createTeamMemberAuth(email, pass) {
 window.addTeamMember = async () => {
   const g = id => document.getElementById(id).value;
   const name = g('tm-name').trim(), email = g('tm-email').trim(), pass = g('tm-pass'), role = g('tm-role');
-  if (!name || !email || !pass) { alert('Naam, email aur password required hai.'); return; }
-  if (pass.length < 8) { alert('Password kam se kam 8 characters ka hona chahiye.'); return; }
+  if (!name || !email || !pass) { toast('Naam, email aur password required hai.', 'warning'); return; }
+  if (pass.length < 8) { toast('Password kam se kam 8 characters ka hona chahiye.', 'warning'); return; }
   try {
     // SECURITY: write the invite doc FIRST, before the Auth account even
     // exists. The Firestore rules now require invited/{email} to exist (with
@@ -1148,14 +1438,14 @@ window.addTeamMember = async () => {
     const uid = await createTeamMemberAuth(email, pass);
     await setDoc(doc(db, 'users', uid), { name, email, role, createdAt: serverTimestamp() });
     logActivity('team_member_added', `${name} (${email}) added as ${role}`);
-    alert(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`);
+    toast(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`, 'success');
     document.getElementById('tm-name').value = '';
     document.getElementById('tm-email').value = '';
     document.getElementById('tm-pass').value = '';
     loadTeam();
   } catch(e) {
-    if (e.code === 'auth/email-already-in-use') alert('Ye email pehle se registered hai.');
-    else alert('Error: ' + e.message);
+    if (e.code === 'auth/email-already-in-use') toast('Ye email pehle se registered hai.', 'error');
+    else { reportError(e); toast('Error: ' + e.message, 'error'); }
   }
 };
 
@@ -1165,7 +1455,7 @@ window.loadTeam = async () => {
     allTeam = [];
     snap.forEach(d => allTeam.push({ id: d.id, ...d.data() }));
     renderTeam();
-  } catch(e) { console.error(e); showLoadError('team-tbody', 4, e); }
+  } catch(e) { reportError(e); showLoadError('team-tbody', 4, e); }
 };
 
 window.renderTeam = () => {
@@ -1202,7 +1492,7 @@ window.loadDeletedItems = async () => {
       ...invoices.filter(i => i.deleted).map(i => ({ type:'invoice', id:i.id, label:i.cname||'—', sub:i.invId||'—', deletedAt:i.deletedAt }))
     ].sort((a,b) => (b.deletedAt?.toMillis?.()||0) - (a.deletedAt?.toMillis?.()||0));
     renderDeletedItems('');
-  } catch(e) { console.error(e); showLoadError('deleted-tbody', 5, e); }
+  } catch(e) { reportError(e); showLoadError('deleted-tbody', 5, e); }
 };
 
 const TYPE_LABEL = { lead:`${ICONS.phone} Lead`, quotation:`${ICONS.fileText} Quotation`, invoice:`${ICONS.receipt} Invoice` };
@@ -1234,26 +1524,26 @@ window.renderDeletedItems = (search='', keepPage=false) => {
 };
 
 window.restoreItem = async (type, id) => {
-  if (!confirm(`Is ${TYPE_NAME[type]} ko restore kar diya jaaye? Ye wapas apni normal list mein dikhne lagega.`)) return;
+  if (!(await confirmDialog(`Is ${TYPE_NAME[type]} ko restore kar diya jaaye? Ye wapas apni normal list mein dikhne lagega.`, { title: 'Restore Item', confirmText: 'Restore' }))) return;
   try {
     await updateDoc(doc(db, TYPE_COLLECTION[type], id), { deleted: false, deletedAt: null });
     invalidateCache(TYPE_COLLECTION[type]);
     logActivity('restore', `${TYPE_NAME[type]} restored (id: ${id})`);
-    alert('Restore ho gaya!');
+    toast('Restore ho gaya!', 'success');
     loadDeletedItems();
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.permanentlyDeleteItem = async (type, id) => {
-  if (!confirm(`⚠️ Ye ${TYPE_NAME[type]} PERMANENTLY delete ho jayega — is baar restore NAHI ho sakega. Pakka?`)) return;
-  if (!confirm('Confirm karein — yeh action undo nahi ho sakta.')) return;
+  if (!(await confirmDialog(`Ye ${TYPE_NAME[type]} PERMANENTLY delete ho jayega — is baar restore NAHI ho sakega. Pakka?`, { title: 'Permanent Delete', danger: true, confirmText: 'Yes, Delete' }))) return;
+  if (!(await confirmDialog('Confirm karein — yeh action undo nahi ho sakta.', { title: 'Final Confirmation', danger: true, confirmText: 'Delete Permanently' }))) return;
   try {
     await deleteDoc(doc(db, TYPE_COLLECTION[type], id));
     invalidateCache(TYPE_COLLECTION[type]);
     logActivity('permanent_delete', `${TYPE_NAME[type]} permanently deleted (id: ${id})`);
-    alert('Permanently deleted.');
+    toast('Permanently deleted.', 'success');
     loadDeletedItems();
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── ACTIVITY LOG PAGE (Admin only) ──────────────────────────────
@@ -1271,7 +1561,7 @@ window.loadActivityLog = async () => {
     let n = 0;
     snap.forEach(d => { if (n < 300) { allActivity.push({ id: d.id, ...d.data() }); n++; } });
     renderActivityLog('');
-  } catch(e) { console.error(e); showLoadError('activity-tbody', 4, e); }
+  } catch(e) { reportError(e); showLoadError('activity-tbody', 4, e); }
 };
 
 window.renderActivityLog = (search='', keepPage=false) => {
@@ -1306,14 +1596,14 @@ window.changeTeamRole = async (uid, role) => {
   const warning = role === 'Admin'
     ? `⚠️ Ye "${t?.name||t?.email}" ko FULL ADMIN access de dega — sab kuch (team management, delete, sabhi data). Confirm karein?`
     : `"${t?.name||t?.email}" ka role "${role}" kar diya jaaye?`;
-  if (!confirm(warning)) { renderTeam(); return; } // reset dropdown visually
+  if (!(await confirmDialog(warning, { title: 'Change Role', danger: role === 'Admin', confirmText: 'Confirm' }))) { renderTeam(); return; } // reset dropdown visually
   try {
     const oldRole = t?.role || 'unknown';
     await updateDoc(doc(db,'users',uid), { role, updatedAt: serverTimestamp() });
     if (t) t.role = role;
     logActivity('role_change', `${t?.name||t?.email||uid}: ${oldRole} → ${role}`);
-    alert('Role updated!');
-  } catch(e) { alert('Error: ' + e.message); renderTeam(); }
+    toast('Role updated!', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); renderTeam(); }
 };
 
 // ── DASHBOARD (role-aware — only reads what the role is allowed to read) ──
@@ -1356,6 +1646,26 @@ window.loadDashboard = async () => {
     if (access.leads) {
       const openLeads = leads.filter(l => !l.deleted && !['Won','Lost'].includes(l.status));
       animateCount('dash-open-leads', openLeads.length);
+
+      const staleLeads = openLeads
+        .filter(l => ['New','Contacted','Site Visit'].includes(l.status))
+        .map(l => ({ ...l, days: daysSince(l.updatedAt || l.createdAt) }))
+        .filter(l => l.days >= 2)
+        .sort((a,b) => b.days - a.days)
+        .slice(0, 10);
+
+      animateCount('dash-stale-leads-count', staleLeads.length);
+      document.getElementById('dash-stale-leads-count').closest('.stat-card').classList.toggle('stat-alert', staleLeads.length > 0);
+      document.getElementById('dash-stale-leads-list').innerHTML = staleLeads.length === 0
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Sab leads follow-up mein up-to-date hain</div>'
+        : staleLeads.map((l,i) => {
+            const msg = `Namaste ${l.name}, R.R Teen Set Solution se. Aapki ${l.ptype||'requirement'} ke baare mein baat karni thi. Kripya bataiye kaise aage badhein. Dhanyawad!`;
+            return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
+              <div><strong>${esc(l.name)}</strong> — ${esc(l.status)} — ${esc(l.ptype||'—')}
+                <br><small style="color:#94a3b8">${l.days} din se koi update nahi</small></div>
+              <a href="${waLink(l.phone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+            </div>`;
+          }).join('');
     }
 
     if (access.quotations) {
@@ -1418,8 +1728,8 @@ window.loadDashboard = async () => {
           }).join('');
     }
   } catch(e) {
-    console.error('Dashboard load error:', e);
-    ['dash-followup-list','dash-overdue-list'].forEach(id => {
+    reportError('Dashboard load error:', e);
+    ['dash-followup-list','dash-overdue-list','dash-stale-leads-list'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Data load nahi ho paaya — page refresh karein.</div>';
     });
@@ -1427,10 +1737,11 @@ window.loadDashboard = async () => {
 };
 
 function showDashboardSkeleton(access) {
-  ['dash-open-leads','dash-pending-qt','dash-won-month','dash-outstanding','dash-conversion','dash-followup-count'].forEach(id => {
+  ['dash-open-leads','dash-pending-qt','dash-won-month','dash-outstanding','dash-conversion','dash-followup-count','dash-stale-leads-count'].forEach(id => {
     const el = document.getElementById(id);
     if (el && el.textContent === '—') el.innerHTML = '<span class="skel skel-num"></span>';
   });
+  if (access.leads)      document.getElementById('dash-stale-leads-list').innerHTML = skeletonRows(3);
   if (access.quotations) document.getElementById('dash-followup-list').innerHTML = skeletonRows(3);
   if (access.invoices)   document.getElementById('dash-overdue-list').innerHTML = skeletonRows(3);
 }
@@ -1486,11 +1797,30 @@ window.doForgotPassword = async () => {
 window.doLogout = () => signOut(auth);
 
 // ── NAV ─────────────────────────────────────────────────────────
+// ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
+const SECTION_TITLES = {
+  dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
+  leads:'Leads', customers:'Customers', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log'
+};
+window.toggleSidebar = () => {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+};
+window.closeSidebar = () => {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
 window.showSection = id => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-section="${id}"]`).classList.add('active');
+  const titleEl = document.getElementById('mobile-topbar-title');
+  if (titleEl) titleEl.textContent = SECTION_TITLES[id] || 'R.R Teen Set Solution';
+  closeSidebar(); // no-op on desktop widths, closes the drawer on mobile after navigating
   if (id === 'dashboard') loadDashboard();
   if (id === 'history')   loadQuotations();
   if (id === 'analytics') renderAnalytics();
@@ -1544,17 +1874,15 @@ async function getNextInvoiceNumber() {
 window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
   const rate  = parseFloat(document.getElementById('f-rate').value)  || 0;
-  const extra = Math.max(0, parseFloat(document.getElementById('f-extra').value) || 0);
-  const base   = Math.round(Math.max(0, area) * Math.max(0, rate));
-  const discount = Math.min(Math.max(0, parseFloat(document.getElementById('f-discount').value) || 0), base + extra);
-  const gstPct = parseFloat(document.getElementById('f-gst').value) || 0;
-  const subtotal = Math.round(base + extra - discount);
-  const gstAmt = Math.round(subtotal * gstPct / 100);
-  const grand  = subtotal + gstAmt;
-  document.getElementById('f-base').textContent       = '₹' + fmt(base);
-  document.getElementById('f-gst-amount').textContent = '₹' + fmt(gstAmt);
-  document.getElementById('f-gst-label').textContent  = '@ ' + gstPct + '%';
-  document.getElementById('f-total').textContent      = '₹' + fmt(grand);
+  const extra = document.getElementById('f-extra').value;
+  const discount = document.getElementById('f-discount').value;
+  const gstPct = document.getElementById('f-gst').value;
+  const base = Math.round(Math.max(0, area) * Math.max(0, rate));
+  const r = calcTotals({ base, extra, discount, gstPct });
+  document.getElementById('f-base').textContent       = '₹' + fmt(r.base);
+  document.getElementById('f-gst-amount').textContent = '₹' + fmt(r.gstAmt);
+  document.getElementById('f-gst-label').textContent  = '@ ' + r.gstPct + '%';
+  document.getElementById('f-total').textContent      = '₹' + fmt(r.total);
 };
 
 // ── SAVE ────────────────────────────────────────────────────────
@@ -1563,22 +1891,20 @@ window.saveQuotation = async isDraft => {
   const cname = g('f-cname').trim(), cphone = g('f-cphone').trim();
   const area  = parseFloat(g('f-area')) || 0;
   const rate  = parseFloat(g('f-rate')) || 0;
-  if (!cname || !cphone || !area || !rate) { alert('Name, phone, area aur rate required hai.'); return; }
-  if (area <= 0 || rate <= 0) { alert('Area aur rate 0 se zyada hone chahiye.'); return; }
+  if (!cname || !cphone || !area || !rate) { toast('Name, phone, area aur rate required hai.', 'warning'); return; }
+  if (area <= 0 || rate <= 0) { toast('Area aur rate 0 se zyada hone chahiye.', 'warning'); return; }
   // Phone validation — must be 10 digits
   const phoneDigits = cphone.replace(/\D/g,'');
-  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  if (phoneDigits.length !== 10) { toast('Phone number 10 digits ka hona chahiye.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('f-extra')) || 0);
   const base   = Math.round(area * rate);
-  let discount = Math.max(0, parseFloat(g('f-discount')) || 0);
-  if (discount > base + extra) {
-    alert(`Discount (₹${fmt(discount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`);
-    discount = base + extra;
-  }
+  const rawDiscount = Math.max(0, parseFloat(g('f-discount')) || 0);
   const gstPct = parseFloat(g('f-gst')) || 0;
-  const subtotal = Math.round(base + extra - discount);
-  const gstAmt = Math.round(subtotal * gstPct / 100);
-  const total  = subtotal + gstAmt;
+  const r = calcTotals({ base, extra, discount: rawDiscount, gstPct });
+  if (r.discountWasClamped) {
+    toast(`Discount (₹${fmt(rawDiscount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`, "warning");
+  }
+  const { discount, subtotal, gstAmt, total } = r;
   const data  = {
     qtId: g('f-qtid'), cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
     ptype: g('f-ptype'), area, rate, extra, discount,
@@ -1601,9 +1927,9 @@ window.saveQuotation = async isDraft => {
     }
     await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
     invalidateCache('quotations');
-    alert(isDraft ? 'Draft saved!' : 'Quotation saved!');
+    toast(isDraft ? 'Draft saved!' : 'Quotation saved!', 'success');
     resetForm(); showSection('history');
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetForm = () => {
@@ -1624,9 +1950,9 @@ window.resetForm = () => {
 window.saveLead = async () => {
   const g = id => document.getElementById(id).value;
   const name = g('ld-name').trim(), phone = g('ld-phone').trim();
-  if (!name || !phone) { alert('Name aur phone required hai.'); return; }
+  if (!name || !phone) { toast('Name aur phone required hai.', 'warning'); return; }
   const phoneDigits = phone.replace(/\D/g,'');
-  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  if (phoneDigits.length !== 10) { toast('Phone number 10 digits ka hona chahiye.', 'warning'); return; }
   const data = {
     name, phone: phoneDigits, email: g('ld-email'), addr: g('ld-addr'),
     ptype: g('ld-ptype'), source: g('ld-source'), notes: g('ld-notes'),
@@ -1639,10 +1965,10 @@ window.saveLead = async () => {
     } else {
       await addDoc(collection(db,'leads'), { ...data, status: 'New', createdAt: serverTimestamp() });
     }
-    alert('Lead saved!');
+    toast('Lead saved!', 'success');
     invalidateCache('leads');
     resetLeadForm(); loadLeads();
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetLeadForm = () => {
@@ -1656,7 +1982,7 @@ window.loadLeads = async () => {
   try {
     allLeads = await fetchCached('leads', 'leads');
     renderLeads('');
-  } catch(e) { console.error(e); showLoadError('leads-tbody', 6, e); }
+  } catch(e) { reportError(e); showLoadError('leads-tbody', 6, e); }
 };
 
 window.renderLeads = (search='', keepPage=false) => {
@@ -1667,22 +1993,30 @@ window.renderLeads = (search='', keepPage=false) => {
   if (statusFilter) list = list.filter(l => l.status === statusFilter);
   const { pageItems, page, totalPages, total } = paginateList(list, 'leads', keepPage);
   tbody.innerHTML = pageItems.length === 0
-    ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No leads found</td></tr>`
-    : pageItems.map(l=>`<tr>
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No leads found</td></tr>`
+    : pageItems.map(l=>{
+        const isOpen = !['Won','Lost'].includes(l.status);
+        const age = daysSince(l.updatedAt || l.createdAt);
+        const ageClass = isOpen && age >= 5 ? 'balance-due' : isOpen && age >= 2 ? '' : 'balance-clear';
+        const followUpBtn = isOpen ? `<a href="${waLink(l.phone, `Namaste ${l.name}, R.R Teen Set Solution se. Aapki ${l.ptype||'requirement'} ke baare mein baat karni thi. Kripya bataiye kaise aage badhein. Dhanyawad!`)}" target="_blank" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
+        return `<tr>
         <td><strong>${esc(l.name)}</strong></td>
         <td>${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
         <td>${esc(l.ptype||'—')}</td>
         <td>${esc(l.source||'—')}</td>
+        <td><span class="mono ${ageClass}">${age}d</span></td>
         <td>
           <select onchange="updateLeadStatus('${l.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
             ${['New','Contacted','Site Visit','Quoted','Won','Lost'].map(s=>`<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
         </td>
         <td class="action-btns">
+          ${followUpBtn}
           <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation">${ICONS.fileText}</button>
           <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
           <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
-        </td></tr>`).join('');
+        </td></tr>`;
+      }).join('');
   renderPaginationControls('leads-pagination', 'leads', page, totalPages, total);
 };
 
@@ -1706,7 +2040,7 @@ window.editLead = id => {
 };
 
 window.delLead = async id => {
-  if (!confirm('Delete this lead? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)')) return;
+  if (!(await confirmDialog('Delete this lead? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)', { title: 'Delete Lead', confirmText: 'Delete' }))) return;
   await updateDoc(doc(db,'leads',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('leads');
   loadLeads();
@@ -1724,7 +2058,7 @@ window.convertLeadToQuotation = async id => {
   try {
     await updateDoc(doc(db,'leads',id), { status: 'Quoted', updatedAt: serverTimestamp() });
     l.status = 'Quoted';
-  } catch(e) { console.error(e); }
+  } catch(e) { reportError(e); }
   showSection('create');
   window.scrollTo(0,0);
 };
@@ -1751,7 +2085,7 @@ async function upsertCustomer({ name, phone, email, addr }) {
         createdAt: serverTimestamp(), lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
       });
     }
-  } catch(e) { console.error('Customer upsert failed:', e); }
+  } catch(e) { reportError('Customer upsert failed:', e); }
   invalidateCache('customers');
 }
 
@@ -1769,7 +2103,7 @@ window.loadCustomers = async () => {
     ]);
     allCustomers = customers;
     renderCustomers('');
-  } catch(e) { console.error(e); showLoadError('customers-tbody', 6, e); }
+  } catch(e) { reportError(e); showLoadError('customers-tbody', 6, e); }
 };
 
 window.renderCustomers = (search='', keepPage=false) => {
@@ -1800,7 +2134,7 @@ window.loadQuotations = async () => {
   try {
     allQuotations = await fetchCached('quotations', 'quotations');
     renderHistory('');
-  } catch(e) { console.error(e); showLoadError('history-tbody', 7, e); }
+  } catch(e) { reportError(e); showLoadError('history-tbody', 7, e); }
 };
 
 window.renderHistory = (search='', keepPage=false) => {
@@ -1864,10 +2198,10 @@ window.updateDealStatus = async (id, dealStatus) => {
     await updateDoc(doc(db,'quotations',id), updates);
     Object.assign(q, updates);
     if (dealStatus === 'Won' && updates.invoiceGenerated) {
-      alert('Deal Won! 🎉 Invoice auto-generated — check Invoices & Payments tab.');
+      toast('Deal Won! 🎉 Invoice auto-generated — check Invoices & Payments tab.', 'success');
     }
     renderHistory(document.getElementById('search-input')?.value || '');
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.editQT = id => {
@@ -1885,7 +2219,7 @@ window.editQT = id => {
 };
 
 window.delQT = async id => {
-  if (!confirm('Delete this quotation? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)')) return;
+  if (!(await confirmDialog('Delete this quotation? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai)', { title: 'Delete Quotation', confirmText: 'Delete' }))) return;
   await updateDoc(doc(db,'quotations',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('quotations');
   loadQuotations();
@@ -2168,26 +2502,11 @@ ${buildQtHTML(q)}
 };
 window.closePreview = () => { document.getElementById('preview-modal').style.display='none'; };
 
-window.dlPDF = id => {
+window.dlPDF = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
-  const fullHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>${esc(q.qtId)}</title>
-<style>
-  @page { size: A4; margin: 0; }
-  @media print { body{margin:0} }
-  body{margin:0;padding:0;background:#ffffff;}
-</style>
-</head>
-<body onload="window.print()">
-${buildQtHTML(q)}
-</body>
-</html>`;
-  const blob = new Blob([fullHTML], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  toast('PDF taiyar ho raha hai...', 'warning', 2000);
+  const ok = await generateRealPDF(buildQtHTML(q), `Quotation_${q.qtId}.pdf`);
+  if (ok) toast('PDF downloaded!', 'success');
 };
 window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewId); };
 
@@ -2264,7 +2583,7 @@ window.populateQuotationDropdown = async () => {
   try {
     allQuotations = await fetchCached('quotations', 'quotations');
   } catch(e) {
-    console.error('Could not load quotations (likely no read access for this role):', e);
+    reportError('Could not load quotations (likely no read access for this role):', e);
     sel.innerHTML = '<option value="">— Not available for your role —</option>';
     return;
   }
@@ -2275,7 +2594,7 @@ window.populateQuotationDropdown = async () => {
 
 window.loadQuotationIntoInvoice = () => {
   const id = document.getElementById('inv-load-qt').value;
-  if (!id) { alert('Pehle ek quotation select karo.'); return; }
+  if (!id) { toast('Pehle ek quotation select karo.', 'warning'); return; }
   const q = allQuotations.find(x => x.id === id); if (!q) return;
   document.getElementById('i-qtref').value = q.qtId;
   document.getElementById('i-cname').value  = q.cname || '';
@@ -2294,17 +2613,15 @@ window.loadQuotationIntoInvoice = () => {
 
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculateInvoice = () => {
-  const base   = Math.max(0, parseFloat(document.getElementById('i-base').value)     || 0);
-  const extra  = Math.max(0, parseFloat(document.getElementById('i-extra').value)    || 0);
-  const discount = Math.min(Math.max(0, parseFloat(document.getElementById('i-discount').value) || 0), base + extra);
-  const gstPct = parseFloat(document.getElementById('i-gst').value)      || 0;
-  const subtotal = Math.round(base + extra - discount);
-  const gstAmt = Math.round(subtotal * gstPct / 100);
-  const grand  = subtotal + gstAmt;
-  document.getElementById('i-sub').textContent        = '₹' + fmt(subtotal);
-  document.getElementById('i-gst-amount').textContent = '₹' + fmt(gstAmt);
-  document.getElementById('i-gst-label').textContent   = '@ ' + gstPct + '%';
-  document.getElementById('i-total').textContent      = '₹' + fmt(grand);
+  const base   = document.getElementById('i-base').value;
+  const extra  = document.getElementById('i-extra').value;
+  const discount = document.getElementById('i-discount').value;
+  const gstPct = document.getElementById('i-gst').value;
+  const r = calcTotals({ base, extra, discount, gstPct });
+  document.getElementById('i-sub').textContent        = '₹' + fmt(r.subtotal);
+  document.getElementById('i-gst-amount').textContent = '₹' + fmt(r.gstAmt);
+  document.getElementById('i-gst-label').textContent   = '@ ' + r.gstPct + '%';
+  document.getElementById('i-total').textContent      = '₹' + fmt(r.total);
 };
 
 // ── SAVE INVOICE ────────────────────────────────────────────────
@@ -2312,20 +2629,18 @@ window.saveInvoice = async () => {
   const g = id => document.getElementById(id).value;
   const cname = g('i-cname').trim(), cphone = g('i-cphone').trim();
   const base  = Math.round(parseFloat(g('i-base')) || 0);
-  if (!cname || !cphone || !base) { alert('Name, phone aur base amount required hai.'); return; }
-  if (base <= 0) { alert('Base amount 0 se zyada hona chahiye.'); return; }
+  if (!cname || !cphone || !base) { toast('Name, phone aur base amount required hai.', 'warning'); return; }
+  if (base <= 0) { toast('Base amount 0 se zyada hona chahiye.', 'warning'); return; }
   const phoneDigits = cphone.replace(/\D/g,'');
-  if (phoneDigits.length !== 10) { alert('Phone number 10 digits ka hona chahiye.'); return; }
+  if (phoneDigits.length !== 10) { toast('Phone number 10 digits ka hona chahiye.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('i-extra')) || 0);
-  let discount = Math.max(0, parseFloat(g('i-discount')) || 0);
-  if (discount > base + extra) {
-    alert(`Discount (₹${fmt(discount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`);
-    discount = base + extra;
-  }
+  const rawDiscount = Math.max(0, parseFloat(g('i-discount')) || 0);
   const gstPct = parseFloat(g('i-gst')) || 0;
-  const subtotal = Math.round(base + extra - discount);
-  const gstAmt = Math.round(subtotal * gstPct / 100);
-  const total  = subtotal + gstAmt;
+  const r = calcTotals({ base, extra, discount: rawDiscount, gstPct });
+  if (r.discountWasClamped) {
+    toast(`Discount (₹${fmt(rawDiscount)}) base+extra amount (₹${fmt(base+extra)}) se zyada nahi ho sakta. Adjust kar diya gaya hai.`, "warning");
+  }
+  const { discount, subtotal, gstAmt, total } = r;
   const data = {
     qtRef: g('i-qtref'), date: g('i-date'), dueDate: g('i-duedate'),
     cname, cphone, cemail: g('i-cemail'), caddr: g('i-caddr'),
@@ -2343,10 +2658,10 @@ window.saveInvoice = async () => {
       data.invId = await getNextInvoiceNumber(); // assigned atomically, exactly once, right before save
       await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdAt: serverTimestamp() });
     }
-    alert(`Invoice saved! (${data.invId})`);
+    toast(`Invoice saved! (${data.invId})`, 'success');
     invalidateCache('invoices');
     resetInvoiceForm(); showSection('invoices');
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetInvoiceForm = () => {
@@ -2370,7 +2685,7 @@ window.loadInvoices = async () => {
   try {
     allInvoices = await fetchCached('invoices', 'invoices');
     renderInvoices('');
-  } catch(e) { console.error(e); showLoadError('invoices-tbody', 7, e); }
+  } catch(e) { reportError(e); showLoadError('invoices-tbody', 7, e); }
 };
 
 function invoiceStatusOf(inv) {
@@ -2443,7 +2758,7 @@ window.editInvoice = id => {
 };
 
 window.delInvoice = async id => {
-  if (!confirm('Delete this invoice? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai. Payment records saath rahenge.)')) return;
+  if (!(await confirmDialog('Delete this invoice? (Ye "deleted" mark ho jayega — permanently mit nahi jayega, Admin restore kar sakta hai. Payment records saath rahenge.)', { title: 'Delete Invoice', confirmText: 'Delete' }))) return;
   await updateDoc(doc(db,'invoices',id), { deleted: true, deletedAt: serverTimestamp() });
   invalidateCache('invoices');
   loadInvoices();
@@ -2469,7 +2784,7 @@ window.openPaymentModal = async id => {
     document.getElementById('pay-history').innerHTML = rows.length
       ? rows.map(p => `<div class="pay-history-row"><span>${p.date||''} · ${esc(p.mode||'')}</span><strong class="mono">₹${fmt(p.amount)}</strong></div>`).join('')
       : '<div style="font-size:12.5px;color:#94a3b8">No payments recorded yet.</div>';
-  } catch(e) { document.getElementById('pay-history').innerHTML = ''; console.error(e); }
+  } catch(e) { document.getElementById('pay-history').innerHTML = ''; reportError(e); }
 };
 
 window.closePaymentModal = () => {
@@ -2480,14 +2795,14 @@ window.closePaymentModal = () => {
 window.savePayment = async () => {
   if (!activePaymentInvoiceId) return;
   const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
-  if (amount <= 0) { alert('Valid payment amount daalo.'); return; }
+  if (amount <= 0) { toast('Valid payment amount daalo.', 'warning'); return; }
   const mode = document.getElementById('pay-mode').value;
   const date = document.getElementById('pay-date').value;
   const note = document.getElementById('pay-note').value;
   const inv = allInvoices.find(x=>x.id===activePaymentInvoiceId); if (!inv) return;
   const balance = Math.max(0, (inv.total||0) - (inv.amountPaid||0));
   if (amount > balance) {
-    alert(`Ye amount (₹${fmt(amount)}) invoice ki balance (₹${fmt(balance)}) se zyada hai. Kripya sahi amount daalein.`);
+    toast(`Ye amount (₹${fmt(amount)}) invoice ki balance (₹${fmt(balance)}) se zyada hai. Kripya sahi amount daalein.`, 'warning');
     return;
   }
   try {
@@ -2498,11 +2813,11 @@ window.savePayment = async () => {
     const newPaid = (inv.amountPaid || 0) + amount;
     const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= inv.total ? 'paid' : 'partial');
     await updateDoc(doc(db,'invoices',activePaymentInvoiceId), { amountPaid: newPaid, status: newStatus });
-    alert('Payment recorded!');
+    toast('Payment recorded!', 'success');
     invalidateCache('invoices');
     closePaymentModal();
     loadInvoices();
-  } catch(e) { alert('Error: ' + e.message); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── BUILD INVOICE HTML (for view / PDF) ────────────────────────
@@ -2620,13 +2935,11 @@ window.viewInvoice = id => {
   window.open(URL.createObjectURL(blob), '_blank');
 };
 
-window.dlInvoicePDF = id => {
+window.dlInvoicePDF = async id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
-  const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${esc(i.invId)}</title>
-<style>@page{size:A4;margin:0;} @media print{body{margin:0}} body{margin:0;padding:0;background:#fff;}</style>
-</head><body onload="window.print()">${buildInvHTML(i)}</body></html>`;
-  const blob = new Blob([fullHTML], { type: 'text/html' });
-  window.open(URL.createObjectURL(blob), '_blank');
+  toast('PDF taiyar ho raha hai...', 'warning', 2000);
+  const ok = await generateRealPDF(buildInvHTML(i), `Invoice_${i.invId}.pdf`);
+  if (ok) toast('PDF downloaded!', 'success');
 };
 
 window.shareInvoiceWhatsApp = id => {
