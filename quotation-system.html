@@ -18,7 +18,6 @@
      window.jspdf / window.html2canvas are ready before the module script runs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="calc.js"></script>
 <!-- Error monitoring (Sentry). Replace SENTRY_DSN below with your project's
      DSN from sentry.io (free tier is enough) — until then this loads but
      sends nothing, and the app works exactly as before either way. -->
@@ -447,6 +446,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
       <button class="nav-btn" data-section="create" onclick="showSection('create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg></span><span>New Quotation</span></button>
       <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg></span><span>History</span></button>
       <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg></span><span>Analytics</span></button>
+      <button class="nav-btn" data-section="employee-profile" onclick="showSection('employee-profile')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></span><span>My Profile</span></button>
       <div class="nav-section">CRM</div>
       <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
       <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
@@ -507,13 +507,6 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="page-sub">Fill in details to generate a professional quotation</div>
         </div>
         <form id="qt-form" onsubmit="return false;">
-          <div class="form-card" style="border-left:3px solid var(--orange)">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="2.5"/></svg> AI DRAFT <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--muted);letter-spacing:0">(beta — customer ka message ya job description paste karo, form auto-fill ho jayega)</span></div>
-            <textarea id="ai-draft-input" class="form-input" rows="3" style="resize:vertical;font-family:inherit" placeholder="e.g. Ramesh Sharma, 9876543210, Dwarka Delhi mein 2000 sq ft ka tin shed chahiye, quotation bhej do"></textarea>
-            <button type="button" class="btn-search" style="margin-top:10px" onclick="aiDraftQuotation()" id="ai-draft-btn">
-              <svg viewBox="0 0 24 24" class="ic" style="stroke:#fff"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="2.5"/></svg> Draft with AI
-            </button>
-          </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
@@ -597,13 +590,13 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="renderHistory(this.value)">
+            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="handleHistorySearch(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">From:</label>
-            <input type="date" id="filter-from" class="date-input" onchange="renderHistory(document.getElementById('search-input').value)">
+            <input type="date" id="filter-from" class="date-input" onchange="handleHistoryDateFilter()">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">To:</label>
-            <input type="date" id="filter-to" class="date-input" onchange="renderHistory(document.getElementById('search-input').value)">
+            <input type="date" id="filter-to" class="date-input" onchange="handleHistoryDateFilter()">
           </div>
           <button class="btn-export" onclick="exportHistoryCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
@@ -616,6 +609,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
               <tbody id="history-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
             <div id="history-pagination" class="pagination-wrap"></div>
+            <div id="history-loadmore"></div>
           </div>
         </div>
       </section>
@@ -689,9 +683,9 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="renderLeads(this.value)">
+            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="handleLeadsSearch(this.value)">
           </div>
-          <select id="lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderLeads(document.getElementById('lead-search-input').value)">
+          <select id="lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="handleLeadsSearch(document.getElementById('lead-search-input').value)">
             <option value="">All Status</option>
             <option>New</option><option>Contacted</option><option>Site Visit</option><option>Quoted</option><option>Won</option><option>Lost</option>
           </select>
@@ -704,6 +698,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
             <tbody id="leads-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
             <div id="leads-pagination" class="pagination-wrap"></div>
+            <div id="leads-loadmore"></div>
         </div>
       </section>
 
@@ -833,11 +828,11 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="renderInvoices(this.value)">
+            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="handleInvoicesSearch(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">Status:</label>
-            <select id="inv-filter-status" class="form-select" style="padding:9px 12px;font-size:13px" onchange="renderInvoices(document.getElementById('inv-search-input').value)">
+            <select id="inv-filter-status" class="form-select" style="padding:9px 12px;font-size:13px" onchange="handleInvoicesSearch(document.getElementById('inv-search-input').value)">
               <option value="">All</option>
               <option value="unpaid">Unpaid</option>
               <option value="partial">Partial</option>
@@ -855,6 +850,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
               <tbody id="invoices-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td><td></td></tr></tbody>
             </table>
             <div id="invoices-pagination" class="pagination-wrap"></div>
+            <div id="invoices-loadmore"></div>
           </div>
         </div>
       </section>
@@ -889,9 +885,24 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
         <div class="table-card">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
-            <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td></tr></tbody>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- EMPLOYEE PROFILE — shows own profile for everyone; Admin can also
+           view any team member's profile via "View Profile" button in Team -->
+      <section id="employee-profile" class="section">
+        <div class="page-header">
+          <div class="page-title" id="ep-page-title">My Profile</div>
+          <div class="page-sub" id="ep-page-sub">Aapki details, stats aur recent activity</div>
+        </div>
+        <div id="ep-back-link" style="display:none;margin-bottom:14px">
+          <button type="button" class="btn-search" onclick="showSection('team')">&larr; Back to Team</button>
+        </div>
+        <div id="ep-content">
+          <div class="form-card"><div class="skel skel-line" style="width:60%"></div><div class="skel skel-line" style="width:40%;margin-top:8px"></div></div>
         </div>
       </section>
 
@@ -1019,10 +1030,8 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, serverTimestamp, runTransaction }
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, serverTimestamp, runTransaction }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-import { getFunctions, httpsCallable }
-  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
@@ -1038,7 +1047,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-const functions = getFunctions(app); // used by AI-assisted quotation drafting
 
 // ── ERROR REPORTING (console + Sentry when configured) ─────────
 function reportError(...args) {
@@ -1167,8 +1175,10 @@ function downloadCSV(filename, csvContent) {
 const csvDate = () => new Date().toISOString().split('T')[0];
 const fbDate = ts => ts?.toDate ? ts.toDate().toLocaleDateString('en-IN') : '';
 
-window.exportHistoryCSV = () => {
-  const rows = allQuotations.filter(q => !q.deleted);
+window.exportHistoryCSV = async () => {
+  let rows;
+  try { rows = (await fetchCached('quotations', 'quotations')).filter(q => !q.deleted); }
+  catch(e) { reportError(e); toast('Export ke liye data load nahi ho paya: ' + e.message, 'error'); return; }
   if (!rows.length) { toast('Export karne ke liye koi quotation nahi hai.', 'warning'); return; }
   const csv = toCSV(rows, [
     ['Quotation ID','qtId'], ['Date','date'], ['Customer Name','cname'], ['Phone','cphone'],
@@ -1181,8 +1191,10 @@ window.exportHistoryCSV = () => {
   toast('Quotations CSV downloaded!', 'success');
 };
 
-window.exportLeadsCSV = () => {
-  const rows = allLeads.filter(l => !l.deleted);
+window.exportLeadsCSV = async () => {
+  let rows;
+  try { rows = (await fetchCached('leads', 'leads')).filter(l => !l.deleted); }
+  catch(e) { reportError(e); toast('Export ke liye data load nahi ho paya: ' + e.message, 'error'); return; }
   if (!rows.length) { toast('Export karne ke liye koi lead nahi hai.', 'warning'); return; }
   const csv = toCSV(rows, [
     ['Name','name'], ['Phone','phone'], ['Email','email'], ['Address/Area','addr'],
@@ -1205,8 +1217,10 @@ window.exportCustomersCSV = () => {
   toast('Customers CSV downloaded!', 'success');
 };
 
-window.exportInvoicesCSV = () => {
-  const rows = allInvoices.filter(i => !i.deleted);
+window.exportInvoicesCSV = async () => {
+  let rows;
+  try { rows = (await fetchCached('invoices', 'invoices')).filter(i => !i.deleted); }
+  catch(e) { reportError(e); toast('Export ke liye data load nahi ho paya: ' + e.message, 'error'); return; }
   if (!rows.length) { toast('Export karne ke liye koi invoice nahi hai.', 'warning'); return; }
   const csv = toCSV(rows, [
     ['Invoice ID','invId'], ['Quotation Ref','qtRef'], ['Date','date'], ['Due Date','dueDate'],
@@ -1265,9 +1279,9 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items','activity-log'],
-  Sales:    ['dashboard','create','history','leads','customers'],
-  Accounts: ['dashboard','invoice-create','invoices','customers','analytics']
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','team','deleted-items','activity-log','employee-profile'],
+  Sales:    ['dashboard','create','history','leads','customers','employee-profile'],
+  Accounts: ['dashboard','invoice-create','invoices','customers','analytics','employee-profile']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 const BRANCH = 'Delhi'; // single branch today — tagged on every new record so a 2nd branch later needs only a picker UI, not a data migration
@@ -1275,17 +1289,91 @@ const BRANCH = 'Delhi'; // single branch today — tagged on every new record so
 // ── PERFORMANCE: short-lived cache so switching tabs repeatedly doesn't
 // re-download the whole collection every single click. Any save/delete/
 // status-change invalidates the relevant key immediately so data is never stale.
-const _cache = { quotations:{data:null,ts:0}, leads:{data:null,ts:0}, invoices:{data:null,ts:0}, customers:{data:null,ts:0} };
+//
+// Two access patterns share this same cache:
+//  - fetchCached()    → ALWAYS returns the COMPLETE collection. Used by
+//                        Analytics, Dashboard, Team Performance, Deleted
+//                        Items, CSV export, and dropdowns — anywhere a
+//                        wrong/partial total would be a real business
+//                        problem (e.g. understated revenue).
+//  - fetchFirstPage() + fetchNextPage() → cursor-based paging (Firestore
+//                        limit()/startAfter()), used by the History/Leads/
+//                        Invoices TABLE views. Opening one of these tabs
+//                        only downloads the most recent FETCH_PAGE_SIZE records
+//                        instead of the entire collection — the "Load
+//                        Older Records" button pulls more on demand.
+// `complete` tracks whether the cached array is the full collection or
+// just a partial page, so fetchCached() knows whether it's safe to reuse
+// what's already in memory or whether it must go fetch everything.
+const FETCH_PAGE_SIZE = 100;
+const _cache = {
+  quotations:{data:null,ts:0,complete:false,lastDoc:null},
+  leads:{data:null,ts:0,complete:false,lastDoc:null},
+  invoices:{data:null,ts:0,complete:false,lastDoc:null},
+  customers:{data:null,ts:0,complete:false,lastDoc:null}
+};
 const CACHE_TTL = 45000; // 45s
+
 async function fetchCached(key, colName, orderField='createdAt') {
   const c = _cache[key];
-  if (c.data && (Date.now() - c.ts) < CACHE_TTL) return c.data;
+  if (c.data && c.complete && (Date.now() - c.ts) < CACHE_TTL) return c.data;
   const snap = await getDocs(query(collection(db,colName), orderBy(orderField,'desc')));
   const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-  c.data = list; c.ts = Date.now();
+  c.data = list; c.ts = Date.now(); c.complete = true;
+  c.lastDoc = snap.docs.length ? snap.docs[snap.docs.length-1] : null;
   return list;
 }
-function invalidateCache(key) { if (_cache[key]) _cache[key].ts = 0; }
+
+// First page only — cheap. Reuses whatever's already cached (partial or
+// complete) if it's still fresh, so switching tabs back and forth doesn't
+// re-download anything.
+async function fetchFirstPage(key, colName, orderField='createdAt') {
+  const c = _cache[key];
+  if (c.data && (Date.now() - c.ts) < CACHE_TTL) return { list: c.data, hasMore: !c.complete };
+  const snap = await getDocs(query(collection(db,colName), orderBy(orderField,'desc'), limit(FETCH_PAGE_SIZE)));
+  const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+  c.data = list; c.ts = Date.now(); c.complete = snap.size < FETCH_PAGE_SIZE;
+  c.lastDoc = snap.docs.length ? snap.docs[snap.docs.length-1] : null;
+  return { list, hasMore: !c.complete };
+}
+
+// Appends the next batch onto whatever's already loaded for this key.
+async function fetchNextPage(key, colName, orderField='createdAt') {
+  const c = _cache[key];
+  if (!c.lastDoc || c.complete) return { list: c.data||[], hasMore: false };
+  const snap = await getDocs(query(collection(db,colName), orderBy(orderField,'desc'), startAfter(c.lastDoc), limit(FETCH_PAGE_SIZE)));
+  const newItems = []; snap.forEach(d => newItems.push({ id: d.id, ...d.data() }));
+  c.data = [...(c.data||[]), ...newItems];
+  c.lastDoc = snap.docs.length ? snap.docs[snap.docs.length-1] : c.lastDoc;
+  c.complete = snap.size < FETCH_PAGE_SIZE;
+  c.ts = Date.now();
+  return { list: c.data, hasMore: !c.complete };
+}
+
+// Renders/refreshes a "Load Older Records" button under a table. Call
+// once after the first page loads, and again after each click (it
+// re-renders itself so the button disappears once everything's loaded).
+function renderLoadMoreButton(containerId, key, colName, onLoaded) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const c = _cache[key];
+  if (!c || c.complete) {
+    el.innerHTML = (c && c.data && c.data.length)
+      ? `<div style="text-align:center;font-size:12px;color:#64748b;padding:8px 0">Saare ${c.data.length} records load ho chuke hain.</div>` : '';
+    return;
+  }
+  el.innerHTML = `<div style="text-align:center;padding:6px 0">
+      <button type="button" class="btn-search" id="${containerId}-btn">Load Older Records (${c.data.length} loaded so far)</button>
+    </div>`;
+  document.getElementById(`${containerId}-btn`).onclick = async (ev) => {
+    ev.target.disabled = true; ev.target.textContent = 'Loading...';
+    try { await fetchNextPage(key, colName); onLoaded(); }
+    catch(err) { reportError(err); toast('Load karne mein error: ' + err.message, 'error'); }
+    finally { renderLoadMoreButton(containerId, key, colName, onLoaded); }
+  };
+}
+
+function invalidateCache(key) { if (_cache[key]) { _cache[key].ts = 0; _cache[key].complete = false; } }
 
 // ── ACTIVITY LOG (audit trail) ──────────────────────────────────
 // Fire-and-forget write for sensitive actions: role changes, permanent
@@ -1309,6 +1397,7 @@ async function logActivity(action, details) {
 }
 const ACTIVITY_LABEL = {
   role_change: 'Role Change',
+  role_unlocked: 'Role Unlocked',
   team_member_added: 'Team Member Added',
   permanent_delete: 'Permanent Delete',
   restore: 'Restore'
@@ -1458,7 +1547,7 @@ window.addTeamMember = async () => {
     // outside this app) could previously self-assign a 'Sales' role.
     await setDoc(doc(db, 'invited', email), { role, invitedAt: serverTimestamp(), invitedBy: auth.currentUser?.email || null });
     const uid = await createTeamMemberAuth(email, pass);
-    await setDoc(doc(db, 'users', uid), { name, email, role, createdAt: serverTimestamp() });
+    await setDoc(doc(db, 'users', uid), { name, email, role, roleLocked: true, createdAt: serverTimestamp() });
     logActivity('team_member_added', `${name} (${email}) added as ${role}`);
     toast(`Login ban gaya! ${email} ab "${role}" role se login kar sakte hain.`, 'success');
     document.getElementById('tm-name').value = '';
@@ -1469,6 +1558,113 @@ window.addTeamMember = async () => {
     if (e.code === 'auth/email-already-in-use') toast('Ye email pehle se registered hai.', 'error');
     else { reportError(e); toast('Error: ' + e.message, 'error'); }
   }
+};
+
+// ── EMPLOYEE PROFILE ────────────────────────────────────────────
+// isSelf=true → "My Profile" nav (every role). isSelf=false → Admin
+// clicked "View Profile" on someone else's row in Team.
+window.showEmployeeProfile = async (uid, isSelf=false) => {
+  if (!uid) return;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('employee-profile').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-section="employee-profile"]`)?.classList.add('active');
+  const titleEl = document.getElementById('mobile-topbar-title');
+  if (titleEl) titleEl.textContent = 'My Profile';
+
+  document.getElementById('ep-back-link').style.display = isSelf ? 'none' : '';
+  document.getElementById('ep-page-title').textContent = isSelf ? 'My Profile' : 'Employee Profile';
+  const content = document.getElementById('ep-content');
+  content.innerHTML = `<div class="form-card"><div class="skel skel-line" style="width:60%"></div><div class="skel skel-line" style="width:40%;margin-top:8px"></div></div>`;
+
+  let member;
+  try {
+    if (!isSelf) member = allTeam.find(t => t.id === uid) || null;
+    if (!member) {
+      const snap = await getDoc(doc(db, 'users', uid));
+      member = snap.exists() ? { id: uid, ...snap.data() } : null;
+    }
+  } catch(e) {
+    reportError(e);
+    content.innerHTML = `<div class="form-card">Profile load nahi ho paya: ${esc(e.message)}</div>`;
+    return;
+  }
+  if (!member) { content.innerHTML = `<div class="form-card">Profile nahi mila.</div>`; return; }
+
+  document.getElementById('ep-page-sub').textContent = isSelf
+    ? 'Aapki details, stats aur recent activity'
+    : `${member.name || member.email} ki details aur performance`;
+
+  // Stats need the COMPLETE quotations collection (not just whatever page
+  // History has loaded) for an accurate count/revenue — same reasoning as
+  // Analytics. Skipped entirely if this role has no read access to quotations.
+  let finals = [];
+  try {
+    if ((ROLE_READ_ACCESS[currentUserRole]||{}).quotations) {
+      const all = await fetchCached('quotations', 'quotations');
+      finals = all.filter(q => !q.isDraft && !q.deleted && q.createdBy === member.email);
+    }
+  } catch(e) { reportError(e); }
+
+  const won = finals.filter(q=>q.dealStatus==='Won');
+  const lost = finals.filter(q=>q.dealStatus==='Lost');
+  const revenue = won.reduce((s,q)=>s+(q.total||0),0);
+  const decided = won.length + lost.length;
+  const conv = decided > 0 ? Math.round((won.length/decided)*100) : 0;
+
+  // Activity Log is Admin-only per Firestore rules — this silently comes
+  // back empty for Sales/Accounts, which is fine, we just hide the note.
+  let recentActivity = [];
+  try {
+    if (currentUserRole === 'Admin') {
+      if (allActivity.length === 0) await loadActivityLog();
+      recentActivity = allActivity.filter(a => a.actorEmail === member.email).slice(0, 8);
+    }
+  } catch(e) { /* non-fatal — profile still renders without this section */ }
+
+  const joined = member.createdAt?.toDate ? member.createdAt.toDate().toLocaleDateString('en-IN') : '—';
+  const roleLockBadge = (member.email === ADMIN_EMAIL)
+    ? ''
+    : (member.roleLocked !== false
+        ? `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);padding:2px 7px;border-radius:2px;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" class="ic" style="width:10px;height:10px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Role Locked</span>`
+        : `<span style="font-size:11px;color:var(--muted)">Role Unlocked</span>`);
+
+  content.innerHTML = `
+    <div class="form-card">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0">${esc((member.name||member.email||'?').charAt(0).toUpperCase())}</div>
+        <div>
+          <div style="font-size:18px;font-weight:700">${esc(member.name || '—')}</div>
+          <div style="color:var(--muted);font-size:13px">${esc(member.email || '—')}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="badge-draft" style="background:var(--orange);color:#fff;border:none">${esc(member.role || '—')}</span>
+          ${roleLockBadge}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:18px;font-size:13px">
+        <div><div style="color:var(--muted)">Joined</div><div style="font-weight:600">${joined}</div></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-top:16px">
+      <div class="stat-card"><div class="stat-label">QUOTATIONS CREATED</div><div class="stat-value">${finals.length}</div></div>
+      <div class="stat-card"><div class="stat-label">WON</div><div class="stat-value green">${won.length}</div></div>
+      <div class="stat-card"><div class="stat-label">LOST</div><div class="stat-value">${lost.length}</div></div>
+      <div class="stat-card"><div class="stat-label">CONVERSION RATE</div><div class="stat-value">${conv}%</div></div>
+      <div class="stat-card"><div class="stat-label">REVENUE GENERATED (WON)</div><div class="stat-value orange">₹${fmt(revenue)}</div></div>
+    </div>
+
+    <div class="type-breakdown" style="margin-top:16px">
+      <div class="breakdown-title">Recent Activity${currentUserRole!=='Admin' ? ' (Admin only)' : ''}</div>
+      ${currentUserRole!=='Admin'
+        ? `<div style="color:#64748b;font-size:13px">Activity Log sirf Admin ke liye visible hai.</div>`
+        : recentActivity.length === 0
+          ? `<div style="color:#64748b;font-size:13px">Koi recent activity nahi mili.</div>`
+          : recentActivity.map(a => `<div class="type-row"><span>${esc(ACTIVITY_LABEL[a.action]||a.action)} — ${esc(a.details||'')}</span><span class="type-count">${a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('en-IN') : ''}</span></div>`).join('')
+      }
+    </div>
+  `;
 };
 
 window.loadTeam = async () => {
@@ -1483,17 +1679,53 @@ window.loadTeam = async () => {
 window.renderTeam = () => {
   const tbody = document.getElementById('team-tbody');
   tbody.innerHTML = allTeam.length === 0
-    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">No team members yet</td></tr>`
-    : allTeam.map(t => `<tr>
+    ? `<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">No team members yet</td></tr>`
+    : allTeam.map(t => {
+        const isPrimaryAdmin = t.email === ADMIN_EMAIL;
+        const isLocked = t.roleLocked !== false && !isPrimaryAdmin; // locked by default for every member except the fixed primary admin
+        const roleCell = isPrimaryAdmin
+          ? `<select class="form-select" style="padding:4px 8px;font-size:12px" disabled title="Primary admin role fixed"><option selected>Admin</option></select>`
+          : isLocked
+            ? `<span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:2px;font-size:12px;font-weight:600">
+                 <svg viewBox="0 0 24 24" class="ic" style="width:12px;height:12px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                 ${esc(t.role)}
+               </span>
+               <button type="button" class="btn-icon" title="Unlock role to change it" onclick="unlockRoleForChange('${t.id}')" style="margin-left:6px">
+                 <svg viewBox="0 0 24 24" class="ic" style="width:13px;height:13px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg> Unlock
+               </button>`
+            : `<select onchange="changeTeamRole('${t.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
+                 ${['Admin','Sales','Accounts'].map(r=>`<option ${t.role===r?'selected':''}>${r}</option>`).join('')}
+               </select>`;
+        return `<tr>
         <td><strong>${esc(t.name||'—')}</strong></td>
         <td>${esc(t.email||'—')}</td>
-        <td>
-          <select onchange="changeTeamRole('${t.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px" ${t.email===ADMIN_EMAIL?'disabled title="Primary admin role fixed"':''}>
-            ${['Admin','Sales','Accounts'].map(r=>`<option ${t.role===r?'selected':''}>${r}</option>`).join('')}
-          </select>
-        </td>
+        <td>${roleCell}</td>
         <td>${t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('en-IN') : '—'}</td>
-      </tr>`).join('');
+        <td><button type="button" class="btn-search" style="padding:5px 10px;font-size:12px" onclick="showEmployeeProfile('${t.id}')">View Profile</button></td>
+      </tr>`;
+      }).join('');
+};
+
+// Role locking: once a role is assigned (at creation, or right after a
+// deliberate change) it's locked — the dropdown is replaced with a
+// read-only badge so a role can't be casually changed by an accidental
+// click. To actually change it, an Admin must explicitly unlock it first
+// (with a reason, logged to the audit trail), which re-enables the
+// dropdown for exactly one change — it re-locks itself automatically
+// right after.
+window.unlockRoleForChange = async (uid) => {
+  const t = allTeam.find(x=>x.id===uid);
+  const reason = window.prompt(`"${t?.name||t?.email}" ka role unlock karne ki wajah likho (audit log mein save hogi):`);
+  if (reason === null) return; // cancelled
+  if (!reason.trim()) { toast('Reason likhna zaroori hai.', 'warning'); return; }
+  if (!(await confirmDialog(`Role change ke liye unlock karein "${t?.name||t?.email}"? Ye ek audit trail mein record hoga.`, { title: 'Unlock Role', confirmText: 'Unlock' }))) return;
+  try {
+    await updateDoc(doc(db,'users',uid), { roleLocked: false, updatedAt: serverTimestamp() });
+    if (t) t.roleLocked = false;
+    logActivity('role_unlocked', `${t?.name||t?.email||uid}: unlocked for role change — reason: ${reason.trim()}`);
+    toast('Role unlock ho gaya — ab dropdown se naya role select karo.', 'success');
+    renderTeam();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── DELETED ITEMS (Admin only — view, restore, or permanently remove) ──
@@ -1617,14 +1849,15 @@ window.changeTeamRole = async (uid, role) => {
   const t = allTeam.find(x=>x.id===uid);
   const warning = role === 'Admin'
     ? `⚠️ Ye "${t?.name||t?.email}" ko FULL ADMIN access de dega — sab kuch (team management, delete, sabhi data). Confirm karein?`
-    : `"${t?.name||t?.email}" ka role "${role}" kar diya jaaye?`;
+    : `"${t?.name||t?.email}" ka role "${role}" kar diya jaaye? Change hote hi role wapas lock ho jayega.`;
   if (!(await confirmDialog(warning, { title: 'Change Role', danger: role === 'Admin', confirmText: 'Confirm' }))) { renderTeam(); return; } // reset dropdown visually
   try {
     const oldRole = t?.role || 'unknown';
-    await updateDoc(doc(db,'users',uid), { role, updatedAt: serverTimestamp() });
-    if (t) t.role = role;
-    logActivity('role_change', `${t?.name||t?.email||uid}: ${oldRole} → ${role}`);
-    toast('Role updated!', 'success');
+    await updateDoc(doc(db,'users',uid), { role, roleLocked: true, updatedAt: serverTimestamp() });
+    if (t) { t.role = role; t.roleLocked = true; }
+    logActivity('role_change', `${t?.name||t?.email||uid}: ${oldRole} → ${role} (re-locked)`);
+    toast('Role updated aur wapas lock ho gaya!', 'success');
+    renderTeam();
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); renderTeam(); }
 };
 
@@ -1823,7 +2056,7 @@ window.doLogout = () => signOut(auth);
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
   leads:'Leads', customers:'Customers', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
-  team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log'
+  team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
 window.toggleSidebar = () => {
   document.querySelector('.sidebar').classList.toggle('open');
@@ -1853,6 +2086,7 @@ window.showSection = id => {
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
   if (id === 'activity-log') loadActivityLog();
+  if (id === 'employee-profile') showEmployeeProfile(auth.currentUser?.uid, true);
 };
 
 // ── HELPERS ─────────────────────────────────────────────────────
@@ -1891,44 +2125,6 @@ async function getNextInvoiceNumber() {
   });
   return `INV-${year}-${String(seq).padStart(4,'0')}`;
 }
-
-window.aiDraftQuotation = async () => {
-  const input = document.getElementById('ai-draft-input').value.trim();
-  if (!input) { toast('Pehle description likho ya paste karo.', 'warning'); return; }
-  const btn = document.getElementById('ai-draft-btn');
-  btn.disabled = true; btn.style.opacity = '0.6';
-  toast('AI se draft ban raha hai...', 'warning', 3000);
-  try {
-    const draftFn = httpsCallable(functions, 'aiDraftQuotation');
-    const result = await draftFn({ description: input });
-    const d = result.data || {};
-    if (d.cname)  document.getElementById('f-cname').value  = d.cname;
-    if (d.cphone) document.getElementById('f-cphone').value = d.cphone.replace(/\D/g,'');
-    if (d.cemail) document.getElementById('f-cemail').value = d.cemail;
-    if (d.caddr)  document.getElementById('f-caddr').value  = d.caddr;
-    if (d.ptype) {
-      const ptypeSelect = document.getElementById('f-ptype');
-      const isValid = Array.from(ptypeSelect.options).some(o => o.value === d.ptype);
-      if (isValid) ptypeSelect.value = d.ptype;
-    }
-    if (d.area) document.getElementById('f-area').value = d.area;
-    if (d.rate) document.getElementById('f-rate').value = d.rate;
-    if (d.notes) document.getElementById('f-notes').value = d.notes;
-    recalculate();
-    toast('Form AI se fill ho gaya — save karne se pehle values zaroor verify kar lo!', 'success', 5500);
-  } catch (e) {
-    reportError(e);
-    if (e.code === 'functions/not-found' || e.code === 'functions/internal' || e.code === 'functions/unavailable') {
-      toast('AI drafting abhi setup nahi hai — Cloud Function deploy karni hogi.', 'error', 6000);
-    } else if (e.code === 'functions/unauthenticated') {
-      toast('Session expire ho gaya — dobara login karo.', 'error');
-    } else {
-      toast('AI draft mein error: ' + e.message, 'error');
-    }
-  } finally {
-    btn.disabled = false; btn.style.opacity = '1';
-  }
-};
 
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculate = () => {
@@ -2038,10 +2234,24 @@ window.resetLeadForm = () => {
   editingLeadId = null;
 };
 
+window.handleLeadsSearch = async (value) => {
+  const statusFilterActive = document.getElementById('lead-filter-status')?.value;
+  if ((value || statusFilterActive) && !_cache.leads.complete) {
+    try { allLeads = await fetchCached('leads', 'leads'); }
+    catch(e) { reportError(e); toast('Poora data search ke liye load nahi ho paya: ' + e.message, 'error'); }
+  }
+  renderLeads(value);
+};
+
 window.loadLeads = async () => {
   try {
-    allLeads = await fetchCached('leads', 'leads');
+    const { list } = await fetchFirstPage('leads', 'leads');
+    allLeads = list;
     renderLeads('');
+    renderLoadMoreButton('leads-loadmore', 'leads', 'leads', () => {
+      allLeads = _cache.leads.data;
+      renderLeads(document.getElementById('lead-search-input')?.value || '', true);
+    });
   } catch(e) { reportError(e); showLoadError('leads-tbody', 6, e); }
 };
 
@@ -2190,10 +2400,37 @@ window.renderCustomers = (search='', keepPage=false) => {
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
+// Search should always cover EVERY record, not just the current page —
+// so typing a search term (unlike plain browsing) triggers a one-time full
+// fetch behind the scenes if we haven't already got everything cached.
+window.handleHistorySearch = async (value) => {
+  if (value && !_cache.quotations.complete) {
+    try { allQuotations = await fetchCached('quotations', 'quotations'); }
+    catch(e) { reportError(e); toast('Poora data search ke liye load nahi ho paya: ' + e.message, 'error'); }
+  }
+  renderHistory(value);
+};
+
+// Date-range filtering means "show me everything in this window" — that
+// has to run against the complete collection, not just whatever page
+// happens to be loaded, so this always forces a full fetch first.
+window.handleHistoryDateFilter = async () => {
+  if (!_cache.quotations.complete) {
+    try { allQuotations = await fetchCached('quotations', 'quotations'); }
+    catch(e) { reportError(e); toast('Poora data load nahi ho paya: ' + e.message, 'error'); }
+  }
+  renderHistory(document.getElementById('search-input')?.value || '');
+};
+
 window.loadQuotations = async () => {
   try {
-    allQuotations = await fetchCached('quotations', 'quotations');
+    const { list } = await fetchFirstPage('quotations', 'quotations');
+    allQuotations = list;
     renderHistory('');
+    renderLoadMoreButton('history-loadmore', 'quotations', 'quotations', () => {
+      allQuotations = _cache.quotations.data;
+      renderHistory(document.getElementById('search-input')?.value || '', true);
+    });
   } catch(e) { reportError(e); showLoadError('history-tbody', 7, e); }
 };
 
@@ -2615,7 +2852,9 @@ window.shareEmail = id => {
 };
 
 // ── ANALYTICS ───────────────────────────────────────────────────
-window.renderAnalytics = () => {
+window.renderAnalytics = async () => {
+  try { allQuotations = await fetchCached('quotations', 'quotations'); }
+  catch(e) { reportError(e); toast('Analytics data load nahi ho payi: ' + e.message, 'error'); return; }
   const finals  = allQuotations.filter(q=>!q.isDraft && !q.deleted);
   const drafts  = allQuotations.filter(q=>q.isDraft && !q.deleted);
   const revenue = finals.reduce((s,q)=>s+(q.total||0),0);
@@ -2785,10 +3024,24 @@ window.resetInvoiceForm = () => {
 };
 
 // ── LOAD & RENDER INVOICES ─────────────────────────────────────
+window.handleInvoicesSearch = async (value) => {
+  const statusFilterActive = document.getElementById('inv-filter-status')?.value;
+  if ((value || statusFilterActive) && !_cache.invoices.complete) {
+    try { allInvoices = await fetchCached('invoices', 'invoices'); }
+    catch(e) { reportError(e); toast('Poora data search ke liye load nahi ho paya: ' + e.message, 'error'); }
+  }
+  renderInvoices(value);
+};
+
 window.loadInvoices = async () => {
   try {
-    allInvoices = await fetchCached('invoices', 'invoices');
+    const { list } = await fetchFirstPage('invoices', 'invoices');
+    allInvoices = list;
     renderInvoices('');
+    renderLoadMoreButton('invoices-loadmore', 'invoices', 'invoices', () => {
+      allInvoices = _cache.invoices.data;
+      renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
+    });
   } catch(e) { reportError(e); showLoadError('invoices-tbody', 7, e); }
 };
 
