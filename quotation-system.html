@@ -1113,10 +1113,10 @@ let allQuotations = [];
 // actual downloadable .pdf file — no print dialog, no manual "Save as
 // PDF" step, consistent output across every browser/OS. Paginates
 // automatically if content ever runs past one A4 page.
-async function generateRealPDF(innerHTML, filename) {
+async function generateRealPDF(innerHTML, filename, mode='download') {
   if (!window.html2canvas || !window.jspdf) {
     toast('PDF library load nahi ho payi — internet connection check karke page refresh karein.', 'error');
-    return false;
+    return mode === 'blob' ? null : false;
   }
   const container = document.createElement('div');
   container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#ffffff';
@@ -1140,12 +1140,13 @@ async function generateRealPDF(innerHTML, filename) {
       pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
       heightLeft -= pageH;
     }
+    if (mode === 'blob') return pdf.output('blob');
     pdf.save(filename);
     return true;
   } catch (e) {
     reportError('PDF generation failed:', e);
     toast('PDF banane mein error aaya: ' + e.message, 'error');
-    return false;
+    return mode === 'blob' ? null : false;
   } finally {
     document.body.removeChild(container);
   }
@@ -1259,6 +1260,7 @@ const ICONS = {
   globe:    `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg>`,
   lock:     `<svg viewBox="0 0 24 24" class="ic"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>`,
   bell:     `<svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+  mail:     `<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
   alert:    `<svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`,
   plus:     `<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
   save:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg>`,
@@ -2126,6 +2128,25 @@ async function getNextInvoiceNumber() {
   return `INV-${year}-${String(seq).padStart(4,'0')}`;
 }
 
+// ── CALCULATE TOTALS ────────────────────────────────────────────
+// Shared by both the Quotation and Invoice forms — live preview
+// (recalculate/recalculateInvoice) and final save both call this.
+// Discount can never exceed base+extra; if it does, it's clamped down
+// and discountWasClamped is set so the caller can warn the user.
+function calcTotals({ base, extra, discount, gstPct }) {
+  base   = Math.max(0, Number(base)   || 0);
+  extra  = Math.max(0, Number(extra)  || 0);
+  gstPct = Math.max(0, Number(gstPct) || 0);
+  const rawDiscount = Math.max(0, Number(discount) || 0);
+  const maxDiscount = base + extra;
+  const discountWasClamped = rawDiscount > maxDiscount;
+  const clampedDiscount = Math.min(rawDiscount, maxDiscount);
+  const subtotal = base + extra - clampedDiscount;
+  const gstAmt = Math.round(subtotal * gstPct / 100);
+  const total = subtotal + gstAmt;
+  return { base, extra, discount: clampedDiscount, gstPct, subtotal, gstAmt, total, discountWasClamped };
+}
+
 // ── CALCULATE ───────────────────────────────────────────────────
 window.recalculate = () => {
   const area  = parseFloat(document.getElementById('f-area').value)  || 0;
@@ -2801,6 +2822,40 @@ ${buildQtHTML(q)}
 };
 window.closePreview = () => { document.getElementById('preview-modal').style.display='none'; };
 
+// ── SHARE WITH PDF ATTACHED (WhatsApp / Email, 1-click) ─────────
+// On phones (where navigator.share supports files — Chrome/Safari/
+// Edge mobile), this opens the native Share Sheet with the PDF already
+// attached and the message pre-filled — person just taps WhatsApp or
+// Gmail and hits send. Desktop browsers mostly can't share files this
+// way, so there it downloads the PDF and opens WhatsApp Web / the mail
+// app with the message ready — one extra manual "attach file" click,
+// but it always works.
+async function shareWithPDF({ innerHTML, filename, waPhone, waText, mailTo, mailSubject, mailBody, fallbackChannel }) {
+  toast('PDF taiyar ho raha hai...', 'warning', 2000);
+  const blob = await generateRealPDF(innerHTML, filename, 'blob');
+  if (!blob) return; // generateRealPDF already showed an error toast
+
+  if (navigator.canShare) {
+    try {
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename, text: waText || mailBody || '' });
+        return;
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return; // person closed the share sheet — not an error
+      // otherwise fall through to the download+deeplink fallback below
+    }
+  }
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('PDF download ho gaya — jo WhatsApp/Email khulega usme ise attach kar dena.', 'warning', 6000);
+  if (fallbackChannel === 'whatsapp') window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`, '_blank');
+  else window.open(`mailto:${encodeURIComponent(mailTo||'')}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`, '_blank');
+}
+
 window.dlPDF = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   toast('PDF taiyar ho raha hai...', 'warning', 2000);
@@ -2810,7 +2865,7 @@ window.dlPDF = async id => {
 window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewId); };
 
 // ── SHARE ───────────────────────────────────────────────────────
-window.shareWhatsApp = id => {
+window.shareWhatsApp = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   // Format phone — add 91 if 10 digit Indian number
   let phone = q.cphone.replace(/\D/g,'');
@@ -2818,13 +2873,13 @@ window.shareWhatsApp = id => {
   const dateObj   = q.date ? new Date(q.date+'T00:00:00') : new Date();
   const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
   const fmtD = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  const msg = encodeURIComponent(
+  const waText =
 `🏗️ *R.R Teen Set Solution*
 📋 *Quotation: ${q.qtId}*
 
 Namaste ${q.cname} Ji,
 
-Aapke *${q.ptype}* project ke liye hamara quotation:
+Aapke *${q.ptype}* project ke liye hamara quotation attached hai:
 
 ━━━━━━━━━━━━━━━━
 📐 Area      : ${(q.area||0).toLocaleString('en-IN')} sq.ft
@@ -2840,15 +2895,20 @@ Aapke *${q.ptype}* project ke liye hamara quotation:
 ✅ 8+ Years Experience | 500+ Projects
 
 📞 Call/WhatsApp: *+91 85272 58462*
-🌐 www.rrteensetsolution.com
-
-_Please download the PDF quotation from our system for complete details & terms._`
-  );
-  window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
+🌐 www.rrteensetsolution.com`;
+  await shareWithPDF({
+    innerHTML: buildQtHTML(q), filename: `Quotation_${q.qtId}.pdf`,
+    waPhone: phone, waText, fallbackChannel: 'whatsapp'
+  });
 };
-window.shareEmail = id => {
+window.shareEmail = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
-  window.open(`mailto:${encodeURIComponent(q.cemail||'')}?subject=${encodeURIComponent(`Quotation ${q.qtId} - R.R Teen Set Solution`)}&body=${encodeURIComponent(`Dear ${q.cname},\n\nQuotation ID: ${q.qtId}\nProject: ${q.ptype}\nArea: ${q.area} sq.ft\nTotal: ₹${fmt(q.total)}\nDate: ${q.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`)}`,'_blank');
+  const mailBody = `Dear ${q.cname},\n\nPlease find attached our quotation for your ${q.ptype} project.\n\nQuotation ID: ${q.qtId}\nProject: ${q.ptype}\nArea: ${q.area} sq.ft\nTotal: ₹${fmt(q.total)}\nDate: ${q.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`;
+  await shareWithPDF({
+    innerHTML: buildQtHTML(q), filename: `Quotation_${q.qtId}.pdf`,
+    mailTo: q.cemail || '', mailSubject: `Quotation ${q.qtId} - R.R Teen Set Solution`, mailBody,
+    fallbackChannel: 'email'
+  });
 };
 
 // ── ANALYTICS ───────────────────────────────────────────────────
@@ -3082,6 +3142,7 @@ window.renderInvoices = (search='', keepPage=false) => {
           <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
           <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
           <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
+          <button onclick="shareInvoiceEmail('${i.id}')" class="btn-icon" title="Share via Email">${ICONS.mail}</button>
           <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`;
       }).join('');
@@ -3299,7 +3360,7 @@ window.dlInvoicePDF = async id => {
   if (ok) toast('PDF downloaded!', 'success');
 };
 
-window.shareInvoiceWhatsApp = id => {
+window.shareInvoiceWhatsApp = async id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
   let phone = i.cphone.replace(/\D/g,'');
   if (phone.length === 10) phone = '91' + phone;
@@ -3307,13 +3368,13 @@ window.shareInvoiceWhatsApp = id => {
   const balance = Math.max(0, (i.total||0) - paid);
   const dateObj = i.date ? new Date(i.date+'T00:00:00') : new Date();
   const fmtD = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  const msg = encodeURIComponent(
+  const waText =
 `🧾 *R.R Teen Set Solution*
 📋 *Invoice: ${i.invId}*
 
 Namaste ${i.cname} Ji,
 
-Aapke *${i.ptype||'project'}* ka invoice:
+Aapke *${i.ptype||'project'}* ka invoice attached hai:
 
 ━━━━━━━━━━━━━━━━
 💰 *Total       : ₹${fmt(i.total)}*
@@ -3323,11 +3384,22 @@ Aapke *${i.ptype||'project'}* ka invoice:
 ━━━━━━━━━━━━━━━━
 
 📞 Call/WhatsApp: *+91 85272 58462*
-🌐 www.rrteensetsolution.com
-
-_Please download the PDF invoice from our system for complete details._`
-  );
-  window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
+🌐 www.rrteensetsolution.com`;
+  await shareWithPDF({
+    innerHTML: buildInvHTML(i), filename: `Invoice_${i.invId}.pdf`,
+    waPhone: phone, waText, fallbackChannel: 'whatsapp'
+  });
+};
+window.shareInvoiceEmail = async id => {
+  const i = allInvoices.find(x=>x.id===id); if (!i) return;
+  const paid = i.amountPaid || 0;
+  const balance = Math.max(0, (i.total||0) - paid);
+  const mailBody = `Dear ${i.cname},\n\nPlease find attached your invoice.\n\nInvoice ID: ${i.invId}\nTotal: ₹${fmt(i.total)}\nPaid: ₹${fmt(paid)}\nBalance Due: ₹${fmt(balance)}\nDate: ${i.date}\n\nContact: +91 85272 58462\n\nThank you,\nR.R Teen Set Solution`;
+  await shareWithPDF({
+    innerHTML: buildInvHTML(i), filename: `Invoice_${i.invId}.pdf`,
+    mailTo: i.cemail || '', mailSubject: `Invoice ${i.invId} - R.R Teen Set Solution`, mailBody,
+    fallbackChannel: 'email'
+  });
 };
 
 // ── INIT ─────────────────────────────────────────────────────────
