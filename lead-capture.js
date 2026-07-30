@@ -83,21 +83,22 @@ window.pushLeadToFirestore = async function(data) {
 const WHATSAPP_NUM = '918527258462';
 
 function ensureFeedbackEls(form) {
-  let success = form.querySelector('.enq-success');
-  let error   = form.querySelector('.enq-error');
+  const wrap = form.parentNode; // append outside <form> so hiding the form doesn't hide these too
+  let success = wrap.querySelector('.enq-success');
+  let error   = wrap.querySelector('.enq-error');
   if (!success) {
     success = document.createElement('div');
     success.className = 'enq-success';
     success.style.cssText = 'display:none;background:rgba(37,211,102,.12);border:1.5px solid rgba(37,211,102,.4);border-radius:12px;padding:20px 18px;margin-top:16px;text-align:center';
     success.innerHTML = '<div style="font-size:32px;margin-bottom:8px">✅</div><div style="color:#25D366;font-weight:700;font-size:16px;margin-bottom:4px">Enquiry Sent Successfully!</div><div style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.6">We have received it. Opening WhatsApp to confirm your details...</div>';
-    form.appendChild(success);
+    wrap.appendChild(success);
   }
   if (!error) {
     error = document.createElement('div');
     error.className = 'enq-error';
     error.style.cssText = 'display:none;background:rgba(244,67,54,.12);border:1.5px solid rgba(244,67,54,.4);border-radius:12px;padding:16px 18px;margin-top:16px;text-align:center';
     error.innerHTML = '<div style="color:#f44336;font-weight:700;font-size:14px;margin-bottom:4px">⚠️ Something went wrong</div><div style="color:rgba(255,255,255,.65);font-size:13px">Please contact us directly on WhatsApp:</div><a href="https://api.whatsapp.com/send?phone=' + WHATSAPP_NUM + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">💬 WhatsApp Now</a>';
-    form.appendChild(error);
+    wrap.appendChild(error);
   }
   return { success, error };
 }
@@ -127,8 +128,9 @@ window.handleEnquiry = async function(event) {
   const area = gv('area'), city = gv('city'), message = gv('message');
 
   if (!name) { showFieldError(form, 'name', 'Please enter your name'); return; }
-  const phoneDigits = phone.replace(/\D/g, '');
-  if (phoneDigits.length < 10) { showFieldError(form, 'phone', 'Enter valid 10-digit number'); return; }
+  let phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length > 10) phoneDigits = phoneDigits.slice(-10); // strip leading 91/0 country-code prefix
+  if (phoneDigits.length !== 10) { showFieldError(form, 'phone', 'Enter valid 10-digit number'); return; }
 
   const btn = form.querySelector('.submit-btn');
   const origTxt = btn ? btn.textContent : '';
