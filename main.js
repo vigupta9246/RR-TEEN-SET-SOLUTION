@@ -114,6 +114,16 @@ document.addEventListener('DOMContentLoaded',function(){
       if(!name){ showErr('name','Please enter your name'); return; }
       if(!phone||phone.replace(/\D/g,'').length<10){ showErr('phone','Enter valid 10-digit number'); return; }
 
+      // Push straight into the CRM's Leads tab (Firestore) — independent of
+      // Formspree/WhatsApp below, so it never blocks the customer-facing flow
+      // even if this fails (e.g. before Firestore rules are deployed).
+      if (typeof window.pushLeadToFirestore === 'function') {
+        window.pushLeadToFirestore({
+          name: name, phone: phone.replace(/\D/g,''), service: svc,
+          area: area, city: city, message: msg, pageSource: document.title
+        });
+      }
+
       // Button loading state
       var btn = document.getElementById('submit-btn');
       var origTxt = btn.textContent;
