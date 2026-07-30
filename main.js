@@ -117,9 +117,13 @@ document.addEventListener('DOMContentLoaded',function(){
       // Push straight into the CRM's Leads tab (Firestore) — independent of
       // Formspree/WhatsApp below, so it never blocks the customer-facing flow
       // even if this fails (e.g. before Firestore rules are deployed).
+      // Firestore rule requires EXACTLY 10 digits, so strip any leading
+      // country-code prefix (e.g. "+91 98765 43210" → "9876543210").
       if (typeof window.pushLeadToFirestore === 'function') {
+        var phoneDigitsAll = phone.replace(/\D/g,'');
+        var phone10 = phoneDigitsAll.length > 10 ? phoneDigitsAll.slice(-10) : phoneDigitsAll;
         window.pushLeadToFirestore({
-          name: name, phone: phone.replace(/\D/g,''), service: svc,
+          name: name, phone: phone10, service: svc,
           area: area, city: city, message: msg, pageSource: document.title
         });
       }
@@ -345,6 +349,3 @@ function scrollVideoSlider(sliderId, direction){
   var step = card ? card.offsetWidth + 16 : 236;
   el.scrollBy({ left: direction * step, behavior: 'smooth' });
 }
-
-
-
