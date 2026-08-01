@@ -644,7 +644,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
       <section id="tickets" class="section">
         <div class="page-header">
           <div class="page-title">Support Tickets</div>
-          <div class="page-sub">Customer complaints, queries &amp; status updates — customers can raise a ticket themselves via <a href="support.html" target="_blank" style="color:var(--orange)">support.html</a></div>
+          <div class="page-sub">Customer complaints, queries &amp; status updates — customers can raise a ticket themselves via <a href="support.html" target="_blank" rel="noopener noreferrer" style="color:var(--orange)">support.html</a></div>
         </div>
 
         <div class="form-card">
@@ -1959,7 +1959,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(l.name)}</strong> — ${esc(l.status)} — ${esc(l.ptype||'—')}
                 <br><small style="color:#94a3b8">${l.days} days with no update</small></div>
-              <a href="${waLink(l.phone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(l.phone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -1996,7 +1996,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                 <br><small style="color:#94a3b8">${q.days} days pending</small></div>
-              <a href="${waLink(q.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(q.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -2019,7 +2019,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${i.days} days overdue</small></div>
-              <a href="${waLink(i.cphone, msg)}" target="_blank" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(i.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -2358,7 +2358,7 @@ window.renderLeads = (search='', keepPage=false) => {
         const isOpen = !['Won','Lost'].includes(l.status);
         const age = daysSince(l.updatedAt || l.createdAt);
         const ageClass = isOpen && age >= 5 ? 'balance-due' : isOpen && age >= 2 ? '' : 'balance-clear';
-        const followUpBtn = isOpen ? `<a href="${waLink(l.phone, `Hello ${l.name}, this is R.R Teen Set Solution. We wanted to discuss your ${l.ptype||'requirement'}. Please let us know how you'd like to proceed. Thank you!`)}" target="_blank" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
+        const followUpBtn = isOpen ? `<a href="${waLink(l.phone, `Hello ${l.name}, this is R.R Teen Set Solution. We wanted to discuss your ${l.ptype||'requirement'}. Please let us know how you'd like to proceed. Thank you!`)}" target="_blank" rel="noopener noreferrer" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
         return `<tr>
         <td><strong>${esc(l.name)}</strong></td>
         <td>${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
