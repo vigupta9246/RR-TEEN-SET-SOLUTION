@@ -427,7 +427,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Quotation ID</label><input type="text" id="f-qtid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label">Quotation ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="f-qtid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label">Date</label><input type="date" id="f-date" class="form-input"></div>
               <input type="hidden" id="f-leadid" value="">
             </div>
@@ -895,6 +895,14 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <button class="btn-export" onclick="downloadFullBackup()" style="white-space:nowrap"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Download Full Backup</button>
         </div>
 
+        <div style="background:#fef2f2;border:1.5px solid #dc2626;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:14px;color:#991b1b">Renumber All Quotations (one-time)</div>
+            <div style="font-size:12.5px;color:#667077;margin-top:3px">Switches every quotation — old and new — to the sequential QT-&lt;FY&gt;-&lt;seq&gt; format. Take a backup above first. This does NOT touch invoice numbers.</div>
+          </div>
+          <button class="btn-export" onclick="migrateQuotationNumbers()" style="white-space:nowrap;border-color:#dc2626;color:#dc2626"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14.5 3.5M19.5 9A8 8 0 0 0 5 5.5"/></svg> Renumber Quotations</button>
+        </div>
+
         <div class="history-controls">
           <div class="search-box">
             <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItems(this.value)">
@@ -1052,7 +1060,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, getCountFromServer, serverTimestamp, runTransaction }
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, getCountFromServer, serverTimestamp, runTransaction, writeBatch }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -2220,39 +2228,86 @@ function numberToWordsIndian(num) {
   return parts.join(' ');
 }
 
-function genId() {
-  const now = Date.now();
-  const rand = Math.random().toString(36).slice(2,4).toUpperCase();
-  return `QT-${new Date().getFullYear()}-${String(now).slice(-6)}${rand}`;
+// Indian financial year: April 1 – March 31. Jan/Feb/Mar belong to the FY
+// that started the previous April (e.g. Feb 2027 is still "FY2026").
+function getFinancialYear(date = new Date()) {
+  const y = date.getFullYear();
+  return date.getMonth() >= 3 ? y : y - 1; // getMonth() is 0-indexed; 3 = April
 }
-// NOTE: invoices no longer use a random/timestamp ID — see
-// getNextInvoiceNumber() below for the GST-compliant sequential version.
-// CGST Rule 46 requires tax invoices to carry a consecutive serial
-// number. A random/timestamp-based ID (like genInvId above) does NOT
-// satisfy this. This uses a Firestore transaction on a single counter
-// doc (counters/invoices) so two invoices created at the same moment
-// by different users can never collide or skip — the counter resets
-// to 1 automatically at the start of each calendar year.
-// NOTE: only call this at the moment of actually SAVING a new invoice,
-// never just to preview a number on the form — previewing early can
-// cause a save to be abandoned and leave a "reserved" number unused,
-// which is fine for GST (gaps are allowed) but calling it twice for
-// the same invoice would waste a number, so call it exactly once.
-async function getNextInvoiceNumber() {
-  const year = new Date().getFullYear();
-  const counterRef = doc(db, 'counters', 'invoices');
-  const seq = await runTransaction(db, async (tx) => {
+
+// Sequential, non-resetting numbering for both Quotations and Invoices.
+// The running sequence NEVER resets at year-end — only the FY label in the
+// ID changes automatically once the date crosses into a new financial year.
+// A single Firestore transaction on counters/{quotations|invoices} means
+// two people saving at the same instant can never collide or skip a number.
+// NOTE: only call this at the moment of actually SAVING a new record, never
+// just to preview a number on the form — previewing early can leave a
+// "reserved" number unused if the save is abandoned. Gaps are harmless for
+// quotations; for GST invoices gaps are explicitly allowed under Rule 46 too
+// (only duplicates/out-of-order numbers are a compliance problem), but call
+// this exactly once per saved record regardless.
+async function getNextSeq(counterName) {
+  const counterRef = doc(db, 'counters', counterName);
+  return runTransaction(db, async (tx) => {
     const snap = await tx.get(counterRef);
-    let next = 1;
-    if (snap.exists()) {
-      const d = snap.data();
-      next = (d.year === year) ? (d.seq + 1) : 1;
-    }
-    tx.set(counterRef, { year, seq: next }, { merge: true });
+    const next = snap.exists() ? (snap.data().seq || 0) + 1 : 1;
+    tx.set(counterRef, { seq: next }, { merge: true });
     return next;
   });
-  return `INV-${year}-${String(seq).padStart(4,'0')}`;
 }
+
+async function getNextInvoiceNumber() {
+  const seq = await getNextSeq('invoices');
+  return `INV-${getFinancialYear()}-${String(seq).padStart(4,'0')}`;
+}
+
+async function getNextQuotationNumber() {
+  const seq = await getNextSeq('quotations');
+  return `QT-${getFinancialYear()}-${String(seq).padStart(2,'0')}`;
+}
+
+// ── ONE-TIME MIGRATION: renumber ALL existing quotations ─────────
+// Quotations aren't tax documents (unlike invoices), so relabeling old
+// ones carries no GST compliance risk — this is safe to run. It assigns
+// every quotation ever created (including deleted ones, so the sequence
+// stays a true, gapless record of everything that happened) a new
+// QT-<FY>-<seq> ID in the exact order they were originally created, then
+// points the live counter to continue from there so new quotations never
+// collide with a renumbered one. Admin-only, one-time use.
+window.migrateQuotationNumbers = async () => {
+  if (!(await confirmDialog(
+    'This renumbers EVERY existing quotation (including deleted ones) into the new QT-<FY>-<seq> format, in the order they were created. Any quotation ID already shared with a customer (WhatsApp/PDF/email) will change and won\'t match anymore. This cannot be undone. Continue?',
+    { title: 'Renumber All Quotations', danger: true, confirmText: 'Yes, Renumber Everything' }
+  ))) return;
+
+  toast('Renumbering quotations — this can take a moment...', 'info');
+  try {
+    const snap = await getDocs(query(collection(db,'quotations'), orderBy('createdAt','asc')));
+    const docs = [];
+    snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+
+    let seq = 0;
+    const BATCH_SIZE = 400; // stay safely under Firestore's 500-writes-per-batch limit
+    for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+      const chunk = docs.slice(i, i + BATCH_SIZE);
+      const batch = writeBatch(db);
+      chunk.forEach(d => {
+        seq++;
+        const createdDate = d.createdAt?.toDate ? d.createdAt.toDate() : new Date();
+        const newQtId = `QT-${getFinancialYear(createdDate)}-${String(seq).padStart(2,'0')}`;
+        batch.update(doc(db,'quotations',d.id), { qtId: newQtId });
+      });
+      await batch.commit();
+    }
+
+    // Point the live counter to continue right after the last renumbered one.
+    await setDoc(doc(db,'counters','quotations'), { seq }, { merge: true });
+
+    invalidateCache('quotations');
+    toast(`Renumbered ${seq} quotations successfully!`, 'success');
+    loadQuotations();
+  } catch(e) { reportError(e); toast('Renumbering failed: ' + e.message, 'error'); }
+};
 
 // ── CALCULATE TOTALS ────────────────────────────────────────────
 // Shared by both the Quotation and Invoice forms — live preview
@@ -2309,7 +2364,7 @@ window.saveQuotation = async isDraft => {
   }
   const { discount, subtotal, gstAmt, total } = r;
   const data  = {
-    qtId: g('f-qtid'), cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
+    cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
     ptype: g('f-ptype'), area, rate, extra, discount,
     gstPct, gstAmt,
     base, total,
@@ -2323,9 +2378,11 @@ window.saveQuotation = async isDraft => {
   }
   try {
     if (editingId) {
+      data.qtId = g('f-qtid'); // editing never renumbers — the ID stays fixed once issued
       await updateDoc(doc(db,'quotations',editingId), data);
       editingId = null;
     } else {
+      data.qtId = await getNextQuotationNumber(); // assigned atomically, exactly once, right before save
       await addDoc(collection(db,'quotations'), { ...data, createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
     }
     await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
@@ -2337,7 +2394,8 @@ window.saveQuotation = async isDraft => {
 
 window.resetForm = () => {
   document.getElementById('qt-form').reset();
-  document.getElementById('f-qtid').value = genId();
+  document.getElementById('f-qtid').value = '';
+  document.getElementById('f-qtid').placeholder = 'Auto-assigned on save (sequential)';
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('f-gst').value = '0';
   document.getElementById('f-terms').value = `1. VALIDITY: This quotation is valid for 30 days from the issue date. Rates are subject to revision thereafter due to material price fluctuation.\n2. PAYMENT TERMS: 50% advance payment required before commencement of work. 40% upon material delivery at site. Balance 10% on completion & handover.\n3. SCOPE OF WORK: Includes supply of IS-grade structural steel, fabrication, transportation to site, erection & installation as per agreed drawings. Civil/foundation work included unless stated otherwise.\n4. MATERIAL STANDARD: All structural steel conforming to IS:2062. GI sheets conforming to IS:277. Anti-corrosion primer applied before dispatch.\n5. TAXES: GST at applicable rate shall be charged extra. GST invoice will be provided (GSTIN: 07DJCPK0635M1Z5).\n6. VARIATIONS: Any addition or alteration in scope during execution will be charged on actual basis with prior written approval.\n7. FORCE MAJEURE: Company shall not be liable for delays caused by reasons beyond control including natural calamities, government orders, or material shortage.\n8. DISPUTE RESOLUTION: Any disputes shall be subject to jurisdiction of courts in New Delhi only.\n9. SITE CONDITIONS: Client to ensure clear access to site, power supply, and water availability during erection work.\n10. ACCEPTANCE: This quotation shall be considered accepted upon receipt of advance payment or written confirmation.`;
