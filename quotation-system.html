@@ -887,6 +887,14 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
           <div class="page-sub">Leads, quotations and invoices that have been deleted — restore or permanently remove them</div>
         </div>
 
+        <div style="background:#fff9f6;border:1.5px solid var(--orange);border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:14px;color:var(--navy)">Full Data Backup</div>
+            <div style="font-size:12.5px;color:#667077;margin-top:3px">Downloads everything — quotations, invoices, leads, customers, payments, team &amp; tickets — as one file. Keep it somewhere safe (Google Drive, etc).</div>
+          </div>
+          <button class="btn-export" onclick="downloadFullBackup()" style="white-space:nowrap"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Download Full Backup</button>
+        </div>
+
         <div class="history-controls">
           <div class="search-box">
             <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItems(this.value)">
@@ -1248,6 +1256,55 @@ window.exportInvoicesCSV = async () => {
   downloadCSV(`invoices_${csvDate()}.csv`, csv);
   toast('Invoices CSV downloaded!', 'success');
 };
+
+// Full snapshot of every collection — quotations, leads, invoices, customers,
+// tickets (via the existing fetchCached, which always does a complete
+// unfiltered fetch), plus payments/team/activity log fetched directly since
+// they don't have their own cache entry. Deleted items are included too
+// (fetchCached doesn't filter them out) so this is a true point-in-time copy,
+// not just what's currently visible in the app. Downloads as one JSON file —
+// keep it somewhere safe (Google Drive, a laptop folder, etc). Admin-only
+// page, so no extra role check needed here.
+window.downloadFullBackup = async () => {
+  toast('Preparing backup — this can take a moment...', 'info');
+  try {
+    const [quotations, leads, invoices, customers, tickets, paymentsSnap, usersSnap, activitySnap] = await Promise.all([
+      fetchCached('quotations', 'quotations'),
+      fetchCached('leads', 'leads'),
+      fetchCached('invoices', 'invoices'),
+      fetchCached('customers', 'customers'),
+      fetchCached('tickets', 'tickets'),
+      getDocs(collection(db, 'payments')),
+      getDocs(collection(db, 'users')),
+      getDocs(collection(db, 'activityLog'))
+    ]);
+    const toList = snap => { const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); return list; };
+
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      exportedBy: auth.currentUser?.email || 'unknown',
+      company: 'R.R Teen Set Solution',
+      quotations, leads, invoices, customers, tickets,
+      payments: toList(paymentsSnap),
+      team: toList(usersSnap),
+      activityLog: toList(activitySnap)
+    };
+
+    const counts = Object.fromEntries(['quotations','leads','invoices','customers','tickets','payments','team','activityLog'].map(k => [k, backup[k].length]));
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `RR-Backup-${csvDate()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+
+    toast(`Backup downloaded! (${Object.entries(counts).map(([k,v])=>`${v} ${k}`).join(', ')})`, 'success');
+  } catch(e) {
+    reportError(e);
+    toast('Backup failed: ' + e.message, 'error');
+  }
+};
+
 let editingId = null;
 let allInvoices = [];
 let editingInvoiceId = null;
@@ -2381,8 +2438,13 @@ window.renderLeads = (search='', keepPage=false) => {
 };
 
 window.updateLeadStatus = async (id, status) => {
-  await updateDoc(doc(db,'leads',id), { status, updatedAt: serverTimestamp() });
-  const l = allLeads.find(x=>x.id===id); if (l) l.status = status;
+  try {
+    await updateDoc(doc(db,'leads',id), { status, updatedAt: serverTimestamp() });
+    const l = allLeads.find(x=>x.id===id); if (l) l.status = status;
+  } catch(e) {
+    reportError(e); toast('Error: ' + e.message, 'error');
+    renderLeads(document.getElementById('lead-search-input')?.value || ''); // revert the dropdown to the real saved status
+  }
 };
 
 window.editLead = id => {
@@ -2401,9 +2463,11 @@ window.editLead = id => {
 
 window.delLead = async id => {
   if (!(await confirmDialog('Delete this lead? (It will be marked "deleted" — not permanently removed; an Admin can restore it)', { title: 'Delete Lead', confirmText: 'Delete' }))) return;
-  await updateDoc(doc(db,'leads',id), { deleted: true, deletedAt: serverTimestamp() });
-  invalidateCache('leads');
-  loadLeads();
+  try {
+    await updateDoc(doc(db,'leads',id), { deleted: true, deletedAt: serverTimestamp() });
+    invalidateCache('leads');
+    loadLeads();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.convertLeadToQuotation = async id => {
@@ -2424,8 +2488,9 @@ window.convertLeadToQuotation = async id => {
 };
 
 // ── CUSTOMERS (auto-built master record) ─────────────────────────
-async function upsertCustomer({ name, phone, email, addr }) {
+async function upsertCustomer({ name, phone, email, addr, kind = 'quotation' }) {
   if (!phone) return;
+  const countField = kind === 'invoice' ? 'totalInvoices' : 'totalQuotations';
   try {
     const snap = await getDocs(query(collection(db,'customers'), where('phone','==',phone)));
     if (!snap.empty) {
@@ -2435,13 +2500,14 @@ async function upsertCustomer({ name, phone, email, addr }) {
         name: name || existing.name,
         email: email || existing.email,
         addr: addr || existing.addr,
-        totalQuotations: (existing.totalQuotations||0) + 1,
+        [countField]: (existing[countField]||0) + 1,
         lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
       });
     } else {
       await addDoc(collection(db,'customers'), {
         name, phone, email: email||'', addr: addr||'',
-        totalQuotations: 1, totalInvoices: 0,
+        totalQuotations: kind === 'quotation' ? 1 : 0,
+        totalInvoices: kind === 'invoice' ? 1 : 0,
         createdAt: serverTimestamp(), lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
       });
     }
@@ -2759,7 +2825,7 @@ window.updateDealStatus = async (id, dealStatus) => {
       };
       await addDoc(collection(db,'invoices'), invData);
       updates.invoiceGenerated = true;
-      await upsertCustomer({ name: q.cname, phone: (q.cphone||'').replace(/\D/g,''), email: q.cemail, addr: q.caddr });
+      await upsertCustomer({ name: q.cname, phone: (q.cphone||'').replace(/\D/g,''), email: q.cemail, addr: q.caddr, kind: 'invoice' });
       invalidateCache('invoices');
     }
 
@@ -2792,9 +2858,11 @@ window.editQT = id => {
 
 window.delQT = async id => {
   if (!(await confirmDialog('Delete this quotation? (It will be marked "deleted" — not permanently removed; an Admin can restore it)', { title: 'Delete Quotation', confirmText: 'Delete' }))) return;
-  await updateDoc(doc(db,'quotations',id), { deleted: true, deletedAt: serverTimestamp() });
-  invalidateCache('quotations');
-  loadQuotations();
+  try {
+    await updateDoc(doc(db,'quotations',id), { deleted: true, deletedAt: serverTimestamp() });
+    invalidateCache('quotations');
+    loadQuotations();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── BUILD QUOTATION HTML ────────────────────────────────────────
@@ -3085,7 +3153,7 @@ window.downloadPreviewPDF = () => { if(window._previewId) dlPDF(window._previewI
 window.shareWhatsApp = async id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   // Format phone — add 91 if 10 digit Indian number
-  let phone = q.cphone.replace(/\D/g,'');
+  let phone = (q.cphone || '').replace(/\D/g,'');
   if (phone.length === 10) phone = '91' + phone;
   const dateObj   = q.date ? new Date(q.date+'T00:00:00') : new Date();
   const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
@@ -3277,6 +3345,11 @@ window.saveInvoice = async () => {
     } else {
       data.invId = await getNextInvoiceNumber(); // assigned atomically, exactly once, right before save
       await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
+      // NOTE: silently no-ops for the Accounts role today — the customers
+      // collection's write rule is Admin/Sales only, so an Accounts-created
+      // invoice won't bump the customer's totalInvoices count unless that
+      // Firestore rule is widened to include Accounts too.
+      await upsertCustomer({ name: cname, phone: phoneDigits, email: g('i-cemail'), addr: g('i-caddr'), kind: 'invoice' });
     }
     toast(`Invoice saved! (${data.invId})`, 'success');
     invalidateCache('invoices');
@@ -3394,9 +3467,11 @@ window.editInvoice = id => {
 
 window.delInvoice = async id => {
   if (!(await confirmDialog('Delete this invoice? (It will be marked "deleted" — not permanently removed; an Admin can restore it. Payment records will remain.)', { title: 'Delete Invoice', confirmText: 'Delete' }))) return;
-  await updateDoc(doc(db,'invoices',id), { deleted: true, deletedAt: serverTimestamp() });
-  invalidateCache('invoices');
-  loadInvoices();
+  try {
+    await updateDoc(doc(db,'invoices',id), { deleted: true, deletedAt: serverTimestamp() });
+    invalidateCache('invoices');
+    loadInvoices();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── PAYMENT MODAL ───────────────────────────────────────────────
@@ -3441,13 +3516,21 @@ window.savePayment = async () => {
     return;
   }
   try {
-    await addDoc(collection(db,'payments'), {
-      invoiceId: activePaymentInvoiceId, invId: inv.invId, amount, mode, date, note,
-      createdAt: serverTimestamp()
+    const invRef = doc(db,'invoices',activePaymentInvoiceId);
+    const payRef = doc(collection(db,'payments')); // pre-generate ID so it can be set() inside the transaction
+    await runTransaction(db, async (tx) => {
+      const invSnap = await tx.get(invRef);
+      if (!invSnap.exists()) throw new Error('Invoice no longer exists.');
+      const curPaid = invSnap.data().amountPaid || 0;
+      const total = invSnap.data().total || 0;
+      const newPaid = curPaid + amount;
+      const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= total ? 'paid' : 'partial');
+      tx.set(payRef, {
+        invoiceId: activePaymentInvoiceId, invId: inv.invId, amount, mode, date, note,
+        createdAt: serverTimestamp()
+      });
+      tx.update(invRef, { amountPaid: newPaid, status: newStatus });
     });
-    const newPaid = (inv.amountPaid || 0) + amount;
-    const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= inv.total ? 'paid' : 'partial');
-    await updateDoc(doc(db,'invoices',activePaymentInvoiceId), { amountPaid: newPaid, status: newStatus });
     toast('Payment recorded!', 'success');
     invalidateCache('invoices');
     closePaymentModal();
@@ -3636,7 +3719,7 @@ window.dlInvoicePDF = async id => {
 
 window.shareInvoiceWhatsApp = async id => {
   const i = allInvoices.find(x=>x.id===id); if (!i) return;
-  let phone = i.cphone.replace(/\D/g,'');
+  let phone = (i.cphone || '').replace(/\D/g,'');
   if (phone.length === 10) phone = '91' + phone;
   const paid = i.amountPaid || 0;
   const balance = Math.max(0, (i.total||0) - paid);
