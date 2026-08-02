@@ -1226,20 +1226,26 @@ async function generateRealPDF(innerHTML, filename, mode='download') {
   document.body.appendChild(container);
   try {
     await new Promise(r => setTimeout(r, 60)); // let fonts/images settle before capture
-    const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    // scale: 3.125 = exactly 300 DPI (the container is a 96-DPI-baseline A4
+    // page, 794px wide, and 300/96 = 3.125) — the standard professional
+    // print-quality target, hit precisely rather than approximated.
+    // PNG instead of JPEG: this template is flat-color text/tables, not a
+    // photo, so PNG's lossless compression keeps text/line edges crisp
+    // where JPEG's compression would blur them.
+    const canvas = await html2canvas(container, { scale: 3.125, useCORS: true, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
     const imgH = (canvas.height * pageW) / canvas.width;
     let heightLeft = imgH, position = 0;
-    pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+    pdf.addImage(imgData, 'PNG', 0, position, pageW, imgH, undefined, 'FAST');
     heightLeft -= pageH;
     while (heightLeft > 0) {
       position -= pageH;
       pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+      pdf.addImage(imgData, 'PNG', 0, position, pageW, imgH, undefined, 'FAST');
       heightLeft -= pageH;
     }
     if (mode === 'blob') return pdf.output('blob');
