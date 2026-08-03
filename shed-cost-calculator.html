@@ -403,7 +403,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .trust-strip{background:linear-gradient(135deg,#16264f 0%,#28407c 100%);padding:28px 5%;position:relative;overflow:hidden}
 .trust-strip::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,111,0,.14) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(255,111,0,.1) 0%,transparent 45%);pointer-events:none}
 .trust-grid{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;z-index:1}
-.trust-item{text-align:center;padding:6px 2px}
+.trust-item{text-align:center;padding:6px 2px;display:flex;flex-direction:column;align-items:center}
 .trust-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,6vw,30px);color:#ff8c00;letter-spacing:.5px;line-height:1;display:block;text-shadow:0 0 20px rgba(255,140,0,.3)}
 .trust-lbl{font-size:9.5px;color:rgba(255,255,255,.6);display:block;margin-top:5px;line-height:1.3;letter-spacing:.2px}
 
@@ -423,7 +423,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .compare-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cmp-card{background:#ffffff;border:1.5px solid rgba(10,22,40,.1);border-radius:14px;padding:14px 10px;text-align:center;position:relative;transition:all .3s}
 .cmp-card.cmp-win{border-color:#25D366;box-shadow:0 0 0 1px rgba(37,211,102,.25),0 8px 20px rgba(37,211,102,.15)}
-.cmp-card.cmp-win::before{content:'💰 Cheaper';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#25D366,#1fb955);color:#fff;font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
+.cmp-win-badge{display:none;position:absolute;top:-10px;left:50%;transform:translateX(-50%);align-items:center;gap:3px;background:linear-gradient(135deg,#25D366,#1fb955);color:#fff;font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
+.cmp-card.cmp-win .cmp-win-badge{display:inline-flex}
 .cmp-lbl{font-size:11px;font-weight:700;color:#0a1628;margin:2px 0 8px}
 .cmp-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff6f00;letter-spacing:.3px;line-height:1;display:block;margin-bottom:4px}
 .cmp-rate{font-size:10px;color:rgba(10,22,40,.45)}
@@ -476,9 +477,63 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 /* Confetti */
 .confetti-piece{position:fixed;top:-10px;width:8px;height:8px;pointer-events:none;z-index:200;border-radius:1px;animation:xconfetti linear forwards}
 @keyframes xconfetti{to{transform:translateY(105vh) rotate(540deg);opacity:.4}}
+
+/* ══════════════════════════════════════════
+   ICON SYSTEM — professional SVG line icons
+══════════════════════════════════════════ */
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.14em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon-solid{fill:currentColor;stroke:none}
+.calc-hero-badge .icon{width:13px;height:13px;margin-right:1px}
+.stype-icon{font-size:0!important}
+.stype-icon .icon{width:28px;height:28px;color:#16264f}
+.stype-card.active .stype-icon .icon{color:#ff6f00}
+.slider-label .icon{width:15px;height:15px;color:#ff6f00;margin-right:2px}
+.preview-title .icon{width:14px;height:14px;color:rgba(10,22,40,.55);margin-right:2px}
+.compare-toggle-btn .icon{width:16px;height:16px}
+.xbtn .icon{width:19px;height:19px}
+.trust-item .icon{width:20px;height:20px;color:#ff8c00;margin-bottom:4px}
+.testi-quote-mark .icon{width:34px;height:34px;color:rgba(255,111,0,.22)}
+.testi-stars .icon{width:13px;height:13px;color:#ff8c00}
+.lead-success-icon .icon{width:34px;height:34px;color:#25D366}
+.cta-disclaimer .icon{width:11px;height:11px;color:#ff8c00;vertical-align:-0.1em}
+.footer-contact .icon{width:14px;height:14px;color:#ff8c00}
+.fab-btn .icon{width:22px;height:22px}
+.theme-toggle .icon{width:16px;height:16px}
+.cmp-card .icon{width:14px;height:14px}
+.share-title .icon,.lead-title .icon{width:15px;height:15px;color:#ff6f00;margin-right:1px}
+.srb-lbl .icon{width:9px;height:9px;margin-right:1px}
 </style>
 </head>
 <body>
+<!-- ICON SPRITE — professional line icons, replaces emoji throughout this page -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+<defs>
+<symbol id="i-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="7" y1="6.5" x2="17" y2="6.5"/><circle cx="7.7" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="7.7" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="7.7" cy="18.6" r="1.1" fill="currentColor" stroke="none"/><rect x="10.6" y="17.5" width="7" height="2.2" rx="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-shed-tin" viewBox="0 0 24 24"><path d="M2.5 10 12 4l9.5 6"/><path d="M4 9.5V20h16V9.5"/><rect x="10" y="13" width="4" height="7"/><line x1="4" y1="20" x2="20" y2="20"/></symbol>
+<symbol id="i-shed-industrial" viewBox="0 0 24 24"><path d="M3 20V9l4-3 4 3V9l4-3 4 3v11"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="17" y1="9" x2="17" y2="4"/><line x1="15.4" y1="4.6" x2="17" y2="3" /><line x1="17" y1="3" x2="18.6" y2="4.6"/><rect x="6" y="14" width="3" height="6"/><rect x="14" y="14" width="3" height="6"/></symbol>
+<symbol id="i-shed-peb" viewBox="0 0 24 24"><path d="M3 20V8l9-5 9 5v12"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="12" y1="3" x2="12" y2="20"/><line x1="3" y1="8" x2="12" y2="14"/><line x1="21" y1="8" x2="12" y2="14"/></symbol>
+<symbol id="i-shed-warehouse" viewBox="0 0 24 24"><path d="M2.5 9.5 12 3.5l9.5 6V20h-19Z"/><rect x="6" y="12" width="5" height="8"/><rect x="13" y="12" width="5" height="8"/><line x1="8.5" y1="12" x2="8.5" y2="20"/><line x1="15.5" y1="12" x2="15.5" y2="20"/></symbol>
+<symbol id="i-ruler-h" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6" rx="1"/><line x1="6" y1="9" x2="6" y2="12"/><line x1="10" y1="9" x2="10" y2="12"/><line x1="14" y1="9" x2="14" y2="12"/><line x1="18" y1="9" x2="18" y2="12"/></symbol>
+<symbol id="i-ruler-v" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="20" rx="1"/><line x1="9" y1="6" x2="12" y2="6"/><line x1="9" y1="10" x2="12" y2="10"/><line x1="9" y1="14" x2="12" y2="14"/><line x1="9" y1="18" x2="12" y2="18"/></symbol>
+<symbol id="i-height" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M8 6 12 2l4 4"/><path d="M8 18l4 4 4-4"/></symbol>
+<symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7Z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></symbol>
+<symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6Z"/><path d="M15 2v5h5"/><line x1="9" y1="13" x2="16" y2="13"/><line x1="9" y1="16.5" x2="16" y2="16.5"/><line x1="9" y1="20" x2="13" y2="20"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3.5 6 12 13l8.5-7"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M9.5 14.5 14.5 9.5"/><path d="M8 16.5 5.5 19a3.5 3.5 0 0 1-5-5l3-3a3.5 3.5 0 0 1 5-.2"/><path d="M16 7.5 18.5 5a3.5 3.5 0 1 1 5 5l-3 3a3.5 3.5 0 0 1-5 .2"/></symbol>
+<symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 2.5a9.3 9.3 0 0 0-8 14l-1.2 4.5 4.6-1.2A9.3 9.3 0 1 0 12 2.5Z"/><path d="M8 8.3c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.5.2.6.7 1.9.7 2 .1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.2.7.2.4 1 1.6 2.1 2.5 1.4 1.2 2.1 1.3 2.4 1.1.3-.2.6-.6.9-1 .2-.3.5-.3.8-.2.3.1 2 1 2.3 1.1.3.1.5.2.6.4.1.2.1 1-.3 1.9-.4.9-2 1.7-2.7 1.7-.7 0-2.4-.1-4.9-2C7.7 15.4 6.6 12.9 6.5 12.7c-.1-.2-1-1.5-1-2.9 0-1.4.7-2 .9-2.3Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M4.5 3.5h3.6l1.4 4.7-2.3 1.6a13.6 13.6 0 0 0 6.5 6.5l1.6-2.3 4.7 1.4v3.6c0 1.1-.9 2-2 1.9C10.8 20 4 13.2 3.5 6c-.1-1.4 1-2.5 1-2.5Z"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5 10.3 15.3 16.5 9"/></symbol>
+<symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><circle cx="12" cy="16.8" r=".2" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5S5 14.8 5 9.8a7 7 0 1 1 14 0c0 5-7 11.7-7 11.7Z"/><circle cx="12" cy="9.5" r="2.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.6 2.2"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M2.5 9 12 3l9.5 6"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="4.5" y1="9" x2="4.5" y2="19"/><line x1="9" y1="9" x2="9" y2="19"/><line x1="15" y1="9" x2="15" y2="19"/><line x1="19.5" y1="9" x2="19.5" y2="19"/><line x1="2.5" y1="20.5" x2="21.5" y2="20.5"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="21" x2="18" y2="21"/><line x1="4" y1="7" x2="20" y2="7"/><path d="M4 7 1.5 12.5a2.7 2.7 0 0 0 5 0Z"/><path d="M20 7l-2.5 5.5a2.7 2.7 0 0 0 5 0Z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a2 2 0 0 1-.6 1.4l-8.6 8.6a2 2 0 0 1-2.8 0l-7.4-7.4a2 2 0 0 1 0-2.8L10.7 3a2 2 0 0 1 1.4-.6Z"/><circle cx="16.2" cy="7.8" r="1.6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5 15 9l7 1-5.2 4.9L18.2 22 12 18.3 5.8 22l1.4-7.1L2 10l7-1Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a7 7 0 0 0 10.2 10.2Z"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="4" y1="12" x2="19" y2="12"/><path d="M13.5 6.5 19 12l-5.5 5.5"/></symbol>
+</defs>
+</svg>
 
 <!-- NAV — same as main site -->
 <nav aria-label="Main Navigation">
@@ -493,7 +548,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <li><a href="blog.html">Blog</a></li>
     <li><a href="contact.html" class="nav-cta">Get Quote</a></li>
   </ul>
-  <button id="theme-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle Dark Mode">🌙</button>
+  <button id="theme-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle Dark Mode"><svg class="icon"><use href="#i-moon"></use></svg></button>
   <button class="hamburger" id="ham-btn" aria-label="Open Menu" aria-expanded="false" aria-controls="mob-menu">
     <span></span><span></span><span></span>
   </button>
@@ -507,7 +562,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <li><a href="projects.html">Projects</a></li>
     <li><a href="shed-cost-calculator.html" style="color:#ff6f00">Calculator</a></li>
     <li><a href="blog.html">Blog</a></li>
-    <li><a href="shed-cost-calculator.html">🧮 Calculator</a></li>
+    <li><a href="shed-cost-calculator.html"><svg class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
     <li><a href="contact.html">Contact</a></li>
   </ul>
 </div>
@@ -515,13 +570,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 <!-- HERO -->
 <section class="calc-page-hero">
   <div class="calc-hero-inner">
-    <div class="calc-hero-badge">🧮 Free Tool · No Signup Required</div>
+    <div class="calc-hero-badge"><svg class="icon"><use href="#i-calc"></use></svg> Free Tool · No Signup Required</div>
     <h1 class="calc-hero-h1">SHED COST<br><span>CALCULATOR</span></h1>
     <p class="calc-hero-sub">Apne shed ka estimated cost seconds mein jaanein. Dimensions enter karein, type chunein — instant estimate milegi. Delhi NCR ke liye bilkul accurate.</p>
     <div class="calc-hero-stats">
       <div class="calc-stat"><span class="calc-stat-num">500+</span><span class="calc-stat-lbl">Projects complete</span></div>
       <div class="calc-stat"><span class="calc-stat-num">8+</span><span class="calc-stat-lbl">Saal ka experience</span></div>
-      <div class="calc-stat"><span class="calc-stat-num">5.0⭐</span><span class="calc-stat-lbl">Google rating</span></div>
+      <div class="calc-stat"><span class="calc-stat-num">5.0 <svg class="icon icon-solid" style="width:.6em;height:.6em;color:#ff8c00"><use href="#i-star"></use></svg></span><span class="calc-stat-lbl">Google rating</span></div>
       <div class="calc-stat"><span class="calc-stat-num">FREE</span><span class="calc-stat-lbl">Site visit</span></div>
     </div>
   </div>
@@ -530,10 +585,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 <!-- TRUST STRIP — animated counters -->
 <section class="trust-strip">
   <div class="trust-grid" id="trust-grid">
-    <div class="trust-item"><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
-    <div class="trust-item"><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
-    <div class="trust-item"><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
-    <div class="trust-item"><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
+    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-tag"></use></svg><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
+    <div class="trust-item"><svg class="icon"><use href="#i-pin"></use></svg><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
+    <div class="trust-item"><svg class="icon"><use href="#i-clock"></use></svg><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
+    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-star"></use></svg><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
   </div>
 </section>
 
@@ -546,22 +601,22 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <div class="stype-grid" id="stype-grid">
     <div class="stype-card active" onclick="calcSelect('tin')">
       <span class="stype-badge">Popular</span>
-      <span class="stype-icon">🏗️</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-tin"></use></svg></span>
       <span class="stype-name">Tin Shed</span>
       <span class="stype-rate">₹150–220 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('industrial')">
-      <span class="stype-icon">🏭</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-industrial"></use></svg></span>
       <span class="stype-name">Industrial Shed</span>
       <span class="stype-rate">₹200–300 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('peb')">
-      <span class="stype-icon">🏢</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-peb"></use></svg></span>
       <span class="stype-name">PEB Structure</span>
       <span class="stype-rate">₹280–380 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('warehouse')">
-      <span class="stype-icon">📦</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-warehouse"></use></svg></span>
       <span class="stype-name">Prefab Warehouse</span>
       <span class="stype-rate">₹240–340 / sqft</span>
     </div>
@@ -569,7 +624,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   <!-- COMPARE 2 SHED TYPES -->
   <button class="compare-toggle-btn" id="cmp-toggle-btn" onclick="toggleCompare()">
-    <span>⚖️ Compare 2 shed types</span><span class="cmp-chev">▼</span>
+    <span><svg class="icon"><use href="#i-scale"></use></svg> Compare 2 shed types</span><span class="cmp-chev">▼</span>
   </button>
   <div class="compare-panel" id="compare-panel">
     <div class="compare-inner">
@@ -590,11 +645,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       </div>
       <div class="compare-cards">
         <div class="cmp-card" id="cmp-card-a">
+          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
           <p class="cmp-lbl" id="cmp-lbl-a">Tin Shed</p>
           <span class="cmp-price" id="cmp-price-a">₹0</span>
           <span class="cmp-rate" id="cmp-rate-a">₹0–0/sqft</span>
         </div>
         <div class="cmp-card" id="cmp-card-b">
+          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
           <p class="cmp-lbl" id="cmp-lbl-b">PEB Structure</p>
           <span class="cmp-price" id="cmp-price-b">₹0</span>
           <span class="cmp-rate" id="cmp-rate-b">₹0–0/sqft</span>
@@ -608,7 +665,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <p class="calc-step-label" data-num="2">Live 3D preview</p>
   <div class="preview-wrap">
     <div class="preview-top">
-      <span class="preview-title">📐 Real-time shed shape</span>
+      <span class="preview-title"><svg class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
       <span class="preview-dim" id="pdim">50 × 40 ft</span>
     </div>
     <svg id="pshed" viewBox="0 0 340 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
@@ -625,15 +682,15 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <p class="calc-step-label" data-num="3">Dimensions enter karein</p>
   <div style="margin-bottom:28px">
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📏 Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-h"></use></svg> Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
       <input type="range" class="calc-slider" id="sl-len" min="20" max="200" value="50" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📐 Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-v"></use></svg> Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
       <input type="range" class="calc-slider" id="sl-wid" min="20" max="150" value="40" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📊 Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-height"></use></svg> Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
       <input type="range" class="calc-slider" id="sl-ht" min="10" max="40" value="14" step="1" oninput="calcDraw();calcResult()">
     </div>
   </div>
@@ -665,21 +722,21 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 
   <!-- PDF DOWNLOAD CTA -->
-  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon">📄</span><span class="xbtn-label">PDF Quote Download Karein</span></button>
+  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
 
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
-    <p class="lead-title">📧 Detailed quote email/WhatsApp pe chahiye?</p>
+    <p class="lead-title"><svg class="icon"><use href="#i-mail"></use></svg> Detailed quote email/WhatsApp pe chahiye?</p>
     <p class="lead-sub">Apna naam aur number daalo — hum 2 ghante mein detailed quote bhejenge. Free!</p>
     <div id="lead-form-area">
       <div class="lead-fields">
         <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
         <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
       </div>
-      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon">📩</span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
+      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
     </div>
     <div class="lead-success" id="lead-success">
-      <div class="lead-success-icon">✅</div>
+      <div class="lead-success-icon"><svg class="icon"><use href="#i-check-circle"></use></svg></div>
       <p class="lead-success-msg">Request send ho gayi!</p>
       <p class="lead-success-sub">Hum <strong>2 ghante mein</strong> aapko WhatsApp/call karenge.</p>
     </div>
@@ -687,19 +744,19 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   <!-- SHARE TOOL -->
   <div class="share-wrap">
-    <p class="share-title">🔗 Is tool ko share karein</p>
+    <p class="share-title"><svg class="icon"><use href="#i-link"></use></svg> Is tool ko share karein</p>
     <p class="share-sub">Apne contacts ko bhi yeh free calculator share karein</p>
     <div class="share-btns">
-      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe share</span></button>
-      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon">🔗</span><span class="xbtn-label">Link copy karein</span></button>
+      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe share</span></button>
+      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon"><svg class="icon"><use href="#i-link"></use></svg></span><span class="xbtn-label">Link copy karein</span></button>
     </div>
-    <p class="copy-confirm" id="copy-confirm">✅ Link copied!</p>
+    <p class="copy-confirm" id="copy-confirm"><svg class="icon" style="width:11px;height:11px"><use href="#i-check-circle"></use></svg> Link copied!</p>
   </div>
 
   <!-- WHATSAPP + CALL CTA -->
-  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
-  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon">📞</span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
-  <p class="cta-disclaimer">⚠️ Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
+  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
+  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon"><svg class="icon"><use href="#i-phone"></use></svg></span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
+  <p class="cta-disclaimer"><svg class="icon"><use href="#i-warning"></use></svg> Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
 
 </div>
 </section>
@@ -734,25 +791,25 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       <div class="testi-track" id="testi-track">
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars">★★★★★</div>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">Calculator se turant estimate mil gaya, aur final quote bhi usi range mein aayi. Poora process transparent tha — GST invoice bhi time pe mil gayi.</p>
           <div class="testi-person"><div class="testi-avatar">RK</div><div><p class="testi-name">Rajesh Kumar</p><p class="testi-meta">Industrial Shed · Gurugram</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars">★★★★★</div>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">15 din mein tin shed complete ho gaya, jaisa promise kiya tha waisa hi. Team professional hai aur site visit bhi free mein turant kar diya.</p>
           <div class="testi-person"><div class="testi-avatar">SV</div><div><p class="testi-name">Sunita Verma</p><p class="testi-meta">Tin Shed · Noida</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars">★★★★★</div>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">PEB structure ke liye 3 companies se quote liya tha, R.R Teen Set Solution ka pricing sabse fair aur clear tha. Quality bhi top-notch hai.</p>
           <div class="testi-person"><div class="testi-avatar">AM</div><div><p class="testi-name">Anil Malik</p><p class="testi-meta">PEB Structure · Faridabad</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars">★★★★★</div>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">Warehouse ke liye bulk quotation chahiye thi, WhatsApp pe hi sab detail mil gayi. Highly recommended for genuine pricing.</p>
           <div class="testi-person"><div class="testi-avatar">PS</div><div><p class="testi-name">Priya Sharma</p><p class="testi-meta">Prefab Warehouse · Ghaziabad</p></div></div>
         </div>
@@ -813,7 +870,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <div class="footer-col"><h5>Pages</h5><ul>
       <li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li>
       <li><a href="services.html">All Services</a></li><li><a href="projects.html">Projects</a></li>
-      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html">🧮 Calculator</a></li>
+      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html"><svg class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
     <li><a href="contact.html">Contact</a></li>
     </ul></div>
     <div class="footer-col"><h5>Services</h5><ul>
@@ -824,11 +881,11 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     </ul></div>
     <div class="footer-col"><h5>Contact</h5>
       <div class="footer-contact">
-        <p><span>📍</span> New Delhi, India</p>
-        <p><span>📞</span> <a href="tel:+918527258462">+91 85272 58462</a></p>
-        <p><span>💬</span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
-        <p><span>🕒</span> Mon–Sat: 9AM–7PM</p>
-        <p><span>🏛️</span> GST: 07DJCPK0635M1Z5</p>
+        <p><span><svg class="icon"><use href="#i-pin"></use></svg></span> New Delhi, India</p>
+        <p><span><svg class="icon"><use href="#i-phone"></use></svg></span> <a href="tel:+918527258462">+91 85272 58462</a></p>
+        <p><span><svg class="icon"><use href="#i-whatsapp"></use></svg></span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
+        <p><span><svg class="icon"><use href="#i-clock"></use></svg></span> Mon–Sat: 9AM–7PM</p>
+        <p><span><svg class="icon"><use href="#i-bank"></use></svg></span> GST: 07DJCPK0635M1Z5</p>
       </div>
     </div>
   <div class="footer-col" style="grid-column:1/-1;border-top:1px solid rgba(239,226,186,.15);padding-top:20px;margin-top:4px">
@@ -872,8 +929,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
 <!-- FLOATING BUTTONS -->
 <div class="fab-wrap">
-  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us">📞</a>
-  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp">💬</a>
+  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us"><svg class="icon"><use href="#i-phone"></use></svg></a>
+  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp"><svg class="icon"><use href="#i-whatsapp"></use></svg></a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
