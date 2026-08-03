@@ -62,7 +62,8 @@
     "Prefab Warehouse Cost Calculator",
     "Live 3D Shed Preview",
     "Location-based pricing for Delhi NCR",
-    "Material and labour cost breakdown"
+    "Material and labour cost breakdown",
+    "Side-by-side Shed Type Comparison"
   ],
   "screenshot":"https://rrteensetsolution.com/images/project-000.jpg",
   "creator":{
@@ -383,6 +384,98 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .fab-wrap .fab-btn:hover{transform:scale(1.12) translateY(-3px)}
 .fab-wrap .fab-wa{animation:xfabglow 2.6s ease-in-out infinite}
 @keyframes xfabglow{0%,100%{box-shadow:0 4px 14px rgba(37,211,102,.35)}50%{box-shadow:0 4px 26px rgba(37,211,102,.7)}}
+
+/* ══════════════════════════════════════════
+   SCROLL-REVEAL — fade+rise on entry
+══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+.reveal-stagger.in-view>*{animation:xstagger .6s cubic-bezier(.22,1,.36,1) both}
+.reveal-stagger.in-view>*:nth-child(1){animation-delay:.05s}
+.reveal-stagger.in-view>*:nth-child(2){animation-delay:.12s}
+.reveal-stagger.in-view>*:nth-child(3){animation-delay:.19s}
+.reveal-stagger.in-view>*:nth-child(4){animation-delay:.26s}
+@keyframes xstagger{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════════════════
+   TRUST BADGES — animated counter strip
+══════════════════════════════════════════ */
+.trust-strip{background:linear-gradient(135deg,#16264f 0%,#28407c 100%);padding:28px 5%;position:relative;overflow:hidden}
+.trust-strip::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,111,0,.14) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(255,111,0,.1) 0%,transparent 45%);pointer-events:none}
+.trust-grid{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;z-index:1}
+.trust-item{text-align:center;padding:6px 2px}
+.trust-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,6vw,30px);color:#ff8c00;letter-spacing:.5px;line-height:1;display:block;text-shadow:0 0 20px rgba(255,140,0,.3)}
+.trust-lbl{font-size:9.5px;color:rgba(255,255,255,.6);display:block;margin-top:5px;line-height:1.3;letter-spacing:.2px}
+
+/* ══════════════════════════════════════════
+   COMPARE MODE
+══════════════════════════════════════════ */
+.compare-toggle-btn{width:100%;background:#ffffff;border:1.5px dashed rgba(255,111,0,.4);border-radius:14px;padding:13px 16px;font-size:12.5px;font-weight:700;color:#ff6f00;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;transition:all .25s}
+.compare-toggle-btn:hover{background:rgba(255,111,0,.06);border-style:solid;transform:translateY(-1px)}
+.compare-toggle-btn .cmp-chev{transition:transform .3s ease;font-size:10px}
+.compare-toggle-btn.is-open .cmp-chev{transform:rotate(180deg)}
+.compare-panel{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.22,1,.36,1),opacity .35s ease,margin .45s ease;opacity:0;margin-bottom:0}
+.compare-panel.is-open{max-height:900px;opacity:1;margin-bottom:28px}
+.compare-inner{background:linear-gradient(160deg,#f7f3e8 0%,#efe2ba 100%);border:1px solid rgba(255,111,0,.25);border-radius:18px;padding:18px;box-shadow:0 4px 20px rgba(10,22,40,.08)}
+.compare-sel-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:16px}
+.compare-sel-row select{width:100%;background:#ffffff!important;border:1.5px solid rgba(10,22,40,.15)!important;color:#0a1628!important;border-radius:11px!important;padding:11px 10px!important;font-size:12px!important;font-weight:600}
+.compare-vs{font-family:'Bebas Neue',sans-serif;color:#ff6f00;font-size:15px;letter-spacing:1px}
+.compare-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp-card{background:#ffffff;border:1.5px solid rgba(10,22,40,.1);border-radius:14px;padding:14px 10px;text-align:center;position:relative;transition:all .3s}
+.cmp-card.cmp-win{border-color:#25D366;box-shadow:0 0 0 1px rgba(37,211,102,.25),0 8px 20px rgba(37,211,102,.15)}
+.cmp-card.cmp-win::before{content:'💰 Cheaper';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#25D366,#1fb955);color:#fff;font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
+.cmp-lbl{font-size:11px;font-weight:700;color:#0a1628;margin:2px 0 8px}
+.cmp-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff6f00;letter-spacing:.3px;line-height:1;display:block;margin-bottom:4px}
+.cmp-rate{font-size:10px;color:rgba(10,22,40,.45)}
+.compare-diff{text-align:center;margin-top:12px;font-size:11.5px;color:rgba(10,22,40,.6);background:rgba(255,255,255,.6);border-radius:10px;padding:9px}
+.compare-diff strong{color:#ff6f00}
+
+/* ══════════════════════════════════════════
+   TESTIMONIALS CAROUSEL
+══════════════════════════════════════════ */
+.testi-section{background:#f7f3e8;padding:52px 5%}
+.testi-wrap{max-width:560px;margin:0 auto}
+.testi-track-wrap{position:relative;overflow:hidden;border-radius:18px}
+.testi-track{display:flex;transition:transform .5s cubic-bezier(.65,0,.35,1)}
+.testi-card{flex:0 0 100%;background:#ffffff;border:1px solid rgba(10,22,40,.08);border-radius:18px;padding:26px 24px;box-sizing:border-box;box-shadow:0 4px 20px rgba(10,22,40,.06);position:relative}
+.testi-quote-mark{font-family:'Bebas Neue',sans-serif;font-size:52px;color:rgba(255,111,0,.18);line-height:.5;position:absolute;top:20px;right:22px}
+.testi-stars{color:#ff8c00;font-size:14px;letter-spacing:2px;margin-bottom:10px}
+.testi-text{font-size:13.5px;color:rgba(10,22,40,.75);line-height:1.8;margin:0 0 16px;min-height:76px}
+.testi-person{display:flex;align-items:center;gap:10px}
+.testi-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,111,0,.3)}
+.testi-name{font-size:12.5px;font-weight:700;color:#0a1628;margin:0}
+.testi-meta{font-size:10.5px;color:rgba(10,22,40,.45);margin:0}
+.testi-dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+.testi-dot{width:7px;height:7px;border-radius:50%;background:rgba(10,22,40,.18);cursor:pointer;transition:all .3s;border:none;padding:0}
+.testi-dot.active{background:#ff6f00;width:20px;border-radius:4px}
+
+/* ══════════════════════════════════════════
+   STICKY MOBILE RESULT BAR
+══════════════════════════════════════════ */
+.sticky-result-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:linear-gradient(135deg,#16264f 0%,#1c3266 100%);border-top:1px solid rgba(255,111,0,.35);box-shadow:0 -8px 28px rgba(0,0,0,.28);padding:11px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(10px)}
+.sticky-result-bar.visible{transform:translateY(0)}
+.srb-info{display:flex;flex-direction:column;line-height:1.25}
+.srb-lbl{font-size:9px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px}
+.srb-price{font-family:'Bebas Neue',sans-serif;font-size:19px;color:#ff8c00;letter-spacing:.3px}
+.srb-cta{background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:11px;padding:11px 18px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(255,111,0,.4);transition:transform .25s}
+.srb-cta:active{transform:scale(.94)}
+@media(min-width:768px){.sticky-result-bar{display:none!important}}
+@media(max-width:767px){.sticky-result-bar{display:flex}.fab-wrap{bottom:82px!important}}
+
+/* ══════════════════════════════════════════
+   MICRO-INTERACTIONS — card tilt, glow, count-up
+══════════════════════════════════════════ */
+.stype-card,.cmp-card{will-change:transform}
+.result-price.is-updating{animation:xpricepop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes xpricepop{0%{transform:scale(1)}45%{transform:scale(1.06)}100%{transform:scale(1)}}
+.rb-val.is-updating{animation:xflash .5s ease}
+@keyframes xflash{0%{color:#ff8c00}100%{color:#fff}}
+.preview-wrap{transition:box-shadow .3s ease}
+.preview-wrap:hover{box-shadow:0 8px 30px rgba(255,111,0,.18),inset 0 1px 0 rgba(255,255,255,.5)}
+
+/* Confetti */
+.confetti-piece{position:fixed;top:-10px;width:8px;height:8px;pointer-events:none;z-index:200;border-radius:1px;animation:xconfetti linear forwards}
+@keyframes xconfetti{to{transform:translateY(105vh) rotate(540deg);opacity:.4}}
 </style>
 </head>
 <body>
@@ -434,6 +527,16 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 </section>
 
+<!-- TRUST STRIP — animated counters -->
+<section class="trust-strip">
+  <div class="trust-grid" id="trust-grid">
+    <div class="trust-item"><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
+    <div class="trust-item"><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
+    <div class="trust-item"><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
+    <div class="trust-item"><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
+  </div>
+</section>
+
 <!-- CALCULATOR MAIN -->
 <section style="padding:40px 5% 0;background:#ffffff">
 <div class="calc-main">
@@ -461,6 +564,43 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       <span class="stype-icon">📦</span>
       <span class="stype-name">Prefab Warehouse</span>
       <span class="stype-rate">₹240–340 / sqft</span>
+    </div>
+  </div>
+
+  <!-- COMPARE 2 SHED TYPES -->
+  <button class="compare-toggle-btn" id="cmp-toggle-btn" onclick="toggleCompare()">
+    <span>⚖️ Compare 2 shed types</span><span class="cmp-chev">▼</span>
+  </button>
+  <div class="compare-panel" id="compare-panel">
+    <div class="compare-inner">
+      <div class="compare-sel-row">
+        <select id="cmp-type-a" onchange="calcCompare()">
+          <option value="tin">Tin Shed</option>
+          <option value="industrial">Industrial Shed</option>
+          <option value="peb">PEB Structure</option>
+          <option value="warehouse">Prefab Warehouse</option>
+        </select>
+        <span class="compare-vs">VS</span>
+        <select id="cmp-type-b" onchange="calcCompare()">
+          <option value="tin">Tin Shed</option>
+          <option value="industrial">Industrial Shed</option>
+          <option value="peb" selected>PEB Structure</option>
+          <option value="warehouse">Prefab Warehouse</option>
+        </select>
+      </div>
+      <div class="compare-cards">
+        <div class="cmp-card" id="cmp-card-a">
+          <p class="cmp-lbl" id="cmp-lbl-a">Tin Shed</p>
+          <span class="cmp-price" id="cmp-price-a">₹0</span>
+          <span class="cmp-rate" id="cmp-rate-a">₹0–0/sqft</span>
+        </div>
+        <div class="cmp-card" id="cmp-card-b">
+          <p class="cmp-lbl" id="cmp-lbl-b">PEB Structure</p>
+          <span class="cmp-price" id="cmp-price-b">₹0</span>
+          <span class="cmp-rate" id="cmp-rate-b">₹0–0/sqft</span>
+        </div>
+      </div>
+      <p class="compare-diff" id="compare-diff">Same size ke liye difference calculate ho raha hai...</p>
     </div>
   </div>
 
@@ -585,6 +725,43 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 </section>
 
+<!-- TESTIMONIALS CAROUSEL -->
+<section class="testi-section">
+  <div class="testi-wrap">
+    <div class="tag" style="margin-bottom:12px">Client Reviews</div>
+    <h2 class="section-title" style="margin-bottom:28px">Kya kehte hain <span>hamare clients</span></h2>
+    <div class="testi-track-wrap">
+      <div class="testi-track" id="testi-track">
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">Calculator se turant estimate mil gaya, aur final quote bhi usi range mein aayi. Poora process transparent tha — GST invoice bhi time pe mil gayi.</p>
+          <div class="testi-person"><div class="testi-avatar">RK</div><div><p class="testi-name">Rajesh Kumar</p><p class="testi-meta">Industrial Shed · Gurugram</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">15 din mein tin shed complete ho gaya, jaisa promise kiya tha waisa hi. Team professional hai aur site visit bhi free mein turant kar diya.</p>
+          <div class="testi-person"><div class="testi-avatar">SV</div><div><p class="testi-name">Sunita Verma</p><p class="testi-meta">Tin Shed · Noida</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">PEB structure ke liye 3 companies se quote liya tha, R.R Teen Set Solution ka pricing sabse fair aur clear tha. Quality bhi top-notch hai.</p>
+          <div class="testi-person"><div class="testi-avatar">AM</div><div><p class="testi-name">Anil Malik</p><p class="testi-meta">PEB Structure · Faridabad</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">Warehouse ke liye bulk quotation chahiye thi, WhatsApp pe hi sab detail mil gayi. Highly recommended for genuine pricing.</p>
+          <div class="testi-person"><div class="testi-avatar">PS</div><div><p class="testi-name">Priya Sharma</p><p class="testi-meta">Prefab Warehouse · Ghaziabad</p></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-dots" id="testi-dots"></div>
+  </div>
+</section>
+
 <!-- FAQ SECTION -->
 <section class="faq-section">
   <div style="max-width:560px;margin:0 auto">
@@ -683,6 +860,15 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <div class="gst-pill">GST: 07DJCPK0635M1Z5</div>
   </div>
 </footer>
+
+<!-- STICKY MOBILE RESULT BAR -->
+<div class="sticky-result-bar" id="sticky-result-bar">
+  <div class="srb-info">
+    <span class="srb-lbl">Estimated Cost</span>
+    <span class="srb-price" id="srb-price">₹3.6L – ₹4.4L</span>
+  </div>
+  <button class="srb-cta" onclick="srbClick()">Free Quote Bhejo →</button>
+</div>
 
 <!-- FLOATING BUTTONS -->
 <div class="fab-wrap">
@@ -816,12 +1002,23 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var r=R[curType];
     var lo=Math.round(r.low*area*loc),hi=Math.round(r.high*area*loc);
     var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
-    document.getElementById('res-price').textContent=fmt(lo)+' – '+fmt(hi);
+    var priceEl=document.getElementById('res-price');
+    priceEl.textContent=fmt(lo)+' – '+fmt(hi);
+    priceEl.classList.remove('is-updating');void priceEl.offsetWidth;priceEl.classList.add('is-updating');
     document.getElementById('res-sub').textContent=area.toLocaleString('en-IN')+' sq.ft · '+r.label;
     document.getElementById('rb-area').textContent=area.toLocaleString('en-IN')+' sq.ft';
     document.getElementById('rb-rate').textContent='₹'+r.low+'–'+r.high;
     document.getElementById('rb-mat').textContent=fmt(mLo)+'–'+fmt(mHi);
     document.getElementById('rb-lab').textContent=fmt(lo-mLo)+'–'+fmt(hi-mHi);
+    ['rb-area','rb-rate','rb-mat','rb-lab'].forEach(function(id){
+      var el=document.getElementById(id);
+      el.classList.remove('is-updating');void el.offsetWidth;el.classList.add('is-updating');
+    });
+    /* Sync sticky mobile bar */
+    var srb=document.getElementById('srb-price');
+    if(srb)srb.textContent=fmt(lo)+' – '+fmt(hi);
+    /* Keep compare panel in sync if open */
+    if(typeof calcCompare==='function')calcCompare();
     /* Update WA button */
     var ht=document.getElementById('sl-ht').value;
     var msg='Hello R.R Teen Set Solution!\n\nMujhe '+r.label+' chahiye.\n📐 Size: '+len+' × '+wid+' feet\n📊 Height: '+ht+' feet\n💰 Estimated Budget: '+fmt(lo)+' – '+fmt(hi)+'\n\nPlease free site visit aur detailed quote arrange karein.\nThank you!';
@@ -841,6 +1038,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var msg='New Lead from Calculator!\n\nName: '+name+'\nPhone: '+phone+'\n\nShed Type: '+r.label+'\nSize: '+len+' × '+wid+' feet\nHeight: '+ht+' feet\n\nPlease call them for quote.';
     document.getElementById('lead-form-area').style.display='none';
     document.getElementById('lead-success').style.display='block';
+    fireConfetti();
     setTimeout(function(){
       window.open('https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg),'_blank');
     },800);
@@ -984,6 +1182,148 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── FAQ TOGGLE ── */
   window.toggleFAQ=function(el){el.classList.toggle('open');};
 
+  /* ── COMPARE 2 SHED TYPES ── */
+  window.toggleCompare=function(){
+    var panel=document.getElementById('compare-panel');
+    var btn=document.getElementById('cmp-toggle-btn');
+    var opening=!panel.classList.contains('is-open');
+    panel.classList.toggle('is-open');
+    btn.classList.toggle('is-open');
+    if(opening)calcCompare();
+  };
+  window.calcCompare=function(){
+    var panel=document.getElementById('compare-panel');
+    if(!panel||!panel.classList.contains('is-open'))return;
+    var len=+document.getElementById('sl-len').value||50;
+    var wid=+document.getElementById('sl-wid').value||40;
+    var loc=+document.getElementById('sl-loc').value||1;
+    var area=len*wid;
+    var ta=document.getElementById('cmp-type-a').value;
+    var tb=document.getElementById('cmp-type-b').value;
+    var ra=R[ta],rb=R[tb];
+    var aLo=Math.round(ra.low*area*loc),aHi=Math.round(ra.high*area*loc);
+    var bLo=Math.round(rb.low*area*loc),bHi=Math.round(rb.high*area*loc);
+    var aMid=(aLo+aHi)/2,bMid=(bLo+bHi)/2;
+    document.getElementById('cmp-lbl-a').textContent=ra.label;
+    document.getElementById('cmp-lbl-b').textContent=rb.label;
+    document.getElementById('cmp-price-a').textContent=fmt(aLo)+'–'+fmt(aHi);
+    document.getElementById('cmp-price-b').textContent=fmt(bLo)+'–'+fmt(bHi);
+    document.getElementById('cmp-rate-a').textContent='₹'+ra.low+'–'+ra.high+'/sqft';
+    document.getElementById('cmp-rate-b').textContent='₹'+rb.low+'–'+rb.high+'/sqft';
+    var cardA=document.getElementById('cmp-card-a'),cardB=document.getElementById('cmp-card-b');
+    cardA.classList.remove('cmp-win');cardB.classList.remove('cmp-win');
+    var diffEl=document.getElementById('compare-diff');
+    if(ta===tb){
+      diffEl.innerHTML='Same shed type select kiya hai — compare karne ke liye alag type chunein.';
+    }else{
+      var cheaper=aMid<bMid?ra:rb;
+      var expensive=aMid<bMid?rb:ra;
+      var diff=Math.round(Math.abs(aMid-bMid));
+      var pct=Math.round((diff/Math.max(aMid,bMid))*100);
+      (aMid<bMid?cardA:cardB).classList.add('cmp-win');
+      diffEl.innerHTML='<strong>'+cheaper.label+'</strong> ~'+fmt(diff)+' ('+pct+'%) sasta hai <strong>'+expensive.label+'</strong> ke muqable, isi size ('+area.toLocaleString('en-IN')+' sq.ft) ke liye.';
+    }
+  };
+
+  /* ── ANIMATED COUNTERS (trust strip) ── */
+  function animateCounters(){
+    var nums=document.querySelectorAll('.trust-num[data-count]');
+    nums.forEach(function(el){
+      var target=+el.getAttribute('data-count');
+      var decimals=+el.getAttribute('data-decimal')||0;
+      var suffix=el.getAttribute('data-suffix')||'';
+      var divisor=decimals>0?Math.pow(10,decimals):1;
+      var dur=1400,start=null;
+      function step(ts){
+        if(!start)start=ts;
+        var p=Math.min((ts-start)/dur,1);
+        var eased=1-Math.pow(1-p,3);
+        var val=(target*eased)/divisor;
+        el.textContent=(decimals>0?val.toFixed(decimals):Math.round(val))+suffix;
+        if(p<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ── TESTIMONIAL CAROUSEL ── */
+  var testiIdx=0,testiTimer=null;
+  function initTesti(){
+    var track=document.getElementById('testi-track');
+    var dotsWrap=document.getElementById('testi-dots');
+    if(!track||!dotsWrap)return;
+    var cards=track.children;
+    for(var i=0;i<cards.length;i++){
+      var dot=document.createElement('button');
+      dot.className='testi-dot'+(i===0?' active':'');
+      dot.setAttribute('aria-label','Slide '+(i+1));
+      dot.onclick=function(idx){return function(){goTesti(idx);};}(i);
+      dotsWrap.appendChild(dot);
+    }
+    function goTesti(i){
+      testiIdx=(i+cards.length)%cards.length;
+      track.style.transform='translateX(-'+(testiIdx*100)+'%)';
+      var dots=dotsWrap.querySelectorAll('.testi-dot');
+      dots.forEach(function(d,di){d.classList.toggle('active',di===testiIdx);});
+    }
+    window.goTesti=goTesti;
+    testiTimer=setInterval(function(){goTesti(testiIdx+1);},5000);
+    track.parentElement.addEventListener('mouseenter',function(){clearInterval(testiTimer);});
+    track.parentElement.addEventListener('mouseleave',function(){testiTimer=setInterval(function(){goTesti(testiIdx+1);},5000);});
+  }
+
+  /* ── STICKY MOBILE RESULT BAR ── */
+  function initStickyBar(){
+    var bar=document.getElementById('sticky-result-bar');
+    var resultWrap=document.querySelector('.result-wrap');
+    if(!bar||!resultWrap)return;
+    window.addEventListener('scroll',function(){
+      var rect=resultWrap.getBoundingClientRect();
+      var pastResult=rect.bottom<0;
+      var nearFooter=document.querySelector('.faq-section');
+      var footerNear=nearFooter?nearFooter.getBoundingClientRect().top<window.innerHeight*0.3:false;
+      if(pastResult&&!footerNear){bar.classList.add('visible');}
+      else{bar.classList.remove('visible');}
+    },{passive:true});
+  }
+  window.srbClick=function(){
+    var leadWrap=document.querySelector('.lead-wrap');
+    if(leadWrap)leadWrap.scrollIntoView({behavior:'smooth',block:'center'});
+    var nameInput=document.getElementById('lf-name');
+    if(nameInput)setTimeout(function(){nameInput.focus();},500);
+  };
+
+  /* ── CONFETTI BURST ── */
+  window.fireConfetti=function(){
+    var colors=['#ff6f00','#ff8c00','#25D366','#16264f','#ffc266'];
+    for(var i=0;i<28;i++){
+      var piece=document.createElement('div');
+      piece.className='confetti-piece';
+      piece.style.left=Math.random()*100+'vw';
+      piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration=(1.8+Math.random()*1.2)+'s';
+      piece.style.borderRadius=Math.random()>0.5?'50%':'2px';
+      document.body.appendChild(piece);
+      (function(p){setTimeout(function(){p.remove();},3200);})(piece);
+    }
+  };
+
+  /* ── SCROLL-REVEAL OBSERVER ── */
+  function initReveal(){
+    var targets=document.querySelectorAll('.trust-strip,.testi-section,.rate-section,.faq-section,.compare-toggle-btn,.share-wrap');
+    if(!('IntersectionObserver' in window)){targets.forEach(function(t){t.classList.add('reveal','in-view');});return;}
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          if(entry.target.id==='trust-grid'||entry.target.classList.contains('trust-strip'))animateCounters();
+          io.unobserve(entry.target);
+        }
+      });
+    },{threshold:0.25});
+    targets.forEach(function(t){t.classList.add('reveal');io.observe(t);});
+  }
+
   /* ── BUTTON RIPPLE (adds a tactile click feel to every action button) ── */
   document.addEventListener('click',function(e){
     var btn=e.target.closest('.xbtn');
@@ -1002,6 +1342,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── INIT ── */
   calcDraw();
   calcResult();
+  initTesti();
+  initStickyBar();
+  initReveal();
 })();
 </script>
 
