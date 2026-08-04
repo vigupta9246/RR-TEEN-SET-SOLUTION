@@ -1,1 +1,354 @@
-"use strict";function loadYTVideo(e){var t=e.getAttribute("data-video-id"),n=e.getAttribute("data-video-title")||"YouTube video player",o=document.createElement("div");o.style.cssText=e.style.cssText,o.innerHTML='<iframe width="100%" height="100%" src="https://www.youtube.com/embed/'+t+'?autoplay=1" title="'+n+'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:inherit"></iframe>',e.replaceWith(o),"function"==typeof gtag&&gtag("event","video_play",{event_category:"engagement",event_label:t})}function scrollVideoSlider(e,t){var n=document.getElementById(e);if(n){var o=n.querySelector(".video-card"),a=o?o.offsetWidth+16:236;n.scrollBy({left:t*a,behavior:"smooth"})}}!function(){var e="rr_theme";function t(){return localStorage.getItem(e)||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}function n(t){document.documentElement.setAttribute("data-theme",t),localStorage.setItem(e,t);var n=document.getElementById("theme-btn");n&&(n.textContent="dark"===t?"☀️":"🌙")}n(t()),document.addEventListener("DOMContentLoaded",function(){n(t());var e=document.getElementById("theme-btn");e&&e.addEventListener("click",function(){n("dark"===document.documentElement.getAttribute("data-theme")?"light":"dark")})})}(),document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(".logo").forEach(function(e){e.style.cursor="pointer",e.addEventListener("click",function(){window.location.href="index.html"})})}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelector(".hamburger"),t=document.getElementById("mob-menu");function n(){e.classList.remove("open"),t.classList.remove("open"),document.body.style.overflow=""}e&&t&&(e.addEventListener("click",function(n){n.stopPropagation();var o=!e.classList.contains("open");e.classList.toggle("open"),t.classList.toggle("open"),document.body.style.overflow=o?"hidden":""}),t.querySelectorAll("a").forEach(function(e){e.addEventListener("click",n)}),document.addEventListener("click",function(o){e.contains(o.target)||t.contains(o.target)||n()}))}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelector("nav");e&&window.addEventListener("scroll",function(){e.classList.toggle("scrolled",scrollY>30)},{passive:!0});var t=location.pathname.split("/").pop()||"index.html";document.querySelectorAll(".nav-links a,#mob-menu a").forEach(function(e){(e.getAttribute("href")||"").split("/").pop()===t&&e.classList.add("active")})}),document.addEventListener("DOMContentLoaded",function(){if("IntersectionObserver"in window){var e=new IntersectionObserver(function(t){t.forEach(function(t){t.isIntersecting&&(t.target.style.opacity="1",t.target.style.transform="translateY(0)",e.unobserve(t.target))})},{threshold:.08,rootMargin:"0px 0px -30px 0px"});document.querySelectorAll(".scard,.wcard,.tcard,.pstep,.gallery-item").forEach(function(t){t.style.opacity="0",t.style.transform="translateY(18px)",t.style.transition="opacity .5s ease,transform .5s ease",e.observe(t)})}}),document.addEventListener("DOMContentLoaded",function(){var e=document.getElementById("enquiry-form");e&&e.addEventListener("submit",function(t){function n(t){return((e.querySelector('[name="'+t+'"]')||{}).value||"").trim()}t.preventDefault();var o=n("name"),a=n("phone"),r=n("service")||"General Enquiry",i=n("area"),l=n("city"),c=n("message");function s(t,n){var o=e.querySelector('[name="'+t+'"]');if(o){o.style.borderColor="#f44336",o.focus();var a=o.parentNode.querySelector(".err-msg");a||((a=document.createElement("span")).className="err-msg",a.style.cssText="font-size:11px;color:#f44336;margin-top:3px;display:block",o.parentNode.appendChild(a)),a.textContent=n,setTimeout(function(){o.style.borderColor="",a.textContent=""},3e3)}}if(o)if(!a||a.replace(/\D/g,"").length<10)s("phone","Enter valid 10-digit number");else{if("function"==typeof window.pushLeadToFirestore){var d=a.replace(/\D/g,""),p=d.length>10?d.slice(-10):d;window.pushLeadToFirestore({name:o,phone:p,service:r,area:i,city:l,message:c,pageSource:document.title})}var u=document.getElementById("submit-btn"),f=u.textContent;u.textContent="⏳ Sending...",u.disabled=!0;var m=new FormData;m.append("name",o),m.append("phone",a),m.append("service",r),m.append("area",i||"Not specified"),m.append("city",l||"Not specified"),m.append("message",c||"No additional requirements"),m.append("_subject","New Enquiry: "+r+" — "+o+" ("+l+")"),m.append("_replyto",""),fetch("https://formspree.io/f/xkoappra",{method:"POST",body:m,headers:{Accept:"application/json"}}).then(function(e){return e.json().then(function(t){return{ok:e.ok,data:t}})}).then(function(t){var n=document.getElementById("form-success"),s=document.getElementById("form-error");if(t.ok){e.style.display="none",n&&(n.style.display="block");var d=["Hello R.R Teen Set Solution! 🏗️","","*New Website Enquiry*","─".repeat(16),"Name: "+o,"Phone: "+a,"Service: "+r,i?"Area: "+i:"",l?"City: "+l:"",c?"Message: "+c:"","","Please call me. Thank you!"].filter(Boolean).join("\n");setTimeout(function(){window.open("https://api.whatsapp.com/send?phone=918527258462&text="+encodeURIComponent(d),"_blank")},1200)}else u.textContent=f,u.disabled=!1,s&&(s.style.display="block"),setTimeout(function(){s&&(s.style.display="none")},8e3)}).catch(function(){u.textContent=f,u.disabled=!1;var e=document.getElementById("form-error");e&&(e.style.display="block"),setTimeout(function(){e&&(e.style.display="none")},8e3)})}else s("name","Please enter your name")})}),function(){var e="https://youtube.com/@rrteensetsolution?si=zD11544a-jkE1Ycf",t="https://www.facebook.com/share/18ymW2vGYH/",n="";function o(){return'<div class="social-icons"><a href="'+e+'" target="_blank" rel="noopener" aria-label="YouTube" class="social-btn yt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a><a href="'+t+'" target="_blank" rel="noopener" aria-label="Facebook" class="social-btn fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a><a href="'+n+'" target="_blank" rel="noopener" aria-label="Instagram" class="social-btn ig"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a></div>'}document.addEventListener("DOMContentLoaded",function(){var e=document.querySelector(".footer-about");if(e){var t=document.createElement("div");t.innerHTML=o(),e.appendChild(t)}var n=document.querySelector(".cinfo-item:last-of-type");if(n){var a=document.createElement("div");a.className="cinfo-item",a.innerHTML='<div class="cinfo-icon">📱</div><div><div class="cinfo-label">Follow Us</div>'+o()+"</div>",n.after(a)}})}(),function(){var e="https://www.google.com/maps/place/?q=place_id:ChIJrw9dr2EtAC0RVWXJKcy66no",t="https://search.google.com/local/writereview?placeid=ChIJrw9dr2EtAC0RVWXJKcy66no";document.addEventListener("DOMContentLoaded",function(){var n=document.querySelector(".footer-contact");if(n){var o=document.createElement("p");o.innerHTML='<span>⭐</span> <a href="'+e+'" target="_blank" rel="noopener" style="color:#4285f4;font-weight:600">View on Google Maps</a>',n.appendChild(o)}var a=document.querySelector(".footer-bottom");if(a){var r=document.createElement("a");r.href=t,r.target="_blank",r.rel="noopener",r.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="#4285f4" style="vertical-align:middle;margin-right:4px"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>Write a Google Review',r.style.cssText="display:inline-flex;align-items:center;font-size:11px;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);padding:5px 12px;border-radius:6px;transition:all .2s;text-decoration:none",r.onmouseover=function(){this.style.borderColor="#4285f4",this.style.color="#4285f4"},r.onmouseout=function(){this.style.borderColor="rgba(255,255,255,.12)",this.style.color="rgba(255,255,255,.5)"},a.appendChild(r)}var i=document.querySelector(".cinfo-item");if(i&&location.pathname.includes("contact")){var l=document.createElement("div");l.style.cssText="background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.3);border-radius:12px;padding:16px 18px;margin-top:20px;display:flex;align-items:center;gap:14px",l.innerHTML='<div style="width:42px;height:42px;background:#4285f4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg></div><div style="flex:1"><div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Google Business Profile</div><div style="color:#fff;font-weight:700;font-size:14px;margin-bottom:5px">R.R Teen Set Solution</div><div style="display:flex;gap:8px;flex-wrap:wrap"><a href="'+e+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4285f4;background:rgba(66,133,244,.15);padding:5px 12px;border-radius:6px;text-decoration:none">View Profile</a><a href="'+t+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#fbbc04;background:rgba(251,188,4,.15);padding:5px 12px;border-radius:6px;text-decoration:none">⭐ Write Review</a></div></div>',i.parentNode.insertBefore(l,i.parentNode.querySelector(".cform")||i.parentNode.lastElementChild)}})}(),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelector("ul.nav-links");if(e&&!e.querySelector('a[href*="shed-cost-calculator"]')){var t=e.querySelector('a[href="contact.html"]');if(t&&t.parentNode){var n=document.createElement("li");n.innerHTML='<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>',e.insertBefore(n,t.parentNode)}}}),document.addEventListener("click",function(e){var t=e.target.closest('a[href^="tel:"], a[href*="wa.me"], a[href*="api.whatsapp.com"]');if(t){var n=0===t.href.indexOf("tel:");"function"==typeof gtag&&gtag("event",n?"call_click":"whatsapp_click",{event_category:"engagement",event_label:n?t.href.replace("tel:",""):"whatsapp",page_path:location.pathname,page_title:document.title})}},!0);
+/* ═══════════════════════════════════════════════════════════
+   R.R Teen Set Solution — main.js v5.0
+   Google Business Profile + Smart Chat (No API, Instant)
+   Dark Mode + Mobile Nav + Social Icons + Forms
+═══════════════════════════════════════════════════════════ */
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   1. DARK MODE
+════════════════════════════════════════════════════════════ */
+(function(){
+  var KEY = 'rr_theme';
+  function get(){ return localStorage.getItem(KEY) || (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'); }
+  function apply(t){
+    document.documentElement.setAttribute('data-theme',t);
+    localStorage.setItem(KEY,t);
+    var b=document.getElementById('theme-btn');
+    if(b) b.textContent = t==='dark'?'☀️':'🌙';
+  }
+  apply(get());
+  document.addEventListener('DOMContentLoaded',function(){
+    apply(get());
+    var b=document.getElementById('theme-btn');
+    if(b) b.addEventListener('click',function(){
+      apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   2. LOGO CLICK → HOME
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.logo').forEach(function(el){
+    el.style.cursor='pointer';
+    el.addEventListener('click',function(){ window.location.href='index.html'; });
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   3. MOBILE MENU
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('DOMContentLoaded',function(){
+    var ham=document.querySelector('.hamburger'), mob=document.getElementById('mob-menu');
+    if(!ham||!mob) return;
+    function close(){ ham.classList.remove('open'); mob.classList.remove('open'); document.body.style.overflow=''; }
+    ham.addEventListener('click',function(e){
+      e.stopPropagation();
+      var open=!ham.classList.contains('open');
+      ham.classList.toggle('open'); mob.classList.toggle('open');
+      document.body.style.overflow=open?'hidden':'';
+    });
+    mob.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',close); });
+    document.addEventListener('click',function(e){ if(!ham.contains(e.target)&&!mob.contains(e.target)) close(); });
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   4. NAV SCROLL + ACTIVE LINK
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',function(){
+  var nav=document.querySelector('nav');
+  if(nav) window.addEventListener('scroll',function(){ nav.classList.toggle('scrolled',scrollY>30); },{passive:true});
+  var page=(location.pathname.split('/').pop()||'index.html');
+  document.querySelectorAll('.nav-links a,#mob-menu a').forEach(function(a){
+    if((a.getAttribute('href')||'').split('/').pop()===page) a.classList.add('active');
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   5. SCROLL ANIMATIONS
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',function(){
+  if(!('IntersectionObserver' in window)) return;
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; io.unobserve(e.target); }
+    });
+  },{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.scard,.wcard,.tcard,.pstep,.gallery-item').forEach(function(el){
+    el.style.opacity='0'; el.style.transform='translateY(18px)'; el.style.transition='opacity .5s ease,transform .5s ease';
+    io.observe(el);
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   6. ENQUIRY FORM → FORMSPREE (EMAIL) + WHATSAPP
+   Replace YOUR_FORMSPREE_ID with actual ID from formspree.io
+════════════════════════════════════════════════════════════ */
+(function(){
+  var FORMSPREE_ID = 'xkoappra';
+  var WHATSAPP_NUM = '918527258462';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var form = document.getElementById('enquiry-form');
+    if(!form) return;
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+
+      function gv(n){ return ((form.querySelector('[name="'+n+'"]')||{}).value||'').trim(); }
+      var name=gv('name'), phone=gv('phone'), svc=gv('service')||'General Enquiry';
+      var area=gv('area'), city=gv('city'), msg=gv('message');
+
+      // Validation
+      function showErr(field, txt){
+        var inp = form.querySelector('[name="'+field+'"]'); if(!inp) return;
+        inp.style.borderColor='#f44336'; inp.focus();
+        var s = inp.parentNode.querySelector('.err-msg');
+        if(!s){ s=document.createElement('span'); s.className='err-msg'; s.style.cssText='font-size:11px;color:#f44336;margin-top:3px;display:block'; inp.parentNode.appendChild(s); }
+        s.textContent=txt; setTimeout(function(){ inp.style.borderColor=''; s.textContent=''; }, 3000);
+      }
+      if(!name){ showErr('name','Please enter your name'); return; }
+      if(!phone||phone.replace(/\D/g,'').length<10){ showErr('phone','Enter valid 10-digit number'); return; }
+
+      // Push straight into the CRM's Leads tab (Firestore) — independent of
+      // Formspree/WhatsApp below, so it never blocks the customer-facing flow
+      // even if this fails (e.g. before Firestore rules are deployed).
+      // Firestore rule requires EXACTLY 10 digits, so strip any leading
+      // country-code prefix (e.g. "+91 98765 43210" → "9876543210").
+      if (typeof window.pushLeadToFirestore === 'function') {
+        var phoneDigitsAll = phone.replace(/\D/g,'');
+        var phone10 = phoneDigitsAll.length > 10 ? phoneDigitsAll.slice(-10) : phoneDigitsAll;
+        window.pushLeadToFirestore({
+          name: name, phone: phone10, service: svc,
+          area: area, city: city, message: msg, pageSource: location.pathname.replace(/^\//, '') || 'index.html'
+        });
+      }
+
+      // Button loading state
+      var btn = document.getElementById('submit-btn');
+      var origTxt = btn.textContent;
+      btn.textContent = '⏳ Sending...';
+      btn.disabled = true;
+
+      // Build form data for Formspree
+      var formData = new FormData();
+      formData.append('name', name);
+      formData.append('phone', phone);
+      formData.append('service', svc);
+      formData.append('area', area || 'Not specified');
+      formData.append('city', city || 'Not specified');
+      formData.append('message', msg || 'No additional requirements');
+      formData.append('_subject', 'New Enquiry: '+svc+' — '+name+' ('+city+')');
+      formData.append('_replyto', '');
+
+      // Submit to Formspree
+      fetch('https://formspree.io/f/'+FORMSPREE_ID, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function(res){ return res.json().then(function(d){ return {ok:res.ok, data:d}; }); })
+      .then(function(r){
+        var successDiv = document.getElementById('form-success');
+        var errorDiv   = document.getElementById('form-error');
+
+        if(r.ok){
+          // Show success message
+          form.style.display = 'none';
+          if(successDiv) successDiv.style.display = 'block';
+
+          // Also open WhatsApp after short delay
+          var waLines = [
+            'Hello R.R Teen Set Solution! 🏗️','',
+            '*New Website Enquiry*','─'.repeat(16),
+            'Name: '+name,
+            'Phone: '+phone,
+            'Service: '+svc,
+            area?'Area: '+area:'',
+            city?'City: '+city:'',
+            msg?'Message: '+msg:'','',
+            'Please call me. Thank you!'
+          ].filter(Boolean).join('\n');
+
+          setTimeout(function(){
+            window.open('https://api.whatsapp.com/send?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(waLines),'_blank');
+          }, 1200);
+
+        } else {
+          // Formspree error — show error, still open WhatsApp
+          btn.textContent = origTxt; btn.disabled = false;
+          if(errorDiv) errorDiv.style.display = 'block';
+          setTimeout(function(){ if(errorDiv) errorDiv.style.display='none'; }, 8000);
+        }
+      })
+      .catch(function(){
+        // Network error fallback — open WhatsApp directly
+        btn.textContent = origTxt; btn.disabled = false;
+        var errorDiv = document.getElementById('form-error');
+        if(errorDiv) errorDiv.style.display = 'block';
+        setTimeout(function(){ if(errorDiv) errorDiv.style.display='none'; }, 8000);
+      });
+    });
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   7. SOCIAL ICONS (YouTube, Facebook, Instagram)
+════════════════════════════════════════════════════════════ */
+(function(){
+  var SOCIAL={youtube:'https://youtube.com/@rrteensetsolution?si=zD11544a-jkE1Ycf',facebook:'https://www.facebook.com/share/18ymW2vGYH/',instagram:''};
+  var YT='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
+  var FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
+  var IG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>';
+  function mkIcons(){
+    return '<div class="social-icons">'+
+      '<a href="'+SOCIAL.youtube+'" target="_blank" rel="noopener" aria-label="YouTube" class="social-btn yt">'+YT+'</a>'+
+      '<a href="'+SOCIAL.facebook+'" target="_blank" rel="noopener" aria-label="Facebook" class="social-btn fb">'+FB+'</a>'+
+      '<a href="'+SOCIAL.instagram+'" target="_blank" rel="noopener" aria-label="Instagram" class="social-btn ig">'+IG+'</a>'+
+    '</div>';
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var fa=document.querySelector('.footer-about');
+    if(fa){var d=document.createElement('div');d.innerHTML=mkIcons();fa.appendChild(d);}
+    var last=document.querySelector('.cinfo-item:last-of-type');
+    if(last){var item=document.createElement('div');item.className='cinfo-item';item.innerHTML='<div class="cinfo-icon">\uD83D\uDCF1</div><div><div class="cinfo-label">Follow Us</div>'+mkIcons()+'</div>';last.after(item);}
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   8. GOOGLE BUSINESS PROFILE BADGE
+   Adds GBP link in footer contact + contact page
+════════════════════════════════════════════════════════════ */
+(function(){
+  var GBP_URL = 'https://share.google/UulUhMi2agMC8ODDI';
+  var GBP_MAPS = 'https://maps.app.goo.gl/UulUhMi2agMC8ODDI';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // 1. Add Google Business badge in footer contact
+    var footerContact = document.querySelector('.footer-contact');
+    if(footerContact){
+      var gbpLine = document.createElement('p');
+      gbpLine.innerHTML = '<span>\u2B50</span> <a href="'+GBP_URL+'" target="_blank" rel="noopener" style="color:#4285f4;font-weight:600">View on Google Maps</a>';
+      footerContact.appendChild(gbpLine);
+    }
+
+    // 2. Add GBP Review button in footer bottom
+    var footerBottom = document.querySelector('.footer-bottom');
+    if(footerBottom){
+      var reviewBtn = document.createElement('a');
+      reviewBtn.href = GBP_URL;
+      reviewBtn.target = '_blank';
+      reviewBtn.rel = 'noopener';
+      reviewBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#4285f4" style="vertical-align:middle;margin-right:4px"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>Write a Google Review';
+      reviewBtn.style.cssText = 'display:inline-flex;align-items:center;font-size:11px;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);padding:5px 12px;border-radius:6px;transition:all .2s;text-decoration:none';
+      reviewBtn.onmouseover = function(){ this.style.borderColor='#4285f4'; this.style.color='#4285f4'; };
+      reviewBtn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,.12)'; this.style.color='rgba(255,255,255,.5)'; };
+      footerBottom.appendChild(reviewBtn);
+    }
+
+    // 3. Add GBP section on contact page
+    var cinfoArea = document.querySelector('.cinfo-item');
+    if(cinfoArea && location.pathname.includes('contact')){
+      var gbpCard = document.createElement('div');
+      gbpCard.style.cssText = 'background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.3);border-radius:12px;padding:16px 18px;margin-top:20px;display:flex;align-items:center;gap:14px';
+      gbpCard.innerHTML =
+        '<div style="width:42px;height:42px;background:#4285f4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+
+          '<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>'+
+        '</div>'+
+        '<div style="flex:1">'+
+          '<div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Google Business Profile</div>'+
+          '<div style="color:#fff;font-weight:700;font-size:14px;margin-bottom:5px">R.R Teen Set Solution</div>'+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<a href="'+GBP_URL+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4285f4;background:rgba(66,133,244,.15);padding:5px 12px;border-radius:6px;text-decoration:none">View Profile</a>'+
+            '<a href="'+GBP_URL+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#fbbc04;background:rgba(251,188,4,.15);padding:5px 12px;border-radius:6px;text-decoration:none">\u2B50 Write Review</a>'+
+          '</div>'+
+        '</div>';
+      cinfoArea.parentNode.insertBefore(gbpCard, cinfoArea.parentNode.querySelector('.cform') || cinfoArea.parentNode.lastElementChild);
+    }
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   AUTO-INJECT CALCULATOR LINK IN NAV — ALL PAGES
+   Har page ke nav mein Calculator link automatically add hoga
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+
+    /* ── Desktop Nav ── */
+    var navLinks = document.querySelector('ul.nav-links');
+    if(navLinks){
+      // Already added check
+      if(!navLinks.querySelector('a[href*="shed-cost-calculator"]')){
+        var contactLi = navLinks.querySelector('a[href="contact.html"]');
+        if(contactLi && contactLi.parentNode){
+          var li = document.createElement('li');
+          li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>';
+          navLinks.insertBefore(li, contactLi.parentNode);
+        }
+      }
+    }
+
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   9. CALL & WHATSAPP CLICK TRACKING (GA4)
+   Fires a GA4 event every time someone taps a Call or WhatsApp
+   button anywhere on the site. View live in GA4 → Reports →
+   Realtime, or historically in Reports → Engagement → Events.
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[href^="tel:"], a[href*="wa.me"], a[href*="api.whatsapp.com"]');
+    if(!link) return;
+    var isCall = link.href.indexOf('tel:') === 0;
+    var eventName = isCall ? 'call_click' : 'whatsapp_click';
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, {
+        'event_category': 'engagement',
+        'event_label': isCall ? link.href.replace('tel:','') : 'whatsapp',
+        'page_path': location.pathname,
+        'page_title': document.title
+      });
+    }
+  }, true);
+})();
+
+/* ════════════════════════════════════════════════════════════
+   10. LAZY-LOAD YOUTUBE FACADE
+   Loads a lightweight thumbnail instead of the full YouTube
+   iframe. The real embed only loads when the user clicks play —
+   keeps page weight and load time low.
+════════════════════════════════════════════════════════════ */
+function loadYTVideo(el){
+  var id = el.getAttribute('data-video-id');
+  var title = el.getAttribute('data-video-title') || 'YouTube video player';
+  var wrap = document.createElement('div');
+  wrap.style.cssText = el.style.cssText;
+  wrap.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + id + '?autoplay=1" title="' + title + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:inherit"></iframe>';
+  el.replaceWith(wrap);
+  if (typeof gtag === 'function') {
+    gtag('event', 'video_play', { 'event_category': 'engagement', 'event_label': id });
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   11. VIDEO SLIDER NAVIGATION
+   Scrolls the video carousel left/right using native scroll-snap
+   — no external library, keeps things fast and simple.
+════════════════════════════════════════════════════════════ */
+function scrollVideoSlider(sliderId, direction){
+  var el = document.getElementById(sliderId);
+  if (!el) return;
+  var card = el.querySelector('.video-card');
+  var step = card ? card.offsetWidth + 16 : 236;
+  el.scrollBy({ left: direction * step, behavior: 'smooth' });
+}
+
+
+
