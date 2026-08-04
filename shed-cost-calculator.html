@@ -62,7 +62,8 @@
     "Prefab Warehouse Cost Calculator",
     "Live 3D Shed Preview",
     "Location-based pricing for Delhi NCR",
-    "Material and labour cost breakdown"
+    "Material and labour cost breakdown",
+    "Side-by-side Shed Type Comparison"
   ],
   "screenshot":"https://rrteensetsolution.com/images/project-000.jpg",
   "creator":{
@@ -383,9 +384,178 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .fab-wrap .fab-btn:hover{transform:scale(1.12) translateY(-3px)}
 .fab-wrap .fab-wa{animation:xfabglow 2.6s ease-in-out infinite}
 @keyframes xfabglow{0%,100%{box-shadow:0 4px 14px rgba(37,211,102,.35)}50%{box-shadow:0 4px 26px rgba(37,211,102,.7)}}
+
+/* ══════════════════════════════════════════
+   SCROLL-REVEAL — fade+rise on entry
+══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+.reveal-stagger.in-view>*{animation:xstagger .6s cubic-bezier(.22,1,.36,1) both}
+.reveal-stagger.in-view>*:nth-child(1){animation-delay:.05s}
+.reveal-stagger.in-view>*:nth-child(2){animation-delay:.12s}
+.reveal-stagger.in-view>*:nth-child(3){animation-delay:.19s}
+.reveal-stagger.in-view>*:nth-child(4){animation-delay:.26s}
+@keyframes xstagger{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════════════════
+   TRUST BADGES — animated counter strip
+══════════════════════════════════════════ */
+.trust-strip{background:linear-gradient(135deg,#16264f 0%,#28407c 100%);padding:28px 5%;position:relative;overflow:hidden}
+.trust-strip::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,111,0,.14) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(255,111,0,.1) 0%,transparent 45%);pointer-events:none}
+.trust-grid{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;z-index:1}
+.trust-item{text-align:center;padding:6px 2px;display:flex;flex-direction:column;align-items:center}
+.trust-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,6vw,30px);color:#ff8c00;letter-spacing:.5px;line-height:1;display:block;text-shadow:0 0 20px rgba(255,140,0,.3)}
+.trust-lbl{font-size:9.5px;color:rgba(255,255,255,.6);display:block;margin-top:5px;line-height:1.3;letter-spacing:.2px}
+
+/* ══════════════════════════════════════════
+   COMPARE MODE
+══════════════════════════════════════════ */
+.compare-toggle-btn{width:100%;background:#ffffff;border:1.5px dashed rgba(255,111,0,.4);border-radius:14px;padding:13px 16px;font-size:12.5px;font-weight:700;color:#ff6f00;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;transition:all .25s}
+.compare-toggle-btn:hover{background:rgba(255,111,0,.06);border-style:solid;transform:translateY(-1px)}
+.compare-toggle-btn .cmp-chev{transition:transform .3s ease;font-size:10px}
+.compare-toggle-btn.is-open .cmp-chev{transform:rotate(180deg)}
+.compare-panel{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.22,1,.36,1),opacity .35s ease,margin .45s ease;opacity:0;margin-bottom:0}
+.compare-panel.is-open{max-height:900px;opacity:1;margin-bottom:28px}
+.compare-inner{background:linear-gradient(160deg,#f7f3e8 0%,#efe2ba 100%);border:1px solid rgba(255,111,0,.25);border-radius:18px;padding:18px;box-shadow:0 4px 20px rgba(10,22,40,.08)}
+.compare-sel-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:16px}
+.compare-sel-row select{width:100%;background:#ffffff!important;border:1.5px solid rgba(10,22,40,.15)!important;color:#0a1628!important;border-radius:11px!important;padding:11px 10px!important;font-size:12px!important;font-weight:600}
+.compare-vs{font-family:'Bebas Neue',sans-serif;color:#ff6f00;font-size:15px;letter-spacing:1px}
+.compare-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp-card{background:#ffffff;border:1.5px solid rgba(10,22,40,.1);border-radius:14px;padding:14px 10px;text-align:center;position:relative;transition:all .3s}
+.cmp-card.cmp-win{border-color:#25D366;box-shadow:0 0 0 1px rgba(37,211,102,.25),0 8px 20px rgba(37,211,102,.15)}
+.cmp-win-badge{display:none;position:absolute;top:-10px;left:50%;transform:translateX(-50%);align-items:center;gap:3px;background:linear-gradient(135deg,#25D366,#1fb955);color:#fff;font-size:8.5px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.3px;white-space:nowrap}
+.cmp-card.cmp-win .cmp-win-badge{display:inline-flex}
+.cmp-lbl{font-size:11px;font-weight:700;color:#0a1628;margin:2px 0 8px}
+.cmp-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff6f00;letter-spacing:.3px;line-height:1;display:block;margin-bottom:4px}
+.cmp-rate{font-size:10px;color:rgba(10,22,40,.45)}
+.compare-diff{text-align:center;margin-top:12px;font-size:11.5px;color:rgba(10,22,40,.6);background:rgba(255,255,255,.6);border-radius:10px;padding:9px}
+.compare-diff strong{color:#ff6f00}
+
+/* ══════════════════════════════════════════
+   TESTIMONIALS CAROUSEL
+══════════════════════════════════════════ */
+.testi-section{background:#f7f3e8;padding:52px 5%}
+.testi-wrap{max-width:560px;margin:0 auto}
+.testi-track-wrap{position:relative;overflow:hidden;border-radius:18px}
+.testi-track{display:flex;transition:transform .5s cubic-bezier(.65,0,.35,1)}
+.testi-card{flex:0 0 100%;background:#ffffff;border:1px solid rgba(10,22,40,.08);border-radius:18px;padding:26px 24px;box-sizing:border-box;box-shadow:0 4px 20px rgba(10,22,40,.06);position:relative}
+.testi-quote-mark{font-family:'Bebas Neue',sans-serif;font-size:52px;color:rgba(255,111,0,.18);line-height:.5;position:absolute;top:20px;right:22px}
+.testi-stars{color:#ff8c00;font-size:14px;letter-spacing:2px;margin-bottom:10px}
+.testi-text{font-size:13.5px;color:rgba(10,22,40,.75);line-height:1.8;margin:0 0 16px;min-height:76px}
+.testi-person{display:flex;align-items:center;gap:10px}
+.testi-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,111,0,.3)}
+.testi-name{font-size:12.5px;font-weight:700;color:#0a1628;margin:0}
+.testi-meta{font-size:10.5px;color:rgba(10,22,40,.45);margin:0}
+.testi-dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+.testi-dot{width:7px;height:7px;border-radius:50%;background:rgba(10,22,40,.18);cursor:pointer;transition:all .3s;border:none;padding:0}
+.testi-dot.active{background:#ff6f00;width:20px;border-radius:4px}
+
+/* ══════════════════════════════════════════
+   STICKY MOBILE RESULT BAR
+══════════════════════════════════════════ */
+.sticky-result-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:linear-gradient(135deg,#16264f 0%,#1c3266 100%);border-top:1px solid rgba(255,111,0,.35);box-shadow:0 -8px 28px rgba(0,0,0,.28);padding:11px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;transform:translateY(100%);transition:transform .4s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(10px)}
+.sticky-result-bar.visible{transform:translateY(0)}
+.srb-info{display:flex;flex-direction:column;line-height:1.25}
+.srb-lbl{font-size:9px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px}
+.srb-price{font-family:'Bebas Neue',sans-serif;font-size:19px;color:#ff8c00;letter-spacing:.3px}
+.srb-cta{background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:11px;padding:11px 18px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(255,111,0,.4);transition:transform .25s}
+.srb-cta:active{transform:scale(.94)}
+@media(min-width:768px){.sticky-result-bar{display:none!important}}
+@media(max-width:767px){.sticky-result-bar{display:flex}.fab-wrap{bottom:82px!important}}
+
+/* ══════════════════════════════════════════
+   MICRO-INTERACTIONS — card tilt, glow, count-up
+══════════════════════════════════════════ */
+.stype-card,.cmp-card{will-change:transform}
+.result-price.is-updating{animation:xpricepop .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes xpricepop{0%{transform:scale(1)}45%{transform:scale(1.06)}100%{transform:scale(1)}}
+.rb-val.is-updating{animation:xflash .5s ease}
+@keyframes xflash{0%{color:#ff8c00}100%{color:#fff}}
+.preview-wrap{transition:box-shadow .3s ease}
+.preview-wrap:hover{box-shadow:0 8px 30px rgba(255,111,0,.18),inset 0 1px 0 rgba(255,255,255,.5)}
+
+/* 3D tilt stage — perspective parallax on cursor/touch */
+.preview-tilt-stage{perspective:900px;position:relative;z-index:1}
+.preview-tilt-inner{transform-style:preserve-3d;transition:transform .35s cubic-bezier(.22,1,.36,1);position:relative;will-change:transform}
+.preview-tilt-inner::after{content:'';position:absolute;top:0;left:-40%;width:35%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);pointer-events:none;animation:xsheen 4.5s ease-in-out infinite;opacity:.7}
+@keyframes xsheen{0%,100%{left:-40%}50%{left:120%}}
+#pshed{transition:opacity .15s ease}
+#pshed.is-rotating{opacity:.55}
+
+/* Rotate controls */
+.preview-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:6px;position:relative;z-index:2}
+.pv-rotate-btn{background:#ffffff;border:1.5px solid rgba(255,111,0,.3);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#ff6f00;cursor:pointer;transition:all .25s;box-shadow:0 2px 8px rgba(10,22,40,.06);flex-shrink:0}
+.pv-rotate-btn:hover{background:#ff6f00;color:#fff;transform:scale(1.1)}
+.pv-rotate-btn:active{transform:scale(.9)}
+.pv-rotate-r .icon{transform:scaleX(-1)}
+.pv-rotate-btn.is-spinning .icon{animation:xspin360 .4s ease}
+@keyframes xspin360{to{transform:rotate(360deg)}}
+.pv-rotate-r.is-spinning .icon{animation:xspin360r .4s ease}
+@keyframes xspin360r{to{transform:scaleX(-1) rotate(-360deg)}}
+.pv-hint{font-size:10px;color:rgba(10,22,40,.4);display:flex;align-items:center;gap:4px;letter-spacing:.2px;user-select:none}
+
+/* Confetti */
+.confetti-piece{position:fixed;top:-10px;width:8px;height:8px;pointer-events:none;z-index:200;border-radius:1px;animation:xconfetti linear forwards}
+@keyframes xconfetti{to{transform:translateY(105vh) rotate(540deg);opacity:.4}}
+
+/* ══════════════════════════════════════════
+   ICON SYSTEM — professional SVG line icons
+══════════════════════════════════════════ */
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.14em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon-solid{fill:currentColor;stroke:none}
+.calc-hero-badge .icon{width:13px;height:13px;margin-right:1px}
+.stype-icon{font-size:0!important}
+.stype-icon .icon{width:28px;height:28px;color:#16264f}
+.stype-card.active .stype-icon .icon{color:#ff6f00}
+.slider-label .icon{width:15px;height:15px;color:#ff6f00;margin-right:2px}
+.preview-title .icon{width:14px;height:14px;color:rgba(10,22,40,.55);margin-right:2px}
+.compare-toggle-btn .icon{width:16px;height:16px}
+.xbtn .icon{width:19px;height:19px}
+.trust-item .icon{width:20px;height:20px;color:#ff8c00;margin-bottom:4px}
+.testi-quote-mark .icon{width:34px;height:34px;color:rgba(255,111,0,.22)}
+.testi-stars .icon{width:13px;height:13px;color:#ff8c00}
+.lead-success-icon .icon{width:34px;height:34px;color:#25D366}
+.cta-disclaimer .icon{width:11px;height:11px;color:#ff8c00;vertical-align:-0.1em}
+.footer-contact .icon{width:14px;height:14px;color:#ff8c00}
+.fab-btn .icon{width:22px;height:22px}
+.theme-toggle .icon{width:16px;height:16px}
+.cmp-card .icon{width:14px;height:14px}
+.share-title .icon,.lead-title .icon{width:15px;height:15px;color:#ff6f00;margin-right:1px}
+.srb-lbl .icon{width:9px;height:9px;margin-right:1px}
 </style>
 </head>
 <body>
+<!-- ICON SPRITE — professional line icons, replaces emoji throughout this page -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+<defs>
+<symbol id="i-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="7" y1="6.5" x2="17" y2="6.5"/><circle cx="7.7" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="7.7" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="7.7" cy="18.6" r="1.1" fill="currentColor" stroke="none"/><rect x="10.6" y="17.5" width="7" height="2.2" rx="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-shed-tin" viewBox="0 0 24 24"><path d="M2.5 10 12 4l9.5 6"/><path d="M4 9.5V20h16V9.5"/><rect x="10" y="13" width="4" height="7"/><line x1="4" y1="20" x2="20" y2="20"/></symbol>
+<symbol id="i-shed-industrial" viewBox="0 0 24 24"><path d="M3 20V9l4-3 4 3V9l4-3 4 3v11"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="17" y1="9" x2="17" y2="4"/><line x1="15.4" y1="4.6" x2="17" y2="3" /><line x1="17" y1="3" x2="18.6" y2="4.6"/><rect x="6" y="14" width="3" height="6"/><rect x="14" y="14" width="3" height="6"/></symbol>
+<symbol id="i-shed-peb" viewBox="0 0 24 24"><path d="M3 20V8l9-5 9 5v12"/><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="12" y1="3" x2="12" y2="20"/><line x1="3" y1="8" x2="12" y2="14"/><line x1="21" y1="8" x2="12" y2="14"/></symbol>
+<symbol id="i-shed-warehouse" viewBox="0 0 24 24"><path d="M2.5 9.5 12 3.5l9.5 6V20h-19Z"/><rect x="6" y="12" width="5" height="8"/><rect x="13" y="12" width="5" height="8"/><line x1="8.5" y1="12" x2="8.5" y2="20"/><line x1="15.5" y1="12" x2="15.5" y2="20"/></symbol>
+<symbol id="i-ruler-h" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6" rx="1"/><line x1="6" y1="9" x2="6" y2="12"/><line x1="10" y1="9" x2="10" y2="12"/><line x1="14" y1="9" x2="14" y2="12"/><line x1="18" y1="9" x2="18" y2="12"/></symbol>
+<symbol id="i-ruler-v" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="20" rx="1"/><line x1="9" y1="6" x2="12" y2="6"/><line x1="9" y1="10" x2="12" y2="10"/><line x1="9" y1="14" x2="12" y2="14"/><line x1="9" y1="18" x2="12" y2="18"/></symbol>
+<symbol id="i-height" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M8 6 12 2l4 4"/><path d="M8 18l4 4 4-4"/></symbol>
+<symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7Z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></symbol>
+<symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6Z"/><path d="M15 2v5h5"/><line x1="9" y1="13" x2="16" y2="13"/><line x1="9" y1="16.5" x2="16" y2="16.5"/><line x1="9" y1="20" x2="13" y2="20"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3.5 6 12 13l8.5-7"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M9.5 14.5 14.5 9.5"/><path d="M8 16.5 5.5 19a3.5 3.5 0 0 1-5-5l3-3a3.5 3.5 0 0 1 5-.2"/><path d="M16 7.5 18.5 5a3.5 3.5 0 1 1 5 5l-3 3a3.5 3.5 0 0 1-5 .2"/></symbol>
+<symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 2.5a9.3 9.3 0 0 0-8 14l-1.2 4.5 4.6-1.2A9.3 9.3 0 1 0 12 2.5Z"/><path d="M8 8.3c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.5.2.6.7 1.9.7 2 .1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.2.7.2.4 1 1.6 2.1 2.5 1.4 1.2 2.1 1.3 2.4 1.1.3-.2.6-.6.9-1 .2-.3.5-.3.8-.2.3.1 2 1 2.3 1.1.3.1.5.2.6.4.1.2.1 1-.3 1.9-.4.9-2 1.7-2.7 1.7-.7 0-2.4-.1-4.9-2C7.7 15.4 6.6 12.9 6.5 12.7c-.1-.2-1-1.5-1-2.9 0-1.4.7-2 .9-2.3Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M4.5 3.5h3.6l1.4 4.7-2.3 1.6a13.6 13.6 0 0 0 6.5 6.5l1.6-2.3 4.7 1.4v3.6c0 1.1-.9 2-2 1.9C10.8 20 4 13.2 3.5 6c-.1-1.4 1-2.5 1-2.5Z"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5 10.3 15.3 16.5 9"/></symbol>
+<symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><circle cx="12" cy="16.8" r=".2" fill="currentColor" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5S5 14.8 5 9.8a7 7 0 1 1 14 0c0 5-7 11.7-7 11.7Z"/><circle cx="12" cy="9.5" r="2.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.6 2.2"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M2.5 9 12 3l9.5 6"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="4.5" y1="9" x2="4.5" y2="19"/><line x1="9" y1="9" x2="9" y2="19"/><line x1="15" y1="9" x2="15" y2="19"/><line x1="19.5" y1="9" x2="19.5" y2="19"/><line x1="2.5" y1="20.5" x2="21.5" y2="20.5"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="21" x2="18" y2="21"/><line x1="4" y1="7" x2="20" y2="7"/><path d="M4 7 1.5 12.5a2.7 2.7 0 0 0 5 0Z"/><path d="M20 7l-2.5 5.5a2.7 2.7 0 0 0 5 0Z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.5 2.5H20a1.5 1.5 0 0 1 1.5 1.5v7.5a2 2 0 0 1-.6 1.4l-8.6 8.6a2 2 0 0 1-2.8 0l-7.4-7.4a2 2 0 0 1 0-2.8L10.7 3a2 2 0 0 1 1.4-.6Z"/><circle cx="16.2" cy="7.8" r="1.6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5 15 9l7 1-5.2 4.9L18.2 22 12 18.3 5.8 22l1.4-7.1L2 10l7-1Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a7 7 0 0 0 10.2 10.2Z"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="4" y1="12" x2="19" y2="12"/><path d="M13.5 6.5 19 12l-5.5 5.5"/></symbol>
+<symbol id="i-rotate" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/></symbol>
+<symbol id="i-drag" viewBox="0 0 24 24"><path d="M8 5 5 8l3 3"/><path d="M5 8h6"/><path d="M16 5l3 3-3 3"/><path d="M19 8h-6"/><path d="M8 19l-3-3 3-3"/><path d="M5 16h6"/><path d="M16 19l3-3-3-3"/><path d="M19 16h-6"/></symbol>
+</defs>
+</svg>
 
 <!-- NAV — same as main site -->
 <nav aria-label="Main Navigation">
@@ -400,7 +570,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <li><a href="blog.html">Blog</a></li>
     <li><a href="contact.html" class="nav-cta">Get Quote</a></li>
   </ul>
-  <button id="theme-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle Dark Mode">🌙</button>
+  <button id="theme-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle Dark Mode"><svg class="icon"><use href="#i-moon"></use></svg></button>
   <button class="hamburger" id="ham-btn" aria-label="Open Menu" aria-expanded="false" aria-controls="mob-menu">
     <span></span><span></span><span></span>
   </button>
@@ -414,7 +584,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <li><a href="projects.html">Projects</a></li>
     <li><a href="shed-cost-calculator.html" style="color:#ff6f00">Calculator</a></li>
     <li><a href="blog.html">Blog</a></li>
-    <li><a href="shed-cost-calculator.html">🧮 Calculator</a></li>
+    <li><a href="shed-cost-calculator.html"><svg class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
     <li><a href="contact.html">Contact</a></li>
   </ul>
 </div>
@@ -422,15 +592,25 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 <!-- HERO -->
 <section class="calc-page-hero">
   <div class="calc-hero-inner">
-    <div class="calc-hero-badge">🧮 Free Tool · No Signup Required</div>
+    <div class="calc-hero-badge"><svg class="icon"><use href="#i-calc"></use></svg> Free Tool · No Signup Required</div>
     <h1 class="calc-hero-h1">SHED COST<br><span>CALCULATOR</span></h1>
     <p class="calc-hero-sub">Apne shed ka estimated cost seconds mein jaanein. Dimensions enter karein, type chunein — instant estimate milegi. Delhi NCR ke liye bilkul accurate.</p>
     <div class="calc-hero-stats">
       <div class="calc-stat"><span class="calc-stat-num">500+</span><span class="calc-stat-lbl">Projects complete</span></div>
       <div class="calc-stat"><span class="calc-stat-num">8+</span><span class="calc-stat-lbl">Saal ka experience</span></div>
-      <div class="calc-stat"><span class="calc-stat-num">5.0⭐</span><span class="calc-stat-lbl">Google rating</span></div>
+      <div class="calc-stat"><span class="calc-stat-num">5.0 <svg class="icon icon-solid" style="width:.6em;height:.6em;color:#ff8c00"><use href="#i-star"></use></svg></span><span class="calc-stat-lbl">Google rating</span></div>
       <div class="calc-stat"><span class="calc-stat-num">FREE</span><span class="calc-stat-lbl">Site visit</span></div>
     </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP — animated counters -->
+<section class="trust-strip">
+  <div class="trust-grid" id="trust-grid">
+    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-tag"></use></svg><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
+    <div class="trust-item"><svg class="icon"><use href="#i-pin"></use></svg><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
+    <div class="trust-item"><svg class="icon"><use href="#i-clock"></use></svg><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
+    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-star"></use></svg><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
   </div>
 </section>
 
@@ -443,57 +623,105 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <div class="stype-grid" id="stype-grid">
     <div class="stype-card active" onclick="calcSelect('tin')">
       <span class="stype-badge">Popular</span>
-      <span class="stype-icon">🏗️</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-tin"></use></svg></span>
       <span class="stype-name">Tin Shed</span>
       <span class="stype-rate">₹150–220 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('industrial')">
-      <span class="stype-icon">🏭</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-industrial"></use></svg></span>
       <span class="stype-name">Industrial Shed</span>
       <span class="stype-rate">₹200–300 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('peb')">
-      <span class="stype-icon">🏢</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-peb"></use></svg></span>
       <span class="stype-name">PEB Structure</span>
       <span class="stype-rate">₹280–380 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('warehouse')">
-      <span class="stype-icon">📦</span>
+      <span class="stype-icon"><svg class="icon"><use href="#i-shed-warehouse"></use></svg></span>
       <span class="stype-name">Prefab Warehouse</span>
       <span class="stype-rate">₹240–340 / sqft</span>
     </div>
   </div>
 
+  <!-- COMPARE 2 SHED TYPES -->
+  <button class="compare-toggle-btn" id="cmp-toggle-btn" onclick="toggleCompare()">
+    <span><svg class="icon"><use href="#i-scale"></use></svg> Compare 2 shed types</span><span class="cmp-chev">▼</span>
+  </button>
+  <div class="compare-panel" id="compare-panel">
+    <div class="compare-inner">
+      <div class="compare-sel-row">
+        <select id="cmp-type-a" onchange="calcCompare()">
+          <option value="tin">Tin Shed</option>
+          <option value="industrial">Industrial Shed</option>
+          <option value="peb">PEB Structure</option>
+          <option value="warehouse">Prefab Warehouse</option>
+        </select>
+        <span class="compare-vs">VS</span>
+        <select id="cmp-type-b" onchange="calcCompare()">
+          <option value="tin">Tin Shed</option>
+          <option value="industrial">Industrial Shed</option>
+          <option value="peb" selected>PEB Structure</option>
+          <option value="warehouse">Prefab Warehouse</option>
+        </select>
+      </div>
+      <div class="compare-cards">
+        <div class="cmp-card" id="cmp-card-a">
+          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
+          <p class="cmp-lbl" id="cmp-lbl-a">Tin Shed</p>
+          <span class="cmp-price" id="cmp-price-a">₹0</span>
+          <span class="cmp-rate" id="cmp-rate-a">₹0–0/sqft</span>
+        </div>
+        <div class="cmp-card" id="cmp-card-b">
+          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
+          <p class="cmp-lbl" id="cmp-lbl-b">PEB Structure</p>
+          <span class="cmp-price" id="cmp-price-b">₹0</span>
+          <span class="cmp-rate" id="cmp-rate-b">₹0–0/sqft</span>
+        </div>
+      </div>
+      <p class="compare-diff" id="compare-diff">Same size ke liye difference calculate ho raha hai...</p>
+    </div>
+  </div>
+
   <!-- STEP 2: 3D Preview -->
   <p class="calc-step-label" data-num="2">Live 3D preview</p>
-  <div class="preview-wrap">
+  <div class="preview-wrap" id="preview-wrap">
     <div class="preview-top">
-      <span class="preview-title">📐 Real-time shed shape</span>
+      <span class="preview-title"><svg class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
       <span class="preview-dim" id="pdim">50 × 40 ft</span>
     </div>
-    <svg id="pshed" viewBox="0 0 340 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-      <rect width="340" height="185" fill="#eef1f8"/>
-      <ellipse cx="170" cy="172" rx="138" ry="11" fill="rgba(10,22,40,0.15)"/>
-      <g id="pshed-g"></g>
-      <text id="plbl-len" font-size="9" fill="#ff6f00" font-family="sans-serif" text-anchor="middle"></text>
-      <text id="plbl-ht" font-size="9" fill="rgba(10,22,40,0.45)" font-family="sans-serif" text-anchor="middle"></text>
-      <line id="pdim-line" stroke="#ff6f00" stroke-width="0.5" opacity="0.45" stroke-dasharray="3,2"/>
-    </svg>
+    <div class="preview-tilt-stage" id="preview-tilt-stage">
+      <div class="preview-tilt-inner" id="preview-tilt-inner">
+        <svg id="pshed" viewBox="0 0 340 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+          <rect width="340" height="185" fill="#eef1f8"/>
+          <ellipse cx="170" cy="172" rx="138" ry="11" fill="rgba(10,22,40,0.15)" id="pshed-shadow"/>
+          <g id="pshed-g"></g>
+          <text id="plbl-len" font-size="9" fill="#ff6f00" font-family="sans-serif" text-anchor="middle"></text>
+          <text id="plbl-ht" font-size="9" fill="rgba(10,22,40,0.45)" font-family="sans-serif" text-anchor="middle"></text>
+          <line id="pdim-line" stroke="#ff6f00" stroke-width="0.5" opacity="0.45" stroke-dasharray="3,2"/>
+        </svg>
+      </div>
+    </div>
+    <div class="preview-controls">
+      <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+      <span class="pv-hint"><svg class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
+      <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+    </div>
   </div>
 
   <!-- STEP 3: Sliders -->
   <p class="calc-step-label" data-num="3">Dimensions enter karein</p>
   <div style="margin-bottom:28px">
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📏 Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-h"></use></svg> Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
       <input type="range" class="calc-slider" id="sl-len" min="20" max="200" value="50" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📐 Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-v"></use></svg> Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
       <input type="range" class="calc-slider" id="sl-wid" min="20" max="150" value="40" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label">📊 Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
+      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-height"></use></svg> Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
       <input type="range" class="calc-slider" id="sl-ht" min="10" max="40" value="14" step="1" oninput="calcDraw();calcResult()">
     </div>
   </div>
@@ -525,21 +753,21 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 
   <!-- PDF DOWNLOAD CTA -->
-  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon">📄</span><span class="xbtn-label">PDF Quote Download Karein</span></button>
+  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
 
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
-    <p class="lead-title">📧 Detailed quote email/WhatsApp pe chahiye?</p>
+    <p class="lead-title"><svg class="icon"><use href="#i-mail"></use></svg> Detailed quote email/WhatsApp pe chahiye?</p>
     <p class="lead-sub">Apna naam aur number daalo — hum 2 ghante mein detailed quote bhejenge. Free!</p>
     <div id="lead-form-area">
       <div class="lead-fields">
         <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
         <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
       </div>
-      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon">📩</span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
+      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
     </div>
     <div class="lead-success" id="lead-success">
-      <div class="lead-success-icon">✅</div>
+      <div class="lead-success-icon"><svg class="icon"><use href="#i-check-circle"></use></svg></div>
       <p class="lead-success-msg">Request send ho gayi!</p>
       <p class="lead-success-sub">Hum <strong>2 ghante mein</strong> aapko WhatsApp/call karenge.</p>
     </div>
@@ -547,19 +775,19 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   <!-- SHARE TOOL -->
   <div class="share-wrap">
-    <p class="share-title">🔗 Is tool ko share karein</p>
+    <p class="share-title"><svg class="icon"><use href="#i-link"></use></svg> Is tool ko share karein</p>
     <p class="share-sub">Apne contacts ko bhi yeh free calculator share karein</p>
     <div class="share-btns">
-      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe share</span></button>
-      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon">🔗</span><span class="xbtn-label">Link copy karein</span></button>
+      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe share</span></button>
+      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon"><svg class="icon"><use href="#i-link"></use></svg></span><span class="xbtn-label">Link copy karein</span></button>
     </div>
-    <p class="copy-confirm" id="copy-confirm">✅ Link copied!</p>
+    <p class="copy-confirm" id="copy-confirm"><svg class="icon" style="width:11px;height:11px"><use href="#i-check-circle"></use></svg> Link copied!</p>
   </div>
 
   <!-- WHATSAPP + CALL CTA -->
-  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon">💬</span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
-  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon">📞</span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
-  <p class="cta-disclaimer">⚠️ Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
+  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
+  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon"><svg class="icon"><use href="#i-phone"></use></svg></span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
+  <p class="cta-disclaimer"><svg class="icon"><use href="#i-warning"></use></svg> Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
 
 </div>
 </section>
@@ -582,6 +810,43 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       </table>
     </div>
     <p class="rate-note">* Rates approximate. Final quote site inspection ke baad. GST @18% extra.</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS CAROUSEL -->
+<section class="testi-section">
+  <div class="testi-wrap">
+    <div class="tag" style="margin-bottom:12px">Client Reviews</div>
+    <h2 class="section-title" style="margin-bottom:28px">Kya kehte hain <span>hamare clients</span></h2>
+    <div class="testi-track-wrap">
+      <div class="testi-track" id="testi-track">
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <p class="testi-text">Calculator se turant estimate mil gaya, aur final quote bhi usi range mein aayi. Poora process transparent tha — GST invoice bhi time pe mil gayi.</p>
+          <div class="testi-person"><div class="testi-avatar">RK</div><div><p class="testi-name">Rajesh Kumar</p><p class="testi-meta">Industrial Shed · Gurugram</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <p class="testi-text">15 din mein tin shed complete ho gaya, jaisa promise kiya tha waisa hi. Team professional hai aur site visit bhi free mein turant kar diya.</p>
+          <div class="testi-person"><div class="testi-avatar">SV</div><div><p class="testi-name">Sunita Verma</p><p class="testi-meta">Tin Shed · Noida</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <p class="testi-text">PEB structure ke liye 3 companies se quote liya tha, R.R Teen Set Solution ka pricing sabse fair aur clear tha. Quality bhi top-notch hai.</p>
+          <div class="testi-person"><div class="testi-avatar">AM</div><div><p class="testi-name">Anil Malik</p><p class="testi-meta">PEB Structure · Faridabad</p></div></div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-quote-mark">"</span>
+          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <p class="testi-text">Warehouse ke liye bulk quotation chahiye thi, WhatsApp pe hi sab detail mil gayi. Highly recommended for genuine pricing.</p>
+          <div class="testi-person"><div class="testi-avatar">PS</div><div><p class="testi-name">Priya Sharma</p><p class="testi-meta">Prefab Warehouse · Ghaziabad</p></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-dots" id="testi-dots"></div>
   </div>
 </section>
 
@@ -636,7 +901,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <div class="footer-col"><h5>Pages</h5><ul>
       <li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li>
       <li><a href="services.html">All Services</a></li><li><a href="projects.html">Projects</a></li>
-      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html">🧮 Calculator</a></li>
+      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html"><svg class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
     <li><a href="contact.html">Contact</a></li>
     </ul></div>
     <div class="footer-col"><h5>Services</h5><ul>
@@ -647,11 +912,11 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     </ul></div>
     <div class="footer-col"><h5>Contact</h5>
       <div class="footer-contact">
-        <p><span>📍</span> New Delhi, India</p>
-        <p><span>📞</span> <a href="tel:+918527258462">+91 85272 58462</a></p>
-        <p><span>💬</span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
-        <p><span>🕒</span> Mon–Sat: 9AM–7PM</p>
-        <p><span>🏛️</span> GST: 07DJCPK0635M1Z5</p>
+        <p><span><svg class="icon"><use href="#i-pin"></use></svg></span> New Delhi, India</p>
+        <p><span><svg class="icon"><use href="#i-phone"></use></svg></span> <a href="tel:+918527258462">+91 85272 58462</a></p>
+        <p><span><svg class="icon"><use href="#i-whatsapp"></use></svg></span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
+        <p><span><svg class="icon"><use href="#i-clock"></use></svg></span> Mon–Sat: 9AM–7PM</p>
+        <p><span><svg class="icon"><use href="#i-bank"></use></svg></span> GST: 07DJCPK0635M1Z5</p>
       </div>
     </div>
   <div class="footer-col" style="grid-column:1/-1;border-top:1px solid rgba(239,226,186,.15);padding-top:20px;margin-top:4px">
@@ -684,10 +949,19 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 </footer>
 
+<!-- STICKY MOBILE RESULT BAR -->
+<div class="sticky-result-bar" id="sticky-result-bar">
+  <div class="srb-info">
+    <span class="srb-lbl">Estimated Cost</span>
+    <span class="srb-price" id="srb-price">₹3.6L – ₹4.4L</span>
+  </div>
+  <button class="srb-cta" onclick="srbClick()">Free Quote Bhejo →</button>
+</div>
+
 <!-- FLOATING BUTTONS -->
 <div class="fab-wrap">
-  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us">📞</a>
-  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp">💬</a>
+  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us"><svg class="icon"><use href="#i-phone"></use></svg></a>
+  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp"><svg class="icon"><use href="#i-whatsapp"></use></svg></a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -704,6 +978,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     warehouse:{low:240,high:340,label:'Prefab Warehouse',wc:'#2E7D32',wd:'#1B5E20',ws:'#0d3314'}
   };
   var curType='tin';
+  var viewAngle=0; /* 0-3 = which corner of the shed we're viewing from */
+  var dispLen=50,dispWid=40,dispHt=14; /* smoothly-animated display values */
+  var animRAF=null;
 
   /* ── SELECT SHED TYPE ── */
   window.calcSelect=function(type){
@@ -717,6 +994,16 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     calcDraw();calcResult();
   };
 
+  /* ── ROTATE VIEW (4 corner views) ── */
+  window.rotateView=function(dir){
+    viewAngle=(viewAngle+dir+4)%4;
+    renderShed(dispLen,dispWid,dispHt);
+    var svg=document.getElementById('pshed');
+    if(svg){svg.classList.add('is-rotating');setTimeout(function(){svg.classList.remove('is-rotating');},150);}
+    var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
+    if(btnEl){btnEl.classList.add('is-spinning');setTimeout(function(){btnEl.classList.remove('is-spinning');},400);}
+  };
+
   /* ── SVG HELPERS ── */
   function svgEl(tag,attrs){
     var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
@@ -725,7 +1012,25 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   }
   function pt(a){return a[0].toFixed(1)+','+a[1].toFixed(1);}
 
-  /* ── DRAW 3D SHED ── */
+  /* ── ANIMATE DIMENSION CHANGES SMOOTHLY ── */
+  function animateTo(targetLen,targetWid,targetHt){
+    if(animRAF)cancelAnimationFrame(animRAF);
+    var startLen=dispLen,startWid=dispWid,startHt=dispHt;
+    var startTime=null,dur=280;
+    function step(ts){
+      if(!startTime)startTime=ts;
+      var p=Math.min((ts-startTime)/dur,1);
+      var eased=1-Math.pow(1-p,3);
+      dispLen=startLen+(targetLen-startLen)*eased;
+      dispWid=startWid+(targetWid-startWid)*eased;
+      dispHt=startHt+(targetHt-startHt)*eased;
+      renderShed(dispLen,dispWid,dispHt);
+      if(p<1){animRAF=requestAnimationFrame(step);}else{animRAF=null;}
+    }
+    animRAF=requestAnimationFrame(step);
+  }
+
+  /* ── PUBLIC: READ SLIDERS, KICK OFF ANIMATION ── */
   window.calcDraw=function(){
     var len=+document.getElementById('sl-len').value||50;
     var wid=+document.getElementById('sl-wid').value||40;
@@ -734,13 +1039,21 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     document.getElementById('sv-wid').textContent=wid+' ft';
     document.getElementById('sv-ht').textContent=ht+' ft';
     document.getElementById('pdim').textContent=len+' × '+wid+' ft';
+    animateTo(len,wid,ht);
+  };
 
+  /* ── ACTUAL 3D RENDER (called every animation frame) ── */
+  function renderShed(lenRaw,widRaw,htRaw){
     var r=R[curType];
-    var sc=Math.min(215/Math.max(len,wid*0.9,ht*1.9),2.7);
-    var W=len*sc,D=wid*sc*0.42,H=ht*sc*0.84,rH=Math.min(H*0.36,38);
+    var swap=(viewAngle%2===1);
+    var mirror=(viewAngle===1||viewAngle===2)?-1:1;
+    var Lfront=swap?widRaw:lenRaw, Dside=swap?lenRaw:widRaw;
+
+    var sc=Math.min(215/Math.max(Lfront,Dside*0.9,htRaw*1.9),2.7);
+    var W=Lfront*sc,D=Dside*sc*0.42,H=htRaw*sc*0.84,rH=Math.min(H*0.36,38);
     var cx=170,bY=165;
     var x0=cx-W/2,y0=bY-H;
-    var dx=D*0.58,dy=-D*0.33;
+    var dx=mirror*D*0.58,dy=-D*0.33;
     var A=[x0,y0+H],B=[x0+W,y0+H],C=[x0+W,y0],D2=[x0,y0];
     var E=[x0+dx,y0+H+dy],F=[x0+W+dx,y0+H+dy],G=[x0+W+dx,y0+dy],H2=[x0+dx,y0+dy];
     var RA=[x0+W/2,y0-rH],RB=[x0+W/2+dx,y0+dy-rH];
@@ -757,41 +1070,103 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     /* Right wall */
     g.appendChild(svgEl('polygon',{points:pt(B)+' '+pt(F)+' '+pt(G)+' '+pt(C),fill:r.wd}));
 
-    /* Wall stripes */
+    /* Wall stripes — corrugated sheet lines */
     var sc2=Math.max(3,Math.round(W/16));
     for(var i=1;i<sc2;i++){
       var sx=x0+(W/sc2)*i;
       g.appendChild(svgEl('line',{x1:sx.toFixed(1),y1:y0.toFixed(1),x2:sx.toFixed(1),y2:(y0+H).toFixed(1),stroke:'rgba(0,0,0,0.14)','stroke-width':'0.8'}));
     }
+    /* Side wall stripes for extra realism */
+    var sideSteps=Math.max(2,Math.round(D/14));
+    for(var si=1;si<sideSteps;si++){
+      var t2=si/sideSteps;
+      var sx1=E[0]+(F[0]-E[0])*t2, sy1=E[1]+(F[1]-E[1])*t2;
+      var sx2=H2[0]+(G[0]-H2[0])*t2, sy2=H2[1]+(G[1]-H2[1])*t2;
+      g.appendChild(svgEl('line',{x1:sx1.toFixed(1),y1:sy1.toFixed(1),x2:sx2.toFixed(1),y2:sy2.toFixed(1),stroke:'rgba(0,0,0,0.16)','stroke-width':'0.7'}));
+    }
 
-    /* Door */
-    var dW=W*0.17,dH=H*0.5,dX=x0+W*0.36,dY=y0+H-dH;
+    /* Door — mirrors position when view is flipped; warehouse gets a shutter look */
+    var dW=W*0.17,dH=H*0.5;
+    var doorFrac=mirror===1?0.36:(1-0.36-0.17);
+    var dX=x0+W*doorFrac,dY=y0+H-dH;
     g.appendChild(svgEl('rect',{x:dX.toFixed(1),y:dY.toFixed(1),width:dW.toFixed(1),height:dH.toFixed(1),fill:'rgba(0,0,0,0.5)',rx:'1'}));
-    g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(10,22,40,0.18)','stroke-width':'0.5'}));
+    if(curType==='warehouse'){
+      /* Rolling shutter — horizontal ribs */
+      var ribs=5;
+      for(var ri=1;ri<ribs;ri++){
+        var ry=dY+(dH/ribs)*ri;
+        g.appendChild(svgEl('line',{x1:dX.toFixed(1),y1:ry.toFixed(1),x2:(dX+dW).toFixed(1),y2:ry.toFixed(1),stroke:'rgba(255,255,255,0.14)','stroke-width':'0.6'}));
+      }
+    }else{
+      g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(10,22,40,0.18)','stroke-width':'0.5'}));
+    }
 
     /* Roof */
     g.appendChild(svgEl('polygon',{points:pt(D2)+' '+pt(C)+' '+pt(RA),fill:'#546E7A'}));
     g.appendChild(svgEl('polygon',{points:pt(C)+' '+pt(G)+' '+pt(RB)+' '+pt(RA),fill:'#37474F'}));
     g.appendChild(svgEl('polygon',{points:pt(D2)+' '+pt(H2)+' '+pt(RB)+' '+pt(RA),fill:'#455A64'}));
 
+    /* Type-specific realistic details */
+    if(curType==='peb'){
+      /* Visible steel truss lines on the side roof plane */
+      var trussN=4;
+      for(var ti=1;ti<trussN;ti++){
+        var tt=ti/trussN;
+        var px1=C[0]+(G[0]-C[0])*tt, py1=C[1]+(G[1]-C[1])*tt;
+        var px2=RA[0]+(RB[0]-RA[0])*tt, py2=RA[1]+(RB[1]-RA[1])*tt;
+        g.appendChild(svgEl('line',{x1:px1.toFixed(1),y1:py1.toFixed(1),x2:px2.toFixed(1),y2:py2.toFixed(1),stroke:'rgba(255,255,255,0.18)','stroke-width':'0.6'}));
+      }
+    }else if(curType==='industrial'){
+      /* Roof ventilator box on the ridge */
+      var vW=W*0.14,vH=rH*0.5;
+      var vX=(RA[0]+RB[0])/2-vW/2,vY=(RA[1]+RB[1])/2-vH*0.9;
+      g.appendChild(svgEl('rect',{x:vX.toFixed(1),y:vY.toFixed(1),width:vW.toFixed(1),height:vH.toFixed(1),fill:'#263238',stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5',rx:'1'}));
+      g.appendChild(svgEl('line',{x1:vX.toFixed(1),y1:(vY+vH*0.4).toFixed(1),x2:(vX+vW).toFixed(1),y2:(vY+vH*0.4).toFixed(1),stroke:'rgba(255,255,255,0.2)','stroke-width':'0.5'}));
+    }
+
     /* Edges */
     g.appendChild(svgEl('line',{x1:A[0].toFixed(1),y1:A[1].toFixed(1),x2:B[0].toFixed(1),y2:B[1].toFixed(1),stroke:'rgba(10,22,40,0.25)','stroke-width':'1'}));
     g.appendChild(svgEl('line',{x1:RA[0].toFixed(1),y1:RA[1].toFixed(1),x2:RB[0].toFixed(1),y2:RB[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
+
+    /* Ground shadow scales with footprint */
+    var shadow=document.getElementById('pshed-shadow');
+    if(shadow){shadow.setAttribute('rx',Math.min(150,W*0.62+40).toFixed(1));}
 
     /* Dimension labels */
     var dimY=A[1]+14;
     var ll=document.getElementById('plbl-len');
     ll.setAttribute('x',((A[0]+B[0])/2).toFixed(1));
     ll.setAttribute('y',dimY.toFixed(1));
-    ll.textContent=len+' ft';
+    ll.textContent=Math.round(Lfront)+' ft';
     var dl=document.getElementById('pdim-line');
     dl.setAttribute('x1',A[0].toFixed(1));dl.setAttribute('y1',dimY.toFixed(1));
     dl.setAttribute('x2',B[0].toFixed(1));dl.setAttribute('y2',dimY.toFixed(1));
     var lh=document.getElementById('plbl-ht');
-    lh.setAttribute('x',(D2[0]-17).toFixed(1));
+    lh.setAttribute('x',(D2[0]-mirror*17).toFixed(1));
     lh.setAttribute('y',((D2[1]+A[1])/2).toFixed(1));
-    lh.textContent=ht+' ft';
-  };
+    lh.textContent=Math.round(htRaw)+' ft';
+  }
+
+  /* ── MOUSE/TOUCH PARALLAX TILT ON PREVIEW ── */
+  function initPreviewTilt(){
+    var stage=document.getElementById('preview-tilt-stage');
+    var inner=document.getElementById('preview-tilt-inner');
+    if(!stage||!inner)return;
+    function apply(cx,cy,rect){
+      var relX=(cx-rect.left)/rect.width;
+      var relY=(cy-rect.top)/rect.height;
+      var rotY=(relX-0.5)*14;
+      var rotX=(0.5-relY)*10;
+      inner.style.transform='rotateX('+rotX.toFixed(2)+'deg) rotateY('+rotY.toFixed(2)+'deg)';
+    }
+    stage.addEventListener('mousemove',function(e){apply(e.clientX,e.clientY,stage.getBoundingClientRect());});
+    stage.addEventListener('mouseleave',function(){inner.style.transform='rotateX(0deg) rotateY(0deg)';});
+    stage.addEventListener('touchmove',function(e){
+      if(!e.touches||!e.touches[0])return;
+      apply(e.touches[0].clientX,e.touches[0].clientY,stage.getBoundingClientRect());
+    },{passive:true});
+    stage.addEventListener('touchend',function(){inner.style.transform='rotateX(0deg) rotateY(0deg)';});
+  }
 
   /* ── FORMAT CURRENCY ── */
   function fmt(n){
@@ -816,12 +1191,23 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var r=R[curType];
     var lo=Math.round(r.low*area*loc),hi=Math.round(r.high*area*loc);
     var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
-    document.getElementById('res-price').textContent=fmt(lo)+' – '+fmt(hi);
+    var priceEl=document.getElementById('res-price');
+    priceEl.textContent=fmt(lo)+' – '+fmt(hi);
+    priceEl.classList.remove('is-updating');void priceEl.offsetWidth;priceEl.classList.add('is-updating');
     document.getElementById('res-sub').textContent=area.toLocaleString('en-IN')+' sq.ft · '+r.label;
     document.getElementById('rb-area').textContent=area.toLocaleString('en-IN')+' sq.ft';
     document.getElementById('rb-rate').textContent='₹'+r.low+'–'+r.high;
     document.getElementById('rb-mat').textContent=fmt(mLo)+'–'+fmt(mHi);
     document.getElementById('rb-lab').textContent=fmt(lo-mLo)+'–'+fmt(hi-mHi);
+    ['rb-area','rb-rate','rb-mat','rb-lab'].forEach(function(id){
+      var el=document.getElementById(id);
+      el.classList.remove('is-updating');void el.offsetWidth;el.classList.add('is-updating');
+    });
+    /* Sync sticky mobile bar */
+    var srb=document.getElementById('srb-price');
+    if(srb)srb.textContent=fmt(lo)+' – '+fmt(hi);
+    /* Keep compare panel in sync if open */
+    if(typeof calcCompare==='function')calcCompare();
     /* Update WA button */
     var ht=document.getElementById('sl-ht').value;
     var msg='Hello R.R Teen Set Solution!\n\nMujhe '+r.label+' chahiye.\n📐 Size: '+len+' × '+wid+' feet\n📊 Height: '+ht+' feet\n💰 Estimated Budget: '+fmt(lo)+' – '+fmt(hi)+'\n\nPlease free site visit aur detailed quote arrange karein.\nThank you!';
@@ -841,6 +1227,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var msg='New Lead from Calculator!\n\nName: '+name+'\nPhone: '+phone+'\n\nShed Type: '+r.label+'\nSize: '+len+' × '+wid+' feet\nHeight: '+ht+' feet\n\nPlease call them for quote.';
     document.getElementById('lead-form-area').style.display='none';
     document.getElementById('lead-success').style.display='block';
+    fireConfetti();
     setTimeout(function(){
       window.open('https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg),'_blank');
     },800);
@@ -984,6 +1371,148 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── FAQ TOGGLE ── */
   window.toggleFAQ=function(el){el.classList.toggle('open');};
 
+  /* ── COMPARE 2 SHED TYPES ── */
+  window.toggleCompare=function(){
+    var panel=document.getElementById('compare-panel');
+    var btn=document.getElementById('cmp-toggle-btn');
+    var opening=!panel.classList.contains('is-open');
+    panel.classList.toggle('is-open');
+    btn.classList.toggle('is-open');
+    if(opening)calcCompare();
+  };
+  window.calcCompare=function(){
+    var panel=document.getElementById('compare-panel');
+    if(!panel||!panel.classList.contains('is-open'))return;
+    var len=+document.getElementById('sl-len').value||50;
+    var wid=+document.getElementById('sl-wid').value||40;
+    var loc=+document.getElementById('sl-loc').value||1;
+    var area=len*wid;
+    var ta=document.getElementById('cmp-type-a').value;
+    var tb=document.getElementById('cmp-type-b').value;
+    var ra=R[ta],rb=R[tb];
+    var aLo=Math.round(ra.low*area*loc),aHi=Math.round(ra.high*area*loc);
+    var bLo=Math.round(rb.low*area*loc),bHi=Math.round(rb.high*area*loc);
+    var aMid=(aLo+aHi)/2,bMid=(bLo+bHi)/2;
+    document.getElementById('cmp-lbl-a').textContent=ra.label;
+    document.getElementById('cmp-lbl-b').textContent=rb.label;
+    document.getElementById('cmp-price-a').textContent=fmt(aLo)+'–'+fmt(aHi);
+    document.getElementById('cmp-price-b').textContent=fmt(bLo)+'–'+fmt(bHi);
+    document.getElementById('cmp-rate-a').textContent='₹'+ra.low+'–'+ra.high+'/sqft';
+    document.getElementById('cmp-rate-b').textContent='₹'+rb.low+'–'+rb.high+'/sqft';
+    var cardA=document.getElementById('cmp-card-a'),cardB=document.getElementById('cmp-card-b');
+    cardA.classList.remove('cmp-win');cardB.classList.remove('cmp-win');
+    var diffEl=document.getElementById('compare-diff');
+    if(ta===tb){
+      diffEl.innerHTML='Same shed type select kiya hai — compare karne ke liye alag type chunein.';
+    }else{
+      var cheaper=aMid<bMid?ra:rb;
+      var expensive=aMid<bMid?rb:ra;
+      var diff=Math.round(Math.abs(aMid-bMid));
+      var pct=Math.round((diff/Math.max(aMid,bMid))*100);
+      (aMid<bMid?cardA:cardB).classList.add('cmp-win');
+      diffEl.innerHTML='<strong>'+cheaper.label+'</strong> ~'+fmt(diff)+' ('+pct+'%) sasta hai <strong>'+expensive.label+'</strong> ke muqable, isi size ('+area.toLocaleString('en-IN')+' sq.ft) ke liye.';
+    }
+  };
+
+  /* ── ANIMATED COUNTERS (trust strip) ── */
+  function animateCounters(){
+    var nums=document.querySelectorAll('.trust-num[data-count]');
+    nums.forEach(function(el){
+      var target=+el.getAttribute('data-count');
+      var decimals=+el.getAttribute('data-decimal')||0;
+      var suffix=el.getAttribute('data-suffix')||'';
+      var divisor=decimals>0?Math.pow(10,decimals):1;
+      var dur=1400,start=null;
+      function step(ts){
+        if(!start)start=ts;
+        var p=Math.min((ts-start)/dur,1);
+        var eased=1-Math.pow(1-p,3);
+        var val=(target*eased)/divisor;
+        el.textContent=(decimals>0?val.toFixed(decimals):Math.round(val))+suffix;
+        if(p<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ── TESTIMONIAL CAROUSEL ── */
+  var testiIdx=0,testiTimer=null;
+  function initTesti(){
+    var track=document.getElementById('testi-track');
+    var dotsWrap=document.getElementById('testi-dots');
+    if(!track||!dotsWrap)return;
+    var cards=track.children;
+    for(var i=0;i<cards.length;i++){
+      var dot=document.createElement('button');
+      dot.className='testi-dot'+(i===0?' active':'');
+      dot.setAttribute('aria-label','Slide '+(i+1));
+      dot.onclick=function(idx){return function(){goTesti(idx);};}(i);
+      dotsWrap.appendChild(dot);
+    }
+    function goTesti(i){
+      testiIdx=(i+cards.length)%cards.length;
+      track.style.transform='translateX(-'+(testiIdx*100)+'%)';
+      var dots=dotsWrap.querySelectorAll('.testi-dot');
+      dots.forEach(function(d,di){d.classList.toggle('active',di===testiIdx);});
+    }
+    window.goTesti=goTesti;
+    testiTimer=setInterval(function(){goTesti(testiIdx+1);},5000);
+    track.parentElement.addEventListener('mouseenter',function(){clearInterval(testiTimer);});
+    track.parentElement.addEventListener('mouseleave',function(){testiTimer=setInterval(function(){goTesti(testiIdx+1);},5000);});
+  }
+
+  /* ── STICKY MOBILE RESULT BAR ── */
+  function initStickyBar(){
+    var bar=document.getElementById('sticky-result-bar');
+    var resultWrap=document.querySelector('.result-wrap');
+    if(!bar||!resultWrap)return;
+    window.addEventListener('scroll',function(){
+      var rect=resultWrap.getBoundingClientRect();
+      var pastResult=rect.bottom<0;
+      var nearFooter=document.querySelector('.faq-section');
+      var footerNear=nearFooter?nearFooter.getBoundingClientRect().top<window.innerHeight*0.3:false;
+      if(pastResult&&!footerNear){bar.classList.add('visible');}
+      else{bar.classList.remove('visible');}
+    },{passive:true});
+  }
+  window.srbClick=function(){
+    var leadWrap=document.querySelector('.lead-wrap');
+    if(leadWrap)leadWrap.scrollIntoView({behavior:'smooth',block:'center'});
+    var nameInput=document.getElementById('lf-name');
+    if(nameInput)setTimeout(function(){nameInput.focus();},500);
+  };
+
+  /* ── CONFETTI BURST ── */
+  window.fireConfetti=function(){
+    var colors=['#ff6f00','#ff8c00','#25D366','#16264f','#ffc266'];
+    for(var i=0;i<28;i++){
+      var piece=document.createElement('div');
+      piece.className='confetti-piece';
+      piece.style.left=Math.random()*100+'vw';
+      piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration=(1.8+Math.random()*1.2)+'s';
+      piece.style.borderRadius=Math.random()>0.5?'50%':'2px';
+      document.body.appendChild(piece);
+      (function(p){setTimeout(function(){p.remove();},3200);})(piece);
+    }
+  };
+
+  /* ── SCROLL-REVEAL OBSERVER ── */
+  function initReveal(){
+    var targets=document.querySelectorAll('.trust-strip,.testi-section,.rate-section,.faq-section,.compare-toggle-btn,.share-wrap');
+    if(!('IntersectionObserver' in window)){targets.forEach(function(t){t.classList.add('reveal','in-view');});return;}
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          if(entry.target.id==='trust-grid'||entry.target.classList.contains('trust-strip'))animateCounters();
+          io.unobserve(entry.target);
+        }
+      });
+    },{threshold:0.25});
+    targets.forEach(function(t){t.classList.add('reveal');io.observe(t);});
+  }
+
   /* ── BUTTON RIPPLE (adds a tactile click feel to every action button) ── */
   document.addEventListener('click',function(e){
     var btn=e.target.closest('.xbtn');
@@ -1002,9 +1531,12 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── INIT ── */
   calcDraw();
   calcResult();
+  initTesti();
+  initStickyBar();
+  initReveal();
+  initPreviewTilt();
 })();
 </script>
 
-<script type="module" src="site-tracker.js"></script>
 </body>
 </html>
