@@ -492,7 +492,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 @keyframes xspin360{to{transform:rotate(360deg)}}
 .pv-rotate-r.is-spinning .icon{animation:xspin360r .4s ease}
 @keyframes xspin360r{to{transform:scaleX(-1) rotate(-360deg)}}
-.pv-hint{font-size:10px;color:rgba(10,22,40,.4);display:flex;align-items:center;gap:4px;letter-spacing:.2px;user-select:none}
+.pv-hint{font-size:10px;color:rgba(10,22,40,.4);display:flex;align-items:center;gap:4px;letter-spacing:.2px;user-select:none;transition:opacity .4s ease}
 
 /* Confetti */
 .confetti-piece{position:fixed;top:-10px;width:8px;height:8px;pointer-events:none;z-index:200;border-radius:1px;animation:xconfetti linear forwards}
@@ -978,7 +978,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     warehouse:{low:240,high:340,label:'Prefab Warehouse',wc:'#2E7D32',wd:'#1B5E20',ws:'#0d3314'}
   };
   var curType='tin';
-  var viewAngle=0; /* 0-3 = which corner of the shed we're viewing from */
   var dispLen=50,dispWid=40,dispHt=14; /* smoothly-animated display values */
   var animRAF=null;
 
@@ -994,15 +993,52 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     calcDraw();calcResult();
   };
 
-  /* ── ROTATE VIEW (4 corner views) ── */
+  /* ── ROTATION STATE (continuous, radians) ── */
+  var theta=-0.5;      /* current rotation angle */
+  var thetaTarget=-0.5;
+  var thetaRAF=null;
+
+  function animateTheta(){
+    if(thetaRAF)cancelAnimationFrame(thetaRAF);
+    function step(){
+      var diff=thetaTarget-theta;
+      theta+=diff*0.18;
+      renderShed(dispLen,dispWid,dispHt);
+      if(Math.abs(diff)>0.002){thetaRAF=requestAnimationFrame(step);}
+      else{theta=thetaTarget;renderShed(dispLen,dispWid,dispHt);thetaRAF=null;}
+    }
+    thetaRAF=requestAnimationFrame(step);
+  }
+
+  /* ── ROTATE BUTTONS — nudge by a fixed step, smoothly ── */
   window.rotateView=function(dir){
-    viewAngle=(viewAngle+dir+4)%4;
-    renderShed(dispLen,dispWid,dispHt);
-    var svg=document.getElementById('pshed');
-    if(svg){svg.classList.add('is-rotating');setTimeout(function(){svg.classList.remove('is-rotating');},150);}
+    thetaTarget+=dir*(Math.PI/4);
+    animateTheta();
     var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
     if(btnEl){btnEl.classList.add('is-spinning');setTimeout(function(){btnEl.classList.remove('is-spinning');},400);}
   };
+
+  /* ── DRAG-TO-ROTATE — full continuous 360° ── */
+  function initDragRotate(){
+    var stage=document.getElementById('preview-tilt-stage');
+    if(!stage)return;
+    var dragging=false,lastX=0,hint=document.querySelector('.pv-hint');
+    function onDown(x){dragging=true;lastX=x;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
+    function onMove(x){
+      if(!dragging)return;
+      var dx=x-lastX;lastX=x;
+      theta+=dx*0.012;thetaTarget=theta;
+      renderShed(dispLen,dispWid,dispHt);
+    }
+    function onUp(){dragging=false;stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
+    stage.style.cursor='grab';
+    stage.addEventListener('mousedown',function(e){onDown(e.clientX);e.preventDefault();});
+    window.addEventListener('mousemove',function(e){if(dragging)onMove(e.clientX);});
+    window.addEventListener('mouseup',onUp);
+    stage.addEventListener('touchstart',function(e){if(e.touches&&e.touches[0])onDown(e.touches[0].clientX);},{passive:true});
+    stage.addEventListener('touchmove',function(e){if(e.touches&&e.touches[0])onMove(e.touches[0].clientX);},{passive:true});
+    stage.addEventListener('touchend',onUp);
+  }
 
   /* ── SVG HELPERS ── */
   function svgEl(tag,attrs){
@@ -1042,130 +1078,135 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     animateTo(len,wid,ht);
   };
 
-  /* ── ACTUAL 3D RENDER (called every animation frame) ── */
+  /* ── TRUE 3D ISOMETRIC RENDER — full 360° rotation with face culling ── */
   function renderShed(lenRaw,widRaw,htRaw){
     var r=R[curType];
-    var swap=(viewAngle%2===1);
-    var mirror=(viewAngle===1||viewAngle===2)?-1:1;
-    var Lfront=swap?widRaw:lenRaw, Dside=swap?lenRaw:widRaw;
+    var L=lenRaw,D=widRaw,H0=htRaw;
+    var hl=L/2,hd=D/2;
+    var rHft=Math.min(H0*0.35,15);
 
-    var sc=Math.min(215/Math.max(Lfront,Dside*0.9,htRaw*1.9),2.7);
-    var W=Lfront*sc,D=Dside*sc*0.42,H=htRaw*sc*0.84,rH=Math.min(H*0.36,38);
-    var cx=170,bY=165;
-    var x0=cx-W/2,y0=bY-H;
-    var dx=mirror*D*0.58,dy=-D*0.33;
-    var A=[x0,y0+H],B=[x0+W,y0+H],C=[x0+W,y0],D2=[x0,y0];
-    var E=[x0+dx,y0+H+dy],F=[x0+W+dx,y0+H+dy],G=[x0+W+dx,y0+dy],H2=[x0+dx,y0+dy];
-    var RA=[x0+W/2,y0-rH],RB=[x0+W/2+dx,y0+dy-rH];
+    /* Scale to fit viewBox at ANY rotation angle (closed-form worst-case bound) */
+    var M=Math.sqrt(2*(hl*hl+hd*hd));
+    var wSpan=1.732*M, hSpan=M+(H0+rHft)*0.86;
+    var sc=Math.min(290/wSpan,116/hSpan,5.2);
+
+    var cx=170,baseY=168-0.5*M*sc;
+    function project(xl,yl,zl){
+      var xc=xl-hl,zc=zl-hd;
+      var xr=xc*Math.cos(theta)-zc*Math.sin(theta);
+      var zr=xc*Math.sin(theta)+zc*Math.cos(theta);
+      var X=xr*sc,Y=yl*sc,Z=zr*sc;
+      return [cx+(X-Z)*0.866, baseY-((X+Z)*0.5)-Y*0.86];
+    }
+
+    var G1=project(0,0,0),G2=project(L,0,0),G3=project(L,0,D),G4=project(0,0,D);
+    var T1=project(0,H0,0),T2=project(L,H0,0),T3=project(L,H0,D),T4=project(0,H0,D);
+    var R1=project(0,H0+rHft,D/2),R2=project(L,H0+rHft,D/2);
+
+    /* Visibility — pick the 2 most camera-facing faces among 4 candidates */
+    var dEndA=-(Math.cos(theta)+Math.sin(theta));
+    var dEndB=(Math.cos(theta)+Math.sin(theta));
+    var dEaveF=Math.sin(theta)-Math.cos(theta);
+    var dEaveB=Math.cos(theta)-Math.sin(theta);
+    var endVisible=dEndA>dEndB?'A':'B';
+    var eaveVisible=dEaveF>dEaveB?'F':'B';
 
     var g=document.getElementById('pshed-g');
     g.innerHTML='';
 
     /* Ground */
-    g.appendChild(svgEl('polygon',{points:pt(A)+' '+pt(B)+' '+pt(F)+' '+pt(E),fill:'#101a0e',opacity:'0.9'}));
-    /* Side wall */
-    g.appendChild(svgEl('polygon',{points:pt(E)+' '+pt(F)+' '+pt(G)+' '+pt(H2),fill:r.ws}));
-    /* Front wall */
-    g.appendChild(svgEl('polygon',{points:pt(A)+' '+pt(B)+' '+pt(C)+' '+pt(D2),fill:r.wc}));
-    /* Right wall */
-    g.appendChild(svgEl('polygon',{points:pt(B)+' '+pt(F)+' '+pt(G)+' '+pt(C),fill:r.wd}));
+    g.appendChild(svgEl('polygon',{points:pt(G1)+' '+pt(G2)+' '+pt(G3)+' '+pt(G4),fill:'#101a0e',opacity:'0.85'}));
 
-    /* Wall stripes — corrugated sheet lines */
-    var sc2=Math.max(3,Math.round(W/16));
-    for(var i=1;i<sc2;i++){
-      var sx=x0+(W/sc2)*i;
-      g.appendChild(svgEl('line',{x1:sx.toFixed(1),y1:y0.toFixed(1),x2:sx.toFixed(1),y2:(y0+H).toFixed(1),stroke:'rgba(0,0,0,0.14)','stroke-width':'0.8'}));
+    /* Determine wall corner sets for the two visible faces */
+    var eave=eaveVisible==='F'?{a:G1,b:G2,ta:T1,tb:T2}:{a:G4,b:G3,ta:T4,tb:T3};
+    var end=endVisible==='A'?{a:G1,b:G4,ta:T1,tb:T4,ridge:R1}:{a:G2,b:G3,ta:T2,tb:T3,ridge:R2};
+    var eaveRidge=eaveVisible==='F'?[R1,R2]:[R2,R1];
+
+    /* End wall (gable end) — drawn first so eave wall's corner overlaps cleanly on top */
+    g.appendChild(svgEl('polygon',{points:pt(end.a)+' '+pt(end.b)+' '+pt(end.tb)+' '+pt(end.ta),fill:r.wd}));
+    g.appendChild(svgEl('polygon',{points:pt(end.ta)+' '+pt(end.tb)+' '+pt(end.ridge),fill:r.wd}));
+
+    /* Eave wall (long wall, main face) */
+    g.appendChild(svgEl('polygon',{points:pt(eave.a)+' '+pt(eave.b)+' '+pt(eave.tb)+' '+pt(eave.ta),fill:r.wc}));
+
+    /* Corrugated stripes on the main eave wall */
+    var steps=Math.max(4,Math.round(L/9));
+    for(var i=1;i<steps;i++){
+      var t=i/steps;
+      var bx=eave.a[0]+(eave.b[0]-eave.a[0])*t, by=eave.a[1]+(eave.b[1]-eave.a[1])*t;
+      var tx=eave.ta[0]+(eave.tb[0]-eave.ta[0])*t, ty=eave.ta[1]+(eave.tb[1]-eave.ta[1])*t;
+      g.appendChild(svgEl('line',{x1:bx.toFixed(1),y1:by.toFixed(1),x2:tx.toFixed(1),y2:ty.toFixed(1),stroke:'rgba(0,0,0,0.13)','stroke-width':'0.7'}));
     }
-    /* Side wall stripes for extra realism */
-    var sideSteps=Math.max(2,Math.round(D/14));
-    for(var si=1;si<sideSteps;si++){
-      var t2=si/sideSteps;
-      var sx1=E[0]+(F[0]-E[0])*t2, sy1=E[1]+(F[1]-E[1])*t2;
-      var sx2=H2[0]+(G[0]-H2[0])*t2, sy2=H2[1]+(G[1]-H2[1])*t2;
-      g.appendChild(svgEl('line',{x1:sx1.toFixed(1),y1:sy1.toFixed(1),x2:sx2.toFixed(1),y2:sy2.toFixed(1),stroke:'rgba(0,0,0,0.16)','stroke-width':'0.7'}));
+    /* Stripes on the end wall too */
+    var steps2=Math.max(2,Math.round(D/12));
+    for(var j=1;j<steps2;j++){
+      var t2=j/steps2;
+      var bx2=end.a[0]+(end.b[0]-end.a[0])*t2, by2=end.a[1]+(end.b[1]-end.a[1])*t2;
+      var tx2=end.ta[0]+(end.tb[0]-end.ta[0])*t2, ty2=end.ta[1]+(end.tb[1]-end.ta[1])*t2;
+      g.appendChild(svgEl('line',{x1:bx2.toFixed(1),y1:by2.toFixed(1),x2:tx2.toFixed(1),y2:ty2.toFixed(1),stroke:'rgba(0,0,0,0.16)','stroke-width':'0.6'}));
     }
 
-    /* Door — mirrors position when view is flipped; warehouse gets a shutter look */
-    var dW=W*0.17,dH=H*0.5;
-    var doorFrac=mirror===1?0.36:(1-0.36-0.17);
-    var dX=x0+W*doorFrac,dY=y0+H-dH;
+    /* Door on the main eave wall, centered-ish */
+    var dW=Math.abs(eave.b[0]-eave.a[0])*0.15,dH=Math.abs(eave.ta[1]-eave.a[1])*0.52;
+    var doorMidX=eave.a[0]+(eave.b[0]-eave.a[0])*0.42, doorBotY=eave.a[1]+(eave.b[1]-eave.a[1])*0.42;
+    var dX=doorMidX-dW/2,dY=doorBotY-dH;
     g.appendChild(svgEl('rect',{x:dX.toFixed(1),y:dY.toFixed(1),width:dW.toFixed(1),height:dH.toFixed(1),fill:'rgba(0,0,0,0.5)',rx:'1'}));
     if(curType==='warehouse'){
-      /* Rolling shutter — horizontal ribs */
       var ribs=5;
       for(var ri=1;ri<ribs;ri++){
         var ry=dY+(dH/ribs)*ri;
         g.appendChild(svgEl('line',{x1:dX.toFixed(1),y1:ry.toFixed(1),x2:(dX+dW).toFixed(1),y2:ry.toFixed(1),stroke:'rgba(255,255,255,0.14)','stroke-width':'0.6'}));
       }
     }else{
-      g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(10,22,40,0.18)','stroke-width':'0.5'}));
+      g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5'}));
     }
 
-    /* Roof */
-    g.appendChild(svgEl('polygon',{points:pt(D2)+' '+pt(C)+' '+pt(RA),fill:'#546E7A'}));
-    g.appendChild(svgEl('polygon',{points:pt(C)+' '+pt(G)+' '+pt(RB)+' '+pt(RA),fill:'#37474F'}));
-    g.appendChild(svgEl('polygon',{points:pt(D2)+' '+pt(H2)+' '+pt(RB)+' '+pt(RA),fill:'#455A64'}));
+    /* Roof slope above the visible eave wall */
+    g.appendChild(svgEl('polygon',{points:pt(eave.ta)+' '+pt(eave.tb)+' '+pt(eaveRidge[1])+' '+pt(eaveRidge[0]),fill:'#455A64'}));
+    /* Ridge line */
+    g.appendChild(svgEl('line',{x1:R1[0].toFixed(1),y1:R1[1].toFixed(1),x2:R2[0].toFixed(1),y2:R2[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
 
     /* Type-specific realistic details */
     if(curType==='peb'){
-      /* Visible steel truss lines on the side roof plane */
       var trussN=4;
       for(var ti=1;ti<trussN;ti++){
         var tt=ti/trussN;
-        var px1=C[0]+(G[0]-C[0])*tt, py1=C[1]+(G[1]-C[1])*tt;
-        var px2=RA[0]+(RB[0]-RA[0])*tt, py2=RA[1]+(RB[1]-RA[1])*tt;
-        g.appendChild(svgEl('line',{x1:px1.toFixed(1),y1:py1.toFixed(1),x2:px2.toFixed(1),y2:py2.toFixed(1),stroke:'rgba(255,255,255,0.18)','stroke-width':'0.6'}));
+        var px1=eave.ta[0]+(eave.tb[0]-eave.ta[0])*tt, py1=eave.ta[1]+(eave.tb[1]-eave.ta[1])*tt;
+        var px2=eaveRidge[0][0]+(eaveRidge[1][0]-eaveRidge[0][0])*tt, py2=eaveRidge[0][1]+(eaveRidge[1][1]-eaveRidge[0][1])*tt;
+        g.appendChild(svgEl('line',{x1:px1.toFixed(1),y1:py1.toFixed(1),x2:px2.toFixed(1),y2:py2.toFixed(1),stroke:'rgba(255,255,255,0.2)','stroke-width':'0.6'}));
       }
     }else if(curType==='industrial'){
-      /* Roof ventilator box on the ridge */
-      var vW=W*0.14,vH=rH*0.5;
-      var vX=(RA[0]+RB[0])/2-vW/2,vY=(RA[1]+RB[1])/2-vH*0.9;
+      var midR=[(R1[0]+R2[0])/2,(R1[1]+R2[1])/2];
+      var vW=Math.abs(R2[0]-R1[0])*0.12,vH=14;
+      var vX=midR[0]-vW/2,vY=midR[1]-vH*0.9;
       g.appendChild(svgEl('rect',{x:vX.toFixed(1),y:vY.toFixed(1),width:vW.toFixed(1),height:vH.toFixed(1),fill:'#263238',stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5',rx:'1'}));
       g.appendChild(svgEl('line',{x1:vX.toFixed(1),y1:(vY+vH*0.4).toFixed(1),x2:(vX+vW).toFixed(1),y2:(vY+vH*0.4).toFixed(1),stroke:'rgba(255,255,255,0.2)','stroke-width':'0.5'}));
     }
 
-    /* Edges */
-    g.appendChild(svgEl('line',{x1:A[0].toFixed(1),y1:A[1].toFixed(1),x2:B[0].toFixed(1),y2:B[1].toFixed(1),stroke:'rgba(10,22,40,0.25)','stroke-width':'1'}));
-    g.appendChild(svgEl('line',{x1:RA[0].toFixed(1),y1:RA[1].toFixed(1),x2:RB[0].toFixed(1),y2:RB[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
+    /* Outline edges for crispness */
+    g.appendChild(svgEl('line',{x1:eave.a[0].toFixed(1),y1:eave.a[1].toFixed(1),x2:eave.b[0].toFixed(1),y2:eave.b[1].toFixed(1),stroke:'rgba(10,22,40,0.25)','stroke-width':'1'}));
+    g.appendChild(svgEl('line',{x1:end.ta[0].toFixed(1),y1:end.ta[1].toFixed(1),x2:end.ridge[0].toFixed(1),y2:end.ridge[1].toFixed(1),stroke:'rgba(10,22,40,0.2)','stroke-width':'0.8'}));
 
     /* Ground shadow scales with footprint */
     var shadow=document.getElementById('pshed-shadow');
-    if(shadow){shadow.setAttribute('rx',Math.min(150,W*0.62+40).toFixed(1));}
-
-    /* Dimension labels */
-    var dimY=A[1]+14;
-    var ll=document.getElementById('plbl-len');
-    ll.setAttribute('x',((A[0]+B[0])/2).toFixed(1));
-    ll.setAttribute('y',dimY.toFixed(1));
-    ll.textContent=Math.round(Lfront)+' ft';
-    var dl=document.getElementById('pdim-line');
-    dl.setAttribute('x1',A[0].toFixed(1));dl.setAttribute('y1',dimY.toFixed(1));
-    dl.setAttribute('x2',B[0].toFixed(1));dl.setAttribute('y2',dimY.toFixed(1));
-    var lh=document.getElementById('plbl-ht');
-    lh.setAttribute('x',(D2[0]-mirror*17).toFixed(1));
-    lh.setAttribute('y',((D2[1]+A[1])/2).toFixed(1));
-    lh.textContent=Math.round(htRaw)+' ft';
-  }
-
-  /* ── MOUSE/TOUCH PARALLAX TILT ON PREVIEW ── */
-  function initPreviewTilt(){
-    var stage=document.getElementById('preview-tilt-stage');
-    var inner=document.getElementById('preview-tilt-inner');
-    if(!stage||!inner)return;
-    function apply(cx,cy,rect){
-      var relX=(cx-rect.left)/rect.width;
-      var relY=(cy-rect.top)/rect.height;
-      var rotY=(relX-0.5)*14;
-      var rotX=(0.5-relY)*10;
-      inner.style.transform='rotateX('+rotX.toFixed(2)+'deg) rotateY('+rotY.toFixed(2)+'deg)';
+    if(shadow){
+      shadow.setAttribute('rx',Math.min(150,L*sc*0.42+30).toFixed(1));
+      shadow.setAttribute('cy',(baseY+0.5*M*sc+3).toFixed(1));
     }
-    stage.addEventListener('mousemove',function(e){apply(e.clientX,e.clientY,stage.getBoundingClientRect());});
-    stage.addEventListener('mouseleave',function(){inner.style.transform='rotateX(0deg) rotateY(0deg)';});
-    stage.addEventListener('touchmove',function(e){
-      if(!e.touches||!e.touches[0])return;
-      apply(e.touches[0].clientX,e.touches[0].clientY,stage.getBoundingClientRect());
-    },{passive:true});
-    stage.addEventListener('touchend',function(){inner.style.transform='rotateX(0deg) rotateY(0deg)';});
+
+    /* Dimension labels — follow the visible eave wall */
+    var dimY=Math.max(eave.a[1],eave.b[1])+14;
+    var ll=document.getElementById('plbl-len');
+    ll.setAttribute('x',((eave.a[0]+eave.b[0])/2).toFixed(1));
+    ll.setAttribute('y',dimY.toFixed(1));
+    ll.textContent=Math.round(L)+' ft';
+    var dl=document.getElementById('pdim-line');
+    dl.setAttribute('x1',eave.a[0].toFixed(1));dl.setAttribute('y1',dimY.toFixed(1));
+    dl.setAttribute('x2',eave.b[0].toFixed(1));dl.setAttribute('y2',dimY.toFixed(1));
+    var lh=document.getElementById('plbl-ht');
+    lh.setAttribute('x',(end.a[0]-14).toFixed(1));
+    lh.setAttribute('y',((end.a[1]+end.ta[1])/2).toFixed(1));
+    lh.textContent=Math.round(htRaw)+' ft';
   }
 
   /* ── FORMAT CURRENCY ── */
@@ -1534,7 +1575,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   initTesti();
   initStickyBar();
   initReveal();
-  initPreviewTilt();
+  initDragRotate();
 })();
 </script>
 
