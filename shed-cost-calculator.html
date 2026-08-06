@@ -539,31 +539,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .crp-field input{width:100%;background:rgba(255,255,255,.1);border:1.3px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 9px;color:#fff;font-size:13px;font-weight:700;box-sizing:border-box}
 .crp-field input:focus{outline:none;border-color:#ff8c00}
 .crp-apply{width:100%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:800;cursor:pointer}
-
-/* ══════════════════════════════════════════
-   ADMIN PANEL — rate management (hidden, ?admin=1)
-══════════════════════════════════════════ */
-.admin-fab{position:fixed;left:14px;bottom:14px;z-index:80;background:#16264f;color:#ff8c00;border:1.5px solid rgba(255,140,0,.4);border-radius:50%;width:42px;height:42px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-.admin-fab.shown{display:flex}
-.admin-fab .icon{width:19px;height:19px}
-.admin-overlay{position:fixed;inset:0;background:rgba(10,22,40,.7);backdrop-filter:blur(3px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
-.admin-overlay.open{display:flex}
-.admin-modal{background:#fff;border-radius:18px;padding:22px;max-width:380px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-.admin-modal h3{margin:0 0 4px;font-size:16px;color:#0a1628}
-.admin-modal p.sub{margin:0 0 16px;font-size:11px;color:rgba(10,22,40,.5)}
-.admin-field{margin-bottom:12px}
-.admin-field label{display:block;font-size:10.5px;font-weight:700;color:#0a1628;margin-bottom:4px}
-.admin-field input{width:100%;background:#f7f3e8;border:1.3px solid rgba(10,22,40,.15);border-radius:9px;padding:9px 10px;font-size:13px;box-sizing:border-box}
-.admin-rate-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.admin-type-block{border-top:1px dashed rgba(10,22,40,.12);padding-top:10px;margin-top:10px}
-.admin-type-block .t-name{font-size:11.5px;font-weight:800;color:#ff6f00;margin-bottom:6px}
-.admin-btn{width:100%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;margin-top:6px}
-.admin-btn-secondary{width:100%;background:none;border:1.3px solid rgba(10,22,40,.15);color:rgba(10,22,40,.6);border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px}
-.admin-status{font-size:11px;text-align:center;margin-top:10px;padding:8px;border-radius:8px;display:none}
-.admin-status.ok{display:block;background:rgba(37,211,102,.12);color:#1a8a4a}
-.admin-status.err{display:block;background:rgba(220,53,69,.1);color:#c62828}
-.admin-close{position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(10,22,40,.4);cursor:pointer}
-.admin-modal{position:relative}
 </style>
 </head>
 <body>
@@ -1008,63 +983,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
 </footer>
 
-<!-- ADMIN — hidden unless ?admin=1, lets Vikash update rates for everyone -->
-<button class="admin-fab" id="admin-fab" onclick="openAdminPanel()" aria-label="Admin: update rates">
-  <svg class="icon"><use href="#i-scale"></use></svg>
-</button>
-<div class="admin-overlay" id="admin-overlay">
-  <div class="admin-modal">
-    <button class="admin-close" onclick="closeAdminPanel()" aria-label="Close" style="font-size:20px;line-height:1">✕</button>
-
-    <div id="admin-login-view">
-      <h3>Admin Login</h3>
-      <p class="sub">CRM wala email/password use karein</p>
-      <div class="admin-field"><label>Email</label><input type="email" id="admin-email" autocomplete="username"></div>
-      <div class="admin-field"><label>Password</label><input type="password" id="admin-pass" autocomplete="current-password"></div>
-      <button class="admin-btn" onclick="adminLogin()">Login</button>
-      <p class="admin-status" id="admin-login-status"></p>
-    </div>
-
-    <div id="admin-rates-view" style="display:none">
-      <h3>Update Shed Rates</h3>
-      <p class="sub">Save karte hi sab visitors ko naye rates dikhenge</p>
-
-      <div class="admin-type-block">
-        <p class="t-name">Tin Shed</p>
-        <div class="admin-rate-row">
-          <div class="admin-field"><label>Min ₹/sqft</label><input type="number" id="ar-tin-low"></div>
-          <div class="admin-field"><label>Max ₹/sqft</label><input type="number" id="ar-tin-high"></div>
-        </div>
-      </div>
-      <div class="admin-type-block">
-        <p class="t-name">Industrial Shed</p>
-        <div class="admin-rate-row">
-          <div class="admin-field"><label>Min ₹/sqft</label><input type="number" id="ar-industrial-low"></div>
-          <div class="admin-field"><label>Max ₹/sqft</label><input type="number" id="ar-industrial-high"></div>
-        </div>
-      </div>
-      <div class="admin-type-block">
-        <p class="t-name">PEB Structure</p>
-        <div class="admin-rate-row">
-          <div class="admin-field"><label>Min ₹/sqft</label><input type="number" id="ar-peb-low"></div>
-          <div class="admin-field"><label>Max ₹/sqft</label><input type="number" id="ar-peb-high"></div>
-        </div>
-      </div>
-      <div class="admin-type-block">
-        <p class="t-name">Prefab Warehouse</p>
-        <div class="admin-rate-row">
-          <div class="admin-field"><label>Min ₹/sqft</label><input type="number" id="ar-warehouse-low"></div>
-          <div class="admin-field"><label>Max ₹/sqft</label><input type="number" id="ar-warehouse-high"></div>
-        </div>
-      </div>
-
-      <button class="admin-btn" onclick="adminSaveRates()">Save to Cloud (Live for everyone)</button>
-      <button class="admin-btn-secondary" onclick="adminLogout()">Logout</button>
-      <p class="admin-status" id="admin-save-status"></p>
-    </div>
-  </div>
-</div>
-
 <!-- STICKY MOBILE RESULT BAR -->
 <div class="sticky-result-bar" id="sticky-result-bar">
   <div class="srb-info">
@@ -1146,7 +1064,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     if(typeof calcResult==='function')calcResult();
   };
 
-  /* ── ADMIN-SET RATES — applied for every visitor on load ── */
+  /* ── ADMIN-SET RATES — applied for every visitor on load (set from the CRM's Calculator Rates panel) ── */
   window.applyServerRates=function(data){
     ['tin','industrial','peb','warehouse'].forEach(function(t){
       if(data[t]&&data[t].low&&data[t].high){
@@ -1159,54 +1077,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       if(maxEl)maxEl.textContent='₹'+R[t].high+'/sqft';
     });
     calcResult();
-  };
-
-  /* ── ADMIN PANEL ── */
-  window.openAdminPanel=function(){document.getElementById('admin-overlay').classList.add('open');};
-  window.closeAdminPanel=function(){document.getElementById('admin-overlay').classList.remove('open');};
-  window.adminLogin=function(){
-    var email=document.getElementById('admin-email').value.trim();
-    var pass=document.getElementById('admin-pass').value;
-    var statusEl=document.getElementById('admin-login-status');
-    statusEl.className='admin-status';statusEl.textContent='';
-    if(!window.__adminLogin){statusEl.className='admin-status err';statusEl.textContent='Cloud abhi load ho raha hai, 2 sec baad try karein.';return;}
-    window.__adminLogin(email,pass).then(function(){
-      document.getElementById('admin-login-view').style.display='none';
-      document.getElementById('admin-rates-view').style.display='block';
-      ['tin','industrial','peb','warehouse'].forEach(function(t){
-        document.getElementById('ar-'+t+'-low').value=R[t].low;
-        document.getElementById('ar-'+t+'-high').value=R[t].high;
-      });
-    }).catch(function(err){
-      statusEl.className='admin-status err';
-      statusEl.textContent='Login fail: '+(err&&err.message?err.message:'Email/password check karein.');
-    });
-  };
-  window.adminSaveRates=function(){
-    var data={},valid=true;
-    ['tin','industrial','peb','warehouse'].forEach(function(t){
-      var lo=+document.getElementById('ar-'+t+'-low').value;
-      var hi=+document.getElementById('ar-'+t+'-high').value;
-      if(!lo||!hi||hi<lo)valid=false;
-      data[t]={low:lo,high:hi};
-    });
-    var statusEl=document.getElementById('admin-save-status');
-    if(!valid){statusEl.className='admin-status err';statusEl.textContent='Sab fields sahi bharein (Max, Min se bada hona chahiye).';return;}
-    if(!window.__adminSaveRates){statusEl.className='admin-status err';statusEl.textContent='Cloud abhi load ho raha hai, 2 sec baad try karein.';return;}
-    statusEl.className='admin-status';statusEl.textContent='Saving...';
-    window.__adminSaveRates(data).then(function(){
-      window.applyServerRates(data);
-      statusEl.className='admin-status ok';statusEl.textContent='✓ Saved! Ab sabko naye rates dikhenge.';
-    }).catch(function(err){
-      statusEl.className='admin-status err';statusEl.textContent='Save fail: '+(err&&err.message?err.message:'dobara try karein.');
-    });
-  };
-  window.adminLogout=function(){
-    if(window.__adminLogout)window.__adminLogout();
-    document.getElementById('admin-login-view').style.display='block';
-    document.getElementById('admin-rates-view').style.display='none';
-    document.getElementById('admin-email').value='';
-    document.getElementById('admin-pass').value='';
   };
 
   /* ── ROTATION STATE (continuous, radians) ── */
@@ -1793,18 +1663,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   initStickyBar();
   initReveal();
   initDragRotate();
-  if(location.search.indexOf('admin=1')!==-1){
-    var fab=document.getElementById('admin-fab');
-    if(fab)fab.classList.add('shown');
-  }
 })();
 </script>
 
-<!-- CLOUD RATES — public read for everyone, authenticated write for admin -->
+<!-- CLOUD RATES — public read-only. Rates are set from the CRM's "Calculator Rates" admin panel. -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
@@ -1817,14 +1682,12 @@ const firebaseConfig = {
   measurementId: "G-N28CZBQ66C"
 };
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
-const RATE_DOC = doc(db, 'config', 'calculatorRates');
 
-/* Public read on page load — every visitor gets the latest admin-set rates */
+/* Public read on page load — every visitor gets the latest CRM-set rates */
 (async function loadRates(){
   try{
-    const snap = await getDoc(RATE_DOC);
+    const snap = await getDoc(doc(db, 'config', 'calculatorRates'));
     if(snap.exists() && window.applyServerRates){
       window.applyServerRates(snap.data());
     }
@@ -1832,14 +1695,6 @@ const RATE_DOC = doc(db, 'config', 'calculatorRates');
     console.warn('Custom rates not loaded, using defaults:', e.message);
   }
 })();
-
-/* Admin bridge — used by the admin panel in the main script */
-window.__adminLogin = function(email, pass){ return signInWithEmailAndPassword(auth, email, pass); };
-window.__adminLogout = function(){ return signOut(auth); };
-window.__adminSaveRates = function(data){
-  data.updatedAt = serverTimestamp();
-  return setDoc(RATE_DOC, data, { merge: true });
-};
 </script>
 
 </body>
