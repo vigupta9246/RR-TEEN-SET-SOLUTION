@@ -270,9 +270,73 @@ section{background:#ffffff!important}
 .slider-val{font-size:14px;font-weight:800;color:#ff6f00;font-family:'Bebas Neue',sans-serif;letter-spacing:.5px}
 input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:pointer}
 
+/* ══════════════════════════════════════════
+   SCROLL PROGRESS BAR — top-of-viewport, fills through the calculator flow
+══════════════════════════════════════════ */
+.calc-progress-track{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(10,22,40,.06);z-index:80;opacity:0;transition:opacity .3s ease}
+.calc-progress-track.visible{opacity:1}
+.calc-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff6f00,#ff8c00);transition:width .12s linear;box-shadow:0 0 8px rgba(255,111,0,.5)}
+@media(min-width:768px){.calc-progress-track{top:var(--nav-h,66px)}}
+
+/* ══════════════════════════════════════════
+   VALUE-TIER BADGE — reacts to where the rate slider sits in the range
+══════════════════════════════════════════ */
+.value-tier{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.4px;padding:4px 10px;border-radius:20px;text-transform:uppercase;margin-bottom:8px}
+.value-tier.tier-budget{background:rgba(37,211,102,.14);color:#1fa855}
+.value-tier.tier-best{background:rgba(255,140,0,.16);color:#ff8c00}
+.value-tier.tier-premium{background:rgba(64,86,161,.16);color:#7d94e0}
+
+/* Lead form trust microcopy */
+.lead-trust-line{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10.5px;color:rgba(10,22,40,.45);text-align:center;margin:2px 0 12px}
+.lead-trust-line svg{width:11px;height:11px;color:#25D366;flex-shrink:0}
+
+/* Respect users who've asked for reduced motion — real perf/accessibility win, not just decoration */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important;scroll-behavior:auto!important}
+  .preview-tilt-inner::after{display:none}
+  .fab-wrap .fab-wa{animation:none}
+}
+
 /* Location select */
 #sl-loc{background:#ffffff!important;border:1px solid rgba(10,22,40,.15)!important;color:#0a1628!important;border-radius:12px!important;padding:13px 16px!important;font-size:13px!important}
 #sl-loc option{background:#ffffff;color:#0a1628}
+
+/* ══════════════════════════════════════════
+   ADD-ONS — optional extras grid
+══════════════════════════════════════════ */
+.addon-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.addon-card{background:#ffffff;border:1.5px solid rgba(10,22,40,.1);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 8px rgba(10,22,40,.03)}
+.addon-card:hover{border-color:rgba(255,111,0,.35)}
+.addon-card.active{border-color:#ff6f00;background:rgba(255,111,0,.05)}
+.addon-check{width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(10,22,40,.25);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:#fff}
+.addon-card.active .addon-check{background:#ff6f00;border-color:#ff6f00}
+.addon-check svg{width:11px;height:11px;color:#fff;opacity:0;transition:opacity .15s}
+.addon-card.active .addon-check svg{opacity:1}
+.addon-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.addon-name{font-size:12.5px;font-weight:700;color:#0a1628;line-height:1.3}
+.addon-price{font-size:10.5px;color:rgba(10,22,40,.45)}
+.addon-card.active .addon-price{color:#ff6f00}
+
+/* GST toggle row inside result card */
+.gst-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+.gst-toggle-lbl{display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(255,255,255,.7);cursor:pointer;user-select:none}
+.gst-switch{width:34px;height:19px;border-radius:20px;background:rgba(255,255,255,.18);position:relative;flex-shrink:0;transition:background .2s}
+.gst-switch::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .2s}
+.gst-toggle-lbl.on .gst-switch{background:#ff6f00}
+.gst-toggle-lbl.on .gst-switch::after{transform:translateX(15px)}
+.gst-amount{font-size:11.5px;color:rgba(255,255,255,.55)}
+
+/* Reset button */
+.calc-reset-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:transparent;border:none;color:rgba(10,22,40,.4);font-size:11.5px;font-weight:600;cursor:pointer;padding:10px;margin:-6px 0 20px;transition:color .2s}
+.calc-reset-btn:hover{color:#ff6f00}
+.calc-reset-btn svg{width:13px;height:13px}
+
+/* Lead form field errors */
+.lf-field{display:flex;flex-direction:column;gap:4px}
+.lf-field input.has-error{border-color:#e14848!important}
+.lf-error{font-size:10.5px;color:#e14848;display:none;line-height:1.3}
+.lf-field.has-error .lf-error{display:block}
+.lf-saved-hint{font-size:10px;color:rgba(10,22,40,.4);text-align:center;margin:8px 0 0}
 
 /* Result card */
 .result-wrap{background:linear-gradient(135deg,#16264f 0%,#28407c 100%);border:1px solid rgba(255,111,0,.25);border-radius:18px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 4px 24px rgba(22,38,79,.25)}
@@ -557,8 +621,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="4" y1="12" x2="19" y2="12"/><path d="M13.5 6.5 19 12l-5.5 5.5"/></symbol>
 <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/></symbol>
 <symbol id="i-drag" viewBox="0 0 24 24"><path d="M8 5 5 8l3 3"/><path d="M5 8h6"/><path d="M16 5l3 3-3 3"/><path d="M19 8h-6"/><path d="M8 19l-3-3 3-3"/><path d="M5 16h6"/><path d="M16 19l3-3-3-3"/><path d="M19 16h-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/></symbol>
 </defs>
 </svg>
+
+<!-- SCROLL PROGRESS BAR — fills as the visitor moves through the calculator -->
+<div class="calc-progress-track" id="calc-progress-track"><div class="calc-progress-fill" id="calc-progress-fill"></div></div>
 
 <!-- NAV — same as main site -->
 <nav aria-label="Main Navigation">
@@ -779,10 +848,35 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   </div>
   <p class="rate-hint" id="rate-hint">Suggested range for Tin Shed: ₹150–220/sqft</p>
 
+  <!-- STEP 6: Optional add-ons -->
+  <p class="calc-step-label" data-num="6">Add-ons chunein (optional)</p>
+  <div class="addon-grid" id="addon-grid">
+    <div class="addon-card" data-addon="windows" onclick="toggleAddon('windows')">
+      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-text"><span class="addon-name">Extra Windows</span><span class="addon-price">+₹450/window · qty 2</span></span>
+    </div>
+    <div class="addon-card" data-addon="doors" onclick="toggleAddon('doors')">
+      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-text"><span class="addon-name">Extra Door</span><span class="addon-price">+₹3,500 flat</span></span>
+    </div>
+    <div class="addon-card" data-addon="insulation" onclick="toggleAddon('insulation')">
+      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-text"><span class="addon-name">Roof Insulation</span><span class="addon-price">+₹35/sqft</span></span>
+    </div>
+    <div class="addon-card" data-addon="flooring" onclick="toggleAddon('flooring')">
+      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-text"><span class="addon-name">PCC Flooring</span><span class="addon-price">+₹55/sqft</span></span>
+    </div>
+  </div>
+
+  <!-- RESET -->
+  <button type="button" class="calc-reset-btn" onclick="resetCalculator()"><svg class="icon"><use href="#i-refresh"></use></svg> Reset karein, shuru se</button>
+
   <!-- RESULT -->
   <div class="result-wrap">
     <div class="result-inner">
       <p class="result-pre">Estimated cost range</p>
+      <span class="value-tier tier-best" id="value-tier">⭐ Best Value</span><br>
       <p class="result-price" id="res-price">₹3.6L – ₹4.4L</p>
       <p class="result-sub" id="res-sub">2,000 sq.ft · Tin Shed · Delhi</p>
       <div class="result-breakdown">
@@ -790,6 +884,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
         <div class="rb-card"><p class="rb-lbl">Rate / sq.ft</p><p class="rb-val" id="rb-rate">₹150–220</p></div>
         <div class="rb-card"><p class="rb-lbl">Material cost</p><p class="rb-val" id="rb-mat">₹2.8L–3.5L</p></div>
         <div class="rb-card"><p class="rb-lbl">Labour + misc</p><p class="rb-val" id="rb-lab">₹0.8L–0.9L</p></div>
+      </div>
+      <div class="gst-row">
+        <span class="gst-toggle-lbl" id="gst-toggle-lbl" onclick="toggleGST()"><span class="gst-switch"></span> GST @18% included</span>
+        <span class="gst-amount" id="gst-amount">+₹0</span>
       </div>
     </div>
   </div>
@@ -803,9 +901,17 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <p class="lead-sub">Apna naam aur number daalo — hum 2 ghante mein detailed quote bhejenge. Free!</p>
     <div id="lead-form-area">
       <div class="lead-fields">
-        <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
-        <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
+        <div class="lf-field" id="lf-name-wrap">
+          <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
+          <span class="lf-error">Naam daalna zaroori hai</span>
+        </div>
+        <div class="lf-field" id="lf-phone-wrap">
+          <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
+          <span class="lf-error" id="lf-phone-error">10-digit valid number daalein</span>
+        </div>
       </div>
+      <p class="lf-saved-hint" id="lf-saved-hint" style="display:none">Aapke pehle ke inputs restore ho gaye hain</p>
+      <p class="lead-trust-line"><svg class="icon"><use href="#i-check-circle"></use></svg> Aapka number safe hai, spam nahi karenge · 2 ghante mein reply guaranteed</p>
       <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
     </div>
     <div class="lead-success" id="lead-success">
@@ -1006,10 +1112,25 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp"><svg class="icon"><use href="#i-whatsapp"></use></svg></a>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="main.js"></script>
-<script src="cookie-consent.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="main.js" defer></script>
+<script src="cookie-consent.js" defer></script>
 
+<!-- ══════════════════════════════════════════════════════════════════
+  CALCULATOR ENGINE — table of contents
+  1. Rate data & state (R, ADDONS, curType, selectedAddons, gstIncluded)
+  2. Shed type selection + rate-slider sync
+  3. Add-ons + GST toggle
+  4. Scroll progress bar + value-tier badge (engagement/conversion UI)
+  5. 3D isometric preview renderer (SVG, rotation, drag)
+  6. Price calculation (calcResult) — single source of truth for pricing,
+     also feeds the WhatsApp message and sticky mobile bar
+  7. Lead form validation + submission
+  8. PDF quote generation (jsPDF)
+  9. Compare-2-types panel, testimonials carousel, share buttons
+  10. localStorage persistence (debounced) + reset
+  11. Init sequence (bottom of file)
+═══════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   /* ── RATES DATA ── */
@@ -1022,6 +1143,29 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   var curType='tin';
   var dispLen=50,dispWid=40,dispHt=14; /* smoothly-animated display values */
   var animRAF=null;
+
+  /* ── ADD-ONS DATA ── */
+  var ADDONS={
+    windows:{label:'Extra Windows',flat:900},      /* ₹450 x 2 windows */
+    doors:{label:'Extra Door',flat:3500},
+    insulation:{label:'Roof Insulation',perSqft:35},
+    flooring:{label:'PCC Flooring',perSqft:55}
+  };
+  var selectedAddons={};   /* e.g. {insulation:true} */
+  var gstIncluded=false;
+  var STORAGE_KEY='rrShedCalcState_v1';
+
+  /* Sum of all currently-selected add-ons for a given area (flat + per-sqft items) */
+  function addonCostFor(area){
+    var total=0;
+    Object.keys(selectedAddons).forEach(function(key){
+      if(!selectedAddons[key])return;
+      var a=ADDONS[key];
+      if(!a)return;
+      total+=a.flat?a.flat:Math.round(a.perSqft*area);
+    });
+    return total;
+  }
 
   /* ── SELECT SHED TYPE ── */
   window.calcSelect=function(type){
@@ -1047,6 +1191,145 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   window.onRateSlide=function(){
     document.getElementById('sv-rate').textContent='₹'+document.getElementById('sl-rate').value;
     calcResult();
+  };
+
+  /* ── ADD-ONS ── */
+  window.toggleAddon=function(key){
+    selectedAddons[key]=!selectedAddons[key];
+    var card=document.querySelector('.addon-card[data-addon="'+key+'"]');
+    if(card)card.classList.toggle('active',!!selectedAddons[key]);
+    calcResult();
+  };
+
+  /* ── GST TOGGLE ── */
+  window.toggleGST=function(){
+    gstIncluded=!gstIncluded;
+    var lbl=document.getElementById('gst-toggle-lbl');
+    if(lbl)lbl.classList.toggle('on',gstIncluded);
+    calcResult();
+  };
+
+  /* ── VALUE-TIER BADGE — reflects where the visitor's chosen rate sits within
+     that shed type's normal market range. Purely transparent feedback on their
+     own slider position, not a manufactured claim. ── */
+  function updateValueTier(rate,r){
+    var el=document.getElementById('value-tier');
+    if(!el)return;
+    var frac=(rate-r.low)/(r.high-r.low);
+    frac=Math.max(0,Math.min(1,frac));
+    el.classList.remove('tier-budget','tier-best','tier-premium');
+    if(frac<0.34){el.classList.add('tier-budget');el.textContent='💰 Budget Friendly';}
+    else if(frac<0.67){el.classList.add('tier-best');el.textContent='⭐ Best Value';}
+    else{el.classList.add('tier-premium');el.textContent='💎 Premium Build';}
+  }
+
+  /* ── SCROLL PROGRESS BAR — gives a sense of momentum through the flow ── */
+  function initScrollProgress(){
+    var mainEl=document.querySelector('.calc-main');
+    var leadEl=document.querySelector('.lead-wrap');
+    var track=document.getElementById('calc-progress-track');
+    var fill=document.getElementById('calc-progress-fill');
+    if(!mainEl||!leadEl||!track||!fill)return;
+    var ticking=false;
+    function update(){
+      ticking=false;
+      var mainRect=mainEl.getBoundingClientRect();
+      var leadRect=leadEl.getBoundingClientRect();
+      var vh=window.innerHeight;
+      var start=mainRect.top+window.scrollY;
+      var end=leadRect.bottom+window.scrollY;
+      var current=window.scrollY+vh*0.4;
+      var frac=(current-start)/Math.max(1,end-start);
+      frac=Math.max(0,Math.min(1,frac));
+      var inRange=(window.scrollY+vh)>start && window.scrollY<end;
+      track.classList.toggle('visible',inRange);
+      fill.style.width=(frac*100)+'%';
+    }
+    function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(update);}}
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.addEventListener('resize',onScroll);
+    update();
+  }
+
+  /* ── PERSIST CALCULATOR INPUTS LOCALLY (device-only, no personal data) ──
+     Debounced: sliders fire input events continuously while dragging, so we
+     coalesce writes instead of hitting localStorage on every pixel of drag. */
+  var saveStateTimer=null;
+  function saveState(){
+    if(saveStateTimer)clearTimeout(saveStateTimer);
+    saveStateTimer=setTimeout(saveStateNow,350);
+  }
+  function saveStateNow(){
+    try{
+      var state={
+        type:curType,
+        len:document.getElementById('sl-len').value,
+        wid:document.getElementById('sl-wid').value,
+        ht:document.getElementById('sl-ht').value,
+        loc:document.getElementById('sl-loc').value,
+        rate:document.getElementById('sl-rate').value,
+        addons:selectedAddons,
+        gst:gstIncluded
+      };
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    }catch(e){/* localStorage unavailable (private browsing etc.) — fail silently */}
+  }
+  function loadState(){
+    try{
+      var raw=localStorage.getItem(STORAGE_KEY);
+      if(!raw)return false;
+      var s=JSON.parse(raw);
+      if(!s||!R[s.type])return false;
+      curType=s.type;
+      document.getElementById('sl-len').value=s.len||50;
+      document.getElementById('sl-wid').value=s.wid||40;
+      document.getElementById('sl-ht').value=s.ht||14;
+      document.getElementById('sl-loc').value=s.loc||1;
+      var cards=document.querySelectorAll('.stype-card');
+      var types=['tin','industrial','peb','warehouse'];
+      cards.forEach(function(c,i){c.classList.toggle('active',types[i]===curType);});
+      if(s.addons){
+        selectedAddons=s.addons;
+        Object.keys(selectedAddons).forEach(function(key){
+          if(!selectedAddons[key])return;
+          var card=document.querySelector('.addon-card[data-addon="'+key+'"]');
+          if(card)card.classList.add('active');
+        });
+      }
+      gstIncluded=!!s.gst;
+      var lbl=document.getElementById('gst-toggle-lbl');
+      if(lbl)lbl.classList.toggle('on',gstIncluded);
+      if(s.rate){
+        document.getElementById('sl-rate').value=s.rate;
+        document.getElementById('sv-rate').textContent='₹'+s.rate;
+        var r=R[curType];
+        document.getElementById('rate-hint').textContent='Suggested range for '+r.label+': ₹'+r.low+'–'+r.high+'/sqft';
+      }
+      return true;
+    }catch(e){return false;}
+  }
+
+  /* ── RESET EVERYTHING TO DEFAULTS ── */
+  window.resetCalculator=function(){
+    try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+    selectedAddons={};
+    gstIncluded=false;
+    document.querySelectorAll('.addon-card').forEach(function(c){c.classList.remove('active');});
+    var lbl=document.getElementById('gst-toggle-lbl');
+    if(lbl)lbl.classList.remove('on');
+    document.getElementById('sl-len').value=50;
+    document.getElementById('sl-wid').value=40;
+    document.getElementById('sl-ht').value=14;
+    document.getElementById('sl-loc').value=1;
+    /* Reset lead form + any error/success state */
+    var nameEl=document.getElementById('lf-name'),phoneEl=document.getElementById('lf-phone');
+    if(nameEl)nameEl.value='';
+    if(phoneEl)phoneEl.value='';
+    ['lf-name-wrap','lf-phone-wrap'].forEach(function(id){var w=document.getElementById(id);if(w)w.classList.remove('has-error');});
+    var formArea=document.getElementById('lead-form-area'),successArea=document.getElementById('lead-success');
+    if(formArea)formArea.style.display='';
+    if(successArea)successArea.style.display='none';
+    calcSelect('tin');
   };
 
   /* ── ROTATION STATE (continuous, radians) ── */
@@ -1300,42 +1583,74 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var area=len*wid;
     var r=R[curType];
     var rate=+document.getElementById('sl-rate').value||Math.round((r.low+r.high)/2);
-    var lo=Math.round(rate*area*loc*0.96),hi=Math.round(rate*area*loc*1.04);
-    var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
+
+    /* Base structure cost from rate x area x location */
+    var baseLo=Math.round(rate*area*loc*0.96),baseHi=Math.round(rate*area*loc*1.04);
+    var mLo=Math.round(baseLo*0.78),mHi=Math.round(baseHi*0.80);
+    var addons=addonCostFor(area);
+    var lLo=(baseLo-mLo)+addons,lHi=(baseHi-mHi)+addons; /* labour + misc + add-ons */
+    var lo=baseLo+addons,hi=baseHi+addons;
+
+    /* GST — always computed for display; only folded into the headline price when toggled on */
+    var gstLo=Math.round(lo*0.18),gstHi=Math.round(hi*0.18);
+    var finalLo=lo,finalHi=hi;
+    if(gstIncluded){finalLo+=gstLo;finalHi+=gstHi;}
+
     var priceEl=document.getElementById('res-price');
-    priceEl.textContent=fmt(lo)+' – '+fmt(hi);
+    priceEl.textContent=fmt(finalLo)+' – '+fmt(finalHi);
     priceEl.classList.remove('is-updating');void priceEl.offsetWidth;priceEl.classList.add('is-updating');
-    document.getElementById('res-sub').textContent=area.toLocaleString('en-IN')+' sq.ft · '+r.label;
+    document.getElementById('res-sub').textContent=area.toLocaleString('en-IN')+' sq.ft · '+r.label+(gstIncluded?' · GST incl.':' · GST excl.');
     document.getElementById('rb-area').textContent=area.toLocaleString('en-IN')+' sq.ft';
     document.getElementById('rb-rate').textContent='₹'+rate+'/sqft';
     document.getElementById('rb-mat').textContent=fmt(mLo)+'–'+fmt(mHi);
-    document.getElementById('rb-lab').textContent=fmt(lo-mLo)+'–'+fmt(hi-mHi);
+    document.getElementById('rb-lab').textContent=fmt(lLo)+'–'+fmt(lHi);
+    document.getElementById('gst-amount').textContent='+'+fmt(gstLo)+'–'+fmt(gstHi);
+    updateValueTier(rate,r);
     ['rb-area','rb-rate','rb-mat','rb-lab'].forEach(function(id){
       var el=document.getElementById(id);
       el.classList.remove('is-updating');void el.offsetWidth;el.classList.add('is-updating');
     });
     /* Sync sticky mobile bar */
     var srb=document.getElementById('srb-price');
-    if(srb)srb.textContent=fmt(lo)+' – '+fmt(hi);
+    if(srb)srb.textContent=fmt(finalLo)+' – '+fmt(finalHi);
     /* Keep compare panel in sync if open */
     if(typeof calcCompare==='function')calcCompare();
     /* Update WA button */
     var ht=document.getElementById('sl-ht').value;
-    var msg='Hello R.R Teen Set Solution!\n\nMujhe '+r.label+' chahiye.\n📐 Size: '+len+' × '+wid+' feet\n📊 Height: '+ht+' feet\n💰 Estimated Budget: '+fmt(lo)+' – '+fmt(hi)+'\n\nPlease free site visit aur detailed quote arrange karein.\nThank you!';
+    var addonNames=Object.keys(selectedAddons).filter(function(k){return selectedAddons[k];}).map(function(k){return ADDONS[k].label;});
+    var addonLine=addonNames.length?('\n🔧 Add-ons: '+addonNames.join(', ')):'';
+    var gstLine=gstIncluded?' (GST incl.)':' (GST extra)';
+    var msg='Hello R.R Teen Set Solution!\n\nMujhe '+r.label+' chahiye.\n📐 Size: '+len+' × '+wid+' feet\n📊 Height: '+ht+' feet'+addonLine+'\n💰 Estimated Budget: '+fmt(finalLo)+' – '+fmt(finalHi)+gstLine+'\n\nPlease free site visit aur detailed quote arrange karein.\nThank you!';
     document.getElementById('cta-wa-btn').href='https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg);
+
+    saveState();
   };
 
   /* ── LEAD FORM SUBMIT ── */
   window.submitLead=function(){
-    var name=(document.getElementById('lf-name').value||'').trim();
-    var phone=(document.getElementById('lf-phone').value||'').trim();
-    if(!name){document.getElementById('lf-name').focus();return;}
-    if(!phone||phone.replace(/\D/g,'').length<10){document.getElementById('lf-phone').focus();return;}
+    var nameEl=document.getElementById('lf-name'),phoneEl=document.getElementById('lf-phone');
+    var nameWrap=document.getElementById('lf-name-wrap'),phoneWrap=document.getElementById('lf-phone-wrap');
+    var name=(nameEl.value||'').trim();
+    var phone=(phoneEl.value||'').trim();
+    var phoneDigits=phone.replace(/\D/g,'');
+    var valid=true;
+
+    if(!name){nameWrap.classList.add('has-error');nameEl.classList.add('has-error');valid=false;}
+    else{nameWrap.classList.remove('has-error');nameEl.classList.remove('has-error');}
+
+    /* Indian mobile numbers: 10 digits, optionally prefixed with 91/+91, starting 6-9 */
+    var phoneOk=/^[6-9]\d{9}$/.test(phoneDigits.length>10?phoneDigits.slice(-10):phoneDigits)&&phoneDigits.length>=10;
+    if(!phoneOk){phoneWrap.classList.add('has-error');phoneEl.classList.add('has-error');valid=false;}
+    else{phoneWrap.classList.remove('has-error');phoneEl.classList.remove('has-error');}
+
+    if(!valid){(!name?nameEl:phoneEl).focus();return;}
+
     var len=document.getElementById('sl-len').value;
     var wid=document.getElementById('sl-wid').value;
     var ht=document.getElementById('sl-ht').value;
     var r=R[curType];
-    var msg='New Lead from Calculator!\n\nName: '+name+'\nPhone: '+phone+'\n\nShed Type: '+r.label+'\nSize: '+len+' × '+wid+' feet\nHeight: '+ht+' feet\n\nPlease call them for quote.';
+    var addonNames=Object.keys(selectedAddons).filter(function(k){return selectedAddons[k];}).map(function(k){return ADDONS[k].label;});
+    var msg='New Lead from Calculator!\n\nName: '+name+'\nPhone: '+phone+'\n\nShed Type: '+r.label+'\nSize: '+len+' × '+wid+' feet\nHeight: '+ht+' feet'+(addonNames.length?('\nAdd-ons: '+addonNames.join(', ')):'')+'\n\nPlease call them for quote.';
     document.getElementById('lead-form-area').style.display='none';
     document.getElementById('lead-success').style.display='block';
     fireConfetti();
@@ -1358,9 +1673,14 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var area=len*wid;
     var r=R[curType];
     var rate=+document.getElementById('sl-rate').value||Math.round((r.low+r.high)/2);
-    var lo=Math.round(rate*area*loc*0.96),hi=Math.round(rate*area*loc*1.04);
-    var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
-    var lLo=lo-mLo,lHi=hi-mHi;
+    var baseLo=Math.round(rate*area*loc*0.96),baseHi=Math.round(rate*area*loc*1.04);
+    var mLo=Math.round(baseLo*0.78),mHi=Math.round(baseHi*0.80);
+    var addonTotal=addonCostFor(area);
+    var lLo=(baseLo-mLo)+addonTotal,lHi=(baseHi-mHi)+addonTotal;
+    var lo=baseLo+addonTotal,hi=baseHi+addonTotal;
+    var gstLo=Math.round(lo*0.18),gstHi=Math.round(hi*0.18);
+    if(gstIncluded){lo+=gstLo;hi+=gstHi;}
+    var addonNamesPDF=Object.keys(selectedAddons).filter(function(k){return selectedAddons[k];}).map(function(k){return ADDONS[k].label;});
     var today=new Date();
     var dateStr=today.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
     var validTill=new Date(today.getTime()+7*24*60*60*1000).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
@@ -1431,9 +1751,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var rows=[
       ['Rate applied','Rs.'+rate+' / sq.ft'],
       ['Material cost (approx.)',fmtPDF(mLo)+' - '+fmtPDF(mHi)],
-      ['Labour + installation (approx.)',fmtPDF(lLo)+' - '+fmtPDF(lHi)],
-      ['GST (extra, as applicable)','18%']
+      ['Labour + installation (approx.)'+(addonTotal?' + add-ons':''),fmtPDF(lLo)+' - '+fmtPDF(lHi)]
     ];
+    if(addonNamesPDF.length)rows.push(['Add-ons selected',addonNamesPDF.join(', ')]);
+    rows.push(['GST @ 18%',gstIncluded?(fmtPDF(gstLo)+' - '+fmtPDF(gstHi)+' (included above)'):(fmtPDF(gstLo)+' - '+fmtPDF(gstHi)+' (extra, not included above)')]);
     doc.setFontSize(10);
     rows.forEach(function(row,i){
       var ry=y+i*22;
@@ -1452,7 +1773,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     fy+=18;
     doc.setFont('helvetica','italic');doc.setFontSize(8.5);
     doc.setTextColor(120,120,120);
-    var disclaimer='This is a planning-stage estimate only. Final cost will be confirmed after a free site visit, based on soil condition, design complexity and site access. GST @18% extra. Rates as per 2026 Delhi NCR market.';
+    var disclaimer='This is a planning-stage estimate only. Final cost will be confirmed after a free site visit, based on soil condition, design complexity and site access. '+(gstIncluded?'GST @18% is included in the price above.':'GST @18% is extra, not included in the price above.')+' Rates as per 2026 Delhi NCR market.';
     var split=doc.splitTextToSize(disclaimer,pw-80);
     doc.text(split,40,fy);
     fy+=split.length*11+14;
@@ -1640,14 +1961,34 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     setTimeout(function(){ripple.remove();},650);
   });
 
+  /* ── LIVE-CLEAR FORM ERRORS WHILE TYPING ── */
+  function initFormErrorClearing(){
+    var nameEl=document.getElementById('lf-name'),phoneEl=document.getElementById('lf-phone');
+    if(nameEl)nameEl.addEventListener('input',function(){
+      document.getElementById('lf-name-wrap').classList.remove('has-error');
+      nameEl.classList.remove('has-error');
+    });
+    if(phoneEl)phoneEl.addEventListener('input',function(){
+      document.getElementById('lf-phone-wrap').classList.remove('has-error');
+      phoneEl.classList.remove('has-error');
+    });
+  }
+
   /* ── INIT ── */
-  syncRateSliderToType();
+  var restored=loadState();
+  if(!restored)syncRateSliderToType(); /* loadState() already set the rate slider + hint when it restored one */
+  if(restored){
+    var savedHint=document.getElementById('lf-saved-hint');
+    if(savedHint){savedHint.style.display='block';setTimeout(function(){savedHint.style.display='none';},4000);}
+  }
   calcDraw();
   calcResult();
   initTesti();
   initStickyBar();
   initReveal();
   initDragRotate();
+  initFormErrorClearing();
+  initScrollProgress();
 })();
 </script>
 
