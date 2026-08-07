@@ -523,22 +523,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .share-title .icon,.lead-title .icon{width:15px;height:15px;color:#ff6f00;margin-right:1px}
 .srb-lbl .icon{width:9px;height:9px;margin-right:1px}
 
-/* ══════════════════════════════════════════
-   CUSTOM RATE — visitor-side override
-══════════════════════════════════════════ */
-.custom-rate-link{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:none;border:none;color:rgba(255,255,255,.65);font-size:11px;font-weight:600;cursor:pointer;padding:2px 0 14px;text-decoration:underline;text-underline-offset:2px}
-.custom-rate-link .icon{width:12px;height:12px}
-.custom-rate-badge{display:none;align-items:center;justify-content:center;gap:6px;width:100%;background:rgba(255,140,0,.14);border:1px solid rgba(255,140,0,.4);border-radius:10px;color:#ffc266;font-size:10.5px;font-weight:700;padding:7px 10px;margin:-2px 0 14px;cursor:pointer}
-.custom-rate-badge.active{display:flex}
-.custom-rate-badge .icon{width:11px;height:11px}
-.custom-rate-panel{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.22,1,.36,1),opacity .3s ease,margin .4s ease;opacity:0}
-.custom-rate-panel.is-open{max-height:200px;opacity:1;margin:0 0 16px}
-.crp-inner{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px}
-.crp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.crp-field label{display:block;font-size:9.5px;color:rgba(255,255,255,.5);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
-.crp-field input{width:100%;background:rgba(255,255,255,.1);border:1.3px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 9px;color:#fff;font-size:13px;font-weight:700;box-sizing:border-box}
-.crp-field input:focus{outline:none;border-color:#ff8c00}
-.crp-apply{width:100%;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:800;cursor:pointer}
+/* Rate slider hint text */
+.rate-hint{font-size:10.5px;color:rgba(255,255,255,.5);margin:-2px 0 20px;text-align:center}
 </style>
 </head>
 <body>
@@ -754,6 +740,14 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <option value="1.10">Outside Delhi NCR</option>
   </select>
 
+  <!-- STEP 5: Rate — every visitor can set their own known local rate, live -->
+  <p class="calc-step-label" data-num="5">Apna rate set karein</p>
+  <div class="slider-block" style="margin-bottom:6px">
+    <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-tag"></use></svg> ₹ per sq.ft</span><span class="slider-val" id="sv-rate">₹185</span></div>
+    <input type="range" class="calc-slider" id="sl-rate" min="80" max="450" value="185" step="5" oninput="onRateSlide()">
+  </div>
+  <p class="rate-hint" id="rate-hint">Suggested range for Tin Shed: ₹150–220/sqft</p>
+
   <!-- RESULT -->
   <div class="result-wrap">
     <div class="result-inner">
@@ -766,23 +760,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
         <div class="rb-card"><p class="rb-lbl">Material cost</p><p class="rb-val" id="rb-mat">₹2.8L–3.5L</p></div>
         <div class="rb-card"><p class="rb-lbl">Labour + misc</p><p class="rb-val" id="rb-lab">₹0.8L–0.9L</p></div>
       </div>
-    </div>
-  </div>
-
-  <!-- CUSTOM RATE — visitor can override the default rate -->
-  <button class="custom-rate-link" id="custom-rate-link" onclick="toggleCustomRate()">
-    <svg class="icon"><use href="#i-tag"></use></svg> Apna rate pata hai? Custom set karo
-  </button>
-  <button class="custom-rate-badge" id="custom-rate-badge" onclick="resetCustomRate()">
-    <svg class="icon"><use href="#i-check-circle"></use></svg> <span id="custom-rate-badge-txt">Custom rate applied</span> · Reset karein ✕
-  </button>
-  <div class="custom-rate-panel" id="custom-rate-panel">
-    <div class="crp-inner">
-      <div class="crp-row">
-        <div class="crp-field"><label>Min ₹/sqft</label><input type="number" id="crp-min" placeholder="150"></div>
-        <div class="crp-field"><label>Max ₹/sqft</label><input type="number" id="crp-max" placeholder="220"></div>
-      </div>
-      <button class="crp-apply" onclick="applyCustomRate()">Apply Custom Rate</button>
     </div>
   </div>
 
@@ -1024,58 +1001,20 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       if(types[i]===type){c.classList.add('active');}
       else{c.classList.remove('active');}
     });
-    resetCustomRate();
+    syncRateSliderToType();
     calcDraw();calcResult();
   };
 
-  /* ── CUSTOM RATE — visitor-side override ── */
-  var customRate=null;
-  window.toggleCustomRate=function(){
-    var panel=document.getElementById('custom-rate-panel');
-    var opening=!panel.classList.contains('is-open');
-    panel.classList.toggle('is-open');
-    if(opening){
-      var r=R[curType];
-      document.getElementById('crp-min').value=customRate?customRate.low:r.low;
-      document.getElementById('crp-max').value=customRate?customRate.high:r.high;
-    }
-  };
-  window.applyCustomRate=function(){
-    var lo=+document.getElementById('crp-min').value;
-    var hi=+document.getElementById('crp-max').value;
-    if(!lo||!hi||lo<=0||hi<=0||hi<lo){
-      alert('Sahi rate range dalein — Min chhota aur Max bada hona chahiye.');
-      return;
-    }
-    customRate={low:lo,high:hi};
-    document.getElementById('custom-rate-panel').classList.remove('is-open');
-    document.getElementById('custom-rate-link').style.display='none';
-    var badge=document.getElementById('custom-rate-badge');
-    badge.classList.add('active');
-    document.getElementById('custom-rate-badge-txt').textContent='Custom ₹'+lo+'–'+hi+'/sqft applied';
-    calcResult();
-  };
-  window.resetCustomRate=function(){
-    customRate=null;
-    var badge=document.getElementById('custom-rate-badge');
-    var link=document.getElementById('custom-rate-link');
-    if(badge)badge.classList.remove('active');
-    if(link)link.style.display='flex';
-    if(typeof calcResult==='function')calcResult();
-  };
-
-  /* ── ADMIN-SET RATES — applied for every visitor on load (set from the CRM's Calculator Rates panel) ── */
-  window.applyServerRates=function(data){
-    ['tin','industrial','peb','warehouse'].forEach(function(t){
-      if(data[t]&&data[t].low&&data[t].high){
-        R[t].low=data[t].low;R[t].high=data[t].high;
-      }
-    });
-    ['tin','industrial','peb','warehouse'].forEach(function(t){
-      var minEl=document.getElementById('rt-'+t+'-min'),maxEl=document.getElementById('rt-'+t+'-max');
-      if(minEl)minEl.textContent='₹'+R[t].low+'/sqft';
-      if(maxEl)maxEl.textContent='₹'+R[t].high+'/sqft';
-    });
+  /* ── RATE SLIDER — every visitor sets their own ₹/sqft directly, live ── */
+  function syncRateSliderToType(){
+    var r=R[curType];
+    var mid=Math.round((r.low+r.high)/2/5)*5;
+    document.getElementById('sl-rate').value=mid;
+    document.getElementById('sv-rate').textContent='₹'+mid;
+    document.getElementById('rate-hint').textContent='Suggested range for '+r.label+': ₹'+r.low+'–'+r.high+'/sqft';
+  }
+  window.onRateSlide=function(){
+    document.getElementById('sv-rate').textContent='₹'+document.getElementById('sl-rate').value;
     calcResult();
   };
 
@@ -1316,15 +1255,15 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var loc=+document.getElementById('sl-loc').value||1;
     var area=len*wid;
     var r=R[curType];
-    var effLow=customRate?customRate.low:r.low, effHigh=customRate?customRate.high:r.high;
-    var lo=Math.round(effLow*area*loc),hi=Math.round(effHigh*area*loc);
+    var rate=+document.getElementById('sl-rate').value||Math.round((r.low+r.high)/2);
+    var lo=Math.round(rate*area*loc*0.96),hi=Math.round(rate*area*loc*1.04);
     var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
     var priceEl=document.getElementById('res-price');
     priceEl.textContent=fmt(lo)+' – '+fmt(hi);
     priceEl.classList.remove('is-updating');void priceEl.offsetWidth;priceEl.classList.add('is-updating');
     document.getElementById('res-sub').textContent=area.toLocaleString('en-IN')+' sq.ft · '+r.label;
     document.getElementById('rb-area').textContent=area.toLocaleString('en-IN')+' sq.ft';
-    document.getElementById('rb-rate').textContent='₹'+effLow+'–'+effHigh;
+    document.getElementById('rb-rate').textContent='₹'+rate+'/sqft';
     document.getElementById('rb-mat').textContent=fmt(mLo)+'–'+fmt(mHi);
     document.getElementById('rb-lab').textContent=fmt(lo-mLo)+'–'+fmt(hi-mHi);
     ['rb-area','rb-rate','rb-mat','rb-lab'].forEach(function(id){
@@ -1374,7 +1313,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var loc=+locSel.value||1;
     var area=len*wid;
     var r=R[curType];
-    var lo=Math.round(r.low*area*loc),hi=Math.round(r.high*area*loc);
+    var rate=+document.getElementById('sl-rate').value||Math.round((r.low+r.high)/2);
+    var lo=Math.round(rate*area*loc*0.96),hi=Math.round(rate*area*loc*1.04);
     var mLo=Math.round(lo*0.78),mHi=Math.round(hi*0.80);
     var lLo=lo-mLo,lHi=hi-mHi;
     var today=new Date();
@@ -1445,7 +1385,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     doc.text('Cost Breakdown',40,y);
     y+=14;
     var rows=[
-      ['Rate applied','Rs.'+r.low+' - Rs.'+r.high+' / sq.ft'],
+      ['Rate applied','Rs.'+rate+' / sq.ft'],
       ['Material cost (approx.)',fmtPDF(mLo)+' - '+fmtPDF(mHi)],
       ['Labour + installation (approx.)',fmtPDF(lLo)+' - '+fmtPDF(lHi)],
       ['GST (extra, as applicable)','18%']
@@ -1657,43 +1597,13 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   });
 
   /* ── INIT ── */
+  syncRateSliderToType();
   calcDraw();
   calcResult();
   initTesti();
   initStickyBar();
   initReveal();
   initDragRotate();
-})();
-</script>
-
-<!-- CLOUD RATES — public read-only. Rates are set from the CRM's "Calculator Rates" admin panel. -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
-  authDomain: "rr-teen-set-quotation.firebaseapp.com",
-  databaseURL: "https://rr-teen-set-quotation-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rr-teen-set-quotation",
-  storageBucket: "rr-teen-set-quotation.firebasestorage.app",
-  messagingSenderId: "871289668592",
-  appId: "1:871289668592:web:6bda2d9f255e61294f1335",
-  measurementId: "G-N28CZBQ66C"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* Public read on page load — every visitor gets the latest CRM-set rates */
-(async function loadRates(){
-  try{
-    const snap = await getDoc(doc(db, 'config', 'calculatorRates'));
-    if(snap.exists() && window.applyServerRates){
-      window.applyServerRates(snap.data());
-    }
-  }catch(e){
-    console.warn('Custom rates not loaded, using defaults:', e.message);
-  }
 })();
 </script>
 

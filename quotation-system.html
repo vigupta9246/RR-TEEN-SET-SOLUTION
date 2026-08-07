@@ -405,7 +405,6 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
       <div class="nav-section">ADMIN</div>
       <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
-      <button class="nav-btn" data-section="calculator-rates" onclick="showSection('calculator-rates')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="7" y1="6.5" x2="17" y2="6.5"/><circle cx="7.7" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="11" r="1.1" fill="currentColor" stroke="none"/></svg></span><span>Calculator Rates</span></button>
       <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
       <button class="nav-btn" data-section="activity-log" onclick="showSection('activity-log')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span>Activity Log</span></button>
       <div class="nav-section">LINKS</div>
@@ -927,38 +926,6 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
             <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
-        </div>
-      </section>
-
-      <!-- CALCULATOR RATES — controls the ₹/sqft ranges shown on the public
-           website's shed cost calculator (shed-cost-calculator.html). Reads
-           and writes the same config/calculatorRates Firestore doc that page
-           reads on every visit, so a Save here goes live for every visitor
-           instantly with no code changes. -->
-      <section id="calculator-rates" class="section">
-        <div class="page-header">
-          <div class="page-title">Calculator Rates</div>
-          <div class="page-sub">Website ke Shed Cost Calculator mein dikhne wale ₹/sqft rates yahan se control karein</div>
-        </div>
-
-        <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="7" y1="6.5" x2="17" y2="6.5"/></svg> RATE RANGES (₹ PER SQ.FT)</div>
-          <div class="form-grid">
-            <div class="form-group"><label class="form-label">Tin Shed — Min</label><input type="number" id="cr-tin-low" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Tin Shed — Max</label><input type="number" id="cr-tin-high" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Industrial Shed — Min</label><input type="number" id="cr-industrial-low" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Industrial Shed — Max</label><input type="number" id="cr-industrial-high" class="form-input"></div>
-            <div class="form-group"><label class="form-label">PEB Structure — Min</label><input type="number" id="cr-peb-low" class="form-input"></div>
-            <div class="form-group"><label class="form-label">PEB Structure — Max</label><input type="number" id="cr-peb-high" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Prefab Warehouse — Min</label><input type="number" id="cr-warehouse-low" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Prefab Warehouse — Max</label><input type="number" id="cr-warehouse-high" class="form-input"></div>
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-save" onclick="saveCalculatorRates()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save — Live for all visitors</button>
-          </div>
-          <div style="font-size:12px;color:#64748b;margin-top:10px" id="cr-status">
-            Website calculator instantly in rates se calculate karega — koi deploy/code change nahi chahiye.
-          </div>
         </div>
       </section>
 
@@ -1516,7 +1483,7 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','tickets','team','calculator-rates','deleted-items','activity-log','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','tickets','team','deleted-items','activity-log','employee-profile'],
   Sales:    ['dashboard','create','history','leads','customers','tickets','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
@@ -1967,50 +1934,6 @@ window.renderTeam = () => {
       }).join('');
 };
 
-// ── CALCULATOR RATES (Admin only) ────────────────────────────────
-// Reads/writes config/calculatorRates — the exact same Firestore doc the
-// public shed-cost-calculator.html page reads on every visit.
-const CALC_RATE_TYPES = ['tin','industrial','peb','warehouse'];
-window.loadCalculatorRates = async () => {
-  const statusEl = document.getElementById('cr-status');
-  try {
-    const snap = await getDoc(doc(db, 'config', 'calculatorRates'));
-    const data = snap.exists() ? snap.data() : {};
-    CALC_RATE_TYPES.forEach(t => {
-      document.getElementById(`cr-${t}-low`).value = data[t]?.low ?? '';
-      document.getElementById(`cr-${t}-high`).value = data[t]?.high ?? '';
-    });
-    if (statusEl) {
-      statusEl.textContent = snap.exists() && data.updatedAt?.toDate
-        ? `Last updated: ${data.updatedAt.toDate().toLocaleString('en-IN')}`
-        : 'Abhi tak koi custom rate set nahi hai — website apne default rates use kar rahi hai.';
-    }
-  } catch(e) {
-    reportError(e);
-    toast('Rates load nahi ho payi. ' + (e.message || ''), 'error');
-  }
-};
-window.saveCalculatorRates = async () => {
-  const data = {};
-  let valid = true;
-  CALC_RATE_TYPES.forEach(t => {
-    const lo = +document.getElementById(`cr-${t}-low`).value;
-    const hi = +document.getElementById(`cr-${t}-high`).value;
-    if (!lo || !hi || hi < lo) valid = false;
-    data[t] = { low: lo, high: hi };
-  });
-  if (!valid) { toast('Sab fields sahi bharein — Max, Min se bada hona chahiye.', 'warning'); return; }
-  try {
-    data.updatedAt = serverTimestamp();
-    await setDoc(doc(db, 'config', 'calculatorRates'), data, { merge: true });
-    toast('Rates saved! Website ke calculator mein turant live ho gaya.', 'success');
-    loadCalculatorRates();
-  } catch(e) {
-    reportError(e);
-    toast('Save fail ho gaya. ' + (e.message || ''), 'error');
-  }
-};
-
 // deliberate change) it's locked — the dropdown is replaced with a
 // read-only badge so a role can't be casually changed by an accidental
 // click. To actually change it, an Admin must explicitly unlock it first
@@ -2377,7 +2300,7 @@ window.doLogout = () => signOut(auth);
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
   leads:'Leads', customers:'Customers', tickets:'Support Tickets', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
-  team:'Team', 'calculator-rates':'Calculator Rates', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
+  team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
 window.toggleSidebar = () => {
   document.querySelector('.sidebar').classList.toggle('open');
@@ -2406,7 +2329,6 @@ window.showSection = id => {
   if (id === 'customers') loadCustomers();
   if (id === 'tickets')   loadTickets();
   if (id === 'team')      loadTeam();
-  if (id === 'calculator-rates') loadCalculatorRates();
   if (id === 'deleted-items') loadDeletedItems();
   if (id === 'activity-log') loadActivityLog();
   if (id === 'employee-profile') showEmployeeProfile(auth.currentUser?.uid, true);
