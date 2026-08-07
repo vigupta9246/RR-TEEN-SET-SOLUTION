@@ -709,12 +709,27 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
             <pattern id="pshedGrid" width="22" height="22" patternUnits="userSpaceOnUse">
               <path d="M22 0H0V22" fill="none" stroke="rgba(10,22,40,0.05)" stroke-width="1"/>
             </pattern>
+            <linearGradient id="pshedEaveGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop id="pshedEaveGradTop" offset="0%" stop-color="#1976D2"/>
+              <stop id="pshedEaveGradBot" offset="100%" stop-color="#0D47A1"/>
+            </linearGradient>
+            <linearGradient id="pshedEndGrad" x1="0" y1="0" x2="1" y2="0.3">
+              <stop id="pshedEndGradTop" offset="0%" stop-color="#0D47A1"/>
+              <stop id="pshedEndGradBot" offset="100%" stop-color="#082f6e"/>
+            </linearGradient>
+            <linearGradient id="pshedRoofGrad" x1="0" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stop-color="#607D8B"/>
+              <stop offset="100%" stop-color="#37474F"/>
+            </linearGradient>
+            <filter id="pshedDropShadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#0a1628" flood-opacity="0.32"/>
+            </filter>
           </defs>
           <rect width="340" height="185" fill="url(#pshedBgGrad)"/>
           <rect width="340" height="185" fill="url(#pshedGrid)"/>
           <rect y="118" width="340" height="67" fill="url(#pshedFloorGrad)"/>
           <ellipse cx="170" cy="172" rx="138" ry="11" fill="rgba(10,22,40,0.15)" id="pshed-shadow"/>
-          <g id="pshed-g"></g>
+          <g id="pshed-g" filter="url(#pshedDropShadow)"></g>
           <text id="plbl-len" font-size="9" fill="#ff6f00" font-family="sans-serif" text-anchor="middle"></text>
           <text id="plbl-ht" font-size="9" fill="rgba(10,22,40,0.45)" font-family="sans-serif" text-anchor="middle"></text>
           <line id="pdim-line" stroke="#ff6f00" stroke-width="0.5" opacity="0.45" stroke-dasharray="3,2"/>
@@ -1157,6 +1172,12 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var endVisible=dEndA>dEndB?'A':'B';
     var eaveVisible=dEaveF>dEaveB?'F':'B';
 
+    /* Sync material gradients to the current shed type — gives solid, shaded product look */
+    var gt=document.getElementById('pshedEaveGradTop'),gb=document.getElementById('pshedEaveGradBot');
+    if(gt&&gb){gt.setAttribute('stop-color',r.wc);gb.setAttribute('stop-color',r.wd);}
+    var et=document.getElementById('pshedEndGradTop'),eb=document.getElementById('pshedEndGradBot');
+    if(et&&eb){et.setAttribute('stop-color',r.wd);eb.setAttribute('stop-color',r.ws);}
+
     var g=document.getElementById('pshed-g');
     g.innerHTML='';
 
@@ -1169,11 +1190,11 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var eaveRidge=[R1,R2]; /* R1 always matches ta (Xl=0), R2 always matches tb (Xl=L) — no swap needed */
 
     /* End wall (gable end) — drawn first so eave wall's corner overlaps cleanly on top */
-    g.appendChild(svgEl('polygon',{points:pt(end.a)+' '+pt(end.b)+' '+pt(end.tb)+' '+pt(end.ta),fill:r.wd}));
-    g.appendChild(svgEl('polygon',{points:pt(end.ta)+' '+pt(end.tb)+' '+pt(end.ridge),fill:r.wd}));
+    g.appendChild(svgEl('polygon',{points:pt(end.a)+' '+pt(end.b)+' '+pt(end.tb)+' '+pt(end.ta),fill:'url(#pshedEndGrad)'}));
+    g.appendChild(svgEl('polygon',{points:pt(end.ta)+' '+pt(end.tb)+' '+pt(end.ridge),fill:'url(#pshedEndGrad)'}));
 
     /* Eave wall (long wall, main face) */
-    g.appendChild(svgEl('polygon',{points:pt(eave.a)+' '+pt(eave.b)+' '+pt(eave.tb)+' '+pt(eave.ta),fill:r.wc}));
+    g.appendChild(svgEl('polygon',{points:pt(eave.a)+' '+pt(eave.b)+' '+pt(eave.tb)+' '+pt(eave.ta),fill:'url(#pshedEaveGrad)'}));
 
     /* Corrugated stripes on the main eave wall */
     var steps=Math.max(4,Math.round(L/9));
@@ -1208,7 +1229,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     }
 
     /* Roof slope above the visible eave wall */
-    g.appendChild(svgEl('polygon',{points:pt(eave.ta)+' '+pt(eave.tb)+' '+pt(eaveRidge[1])+' '+pt(eaveRidge[0]),fill:'#455A64'}));
+    g.appendChild(svgEl('polygon',{points:pt(eave.ta)+' '+pt(eave.tb)+' '+pt(eaveRidge[1])+' '+pt(eaveRidge[0]),fill:'url(#pshedRoofGrad)'}));
     /* Ridge line */
     g.appendChild(svgEl('line',{x1:R1[0].toFixed(1),y1:R1[1].toFixed(1),x2:R2[0].toFixed(1),y2:R2[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
 
@@ -1232,6 +1253,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     /* Outline edges for crispness */
     g.appendChild(svgEl('line',{x1:eave.a[0].toFixed(1),y1:eave.a[1].toFixed(1),x2:eave.b[0].toFixed(1),y2:eave.b[1].toFixed(1),stroke:'rgba(10,22,40,0.25)','stroke-width':'1'}));
     g.appendChild(svgEl('line',{x1:end.ta[0].toFixed(1),y1:end.ta[1].toFixed(1),x2:end.ridge[0].toFixed(1),y2:end.ridge[1].toFixed(1),stroke:'rgba(10,22,40,0.2)','stroke-width':'0.8'}));
+    /* Rim-light — subtle bright edge where the main wall meets the roofline, sells the "solid material" look */
+    g.appendChild(svgEl('line',{x1:eave.ta[0].toFixed(1),y1:eave.ta[1].toFixed(1),x2:eave.tb[0].toFixed(1),y2:eave.tb[1].toFixed(1),stroke:'rgba(255,255,255,0.4)','stroke-width':'0.8'}));
 
     /* Ground shadow scales with footprint */
     var shadow=document.getElementById('pshed-shadow');
