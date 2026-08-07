@@ -475,7 +475,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .preview-wrap:hover{box-shadow:0 8px 30px rgba(255,111,0,.18),inset 0 1px 0 rgba(255,255,255,.5)}
 
 /* 3D tilt stage — perspective parallax on cursor/touch */
-.preview-tilt-stage{perspective:900px;position:relative;z-index:1}
+.preview-tilt-stage{perspective:900px;position:relative;z-index:1;touch-action:none;-webkit-user-select:none;user-select:none}
 .preview-tilt-inner{transform-style:preserve-3d;transition:transform .35s cubic-bezier(.22,1,.36,1);position:relative;will-change:transform}
 .preview-tilt-inner::after{content:'';position:absolute;top:0;left:-40%;width:35%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);pointer-events:none;animation:xsheen 4.5s ease-in-out infinite;opacity:.7}
 @keyframes xsheen{0%,100%{left:-40%}50%{left:120%}}
@@ -1047,13 +1047,18 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   function initDragRotate(){
     var stage=document.getElementById('preview-tilt-stage');
     if(!stage)return;
-    var dragging=false,lastX=0,hint=document.querySelector('.pv-hint');
-    function onDown(x){dragging=true;lastX=x;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
+    var dragging=false,lastX=0,pendingDx=0,frameQueued=false,hint=document.querySelector('.pv-hint');
+    function onDown(x){dragging=true;lastX=x;pendingDx=0;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
+    function flush(){
+      frameQueued=false;
+      if(pendingDx===0)return;
+      theta+=pendingDx*0.012;thetaTarget=theta;pendingDx=0;
+      renderShed(dispLen,dispWid,dispHt);
+    }
     function onMove(x){
       if(!dragging)return;
-      var dx=x-lastX;lastX=x;
-      theta+=dx*0.012;thetaTarget=theta;
-      renderShed(dispLen,dispWid,dispHt);
+      pendingDx+=x-lastX;lastX=x;
+      if(!frameQueued){frameQueued=true;requestAnimationFrame(flush);}
     }
     function onUp(){dragging=false;stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
     stage.style.cursor='grab';
@@ -1061,7 +1066,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     window.addEventListener('mousemove',function(e){if(dragging)onMove(e.clientX);});
     window.addEventListener('mouseup',onUp);
     stage.addEventListener('touchstart',function(e){if(e.touches&&e.touches[0])onDown(e.touches[0].clientX);},{passive:true});
-    stage.addEventListener('touchmove',function(e){if(e.touches&&e.touches[0])onMove(e.touches[0].clientX);},{passive:true});
+    stage.addEventListener('touchmove',function(e){if(e.touches&&e.touches[0]){onMove(e.touches[0].clientX);e.preventDefault();}},{passive:false});
     stage.addEventListener('touchend',onUp);
   }
 
@@ -1145,7 +1150,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     /* Determine wall corner sets for the two visible faces */
     var eave=eaveVisible==='F'?{a:G1,b:G2,ta:T1,tb:T2}:{a:G4,b:G3,ta:T4,tb:T3};
     var end=endVisible==='A'?{a:G1,b:G4,ta:T1,tb:T4,ridge:R1}:{a:G2,b:G3,ta:T2,tb:T3,ridge:R2};
-    var eaveRidge=eaveVisible==='F'?[R1,R2]:[R2,R1];
+    var eaveRidge=[R1,R2]; /* R1 always matches ta (Xl=0), R2 always matches tb (Xl=L) — no swap needed */
 
     /* End wall (gable end) — drawn first so eave wall's corner overlaps cleanly on top */
     g.appendChild(svgEl('polygon',{points:pt(end.a)+' '+pt(end.b)+' '+pt(end.tb)+' '+pt(end.ta),fill:r.wd}));
