@@ -587,6 +587,15 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .share-title .icon,.lead-title .icon{width:15px;height:15px;color:#ff6f00;margin-right:1px}
 .srb-lbl .icon{width:9px;height:9px;margin-right:1px}
 
+/* Add-on chips shown in the 3D preview header — confirms the model reflects what's selected */
+.preview-addon-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px;position:relative;z-index:1;min-height:0}
+.pv-addon-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(255,111,0,.12);border:1px solid rgba(255,111,0,.3);color:#ff6f00;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.2px}
+
+/* Auto-rotate toggle */
+.pv-auto-toggle{background:rgba(10,22,40,.06);border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:rgba(10,22,40,.5);cursor:pointer;transition:all .2s;flex-shrink:0}
+.pv-auto-toggle:hover{background:rgba(255,111,0,.15);color:#ff6f00}
+.pv-auto-toggle svg{width:11px;height:11px}
+
 /* Rate slider hint text */
 .rate-hint{font-size:10.5px;color:rgba(255,255,255,.5);margin:-2px 0 20px;text-align:center}
 </style>
@@ -623,6 +632,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 <symbol id="i-drag" viewBox="0 0 24 24"><path d="M8 5 5 8l3 3"/><path d="M5 8h6"/><path d="M16 5l3 3-3 3"/><path d="M19 8h-6"/><path d="M8 19l-3-3 3-3"/><path d="M5 16h6"/><path d="M16 19l3-3-3-3"/><path d="M19 16h-6"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></symbol>
 <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5Z" fill="currentColor" stroke="none"/></symbol>
 </defs>
 </svg>
 
@@ -762,6 +773,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       <span class="preview-title"><svg class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
       <span class="preview-dim" id="pdim">50 × 40 ft</span>
     </div>
+    <div class="preview-addon-chips" id="preview-addon-chips"></div>
     <div class="preview-tilt-stage" id="preview-tilt-stage">
       <div class="preview-tilt-inner" id="preview-tilt-inner">
         <svg id="pshed" viewBox="0 0 340 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
@@ -787,8 +799,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
               <stop id="pshedEndGradBot" offset="100%" stop-color="#082f6e"/>
             </linearGradient>
             <linearGradient id="pshedRoofGrad" x1="0" y1="0" x2="0.5" y2="1">
-              <stop offset="0%" stop-color="#607D8B"/>
-              <stop offset="100%" stop-color="#37474F"/>
+              <stop id="pshedRoofGradTop" offset="0%" stop-color="#607D8B"/>
+              <stop id="pshedRoofGradBot" offset="100%" stop-color="#37474F"/>
             </linearGradient>
             <filter id="pshedDropShadow" x="-30%" y="-30%" width="160%" height="160%">
               <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#0a1628" flood-opacity="0.32"/>
@@ -807,6 +819,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     </div>
     <div class="preview-controls">
       <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+      <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
       <span class="pv-hint"><svg class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
       <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg class="icon"><use href="#i-rotate"></use></svg></button>
     </div>
@@ -1193,11 +1206,23 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     calcResult();
   };
 
+  /* ── PREVIEW ADD-ON CHIPS — confirms to the visitor that the 3D model in front
+     of them reflects the extras they've picked, not just a generic shape ── */
+  function updatePreviewAddonChips(){
+    var wrap=document.getElementById('preview-addon-chips');
+    if(!wrap)return;
+    var active=Object.keys(selectedAddons).filter(function(k){return selectedAddons[k];});
+    if(!active.length){wrap.innerHTML='';return;}
+    wrap.innerHTML=active.map(function(k){return '<span class="pv-addon-chip">'+ADDONS[k].label+'</span>';}).join('');
+  }
+
   /* ── ADD-ONS ── */
   window.toggleAddon=function(key){
     selectedAddons[key]=!selectedAddons[key];
     var card=document.querySelector('.addon-card[data-addon="'+key+'"]');
     if(card)card.classList.toggle('active',!!selectedAddons[key]);
+    if(typeof renderShed==='function')renderShed(dispLen,dispWid,dispHt);
+    updatePreviewAddonChips();
     calcResult();
   };
 
@@ -1315,6 +1340,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     selectedAddons={};
     gstIncluded=false;
     document.querySelectorAll('.addon-card').forEach(function(c){c.classList.remove('active');});
+    updatePreviewAddonChips();
     var lbl=document.getElementById('gst-toggle-lbl');
     if(lbl)lbl.classList.remove('on');
     document.getElementById('sl-len').value=50;
@@ -1336,6 +1362,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   var theta=-0.5;      /* current rotation angle */
   var thetaTarget=-0.5;
   var thetaRAF=null;
+  var autoRotateOn=true;
+  var manualDragActive=false;
+  var lastInteraction=0;
 
   function animateTheta(){
     if(thetaRAF)cancelAnimationFrame(thetaRAF);
@@ -1351,10 +1380,35 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   /* ── ROTATE BUTTONS — nudge by a fixed step, smoothly ── */
   window.rotateView=function(dir){
+    lastInteraction=Date.now();
     thetaTarget+=dir*(Math.PI/4);
     animateTheta();
     var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
     if(btnEl){btnEl.classList.add('is-spinning');setTimeout(function(){btnEl.classList.remove('is-spinning');},400);}
+  };
+
+  /* ── AUTO-ROTATE — idle showcase spin, pauses on any manual interaction and
+     resumes a couple seconds after the visitor lets go. Runs as one continuous
+     RAF loop so it never fights with the drag/button rotation animations. ── */
+  function startAutoRotateLoop(){
+    function step(){
+      var idleLongEnough=(Date.now()-lastInteraction)>2200;
+      if(autoRotateOn&&!manualDragActive&&idleLongEnough&&!thetaRAF){
+        theta+=0.0028;
+        thetaTarget=theta;
+        renderShed(dispLen,dispWid,dispHt);
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  window.toggleAutoRotate=function(){
+    autoRotateOn=!autoRotateOn;
+    lastInteraction=autoRotateOn?0:Date.now(); /* resume immediately on next frame if turned back on */
+    var icon=document.getElementById('pv-auto-icon');
+    if(icon)icon.setAttribute('href',autoRotateOn?'#i-pause':'#i-play');
+    var btn=document.getElementById('pv-auto-toggle');
+    if(btn)btn.setAttribute('aria-label',autoRotateOn?'Pause auto-rotate':'Resume auto-rotate');
   };
 
   /* ── DRAG-TO-ROTATE — full continuous 360° ── */
@@ -1362,7 +1416,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var stage=document.getElementById('preview-tilt-stage');
     if(!stage)return;
     var dragging=false,lastX=0,pendingDx=0,frameQueued=false,hint=document.querySelector('.pv-hint');
-    function onDown(x){dragging=true;lastX=x;pendingDx=0;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
+    function onDown(x){dragging=true;manualDragActive=true;lastInteraction=Date.now();lastX=x;pendingDx=0;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
     function flush(){
       frameQueued=false;
       if(pendingDx===0)return;
@@ -1371,10 +1425,11 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     }
     function onMove(x){
       if(!dragging)return;
+      lastInteraction=Date.now();
       pendingDx+=x-lastX;lastX=x;
       if(!frameQueued){frameQueued=true;requestAnimationFrame(flush);}
     }
-    function onUp(){dragging=false;stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
+    function onUp(){dragging=false;manualDragActive=false;lastInteraction=Date.now();stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
     stage.style.cursor='grab';
     stage.addEventListener('mousedown',function(e){onDown(e.clientX);e.preventDefault();});
     window.addEventListener('mousemove',function(e){if(dragging)onMove(e.clientX);});
@@ -1464,8 +1519,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var g=document.getElementById('pshed-g');
     g.innerHTML='';
 
-    /* Ground */
-    g.appendChild(svgEl('polygon',{points:pt(G1)+' '+pt(G2)+' '+pt(G3)+' '+pt(G4),fill:'#101a0e',opacity:'0.85'}));
+    /* Ground — tinted light concrete grey when the PCC Flooring add-on is selected, otherwise bare earth */
+    var floorTint=(selectedAddons&&selectedAddons.flooring)?'#c9ccd1':'#101a0e';
+    var floorOpacity=(selectedAddons&&selectedAddons.flooring)?'0.9':'0.85';
+    g.appendChild(svgEl('polygon',{points:pt(G1)+' '+pt(G2)+' '+pt(G3)+' '+pt(G4),fill:floorTint,opacity:floorOpacity}));
 
     /* Determine wall corner sets for the two visible faces */
     var eave=eaveVisible==='F'?{a:G1,b:G2,ta:T1,tb:T2}:{a:G4,b:G3,ta:T4,tb:T3};
@@ -1511,10 +1568,38 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5'}));
     }
 
+    /* ── ADD-ON: extra windows — only drawn when the user has selected the Windows add-on ── */
+    if(selectedAddons&&selectedAddons.windows){
+      var wW=Math.abs(eave.b[0]-eave.a[0])*0.09,wH=Math.abs(eave.ta[1]-eave.a[1])*0.28;
+      [0.74,0.9].forEach(function(wt){
+        var wMidX=eave.a[0]+(eave.b[0]-eave.a[0])*wt, wMidY=eave.a[1]+(eave.b[1]-eave.a[1])*wt;
+        var wX=wMidX-wW/2, wY=wMidY-Math.abs(eave.ta[1]-eave.a[1])*0.62-wH/2;
+        g.appendChild(svgEl('rect',{x:wX.toFixed(1),y:wY.toFixed(1),width:wW.toFixed(1),height:wH.toFixed(1),fill:'rgba(179,229,252,.55)',stroke:'rgba(255,255,255,.55)','stroke-width':'.6',rx:'.5'}));
+        g.appendChild(svgEl('line',{x1:(wX+wW/2).toFixed(1),y1:wY.toFixed(1),x2:(wX+wW/2).toFixed(1),y2:(wY+wH).toFixed(1),stroke:'rgba(255,255,255,.6)','stroke-width':'.4'}));
+        g.appendChild(svgEl('line',{x1:wX.toFixed(1),y1:(wY+wH/2).toFixed(1),x2:(wX+wW).toFixed(1),y2:(wY+wH/2).toFixed(1),stroke:'rgba(255,255,255,.6)','stroke-width':'.4'}));
+      });
+    }
+
+    /* ── ADD-ON: extra door — a second, slightly smaller door near the other end of the wall ── */
+    if(selectedAddons&&selectedAddons.doors){
+      var d2W=dW*0.82,d2H=dH*0.88;
+      var d2MidX=eave.a[0]+(eave.b[0]-eave.a[0])*0.15, d2BotY=eave.a[1]+(eave.b[1]-eave.a[1])*0.15;
+      var d2X=d2MidX-d2W/2,d2Y=d2BotY-d2H;
+      g.appendChild(svgEl('rect',{x:d2X.toFixed(1),y:d2Y.toFixed(1),width:d2W.toFixed(1),height:d2H.toFixed(1),fill:'rgba(0,0,0,0.45)',rx:'1'}));
+      g.appendChild(svgEl('line',{x1:(d2X+d2W/2).toFixed(1),y1:d2Y.toFixed(1),x2:(d2X+d2W/2).toFixed(1),y2:(d2Y+d2H).toFixed(1),stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5'}));
+    }
+
     /* Roof slope above the visible eave wall */
     g.appendChild(svgEl('polygon',{points:pt(eave.ta)+' '+pt(eave.tb)+' '+pt(eaveRidge[1])+' '+pt(eaveRidge[0]),fill:'url(#pshedRoofGrad)'}));
     /* Ridge line */
     g.appendChild(svgEl('line',{x1:R1[0].toFixed(1),y1:R1[1].toFixed(1),x2:R2[0].toFixed(1),y2:R2[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
+
+    /* ── ADD-ON: insulation — tints the roof gradient to a reflective silver sheet look ── */
+    var roofTop=document.getElementById('pshedRoofGradTop'),roofBot=document.getElementById('pshedRoofGradBot');
+    if(roofTop&&roofBot){
+      if(selectedAddons&&selectedAddons.insulation){roofTop.setAttribute('stop-color','#CFD8DC');roofBot.setAttribute('stop-color','#90A4AE');}
+      else{roofTop.setAttribute('stop-color','#607D8B');roofBot.setAttribute('stop-color','#37474F');}
+    }
 
     /* Type-specific realistic details */
     if(curType==='peb'){
@@ -1983,12 +2068,14 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   }
   calcDraw();
   calcResult();
+  updatePreviewAddonChips();
   initTesti();
   initStickyBar();
   initReveal();
   initDragRotate();
   initFormErrorClearing();
   initScrollProgress();
+  startAutoRotateLoop();
 })();
 </script>
 
