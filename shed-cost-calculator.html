@@ -587,6 +587,26 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .share-title .icon,.lead-title .icon{width:15px;height:15px;color:#ff6f00;margin-right:1px}
 .srb-lbl .icon{width:9px;height:9px;margin-right:1px}
 
+/* ══════════════════════════════════════════
+   EMI / FINANCING PANEL
+══════════════════════════════════════════ */
+.emi-toggle-row{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+.emi-toggle-btn{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:#fff;cursor:pointer;padding:0}
+.emi-toggle-btn-lbl{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)}
+.emi-toggle-btn-lbl svg{width:14px;height:14px;color:#ff8c00}
+.emi-toggle-chevron{width:14px;height:14px;color:rgba(255,255,255,.5);transition:transform .25s}
+.emi-toggle-btn.open .emi-toggle-chevron{transform:rotate(90deg)}
+.emi-panel{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.emi-panel.open{max-height:220px}
+.emi-panel-inner{padding-top:14px}
+.emi-tenure-pills{display:flex;gap:6px;margin-bottom:12px}
+.emi-pill{flex:1;text-align:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-size:11px;font-weight:700;padding:7px 4px;border-radius:8px;cursor:pointer;transition:all .18s}
+.emi-pill.active{background:#ff6f00;border-color:#ff6f00;color:#fff}
+.emi-amount-row{display:flex;align-items:baseline;gap:6px;margin-bottom:6px}
+.emi-amount{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#ff8c00;letter-spacing:.5px}
+.emi-amount-lbl{font-size:11px;color:rgba(255,255,255,.55)}
+.emi-disclaimer{font-size:9.5px;color:rgba(255,255,255,.4);line-height:1.4;margin:0}
+
 /* Add-on chips shown in the 3D preview header — confirms the model reflects what's selected */
 .preview-addon-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px;position:relative;z-index:1;min-height:0}
 .pv-addon-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(255,111,0,.12);border:1px solid rgba(255,111,0,.3);color:#ff6f00;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.2px}
@@ -902,6 +922,27 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
         <span class="gst-toggle-lbl" id="gst-toggle-lbl" onclick="toggleGST()"><span class="gst-switch"></span> GST @18% included</span>
         <span class="gst-amount" id="gst-amount">+₹0</span>
       </div>
+      <div class="emi-toggle-row">
+        <button type="button" class="emi-toggle-btn" id="emi-toggle-btn" onclick="toggleEMI()">
+          <span class="emi-toggle-btn-lbl"><svg class="icon"><use href="#i-bank"></use></svg> EMI mein pao — dekhein monthly kitna</span>
+          <svg class="icon emi-toggle-chevron" id="emi-chevron"><use href="#i-arrow-right"></use></svg>
+        </button>
+        <div class="emi-panel" id="emi-panel">
+          <div class="emi-panel-inner">
+            <div class="emi-tenure-pills" id="emi-tenure-pills">
+              <span class="emi-pill" data-months="12" onclick="setEMITenure(12)">12 mo</span>
+              <span class="emi-pill active" data-months="24" onclick="setEMITenure(24)">24 mo</span>
+              <span class="emi-pill" data-months="36" onclick="setEMITenure(36)">36 mo</span>
+              <span class="emi-pill" data-months="48" onclick="setEMITenure(48)">48 mo</span>
+            </div>
+            <div class="emi-amount-row">
+              <span class="emi-amount" id="emi-amount">₹0</span>
+              <span class="emi-amount-lbl">/ month</span>
+            </div>
+            <p class="emi-disclaimer">Indicative estimate @14% p.a. reducing balance, business-loan financing partners ke through. Actual EMI aapke eligibility aur lender par depend karega — final quote ke saath discuss karenge.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1167,6 +1208,17 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   var selectedAddons={};   /* e.g. {insulation:true} */
   var gstIncluded=false;
   var STORAGE_KEY='rrShedCalcState_v1';
+  var emiOpen=false;
+  var emiTenureMonths=24;
+  var EMI_ANNUAL_RATE=14; /* illustrative %, reducing balance — real rate depends on lender/eligibility */
+  var milestoneFired=false;
+  var lastFinalLo=0,lastFinalHi=0; /* raw rupee values behind the currently-displayed price, used by the EMI calc */
+
+  /* ── HAPTIC FEEDBACK — subtle tactile confirmation on supported mobile devices.
+     Fails silently everywhere else (desktop browsers simply don't have the API). ── */
+  function haptic(ms){
+    try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}
+  }
 
   /* Sum of all currently-selected add-ons for a given area (flat + per-sqft items) */
   function addonCostFor(area){
@@ -1183,6 +1235,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── SELECT SHED TYPE ── */
   window.calcSelect=function(type){
     curType=type;
+    haptic(16);
     var cards=document.querySelectorAll('.stype-card');
     var types=['tin','industrial','peb','warehouse'];
     cards.forEach(function(c,i){
@@ -1219,6 +1272,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── ADD-ONS ── */
   window.toggleAddon=function(key){
     selectedAddons[key]=!selectedAddons[key];
+    haptic(14);
     var card=document.querySelector('.addon-card[data-addon="'+key+'"]');
     if(card)card.classList.toggle('active',!!selectedAddons[key]);
     if(typeof renderShed==='function')renderShed(dispLen,dispWid,dispHt);
@@ -1229,10 +1283,41 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── GST TOGGLE ── */
   window.toggleGST=function(){
     gstIncluded=!gstIncluded;
+    haptic(14);
     var lbl=document.getElementById('gst-toggle-lbl');
     if(lbl)lbl.classList.toggle('on',gstIncluded);
     calcResult();
   };
+
+  /* ── EMI / FINANCING PANEL ── */
+  function computeEMI(principal,months,annualRatePct){
+    var r=annualRatePct/1200; /* monthly rate */
+    if(r===0)return principal/months;
+    var factor=Math.pow(1+r,months);
+    return principal*r*factor/(factor-1);
+  }
+  window.toggleEMI=function(){
+    emiOpen=!emiOpen;
+    haptic(14);
+    var btn=document.getElementById('emi-toggle-btn'),panel=document.getElementById('emi-panel');
+    if(btn)btn.classList.toggle('open',emiOpen);
+    if(panel)panel.classList.toggle('open',emiOpen);
+  };
+  window.setEMITenure=function(months){
+    emiTenureMonths=months;
+    haptic(10);
+    document.querySelectorAll('.emi-pill').forEach(function(p){
+      p.classList.toggle('active',+p.dataset.months===months);
+    });
+    updateEMI();
+  };
+  function updateEMI(){
+    if(!lastFinalLo&&!lastFinalHi)return;
+    var principal=(lastFinalLo+lastFinalHi)/2;
+    var emi=computeEMI(principal,emiTenureMonths,EMI_ANNUAL_RATE);
+    var emiEl=document.getElementById('emi-amount');
+    if(emiEl)emiEl.textContent='₹'+Math.round(emi).toLocaleString('en-IN');
+  }
 
   /* ── VALUE-TIER BADGE — reflects where the visitor's chosen rate sits within
      that shed type's normal market range. Purely transparent feedback on their
@@ -1269,6 +1354,12 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       var inRange=(window.scrollY+vh)>start && window.scrollY<end;
       track.classList.toggle('visible',inRange);
       fill.style.width=(frac*100)+'%';
+      /* One-time "you've made it to the finish line" celebration — nudges toward filling the form */
+      if(!milestoneFired&&frac>=0.92){
+        milestoneFired=true;
+        haptic([12,30,12]);
+        if(typeof fireConfetti==='function')fireConfetti();
+      }
     }
     function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(update);}}
     window.addEventListener('scroll',onScroll,{passive:true});
@@ -1337,6 +1428,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── RESET EVERYTHING TO DEFAULTS ── */
   window.resetCalculator=function(){
     try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+    haptic(18);
+    milestoneFired=false;
     selectedAddons={};
     gstIncluded=false;
     document.querySelectorAll('.addon-card').forEach(function(c){c.classList.remove('active');});
@@ -1381,6 +1474,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   /* ── ROTATE BUTTONS — nudge by a fixed step, smoothly ── */
   window.rotateView=function(dir){
     lastInteraction=Date.now();
+    haptic(8);
     thetaTarget+=dir*(Math.PI/4);
     animateTheta();
     var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
@@ -1691,6 +1785,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     document.getElementById('rb-lab').textContent=fmt(lLo)+'–'+fmt(lHi);
     document.getElementById('gst-amount').textContent='+'+fmt(gstLo)+'–'+fmt(gstHi);
     updateValueTier(rate,r);
+    lastFinalLo=finalLo;lastFinalHi=finalHi;
+    updateEMI();
     ['rb-area','rb-rate','rb-mat','rb-lab'].forEach(function(id){
       var el=document.getElementById(id);
       el.classList.remove('is-updating');void el.offsetWidth;el.classList.add('is-updating');
@@ -1738,6 +1834,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var msg='New Lead from Calculator!\n\nName: '+name+'\nPhone: '+phone+'\n\nShed Type: '+r.label+'\nSize: '+len+' × '+wid+' feet\nHeight: '+ht+' feet'+(addonNames.length?('\nAdd-ons: '+addonNames.join(', ')):'')+'\n\nPlease call them for quote.';
     document.getElementById('lead-form-area').style.display='none';
     document.getElementById('lead-success').style.display='block';
+    haptic([15,40,15,40,25]);
     fireConfetti();
     setTimeout(function(){
       window.open('https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg),'_blank');
