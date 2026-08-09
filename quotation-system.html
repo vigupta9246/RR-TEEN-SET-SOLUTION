@@ -1111,6 +1111,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="confirm-box">
     <div class="confirm-title" id="confirm-title">Confirm</div>
     <div class="confirm-msg" id="confirm-msg"></div>
+    <input type="text" id="confirm-input" class="field-input" style="display:none;margin-top:12px" />
     <div class="confirm-btns">
       <button class="btn btn-reset" id="confirm-cancel-btn">Cancel</button>
       <button class="btn btn-save" id="confirm-ok-btn">Confirm</button>
@@ -1203,6 +1204,44 @@ window.confirmDialog = (message, opts = {}) => {
     const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
     okBtn.onclick = () => cleanup(true);
     cancelBtn.onclick = () => cleanup(false);
+    document.addEventListener('keydown', onKey);
+  });
+};
+
+// ── PROMPT MODAL (replaces window.prompt) ───────────────────────
+// Same styled modal as confirmDialog, but with a text input. Resolves the
+// trimmed string on Confirm, or null on Cancel/Escape (same contract as
+// window.prompt, so callers that already checked `=== null` keep working).
+// Usage: const reason = await promptDialog('Enter a reason:', { title, placeholder });
+window.promptDialog = (message, opts = {}) => {
+  const { title = 'Please Enter a Value', confirmText = 'OK', cancelText = 'Cancel', placeholder = '', defaultValue = '' } = opts;
+  return new Promise(resolve => {
+    const modal = document.getElementById('confirm-modal');
+    const box = modal.querySelector('.confirm-box');
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = message;
+    box.classList.remove('confirm-danger');
+    const okBtn = document.getElementById('confirm-ok-btn');
+    const cancelBtn = document.getElementById('confirm-cancel-btn');
+    const input = document.getElementById('confirm-input');
+    okBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    input.style.display = '';
+    input.placeholder = placeholder;
+    input.value = defaultValue;
+    modal.style.display = 'flex';
+    setTimeout(() => input.focus(), 0);
+    const cleanup = (result) => {
+      modal.style.display = 'none';
+      input.style.display = 'none';
+      okBtn.onclick = null; cancelBtn.onclick = null; input.onkeydown = null;
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(null); };
+    okBtn.onclick = () => cleanup(input.value.trim());
+    cancelBtn.onclick = () => cleanup(null);
+    input.onkeydown = (e) => { if (e.key === 'Enter') cleanup(input.value.trim()); };
     document.addEventListener('keydown', onKey);
   });
 };
@@ -1308,7 +1347,12 @@ async function generateRealPDF(innerHTML, filename, mode='download') {
 // Generic: rows = array of objects, columns = [[header, keyOrFn], ...]
 function toCSV(rows, columns) {
   const escCell = v => {
-    const s = v === null || v === undefined ? '' : String(v);
+    let s = v === null || v === undefined ? '' : String(v);
+    // CSV/formula-injection guard: if the cell starts with a character Excel/
+    // Sheets treats as a formula trigger (=,+,-,@) — including from untrusted
+    // sources like public support-ticket submissions — prefix it with a
+    // leading apostrophe so it's forced to render as plain text, not run.
+    if (/^[=+\-@]/.test(s)) s = "'" + s;
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   const header = columns.map(c => escCell(c[0])).join(',');
@@ -1942,14 +1986,14 @@ window.renderTeam = () => {
 // right after.
 window.unlockRoleForChange = async (uid) => {
   const t = allTeam.find(x=>x.id===uid);
-  const reason = window.prompt(`Enter a reason for unlocking the role for "${t?.name||t?.email}" (this will be saved to the audit log):`);
+  const reason = await promptDialog(`Enter a reason for unlocking the role for "${t?.name||t?.email}" (this will be saved to the audit log):`, { title: 'Unlock Role', confirmText: 'Continue' });
   if (reason === null) return; // cancelled
-  if (!reason.trim()) { toast('A reason is required.', 'warning'); return; }
+  if (!reason) { toast('A reason is required.', 'warning'); return; }
   if (!(await confirmDialog(`Unlock the role for "${t?.name||t?.email}" for a role change? This will be recorded in the audit trail.`, { title: 'Unlock Role', confirmText: 'Unlock' }))) return;
   try {
     await updateDoc(doc(db,'users',uid), { roleLocked: false, updatedAt: serverTimestamp() });
     if (t) t.roleLocked = false;
-    logActivity('role_unlocked', `${t?.name||t?.email||uid}: unlocked for role change — reason: ${reason.trim()}`);
+    logActivity('role_unlocked', `${t?.name||t?.email||uid}: unlocked for role change — reason: ${reason}`);
     toast('Role unlocked — you can now select a new role from the dropdown.', 'success');
     renderTeam();
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
@@ -2287,11 +2331,14 @@ window.doForgotPassword = async () => {
   const errEl = document.getElementById('login-err');
   errEl.classList.remove('success');
   if (!email) { errEl.textContent = 'Please enter your email first to reset your password.'; return; }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    errEl.classList.add('success');
-    errEl.textContent = 'Reset link sent — please check your email.';
-  } catch(e) { errEl.textContent = 'This email is not registered, or an error occurred — please try again.'; }
+  // Always show the same generic message whether or not the email is
+  // actually registered — telling the user "this email is not registered"
+  // lets anyone probe which staff emails have accounts (user enumeration).
+  // Firebase still only sends the email if the account genuinely exists.
+  try { await sendPasswordResetEmail(auth, email); }
+  catch(e) { if (e.code !== 'auth/user-not-found') reportError(e); }
+  errEl.classList.add('success');
+  errEl.textContent = 'If that email is registered, a reset link has been sent — please check your inbox.';
 };
 window.doLogout = () => signOut(auth);
 
@@ -2772,7 +2819,16 @@ window.renderCustomers = (search='', keepPage=false) => {
 // change status/priority. Uses the same cheap-first-page + Load More
 // pattern as History/Leads/Invoices (see fetchFirstPage/fetchNextPage).
 function genTicketId() {
-  return 'TKT-' + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).slice(2,6).toUpperCase();
+  // SECURITY: the Firestore rules treat this ID as a bearer token — anyone
+  // who has it can read that one ticket (`allow get: if true`), no login
+  // needed. The old version only had 4 chars of Math.random() entropy
+  // (~1.68M combinations) plus a time-correlated prefix, which is brute-
+  // forceable. Now uses crypto.getRandomValues for 10 cryptographically
+  // random base36 chars (~62 bits) — not realistically guessable.
+  const bytes = new Uint32Array(3);
+  crypto.getRandomValues(bytes);
+  const rand = Array.from(bytes, b => b.toString(36).padStart(7,'0')).join('').toUpperCase().slice(0,10);
+  return 'TKT-' + rand;
 }
 
 window.createTicketByStaff = async () => {
@@ -3020,8 +3076,41 @@ window.updateDealStatus = async (id, dealStatus) => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   try {
     const updates = { dealStatus, updatedAt: serverTimestamp() };
+    let shouldGenerateInvoice = false;
 
     if (dealStatus === 'Won' && !q.invoiceGenerated) {
+      // BUG FIX: previously `invoiceGenerated:true` was only saved on the
+      // quotation in the FINAL updateDoc below, after the invoice was
+      // already created. If that final write failed (network blip,
+      // permission hiccup) — or the dropdown fired twice quickly — the
+      // local/remote flag never flipped, so the very next attempt saw
+      // `invoiceGenerated` still false and created a SECOND invoice for the
+      // same quotation (duplicate GST document, double revenue in reports).
+      // Fix: atomically claim the flag on the quotation FIRST, inside a
+      // transaction that reads-then-sets it. If another call already
+      // claimed it (or it's somehow already true), this aborts here and we
+      // skip invoice creation entirely — so at most one invoice is ever
+      // generated per quotation, regardless of retries/double-clicks.
+      try {
+        await runTransaction(db, async (tx) => {
+          const qRef = doc(db, 'quotations', id);
+          const qSnap = await tx.get(qRef);
+          if (qSnap.exists() && qSnap.data().invoiceGenerated) {
+            throw new Error('ALREADY_GENERATED');
+          }
+          tx.update(qRef, { invoiceGenerated: true, updatedAt: serverTimestamp() });
+        });
+        shouldGenerateInvoice = true;
+        updates.invoiceGenerated = true;
+      } catch (claimErr) {
+        if (claimErr.message !== 'ALREADY_GENERATED') throw claimErr;
+        // Someone else already generated it — proceed with just the status
+        // change, no invoice, no error shown to the user.
+        updates.invoiceGenerated = true;
+      }
+    }
+
+    if (shouldGenerateInvoice) {
       const invId = await getNextInvoiceNumber();
       const invData = {
         invId, qtRef: q.qtId, date: new Date().toISOString().split('T')[0], dueDate: '',
@@ -3035,7 +3124,6 @@ window.updateDealStatus = async (id, dealStatus) => {
         createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       };
       await addDoc(collection(db,'invoices'), invData);
-      updates.invoiceGenerated = true;
       await upsertCustomer({ name: q.cname, phone: (q.cphone||'').replace(/\D/g,''), email: q.cemail, addr: q.caddr, kind: 'invoice' });
       invalidateCache('invoices');
     }
@@ -3046,7 +3134,7 @@ window.updateDealStatus = async (id, dealStatus) => {
 
     await updateDoc(doc(db,'quotations',id), updates);
     Object.assign(q, updates);
-    if (dealStatus === 'Won' && updates.invoiceGenerated) {
+    if (dealStatus === 'Won' && shouldGenerateInvoice) {
       toast('Deal Won! 🎉 Invoice auto-generated — check Invoices & Payments tab.', 'success');
     }
     renderHistory(document.getElementById('search-input')?.value || '');
@@ -3805,6 +3893,13 @@ window.savePayment = async () => {
       const curPaid = invSnap.data().amountPaid || 0;
       const total = invSnap.data().total || 0;
       const newPaid = curPaid + amount;
+      // Re-check against the LIVE document inside the transaction, not just
+      // the client-cached `balance` checked before we got here — that cache
+      // can be stale if another payment landed in between (two tabs, two
+      // staff, etc). Without this, an invoice could be silently overpaid.
+      if (newPaid > total) {
+        throw new Error(`This payment would overpay the invoice — balance is now only ₹${fmt(Math.max(0, total - curPaid))}. Please refresh and try again.`);
+      }
       const newStatus = newPaid <= 0 ? 'unpaid' : (newPaid >= total ? 'paid' : 'partial');
       tx.set(payRef, {
         invoiceId: activePaymentInvoiceId, invId: inv.invId, amount, mode, date, note,
