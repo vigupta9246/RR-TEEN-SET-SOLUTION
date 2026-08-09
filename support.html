@@ -188,7 +188,16 @@ const db = getFirestore(app);
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function genTicketId() {
-  return 'TKT-' + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).slice(2,6).toUpperCase();
+  // SECURITY: this ID is the bearer token the Firestore rules trust —
+  // whoever has it can read that one ticket, no login needed. The old
+  // version had only 4 chars of Math.random() entropy (~1.68M combos) plus
+  // a time-correlated prefix, which is brute-forceable. Now uses
+  // crypto.getRandomValues for 10 cryptographically random base36 chars
+  // (~62 bits) — matches the same fix applied in the CRM app.
+  const bytes = new Uint32Array(3);
+  crypto.getRandomValues(bytes);
+  const rand = Array.from(bytes, b => b.toString(36).padStart(7,'0')).join('').toUpperCase().slice(0,10);
+  return 'TKT-' + rand;
 }
 function showError(id, msg) {
   const el = document.getElementById(id);
