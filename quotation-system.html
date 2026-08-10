@@ -86,6 +86,38 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .login-forgot:hover{text-decoration:underline}
 #login-err{color:var(--red);font-size:13px;margin-top:4px;margin-bottom:4px;min-height:16px;text-align:center}
 #login-err.success{color:var(--green)}
+/* CUSTOMER PORTAL (public, no login) */
+#portal-screen{display:none;min-height:100vh;background:var(--bg)}
+.portal-topbar{background:var(--navy);padding:18px 24px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.portal-topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
+.portal-logo{height:36px;width:auto;object-fit:contain;position:relative;z-index:1}
+.portal-wordmark{font-size:16px;font-weight:700;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:.3px;position:relative;z-index:1}
+.portal-tagline{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1.2px;text-transform:uppercase;position:relative;z-index:1}
+.portal-body{max-width:640px;margin:0 auto;padding:28px 20px 60px}
+.portal-loading,.portal-error{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.portal-error{color:var(--red)}
+.portal-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:26px 24px;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
+.portal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
+.portal-id{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);letter-spacing:.5px}
+.portal-cname{font-size:20px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;margin-top:4px}
+.portal-ptype{font-size:12.5px;color:var(--muted);margin-top:2px}
+.portal-badge{display:inline-block;padding:4px 12px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:10px}
+.portal-badge-paid,.portal-badge-won{background:#dcfce7;color:#166534}
+.portal-badge-partial,.portal-badge-pending,.portal-badge-sent{background:#fef3c7;color:#92400e}
+.portal-badge-unpaid,.portal-badge-lost{background:#fee2e2;color:#991b1b}
+.portal-rows{margin-top:20px;border-top:1px solid var(--border)}
+.portal-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.portal-row span:first-child{color:var(--muted)}
+.portal-row span:last-child{font-weight:600;color:var(--text)}
+.portal-row.portal-total span:last-child{font-size:17px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace}
+.portal-row.portal-due span:last-child{color:var(--red)}
+.portal-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.portal-btn{flex:1;min-width:160px;padding:12px;border-radius:3px;text-align:center;font-size:13.5px;font-weight:700;border:none;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.portal-btn-primary{background:var(--orange);color:#fff}
+.portal-btn-primary:hover{background:var(--orange-light)}
+.portal-btn-whatsapp{background:#25d366;color:#fff}
+.portal-footer{text-align:center;margin-top:22px;font-size:11.5px;color:var(--muted)}
+
 /* SHELL */
 #app{display:none;min-height:100vh}
 .shell{display:flex;min-height:100vh}
@@ -373,6 +405,22 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
     <div id="login-err"></div>
     <button class="btn-primary" onclick="doLogin()">Sign In</button>
     <button class="login-forgot" onclick="doForgotPassword()">Forgot Password?</button>
+  </div>
+</div>
+
+<!-- CUSTOMER PORTAL — read-only public view, no login. Reached via a
+     ?portal=quotation|invoice&id=...&token=... link generated from the
+     History/Invoices tables ("Share Customer Link" button). -->
+<div id="portal-screen">
+  <div class="portal-topbar">
+    <img src="images/rr-logo-original.png" alt="R.R Teen Set Solution" class="portal-logo">
+    <div>
+      <div class="portal-wordmark">R.R Teen Set Solution</div>
+      <div class="portal-tagline">Supply · Fabrication · Erection</div>
+    </div>
+  </div>
+  <div id="portal-body" class="portal-body">
+    <div class="portal-loading">Loading…</div>
   </div>
 </div>
 
@@ -1294,6 +1342,10 @@ function setBtnLoading(btn, loading, loadingText) {
 }
 
 let allQuotations = [];
+// Set to true before Firebase Auth resolves if the page was opened as a
+// customer portal link (?portal=...). When true, onAuthStateChanged must
+// not touch the login/app screens — the portal screen owns the UI instead.
+let PORTAL_MODE = false;
 
 // ── REAL PDF GENERATION (replaces window.print() → "Save as PDF") ──
 // Renders the same 794px-wide (A4 @96dpi) HTML template used for the
@@ -1726,6 +1778,7 @@ window._gotoPage = (key, page) => {
 
 // ── AUTH ────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async u => {
+  if (PORTAL_MODE) return; // customer portal link — login/app screens stay hidden regardless of auth state
   if (u) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -2247,9 +2300,16 @@ window.loadDashboard = async () => {
       const outstanding = unpaid.reduce((s,i)=>s+((i.total||0)-(i.amountPaid||0)),0);
       document.getElementById('dash-outstanding').textContent = '₹' + fmt(outstanding);
 
+      // BUGFIX: this used to compute "days overdue" from the invoice's issue
+      // date (i.date), ignoring the dueDate field entirely — so an invoice
+      // due 30 days out could get flagged "overdue" a week after being
+      // issued, and one due immediately wouldn't show as overdue until a
+      // week later. Now: if a due date was set, "overdue" means past THAT
+      // date. Only invoices with no due date fall back to the old 7-day
+      // grace-period-after-issue heuristic.
       const overdue = unpaid
-        .map(i => ({ ...i, days: daysSince(i.date), due: (i.total||0)-(i.amountPaid||0) }))
-        .filter(i => i.days >= 7)
+        .map(i => ({ ...i, days: daysSince(i.dueDate || i.date), due: (i.total||0)-(i.amountPaid||0) }))
+        .filter(i => i.dueDate ? i.days >= 1 : i.days >= 7)
         .sort((a,b) => b.days - a.days)
         .slice(0, 10);
 
@@ -2257,9 +2317,12 @@ window.loadDashboard = async () => {
         ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> No overdue payments</div>'
         : overdue.map((i,idx) => {
             const msg = `Hello ${i.cname}, this is R.R Teen Set Solution. A payment of ₹${fmt(i.due)} is due on your invoice ${i.invId}. Please make the payment at your earliest convenience. Thank you!`;
+            const ageLabel = i.dueDate
+              ? `${i.days} day${i.days===1?'':'s'} past due date`
+              : `${i.days} days since issued (no due date set)`;
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
-                <br><small style="color:#94a3b8">${i.days} days overdue</small></div>
+                <br><small style="color:#94a3b8">${ageLabel}</small></div>
               <a href="${waLink(i.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
@@ -2739,6 +2802,7 @@ window.saveQuotation = async isDraft => {
     const existing = editingId ? allQuotations.find(x=>x.id===editingId) : null;
     if (!existing || !existing.dealStatus) data.dealStatus = 'Pending';
   }
+  const wasEdit = !!editingId; // captured before the branch below clears it
   const btn = document.getElementById(isDraft ? 'qt-draft-btn' : 'qt-save-btn');
   setBtnLoading(btn, true, isDraft ? 'Saving Draft...' : 'Finalizing...');
   try {
@@ -2750,7 +2814,12 @@ window.saveQuotation = async isDraft => {
       data.qtId = await getNextQuotationNumber(); // assigned atomically, exactly once, right before save
       await addDoc(collection(db,'quotations'), { ...data, createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
     }
-    await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr') });
+    // BUGFIX: previously bumped every save unconditionally, so editing (or
+    // finalizing a draft of) the SAME quotation multiple times kept
+    // inflating that customer's "Total Quotations" count in the Customers
+    // tab. Now only a genuinely new quotation increments it; edits still
+    // sync the customer's name/email/address.
+    await upsertCustomer({ name: cname, phone: phoneDigits, email: g('f-cemail'), addr: g('f-caddr'), bump: !wasEdit });
     invalidateCache('quotations');
     setBtnLoading(btn, false);
     if (isDraft) {
@@ -2924,7 +2993,11 @@ window.convertLeadToQuotation = async id => {
 };
 
 // ── CUSTOMERS (auto-built master record) ─────────────────────────
-async function upsertCustomer({ name, phone, email, addr, kind = 'quotation' }) {
+// bump: whether this call represents a genuinely NEW quotation/invoice
+// (increment the count) vs an edit/re-save of an existing one (just sync
+// contact details, don't inflate the count). Defaults to true since most
+// callers are create-flows; pass bump:false from edit paths.
+async function upsertCustomer({ name, phone, email, addr, kind = 'quotation', bump = true }) {
   if (!phone) return;
   const countField = kind === 'invoice' ? 'totalInvoices' : 'totalQuotations';
   try {
@@ -2932,18 +3005,19 @@ async function upsertCustomer({ name, phone, email, addr, kind = 'quotation' }) 
     if (!snap.empty) {
       const d = snap.docs[0];
       const existing = d.data();
-      await updateDoc(doc(db,'customers',d.id), {
+      const update = {
         name: name || existing.name,
         email: email || existing.email,
         addr: addr || existing.addr,
-        [countField]: (existing[countField]||0) + 1,
         lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
-      });
+      };
+      if (bump) update[countField] = (existing[countField]||0) + 1;
+      await updateDoc(doc(db,'customers',d.id), update);
     } else {
       await addDoc(collection(db,'customers'), {
         name, phone, email: email||'', addr: addr||'',
-        totalQuotations: kind === 'quotation' ? 1 : 0,
-        totalInvoices: kind === 'invoice' ? 1 : 0,
+        totalQuotations: (kind === 'quotation' && bump) ? 1 : 0,
+        totalInvoices: (kind === 'invoice' && bump) ? 1 : 0,
         createdAt: serverTimestamp(), lastActivity: serverTimestamp(), updatedAt: serverTimestamp()
       });
     }
@@ -3244,6 +3318,7 @@ window.renderHistory = (search='', keepPage=false) => {
           <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
           <button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
           <button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
+          ${!q.isDraft ? `<button onclick="generatePortalLink('quotation','${q.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>` : ''}
           <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`).join('');
   renderPaginationControls('history-pagination', 'history', page, totalPages, total);
@@ -3680,7 +3755,47 @@ window.shareEmail = async id => {
   });
 };
 
-// ── ANALYTICS ───────────────────────────────────────────────────
+// ── CUSTOMER PORTAL LINK ─────────────────────────────────────────
+// Generates (or reuses) a shareable, no-login link a customer can open to
+// see live status + download the PDF themselves. Security model: a random
+// UUID token is stored on the record itself; Firestore rules (added
+// separately — see setup notes) allow an unauthenticated `get` on a
+// quotation/invoice ONLY when it already has a portalToken set. The doc ID
+// is also required to fetch it, and Firestore auto-IDs are unguessable, so
+// the link is only exploitable by someone who has the exact link. Because
+// it reads the SAME live document, status/payments shown to the customer
+// are always current — nothing to keep in sync.
+window.generatePortalLink = async (type, id) => {
+  const isInvoice = type === 'invoice';
+  const record = isInvoice ? allInvoices.find(x=>x.id===id) : allQuotations.find(x=>x.id===id);
+  if (!record) return;
+  if (!isInvoice && record.isDraft) { toast('Finalize this quotation before sharing a customer link.', 'warning'); return; }
+  try {
+    let token = record.portalToken;
+    if (!token) {
+      token = crypto.randomUUID();
+      await updateDoc(doc(db, isInvoice ? 'invoices' : 'quotations', id), { portalToken: token });
+      record.portalToken = token; // keep in-memory cache in sync so re-clicking reuses it
+      invalidateCache(isInvoice ? 'invoices' : 'quotations');
+    }
+    const url = `${location.origin}${location.pathname}?portal=${isInvoice ? 'invoice' : 'quotation'}&id=${id}&token=${token}`;
+    let copied = false;
+    try { await navigator.clipboard.writeText(url); copied = true; } catch(e) {}
+    const send = await confirmDialog(
+      copied
+        ? `Link copied to clipboard!\n\nSend it to ${record.cname} on WhatsApp now?`
+        : `Couldn't auto-copy — here's the link:\n${url}\n\nSend it to ${record.cname} on WhatsApp now?`,
+      { title: 'Share Customer Link', confirmText: 'Open WhatsApp', cancelText: copied ? 'Done' : 'Close' }
+    );
+    if (send) {
+      let phone = (record.cphone || '').replace(/\D/g,'');
+      if (phone.length === 10) phone = '91' + phone;
+      const label = isInvoice ? record.invId : record.qtId;
+      const msg = `Hello ${record.cname}, here is your ${isInvoice ? 'invoice' : 'quotation'} ${label} from R.R Teen Set Solution — you can check the status and download the PDF anytime here:\n${url}`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  } catch(e) { reportError(e); toast('Could not create customer link: ' + e.message, 'error'); }
+};
 window.renderAnalytics = async () => {
   try { allQuotations = await fetchCached('quotations', 'quotations'); }
   catch(e) { reportError(e); toast('Failed to load analytics data: ' + e.message, 'error'); return; }
@@ -3986,6 +4101,7 @@ window.renderInvoices = (search='', keepPage=false) => {
           <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
           <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
           <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
+          <button onclick="generatePortalLink('invoice','${i.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>
           <button onclick="shareInvoiceEmail('${i.id}')" class="btn-icon" title="Share via Email">${ICONS.mail}</button>
           <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td></tr>`;
@@ -4320,9 +4436,117 @@ window.shareInvoiceEmail = async id => {
   });
 };
 
+// ── CUSTOMER PORTAL VIEW (public, read-only) ────────────────────
+async function renderPortalView(type, id, token) {
+  const body = document.getElementById('portal-body');
+  const isInvoice = type === 'invoice';
+  try {
+    const ref = doc(db, isInvoice ? 'invoices' : 'quotations', id);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : null;
+    if (!data || data.portalToken !== token || data.deleted) {
+      body.innerHTML = `<div class="portal-error">This link is invalid or has expired. Please contact R.R Teen Set Solution for an updated link.</div>`;
+      return;
+    }
+    renderPortalCard({ id: snap.id, ...data }, isInvoice);
+  } catch(e) {
+    reportError(e);
+    body.innerHTML = `<div class="portal-error">Couldn't load this ${isInvoice ? 'invoice' : 'quotation'} right now. Please check your connection and try again, or contact us directly.</div>`;
+  }
+}
+
+function renderPortalCard(d, isInvoice) {
+  const body = document.getElementById('portal-body');
+  const R = '₹';
+  window._portalRecord = d;
+  window._portalIsInvoice = isInvoice;
+  if (isInvoice) {
+    const paid = d.amountPaid || 0;
+    const balance = Math.max(0, (d.total||0) - paid);
+    const status = invoiceStatusOf(d);
+    const badgeClass = status==='paid' ? 'portal-badge-paid' : status==='partial' ? 'portal-badge-partial' : 'portal-badge-unpaid';
+    const badgeText  = status==='paid' ? 'Paid' : status==='partial' ? 'Partially Paid' : 'Unpaid';
+    body.innerHTML = `
+      <div class="portal-card">
+        <div class="portal-id">${esc(d.invId)}</div>
+        <div class="portal-cname">${esc(d.cname)}</div>
+        <div class="portal-ptype">${esc(d.ptype||'')}${d.date?' &middot; '+esc(d.date):''}</div>
+        <span class="portal-badge ${badgeClass}">${badgeText}</span>
+        <div class="portal-rows">
+          <div class="portal-row"><span>Base Amount</span><span>${R}${fmt(d.base)}</span></div>
+          ${d.extra>0?`<div class="portal-row"><span>Additional</span><span>${R}${fmt(d.extra)}</span></div>`:''}
+          ${d.discount>0?`<div class="portal-row"><span>Discount</span><span>&minus;${R}${fmt(d.discount)}</span></div>`:''}
+          ${d.gstPct>0?`<div class="portal-row"><span>GST @ ${d.gstPct}%</span><span>${R}${fmt(d.gstAmt)}</span></div>`:''}
+          <div class="portal-row portal-total"><span>Total</span><span>${R}${fmt(d.total)}</span></div>
+          <div class="portal-row"><span>Amount Paid</span><span>${R}${fmt(paid)}</span></div>
+          ${balance>0?`<div class="portal-row portal-due"><span>Balance Due</span><span>${R}${fmt(balance)}</span></div>`:''}
+          ${d.dueDate?`<div class="portal-row"><span>Due Date</span><span>${esc(d.dueDate)}</span></div>`:''}
+        </div>
+        <div class="portal-actions">
+          <button class="portal-btn portal-btn-primary" onclick="portalDownloadPDF()">${ICONS.download} Download PDF</button>
+          <a class="portal-btn portal-btn-whatsapp" href="https://wa.me/918527258462" target="_blank" rel="noopener noreferrer">${ICONS.chat} Contact Us</a>
+        </div>
+      </div>
+      <div class="portal-footer">R.R Teen Set Solution &middot; GSTIN: 07DJCPK0635M1Z5 &middot; +91 85272 58462</div>`;
+  } else {
+    const dateObj = d.date ? new Date(d.date+'T00:00:00') : new Date();
+    const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
+    const expired = validTill < new Date();
+    const dealBadgeClass = { Won:'portal-badge-won', Lost:'portal-badge-lost', Sent:'portal-badge-sent', Pending:'portal-badge-pending' }[d.dealStatus] || 'portal-badge-pending';
+    body.innerHTML = `
+      <div class="portal-card">
+        <div class="portal-id">${esc(d.qtId)}</div>
+        <div class="portal-cname">${esc(d.cname)}</div>
+        <div class="portal-ptype">${esc(d.ptype||'')}${d.date?' &middot; '+esc(d.date):''}</div>
+        <span class="portal-badge ${dealBadgeClass}">${esc(d.dealStatus||'Pending')}</span>
+        <div class="portal-rows">
+          <div class="portal-row"><span>Area</span><span>${(d.area||0).toLocaleString('en-IN')} sq.ft</span></div>
+          <div class="portal-row"><span>Rate</span><span>${R}${fmt(d.rate)}/sq.ft</span></div>
+          <div class="portal-row"><span>Base Amount</span><span>${R}${fmt(d.base)}</span></div>
+          ${d.extra>0?`<div class="portal-row"><span>Additional</span><span>${R}${fmt(d.extra)}</span></div>`:''}
+          ${d.discount>0?`<div class="portal-row"><span>Discount</span><span>&minus;${R}${fmt(d.discount)}</span></div>`:''}
+          ${d.gstPct>0?`<div class="portal-row"><span>GST @ ${d.gstPct}%</span><span>${R}${fmt(d.gstAmt)}</span></div>`:''}
+          <div class="portal-row portal-total"><span>Total</span><span>${R}${fmt(d.total)}</span></div>
+          <div class="portal-row"><span>${expired?'Was Valid Till':'Valid Till'}</span><span>${validTill.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</span></div>
+        </div>
+        <div class="portal-actions">
+          <button class="portal-btn portal-btn-primary" onclick="portalDownloadPDF()">${ICONS.download} Download PDF</button>
+          <a class="portal-btn portal-btn-whatsapp" href="https://wa.me/918527258462" target="_blank" rel="noopener noreferrer">${ICONS.chat} Contact Us</a>
+        </div>
+      </div>
+      <div class="portal-footer">R.R Teen Set Solution &middot; GSTIN: 07DJCPK0635M1Z5 &middot; +91 85272 58462</div>`;
+  }
+}
+
+window.portalDownloadPDF = async () => {
+  const d = window._portalRecord; if (!d) return;
+  const isInvoice = window._portalIsInvoice;
+  toast('Preparing PDF...', 'warning', 2000);
+  const filename = isInvoice ? `Invoice_${d.invId}.pdf` : `Quotation_${d.qtId}.pdf`;
+  const ok = await generateRealPDF(isInvoice ? buildInvHTML(d) : buildQtHTML(d), filename);
+  if (ok) toast('PDF downloaded!', 'success');
+};
+
+// Detects a ?portal=quotation|invoice&id=...&token=... link and switches
+// the whole page into the read-only public view instead of the normal
+// login/app flow. Must run before anything else touches those screens.
+async function initPortalIfNeeded() {
+  const params = new URLSearchParams(location.search);
+  const type = params.get('portal');
+  const id = params.get('id');
+  const token = params.get('token');
+  if (!type || !id || !token || (type !== 'quotation' && type !== 'invoice')) return;
+  PORTAL_MODE = true;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('portal-screen').style.display = 'block';
+  await renderPortalView(type, id, token);
+}
+
 // ── INIT ─────────────────────────────────────────────────────────
 window.resetForm();
 window.resetInvoiceForm();
+initPortalIfNeeded();
 </script>
 </body>
 </html>
