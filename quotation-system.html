@@ -20,6 +20,7 @@
      may not even need this session (PDF download/share is a later action). -->
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <!-- Error monitoring (Sentry). Replace SENTRY_DSN below with your project's
      DSN from sentry.io (free tier is enough) — until then this loads but
      sends nothing, and the app works exactly as before either way. -->
@@ -1131,7 +1132,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
 <script type="module">
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail }
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail, multiFactor, getMultiFactorResolver, reauthenticateWithCredential, EmailAuthProvider, TotpMultiFactorGenerator, sendEmailVerification }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, getCountFromServer, serverTimestamp, runTransaction, writeBatch }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -1214,7 +1215,7 @@ window.confirmDialog = (message, opts = {}) => {
 // window.prompt, so callers that already checked `=== null` keep working).
 // Usage: const reason = await promptDialog('Enter a reason:', { title, placeholder });
 window.promptDialog = (message, opts = {}) => {
-  const { title = 'Please Enter a Value', confirmText = 'OK', cancelText = 'Cancel', placeholder = '', defaultValue = '' } = opts;
+  const { title = 'Please Enter a Value', confirmText = 'OK', cancelText = 'Cancel', placeholder = '', defaultValue = '', inputType = 'text' } = opts;
   return new Promise(resolve => {
     const modal = document.getElementById('confirm-modal');
     const box = modal.querySelector('.confirm-box');
@@ -1227,6 +1228,7 @@ window.promptDialog = (message, opts = {}) => {
     okBtn.textContent = confirmText;
     cancelBtn.textContent = cancelText;
     input.style.display = '';
+    input.type = inputType;
     input.placeholder = placeholder;
     input.value = defaultValue;
     modal.style.display = 'flex';
@@ -1234,6 +1236,7 @@ window.promptDialog = (message, opts = {}) => {
     const cleanup = (result) => {
       modal.style.display = 'none';
       input.style.display = 'none';
+      input.type = 'text';
       okBtn.onclick = null; cancelBtn.onclick = null; input.onkeydown = null;
       document.removeEventListener('keydown', onKey);
       resolve(result);
@@ -1671,7 +1674,9 @@ const ACTIVITY_LABEL = {
   role_unlocked: 'Role Unlocked',
   team_member_added: 'Team Member Added',
   permanent_delete: 'Permanent Delete',
-  restore: 'Restore'
+  restore: 'Restore',
+  mfa_enrolled: '2FA Enabled',
+  mfa_unenrolled: '2FA Disabled'
 };
 
 // Shows a visible error row instead of silently leaving a table empty
@@ -1936,7 +1941,13 @@ window.showEmployeeProfile = async (uid, isSelf=false) => {
           : recentActivity.map(a => `<div class="type-row"><span>${esc(ACTIVITY_LABEL[a.action]||a.action)} — ${esc(a.details||'')}</span><span class="type-count">${a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('en-IN') : ''}</span></div>`).join('')
       }
     </div>
+    ${isSelf ? `
+    <div class="form-card" style="margin-top:16px">
+      <div class="breakdown-title" style="margin-bottom:12px">Security</div>
+      <div id="ep-security-card">Loading…</div>
+    </div>` : ''}
   `;
+  if (isSelf) renderSecurityCard();
 };
 
 window.loadTeam = async () => {
@@ -2324,7 +2335,24 @@ window.doLogin = async () => {
   try {
     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
     await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) { errEl.textContent = 'Invalid email or password.'; }
+  } catch(e) {
+    if (e.code === 'auth/multi-factor-auth-required') {
+      // Password was correct — this account has 2FA enabled, so Firebase
+      // is asking for the second factor before completing sign-in.
+      try {
+        await handleMfaLoginChallenge(e);
+      } catch (mfaErr) {
+        if (mfaErr.message !== 'MFA_CANCELLED') {
+          reportError(mfaErr);
+          errEl.textContent = mfaErr.code === 'auth/invalid-verification-code'
+            ? 'Incorrect code — please try logging in again.'
+            : 'Two-factor verification failed — please try logging in again.';
+        }
+      }
+      return;
+    }
+    errEl.textContent = 'Invalid email or password.';
+  }
 };
 window.doForgotPassword = async () => {
   const email = document.getElementById('l-email').value.trim();
@@ -2341,6 +2369,156 @@ window.doForgotPassword = async () => {
   errEl.textContent = 'If that email is registered, a reset link has been sent — please check your inbox.';
 };
 window.doLogout = () => signOut(auth);
+
+// ── TWO-FACTOR AUTHENTICATION (TOTP — authenticator app, not SMS) ──────
+// Uses an authenticator app (Google Authenticator / Authy / Microsoft
+// Authenticator) instead of SMS: no per-message cost, no reCAPTCHA, no
+// phone number stored. Still requires the ONE-TIME project upgrade to
+// "Firebase Authentication with Identity Platform" (Console → Authentication
+// → click "Upgrade project") — this is what unlocks MFA at all, for SMS or
+// TOTP alike. That upgrade itself is free for up to 50,000 MAU/month, which
+// an internal staff tool will never come close to; TOTP has no further
+// per-use charge on top of that (unlike SMS, which bills per code sent).
+// Also: Firebase requires the user's EMAIL to be verified before it will let
+// them enroll a second factor — enableMFA() below handles that automatically
+// by sending a verification email if needed.
+
+// Called from doLogin() when Firebase rejects a correct password with
+// "multi-factor-auth-required" — walks the user through entering the code
+// currently shown in their authenticator app, then completes the sign-in.
+async function handleMfaLoginChallenge(mfaError) {
+  const resolver = getMultiFactorResolver(auth, mfaError);
+  const hint = resolver.hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID) || resolver.hints[0];
+  const code = await promptDialog('Enter the 6-digit code from your authenticator app:', { title: 'Two-Factor Verification', placeholder: '123456' });
+  if (!code) throw new Error('MFA_CANCELLED');
+  const assertion = TotpMultiFactorGenerator.assertionForSignIn(hint.uid, code);
+  await resolver.resolveSignIn(assertion);
+}
+
+// Enroll the CURRENTLY signed-in user with an authenticator app as their
+// second factor. Only applies to your own account — Firebase's client SDK
+// has no API for an Admin to enroll/manage another user's 2FA.
+window.enableMFA = async () => {
+  if (!auth.currentUser) return;
+  if ((multiFactor(auth.currentUser).enrolledFactors || []).length > 0) {
+    toast('Two-factor authentication is already enabled on this account.', 'warning'); return;
+  }
+  if (!auth.currentUser.emailVerified) {
+    if (await confirmDialog('Your email needs to be verified before you can enable 2FA. Send a verification email to ' + auth.currentUser.email + ' now?', { title: 'Verify Email First', confirmText: 'Send Email' })) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        toast('Verification email sent — click the link in it, then come back and click "Enable 2FA" again.', 'success');
+      } catch(e) { reportError(e); toast('Error sending verification email: ' + e.message, 'error'); }
+    }
+    return;
+  }
+  const password = await promptDialog('For security, re-enter your current password to continue:', { title: 'Confirm Password', inputType: 'password' });
+  if (!password) return;
+  try {
+    // Firebase requires a "recent" sign-in before letting you enroll a new
+    // second factor — reauthenticate explicitly rather than asking the
+    // person to log out and back in.
+    await reauthenticateWithCredential(auth.currentUser, EmailAuthProvider.credential(auth.currentUser.email, password));
+
+    const mfaUser = multiFactor(auth.currentUser);
+    const session = await mfaUser.getSession();
+    const totpSecret = await TotpMultiFactorGenerator.generateSecret(session);
+    const issuer = 'RR Teen Set CRM';
+    const otpauthUrl = totpSecret.generateQrCodeUrl(auth.currentUser.email, issuer);
+    const secretFormatted = (totpSecret.secretKey.match(/.{1,4}/g) || [totpSecret.secretKey]).join(' ');
+
+    await showTotpSetupModal(otpauthUrl, secretFormatted);
+
+    const code = await promptDialog('Enter the 6-digit code your authenticator app is showing now:', { title: 'Verify Authenticator App', placeholder: '123456' });
+    if (!code) { toast('2FA setup cancelled.', 'warning'); return; }
+
+    const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code);
+    await mfaUser.enroll(assertion, 'Authenticator App');
+
+    toast('Two-factor authentication enabled — you\'ll be asked for a code from your app on future logins.', 'success');
+    try { logActivity('mfa_enrolled', `${auth.currentUser.email} enabled 2FA (authenticator app)`); } catch(e) {}
+    renderSecurityCard();
+  } catch(e) {
+    reportError(e);
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') toast('Incorrect password.', 'error');
+    else if (e.code === 'auth/requires-recent-login') toast('Please log out and back in, then try enabling 2FA again.', 'error');
+    else if (e.code === 'auth/invalid-verification-code') toast('Incorrect code — please try again.', 'error');
+    else if (e.code === 'auth/operation-not-allowed') toast('2FA is not enabled for this project yet — an Admin needs to upgrade to Identity Platform in the Firebase Console first.', 'error');
+    else toast('Error enabling 2FA: ' + e.message, 'error');
+  }
+};
+
+// Small dedicated modal (not the shared confirm/prompt one, since this
+// needs to show a QR image + manual-entry key, not just text) walking the
+// user through scanning the QR code before they're asked for a code.
+// SECURITY: the QR is rendered entirely client-side (qrcodejs library) —
+// the otpauth:// URL, which embeds the TOTP secret, is never sent to any
+// server (an earlier version of this used a third-party image API, which
+// would have leaked the secret over the network — fixed).
+function showTotpSetupModal(otpauthUrl, secretFormatted) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:230;background:rgba(32,38,44,.65);display:flex;align-items:center;justify-content:center;padding:20px';
+    wrap.innerHTML = `
+      <div style="background:#fff;border-radius:6px;padding:24px;max-width:340px;width:100%;text-align:center">
+        <div style="font-weight:700;font-size:16px;margin-bottom:10px">Scan with your authenticator app</div>
+        <div id="totp-qr-box" style="width:200px;height:200px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center"></div>
+        <div style="color:var(--muted);font-size:12px;margin-bottom:6px">Can't scan? Enter this key manually:</div>
+        <div style="font-family:monospace;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;word-break:break-all;margin-bottom:16px">${esc(secretFormatted)}</div>
+        <button class="btn btn-save" style="width:100%" id="totp-setup-continue">I've added it — Continue</button>
+      </div>`;
+    document.body.appendChild(wrap);
+    const qrBox = wrap.querySelector('#totp-qr-box');
+    if (window.QRCode) {
+      new QRCode(qrBox, { text: otpauthUrl, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      // Library failed to load (e.g. no internet) — manual key entry above still works fine.
+      qrBox.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:10px">QR code unavailable — use the manual key below instead.</div>`;
+    }
+    wrap.querySelector('#totp-setup-continue').onclick = () => { wrap.remove(); resolve(); };
+  });
+}
+
+window.disableMFA = async () => {
+  if (!auth.currentUser) return;
+  const mfaUser = multiFactor(auth.currentUser);
+  const enrolled = mfaUser.enrolledFactors || [];
+  if (!enrolled.length) { toast('Two-factor authentication is not enabled.', 'warning'); return; }
+  if (!(await confirmDialog('Disable two-factor authentication for your account? This will make your login less secure.', { title: 'Disable 2FA', confirmText: 'Disable' }))) return;
+  try {
+    await mfaUser.unenroll(enrolled[0]);
+    toast('Two-factor authentication disabled.', 'success');
+    try { logActivity('mfa_unenrolled', `${auth.currentUser.email} disabled 2FA`); } catch(e) {}
+    renderSecurityCard();
+  } catch(e) {
+    reportError(e);
+    if (e.code === 'auth/requires-recent-login') toast('Please log out and back in, then try disabling 2FA again.', 'error');
+    else toast('Error disabling 2FA: ' + e.message, 'error');
+  }
+};
+
+// Renders the Security card inside "My Profile" — safe to call any time;
+// no-ops if the card isn't on screen (e.g. viewing someone else's profile).
+function renderSecurityCard() {
+  const el = document.getElementById('ep-security-card');
+  if (!el || !auth.currentUser) return;
+  const enrolled = multiFactor(auth.currentUser).enrolledFactors || [];
+  el.innerHTML = enrolled.length
+    ? `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+         <div>
+           <div style="font-weight:600;color:var(--green,#16a34a)">Two-factor authentication is ON</div>
+           <div style="color:var(--muted);font-size:13px">Codes come from your authenticator app</div>
+         </div>
+         <button class="btn btn-reset" onclick="disableMFA()">Disable 2FA</button>
+       </div>`
+    : `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+         <div>
+           <div style="font-weight:600">Two-factor authentication is OFF</div>
+           <div style="color:var(--muted);font-size:13px">Use a free authenticator app (Google Authenticator, Authy, etc.) as a second login step.</div>
+         </div>
+         <button class="btn btn-save" onclick="enableMFA()">Enable 2FA</button>
+       </div>`;
+}
 
 // ── NAV ─────────────────────────────────────────────────────────
 // ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
@@ -3165,6 +3343,15 @@ window.delQT = async id => {
 };
 
 // ── BUILD QUOTATION HTML ────────────────────────────────────────
+// BUG FIX: this used to be declared with `const` INSIDE buildQtHTML() only,
+// so buildInvHTML() (a separate function, further down) referencing the same
+// name threw an uncaught "stampSVG is not defined" the instant anyone clicked
+// View/Download/WhatsApp/Email on an invoice — silently, with no error toast,
+// since the exception happened before any of those functions' own try/catch
+// or toast logic ever ran. Hoisted here as a shared constant so both
+// quotation and invoice HTML builders can use it safely.
+const stampSVG = `<img src="https://rrteensetsolution.com/images/company-stamp.png" alt="R.R Teen Set Solution — Official Stamp" style="width:88px;height:88px;object-fit:contain;">`;
+
 function buildQtHTML(q) {
   const dateObj   = q.date ? new Date(q.date+'T00:00:00') : new Date();
   const validTill = new Date(dateObj); validTill.setDate(validTill.getDate()+30);
@@ -3212,8 +3399,6 @@ function buildQtHTML(q) {
   const half = Math.ceil(userTerms.length/2);
   const col1 = userTerms.slice(0, half);
   const col2 = userTerms.slice(half);
-
-  const stampSVG = `<img src="https://rrteensetsolution.com/images/company-stamp.png" alt="R.R Teen Set Solution — Official Stamp" style="width:88px;height:88px;object-fit:contain;">`;
 
   return `
 <div id="qt-print" style="font-family:Arial,Helvetica,sans-serif;width:794px;background:#ffffff;color:#1a1a1a;box-sizing:border-box;margin:0;padding:26px 32px;font-size:11px;">
