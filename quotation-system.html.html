@@ -1396,8 +1396,6 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, creat
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, getCountFromServer, serverTimestamp, runTransaction, writeBatch }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject }
-  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",
@@ -1413,7 +1411,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-const storage = getStorage(app);
 
 // ── ERROR REPORTING (console + Sentry when configured) ─────────
 function reportError(...args) {
@@ -1808,6 +1805,15 @@ const ROLE_PERMISSIONS = {
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 const BRANCH = 'Delhi'; // single branch today — tagged on every new record so a 2nd branch later needs only a picker UI, not a data migration
+
+// Free image hosting for Work Progress Photos — an unsigned upload preset,
+// so uploads go straight from the browser with no server/API secret
+// involved. Deletion isn't done via this preset (unsigned uploads can't
+// delete — that needs a signed, server-side call), so "remove" only
+// unlinks the photo from the invoice; the file itself stays in the
+// Cloudinary account, harmless and unused.
+const CLOUDINARY_CLOUD_NAME = 'k676kjvm';
+const CLOUDINARY_UPLOAD_PRESET = 'work-progress-photos';
 
 // ── PERFORMANCE: short-lived cache so switching tabs repeatedly doesn't
 // re-download the whole collection every single click. Any save/delete/
@@ -4846,9 +4852,12 @@ window.saveWorkStatus = async () => {
 };
 
 // ── WORK PROGRESS PHOTOS ─────────────────────────────────────────
-// Compresses client-side before upload — customer-facing site photos don't
-// need full camera resolution, and keeping files small (~150–300KB) keeps
-// the portal fast to load on a customer's mobile data.
+// No Firebase Storage (that needs the paid Blaze plan). Instead, photos
+// Photos upload to Cloudinary's free tier (unsigned preset — no API
+// secret needed client-side) and only the returned URL is saved on the
+// invoice document, so Firestore stays light and there's no 5-photo /
+// 1MB-document cap to worry about. Still compressed client-side first —
+// faster uploads, less of the free bandwidth quota used per photo.
 function compressImageFile(file, maxDim = 1280, quality = 0.75) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -4872,26 +4881,35 @@ function compressImageFile(file, maxDim = 1280, quality = 0.75) {
   });
 }
 
+async function uploadToCloudinary(blob) {
+  const formData = new FormData();
+  formData.append('file', blob);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+  if (!res.ok) throw new Error('Cloudinary upload failed (' + res.status + ')');
+  const json = await res.json();
+  return json.secure_url;
+}
+
 window.handleWorkPhotoSelect = async (fileList) => {
   const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/'));
   if (!files.length || !activeWorkStatusInvoiceId) return;
   const inv = allInvoices.find(x => x.id === activeWorkStatusInvoiceId); if (!inv) return;
+  document.getElementById('ws-photo-input').value = '';
   const uploadingEl = document.getElementById('ws-photo-uploading');
   uploadingEl.style.display = 'block';
-  document.getElementById('ws-photo-input').value = '';
   try {
+    const newPhotos = [];
     for (const file of files) {
       const compressed = await compressImageFile(file);
-      const path = `workProgress/${activeWorkStatusInvoiceId}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.jpg`;
-      const fileRef = storageRef(storage, path);
-      await uploadBytes(fileRef, compressed, { contentType: 'image/jpeg' });
-      const url = await getDownloadURL(fileRef);
-      inv.workPhotos = [...(inv.workPhotos || []), { url, path, uploadedAt: new Date().toISOString() }];
-      await updateDoc(doc(db, 'invoices', activeWorkStatusInvoiceId), { workPhotos: inv.workPhotos });
+      const url = await uploadToCloudinary(compressed);
+      newPhotos.push({ url, uploadedAt: new Date().toISOString() });
     }
+    inv.workPhotos = [...(inv.workPhotos || []), ...newPhotos];
+    await updateDoc(doc(db, 'invoices', activeWorkStatusInvoiceId), { workPhotos: inv.workPhotos });
     invalidateCache('invoices');
     renderWorkPhotoGallery(inv);
-    toast(`${files.length} photo${files.length===1?'':'s'} uploaded!`, 'success');
+    toast(`${newPhotos.length} photo${newPhotos.length===1?'':'s'} uploaded!`, 'success');
   } catch(e) {
     reportError(e); toast('Upload failed: ' + e.message, 'error');
   } finally {
@@ -4909,13 +4927,16 @@ function renderWorkPhotoGallery(inv) {
     </div>`).join('');
 }
 
+// "Remove" unlinks the photo from the invoice (it stops showing anywhere
+// in the app or the customer portal). The file itself stays in the
+// Cloudinary account — an unsigned upload preset can't delete (that needs
+// a signed, server-side call), so this only removes the reference here.
 window.deleteWorkPhoto = async (idx) => {
   if (!activeWorkStatusInvoiceId) return;
   const inv = allInvoices.find(x => x.id === activeWorkStatusInvoiceId); if (!inv) return;
   const photo = (inv.workPhotos || [])[idx]; if (!photo) return;
   if (!(await confirmDialog('Remove this photo? The customer will no longer see it on their portal link.', { title: 'Remove Photo', confirmText: 'Remove' }))) return;
   try {
-    if (photo.path) { try { await deleteObject(storageRef(storage, photo.path)); } catch(e) { /* file already gone — non-fatal */ } }
     inv.workPhotos = inv.workPhotos.filter((_, i) => i !== idx);
     await updateDoc(doc(db, 'invoices', activeWorkStatusInvoiceId), { workPhotos: inv.workPhotos });
     invalidateCache('invoices');
