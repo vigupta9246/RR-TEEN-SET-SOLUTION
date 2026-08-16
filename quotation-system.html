@@ -405,6 +405,29 @@ html.portal-boot #portal-screen{display:block!important}
 .btn-modal-close{background:rgba(255,255,255,.12);color:#fff}
 .btn-modal-close:hover{background:rgba(255,255,255,.2)}
 #preview-content{padding:24px;position:relative}
+
+/* LABOUR — sub-tabs (Workers / Attendance / Wages & Payments) inside one nav section */
+.subtab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.subtab-btn{padding:10px 16px;background:none;border:none;border-bottom:2.5px solid transparent;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:color .15s,border-color .15s}
+.subtab-btn:hover{color:var(--navy)}
+.subtab-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+.subtab-pane{display:none}
+.subtab-pane.active{display:block}
+/* Attendance — three-way status toggle per worker row, per date */
+.att-btn-group{display:flex;gap:6px}
+.att-btn{padding:6px 12px;border:1.5px solid var(--border);background:#fff;border-radius:2px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.2px;color:var(--muted);transition:all .12s}
+.att-btn:hover{border-color:var(--steel)}
+.att-btn.att-present.active{background:#e8f3ec;border-color:var(--green);color:var(--green)}
+.att-btn.att-half.active{background:#fdeee3;border-color:var(--orange);color:var(--orange)}
+.att-btn.att-absent.active{background:#fbeae8;border-color:var(--red);color:var(--red)}
+/* Reuses the same floating box chrome as #payment-modal for the wage-payment
+   and worker-history popups, so it matches the rest of the app visually
+   without duplicating the whole modal look-and-feel. */
+#labour-pay-modal,#labour-history-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(32,38,44,.6);align-items:center;justify-content:center;padding:20px}
+.labour-history-box{background:#fff;border-radius:2px;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;padding:28px;border-top:4px solid var(--orange);box-shadow:var(--shadow-lg)}
+.labour-hist-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bg);font-size:13px}
+.labour-hist-row:last-child{border-bottom:none}
+
 /* MOBILE TOPBAR (hidden on desktop) */
 .mobile-topbar{display:none}
 #sidebar-overlay{display:none}
@@ -526,6 +549,8 @@ html.portal-boot #portal-screen{display:block!important}
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
+      <div class="nav-section">OPERATIONS</div>
+      <button class="nav-btn" data-section="labour" onclick="showSection('labour')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="8" cy="7" r="3"/><path d="M2.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17" cy="8" r="2.3"/><path d="M14.5 20c.3-2.7 2-5 4.5-5"/></svg></span><span>Labour &amp; Wages</span></button>
       <div class="nav-section">ADMIN</div>
       <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
       <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
@@ -567,6 +592,11 @@ html.portal-boot #portal-screen{display:block!important}
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
           <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Needs Follow-up (quotation sent 3+ days ago, no response)</div>
           <div id="dash-followup-list">Loading...</div>
+        </div>
+
+        <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations" id="dash-approval-card">
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> Quotations Awaiting Approval (discount above threshold)</div>
+          <div id="dash-approval-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
@@ -1086,11 +1116,104 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
       </section>
 
+      <!-- LABOUR & WAGES (Admin + Accounts) -->
+      <section id="labour" class="section">
+        <div class="page-header">
+          <div class="page-title">Labour &amp; Wages</div>
+          <div class="page-sub">Site worker master, daily attendance and wage payments</div>
+        </div>
+
+        <div class="subtab-bar">
+          <button class="subtab-btn active" id="labour-tab-workers" onclick="showLabourSubtab('workers')">Workers</button>
+          <button class="subtab-btn" id="labour-tab-attendance" onclick="showLabourSubtab('attendance')">Attendance</button>
+          <button class="subtab-btn" id="labour-tab-wages" onclick="showLabourSubtab('wages')">Wages &amp; Payments</button>
+        </div>
+
+        <!-- WORKERS -->
+        <div class="subtab-pane active" id="labour-pane-workers">
+          <div class="form-card">
+            <div class="form-section-title" id="labour-form-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Name *</label><input type="text" id="lb-name" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Phone</label><input type="tel" id="lb-phone" class="form-input" maxlength="10"></div>
+              <div class="form-group">
+                <label class="form-label">Role / Skill</label>
+                <select id="lb-role" class="form-select">
+                  <option>Welder</option><option>Fitter</option><option>Helper</option><option>Mason</option>
+                  <option>Electrician</option><option>Supervisor</option><option>Driver</option><option>Other</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Daily Wage (₹) *</label><input type="number" id="lb-wage" class="form-input" min="0"></div>
+              <div class="form-group"><label class="form-label">Joined Date</label><input type="date" id="lb-joined" class="form-input"></div>
+              <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="lb-notes" class="form-input"></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-save" id="lb-save-btn" onclick="saveLabour()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker</button>
+              <button class="btn btn-reset" onclick="resetLabourForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
+            </div>
+          </div>
+
+          <div class="history-controls">
+            <div class="search-box">
+              <input type="text" id="labour-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderLabourList(this.value)">
+            </div>
+            <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none">
+              <input type="checkbox" id="labour-show-inactive" onchange="renderLabourList(document.getElementById('labour-search-input').value)"> Show inactive
+            </label>
+            <button class="btn-export" onclick="exportLabourCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          </div>
+
+          <div class="table-card">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Daily Wage</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="labour-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ATTENDANCE -->
+        <div class="subtab-pane" id="labour-pane-attendance">
+          <div class="history-controls">
+            <div class="form-group" style="min-width:170px">
+              <label class="form-label">Date</label>
+              <input type="date" id="att-date" class="form-input" onchange="loadAttendanceForDate()">
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Role</th><th>Daily Wage</th><th>Today's Status</th><th>Wage for Day</th></tr></thead>
+              <tbody id="attendance-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Pick a date to mark attendance</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- WAGES & PAYMENTS -->
+        <div class="subtab-pane" id="labour-pane-wages">
+          <div class="table-card">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Role</th><th>Total Earned</th><th>Total Paid</th><th>Balance Due</th><th>Actions</th></tr></thead>
+              <tbody id="wages-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td><td></td><td></td><td></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- TEAM (Admin only) -->
       <section id="team" class="section">
         <div class="page-header">
           <div class="page-title">Team</div>
           <div class="page-sub">Manage staff logins &amp; access levels — Admin, Sales, Accounts</div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> PRICING APPROVAL SETTINGS</div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When Sales finalizes a quotation with a discount above this percentage of (base + extra), it's saved as "Pending Approval" — it can't be downloaded, shared on WhatsApp, or given a customer portal link until an Admin approves it here or on the Dashboard.</p>
+          <div class="form-grid" style="max-width:320px">
+            <div class="form-group"><label class="form-label">Discount Threshold (%)</label><input type="number" id="approval-threshold-input" class="form-input" min="0" max="100" step="0.5"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="saveApprovalThreshold()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Threshold</button>
+          </div>
         </div>
 
         <div class="form-card">
@@ -1283,6 +1406,38 @@ html.portal-boot #portal-screen{display:block!important}
     <div class="btn-row">
       <button class="btn btn-save" onclick="saveWorkStatus()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Progress</button>
       <button class="btn btn-reset" onclick="closeWorkStatusModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LABOUR WAGE PAYMENT MODAL -->
+<div id="labour-pay-modal">
+  <div class="pay-modal-box">
+    <div class="pay-modal-title">Record Wage Payment</div>
+    <div class="pay-modal-sub" id="lb-pay-modal-sub">Worker —</div>
+    <div class="form-grid">
+      <div class="form-group span-2"><label class="form-label">Amount Paid (₹) *</label><input type="number" id="lb-pay-amount" class="form-input" min="0"></div>
+      <div class="form-group"><label class="form-label">Date</label><input type="date" id="lb-pay-date" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Mode</label>
+        <select id="lb-pay-mode" class="form-select"><option>Cash</option><option>UPI</option><option>Bank Transfer</option></select>
+      </div>
+      <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-save" onclick="saveLabourPayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-reset" onclick="closeLabourPayModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LABOUR HISTORY MODAL — attendance + payment record for one worker -->
+<div id="labour-history-modal">
+  <div class="labour-history-box">
+    <div class="pay-modal-title">Worker History</div>
+    <div class="pay-modal-sub" id="lb-hist-sub">Worker —</div>
+    <div id="lb-hist-content">Loading...</div>
+    <div class="btn-row">
+      <button class="btn btn-reset" onclick="closeLabourHistoryModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
     </div>
   </div>
 </div>
@@ -1755,9 +1910,25 @@ let allLeads = [];
 let editingLeadId = null;
 let allCustomers = [];
 let currentUserRole = null;
+let approvalThresholdPct = 15; // default until settings/approvalConfig loads
+
+// Pricing governance: a quotation whose discount exceeds this percentage
+// of (base+extra) needs Admin approval before it can be finalized/shared.
+// Cached after first load so it's not re-fetched on every save.
+async function loadApprovalConfig() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'approvalConfig'));
+    if (snap.exists() && typeof snap.data().discountThresholdPct === 'number') {
+      approvalThresholdPct = snap.data().discountThresholdPct;
+    }
+  } catch(e) { reportError(e); }
+}
 let allTeam = [];
 let allTickets = [];
 let allDeletedItems = [];
+let allLabour = [];
+let editingLabourId = null;
+let activeLabourPaymentId = null;
 
 // ── ICONS — flat line-icon set (replaces emoji throughout the UI) ──────
 const ICONS = {
@@ -1795,13 +1966,16 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','tickets','team','deleted-items','activity-log','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','team','deleted-items','activity-log','employee-profile'],
   Sales:    ['dashboard','create','history','leads','customers','tickets','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
   // read access to (see ROLE_READ_ACCESS below). Accounts already gets
   // equivalent financial totals (invoiced/received/due) inside Invoices & Payments.
-  Accounts: ['dashboard','invoice-create','invoices','customers','tickets','employee-profile']
+  // 'labour' IS included for Accounts — wages are a financial record, same
+  // reasoning as why Accounts owns Invoices & Payments. Excluded for Sales,
+  // who has no reason to see wage data.
+  Accounts: ['dashboard','invoice-create','invoices','labour','customers','tickets','employee-profile']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 const BRANCH = 'Delhi'; // single branch today — tagged on every new record so a 2nd branch later needs only a picker UI, not a data migration
@@ -1840,7 +2014,8 @@ const _cache = {
   leads:{data:null,ts:0,complete:false,lastDoc:null},
   invoices:{data:null,ts:0,complete:false,lastDoc:null},
   customers:{data:null,ts:0,complete:false,lastDoc:null},
-  tickets:{data:null,ts:0,complete:false,lastDoc:null}
+  tickets:{data:null,ts:0,complete:false,lastDoc:null},
+  labour:{data:null,ts:0,complete:false,lastDoc:null}
 };
 const CACHE_TTL = 45000; // 45s
 
@@ -1950,7 +2125,8 @@ const ACTIVITY_LABEL = {
   permanent_delete: 'Permanent Delete',
   restore: 'Restore',
   mfa_enrolled: '2FA Enabled',
-  mfa_unenrolled: '2FA Disabled'
+  mfa_unenrolled: '2FA Disabled',
+  wage_payment: 'Wage Payment'
 };
 
 // Shows a visible error row instead of silently leaving a table empty
@@ -2042,6 +2218,7 @@ async function loadCurrentUserRole(u) {
     toast('Your role could not be loaded (network/permission issue). Please refresh the page and try again.', 'error');
   }
   document.getElementById('user-role-badge').textContent = currentUserRole || 'Unknown';
+  if (currentUserRole) loadApprovalConfig();
 }
 
 function applyRolePermissions() {
@@ -2226,12 +2403,23 @@ window.showEmployeeProfile = async (uid, isSelf=false) => {
 };
 
 window.loadTeam = async () => {
+  document.getElementById('approval-threshold-input').value = approvalThresholdPct;
   try {
     const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt','desc')));
     allTeam = [];
     snap.forEach(d => allTeam.push({ id: d.id, ...d.data() }));
     renderTeam();
   } catch(e) { reportError(e); showLoadError('team-tbody', 4, e); }
+};
+
+window.saveApprovalThreshold = async () => {
+  const val = parseFloat(document.getElementById('approval-threshold-input').value);
+  if (isNaN(val) || val < 0 || val > 100) { toast('Enter a threshold between 0 and 100.', 'warning'); return; }
+  try {
+    await setDoc(doc(db,'settings','approvalConfig'), { discountThresholdPct: val, updatedAt: serverTimestamp() }, { merge: true });
+    approvalThresholdPct = val;
+    toast('Approval threshold saved!', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.renderTeam = () => {
@@ -2291,24 +2479,26 @@ window.unlockRoleForChange = async (uid) => {
 // tabs were already visited this session.
 window.loadDeletedItems = async () => {
   try {
-    const [leads, quotes, invoices] = await Promise.all([
+    const [leads, quotes, invoices, labour] = await Promise.all([
       fetchCached('leads', 'leads'),
       fetchCached('quotations', 'quotations'),
-      fetchCached('invoices', 'invoices')
+      fetchCached('invoices', 'invoices'),
+      fetchCached('labour', 'labour')
     ]);
-    allLeads = leads; allQuotations = quotes; allInvoices = invoices;
+    allLeads = leads; allQuotations = quotes; allInvoices = invoices; allLabour = labour;
     allDeletedItems = [
       ...leads.filter(l => l.deleted).map(l => ({ type:'lead', id:l.id, label:l.name||'—', sub:l.phone||'—', deletedAt:l.deletedAt })),
       ...quotes.filter(q => q.deleted).map(q => ({ type:'quotation', id:q.id, label:q.cname||'—', sub:q.qtId||'—', deletedAt:q.deletedAt })),
-      ...invoices.filter(i => i.deleted).map(i => ({ type:'invoice', id:i.id, label:i.cname||'—', sub:i.invId||'—', deletedAt:i.deletedAt }))
+      ...invoices.filter(i => i.deleted).map(i => ({ type:'invoice', id:i.id, label:i.cname||'—', sub:i.invId||'—', deletedAt:i.deletedAt })),
+      ...labour.filter(w => w.deleted).map(w => ({ type:'labour', id:w.id, label:w.name||'—', sub:w.phone||'—', deletedAt:w.deletedAt }))
     ].sort((a,b) => (b.deletedAt?.toMillis?.()||0) - (a.deletedAt?.toMillis?.()||0));
     renderDeletedItems('');
   } catch(e) { reportError(e); showLoadError('deleted-tbody', 5, e); }
 };
 
-const TYPE_LABEL = { lead:`${ICONS.phone} Lead`, quotation:`${ICONS.fileText} Quotation`, invoice:`${ICONS.receipt} Invoice` };
-const TYPE_NAME = { lead:'Lead', quotation:'Quotation', invoice:'Invoice' }; // plain text for use in confirm()/alert() — TYPE_LABEL now contains SVG markup, so splitting it on spaces would grab a fragment of an SVG attribute instead of the word "Lead"/"Quotation"/"Invoice"
-const TYPE_COLLECTION = { lead:'leads', quotation:'quotations', invoice:'invoices' };
+const TYPE_LABEL = { lead:`${ICONS.phone} Lead`, quotation:`${ICONS.fileText} Quotation`, invoice:`${ICONS.receipt} Invoice`, labour:`${ICONS.building} Worker` };
+const TYPE_NAME = { lead:'Lead', quotation:'Quotation', invoice:'Invoice', labour:'Worker' }; // plain text for use in confirm()/alert() — TYPE_LABEL now contains SVG markup, so splitting it on spaces would grab a fragment of an SVG attribute instead of the word "Lead"/"Quotation"/"Invoice"/"Worker"
+const TYPE_COLLECTION = { lead:'leads', quotation:'quotations', invoice:'invoices', labour:'labour' };
 
 window.renderDeletedItems = (search='', keepPage=false) => {
   const tbody = document.getElementById('deleted-tbody');
@@ -2355,6 +2545,336 @@ window.permanentlyDeleteItem = async (type, id) => {
     toast('Permanently deleted.', 'success');
     loadDeletedItems();
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// ── LABOUR & WAGES (Admin + Accounts) ─────────────────────────────
+// Three collections:
+//   labour        — worker master (name, role, daily wage, active/deleted flag)
+//                    plus two RUNNING TOTALS kept on the doc itself —
+//                    totalEarned / totalPaid — so the Wages tab never has
+//                    to sum a whole attendance/payment history just to
+//                    show a balance; it's an O(1) read per worker.
+//   attendance     — one doc per (worker, date), id = `${labourId}_${date}`
+//                    so re-marking the same day overwrites instead of
+//                    duplicating. wageAmount is a SNAPSHOT of the daily
+//                    wage at the moment it was marked, so a later wage-rate
+//                    change never silently rewrites past days.
+//   wagePayments   — write-once payment records (Admin/Accounts only),
+//                    same pattern as the invoices `payments` collection.
+// Both attendance-marking and payment-recording run inside a Firestore
+// transaction that reads the worker doc, computes the delta, and updates
+// the running total atomically — the same pattern already used for
+// invoice payments (savePayment) and sequential numbering (getNextSeq).
+window.showLabourSubtab = (tab) => {
+  ['workers','attendance','wages'].forEach(t => {
+    document.getElementById(`labour-tab-${t}`).classList.toggle('active', t===tab);
+    document.getElementById(`labour-pane-${t}`).classList.toggle('active', t===tab);
+  });
+  if (tab === 'attendance') {
+    const dateInput = document.getElementById('att-date');
+    if (!dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+    loadAttendanceForDate();
+  }
+  if (tab === 'wages') renderWageSummary();
+};
+
+window.loadLabour = async () => {
+  try {
+    allLabour = await fetchCached('labour', 'labour');
+    renderLabourList('');
+  } catch(e) { reportError(e); showLoadError('labour-tbody', 7, e); }
+};
+
+window.renderLabourList = (search='') => {
+  const tbody = document.getElementById('labour-tbody');
+  const showInactive = document.getElementById('labour-show-inactive')?.checked;
+  let list = allLabour.filter(w => !w.deleted && (showInactive || w.active !== false));
+  if (search) { const s=search.toLowerCase(); list=list.filter(w=>w.name?.toLowerCase().includes(s)||w.phone?.includes(s)); }
+  list = [...list].sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  tbody.innerHTML = list.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No workers found</td></tr>`
+    : list.map(w => `<tr${w.active===false?' style="opacity:.55"':''}>
+        <td><strong>${esc(w.name)}</strong></td>
+        <td>${esc(w.phone||'—')}</td>
+        <td>${esc(w.role||'—')}</td>
+        <td class="mono">₹${fmt(w.dailyWage||0)}</td>
+        <td>${w.joinedDate||'—'}</td>
+        <td>${w.active===false?'<span class="badge-draft">Inactive</span>':'<span style="color:var(--green);font-size:12px;font-weight:700">Active</span>'}</td>
+        <td class="action-btns">
+          <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
+          <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="toggleLabourActive('${w.id}')" class="btn-icon" title="${w.active===false?'Reactivate':'Deactivate'}">${w.active===false?ICONS.restore:ICONS.trash}</button>
+          <button onclick="delLabour('${w.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
+        </td>
+      </tr>`).join('');
+};
+
+window.saveLabour = async () => {
+  const g = id => document.getElementById(id).value;
+  const name = g('lb-name').trim();
+  const dailyWage = parseFloat(g('lb-wage')) || 0;
+  if (!name) { toast('Worker name is required.', 'warning'); return; }
+  if (dailyWage <= 0) { toast('Please enter a valid daily wage.', 'warning'); return; }
+  const phoneDigits = g('lb-phone').trim().replace(/\D/g,'');
+  const data = {
+    name, phone: phoneDigits, role: g('lb-role'), dailyWage,
+    joinedDate: g('lb-joined') || new Date().toISOString().split('T')[0],
+    notes: g('lb-notes'), updatedAt: serverTimestamp()
+  };
+  try {
+    if (editingLabourId) {
+      await updateDoc(doc(db,'labour',editingLabourId), data);
+    } else {
+      await addDoc(collection(db,'labour'), {
+        ...data, active: true, totalEarned: 0, totalPaid: 0,
+        branch: BRANCH, createdBy: auth.currentUser?.email || null, createdAt: serverTimestamp()
+      });
+    }
+    toast('Worker saved!', 'success');
+    invalidateCache('labour');
+    resetLabourForm(); loadLabour();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.resetLabourForm = () => {
+  ['lb-name','lb-phone','lb-wage','lb-joined','lb-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('lb-role').selectedIndex = 0;
+  document.getElementById('labour-form-title').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER';
+  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker';
+  editingLabourId = null;
+};
+
+window.editLabour = id => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  editingLabourId = id;
+  document.getElementById('lb-name').value = w.name||'';
+  document.getElementById('lb-phone').value = w.phone||'';
+  if (w.role) document.getElementById('lb-role').value = w.role;
+  document.getElementById('lb-wage').value = w.dailyWage||'';
+  document.getElementById('lb-joined').value = w.joinedDate||'';
+  document.getElementById('lb-notes').value = w.notes||'';
+  document.getElementById('labour-form-title').innerHTML = `<svg viewBox="0 0 24 24" class="ic"><path d="M4 20h4l10-10-4-4L4 16Z"/></svg> EDIT WORKER — ${esc(w.name)}`;
+  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Update Worker';
+  showLabourSubtab('workers');
+  window.scrollTo(0,0);
+};
+
+// Deactivate ≠ delete: an inactive worker drops off the daily Attendance
+// list (so a supervisor can't accidentally mark a worker who's left the
+// site) but stays visible in Workers/Wages with full history intact —
+// unlike delLabour(), which soft-deletes it the same way leads/quotations/
+// invoices are, hiding it everywhere until an Admin restores it.
+window.toggleLabourActive = async (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  const goingInactive = w.active !== false;
+  if (!(await confirmDialog(goingInactive
+    ? `Mark "${w.name}" inactive? They'll no longer appear in the daily Attendance list, but their history stays intact.`
+    : `Reactivate "${w.name}"? They'll appear in the daily Attendance list again.`,
+    { title: goingInactive ? 'Deactivate Worker' : 'Reactivate Worker', confirmText: goingInactive ? 'Deactivate' : 'Reactivate' }
+  ))) return;
+  try {
+    await updateDoc(doc(db,'labour',id), { active: !goingInactive, updatedAt: serverTimestamp() });
+    invalidateCache('labour');
+    loadLabour();
+    toast(goingInactive ? 'Worker marked inactive.' : 'Worker reactivated.', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.delLabour = async id => {
+  if (!(await confirmDialog('Delete this worker? (Marked "deleted" — not permanently removed; an Admin can restore it from Deleted Items. Their attendance/wage history is kept.)', { title: 'Delete Worker', confirmText: 'Delete' }))) return;
+  try {
+    await updateDoc(doc(db,'labour',id), { deleted: true, deletedAt: serverTimestamp() });
+    invalidateCache('labour');
+    loadLabour();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.exportLabourCSV = async () => {
+  let rows;
+  try { rows = (await fetchCached('labour', 'labour')).filter(w => !w.deleted); }
+  catch(e) { reportError(e); toast('Failed to load data for export: ' + e.message, 'error'); return; }
+  if (!rows.length) { toast('There is no worker to export.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['Phone','phone'], ['Role','role'], ['Daily Wage','dailyWage'],
+    ['Joined','joinedDate'], ['Status', w => w.active===false?'Inactive':'Active'],
+    ['Total Earned','totalEarned'], ['Total Paid','totalPaid'],
+    ['Balance Due', w => (w.totalEarned||0) - (w.totalPaid||0)], ['Notes','notes']
+  ]);
+  downloadCSV(`labour_${csvDate()}.csv`, csv);
+  toast('Labour CSV downloaded!', 'success');
+};
+
+// ── ATTENDANCE ──────────────────────────────────────────────────
+window.loadAttendanceForDate = async () => {
+  const dateStr = document.getElementById('att-date').value;
+  const tbody = document.getElementById('attendance-tbody');
+  if (!dateStr) return;
+  tbody.innerHTML = `<tr><td colspan="5"><span class="skel skel-line" style="width:70%"></span></td></tr><tr><td colspan="5"><span class="skel skel-line" style="width:60%"></span></td></tr>`;
+  try {
+    if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
+    const active = allLabour.filter(w => !w.deleted && w.active !== false).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    if (!active.length) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">No active workers yet — add one in the Workers tab</td></tr>`; return; }
+    const snap = await getDocs(query(collection(db,'attendance'), where('date','==',dateStr)));
+    const marked = {};
+    snap.forEach(d => { marked[d.data().labourId] = d.data(); });
+    renderAttendanceRows(active, marked, dateStr);
+  } catch(e) { reportError(e); showLoadError('attendance-tbody', 5, e); }
+};
+
+function renderAttendanceRows(active, marked, dateStr) {
+  const tbody = document.getElementById('attendance-tbody');
+  tbody.innerHTML = active.map(w => {
+    const m = marked[w.id];
+    const status = m?.status || null;
+    const wageForDay = m?.wageAmount ?? null;
+    const btn = (val, cls, label) => `<button type="button" class="att-btn ${cls}${status===val?' active':''}" onclick="markAttendance('${w.id}','${dateStr}','${val}')">${label}</button>`;
+    return `<tr id="att-row-${w.id}">
+      <td><strong>${esc(w.name)}</strong></td>
+      <td>${esc(w.role||'—')}</td>
+      <td class="mono">₹${fmt(w.dailyWage||0)}</td>
+      <td><div class="att-btn-group">${btn('Present','att-present','Present')}${btn('Half Day','att-half','Half Day')}${btn('Absent','att-absent','Absent')}</div></td>
+      <td class="mono" id="att-wage-${w.id}">${wageForDay!=null ? '₹'+fmt(wageForDay) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+window.markAttendance = async (labourId, dateStr, status) => {
+  const attId = `${labourId}_${dateStr}`;
+  const attRef = doc(db, 'attendance', attId);
+  const labRef = doc(db, 'labour', labourId);
+  try {
+    await runTransaction(db, async (tx) => {
+      const [attSnap, labSnap] = await Promise.all([tx.get(attRef), tx.get(labRef)]);
+      if (!labSnap.exists()) throw new Error('Worker no longer exists.');
+      const lab = labSnap.data();
+      const dailyWage = lab.dailyWage || 0;
+      const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
+      const oldWage = attSnap.exists() ? (attSnap.data().wageAmount || 0) : 0;
+      const delta = newWage - oldWage;
+      tx.set(attRef, {
+        labourId, labourName: lab.name, date: dateStr, status, wageAmount: newWage,
+        markedBy: auth.currentUser?.email || null, updatedAt: serverTimestamp(),
+        createdAt: attSnap.exists() ? attSnap.data().createdAt : serverTimestamp()
+      });
+      tx.update(labRef, { totalEarned: (lab.totalEarned || 0) + delta });
+    });
+    // Reflect the change immediately without a full reload: update the
+    // in-memory worker (so the Wages tab is correct if opened next) and
+    // just this one row's buttons/wage cell.
+    const w = allLabour.find(x=>x.id===labourId);
+    const dailyWage = w?.dailyWage || 0;
+    const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
+    document.querySelectorAll(`#att-row-${labourId} .att-btn`).forEach(b => b.classList.remove('active'));
+    document.querySelector(`#att-row-${labourId} .att-btn.${status==='Present'?'att-present':status==='Half Day'?'att-half':'att-absent'}`)?.classList.add('active');
+    document.getElementById(`att-wage-${labourId}`).textContent = `₹${fmt(newWage)}`;
+    invalidateCache('labour');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// ── WAGES & PAYMENTS ────────────────────────────────────────────
+window.renderWageSummary = async () => {
+  const tbody = document.getElementById('wages-tbody');
+  try {
+    if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
+    const list = allLabour.filter(w => !w.deleted).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    tbody.innerHTML = list.length === 0
+      ? `<tr><td colspan="6" style="text-align:center;padding:32px;color:#64748b">No workers yet</td></tr>`
+      : list.map(w => {
+          const earned = w.totalEarned||0, paid = w.totalPaid||0, balance = earned - paid;
+          return `<tr>
+            <td><strong>${esc(w.name)}</strong>${w.active===false?' <span class="badge-draft">Inactive</span>':''}</td>
+            <td>${esc(w.role||'—')}</td>
+            <td class="mono">₹${fmt(earned)}</td>
+            <td class="mono">₹${fmt(paid)}</td>
+            <td class="mono ${balance>0?'balance-due':'balance-clear'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</td>
+            <td class="action-btns">
+              <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
+              <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
+            </td>
+          </tr>`;
+        }).join('');
+  } catch(e) { reportError(e); showLoadError('wages-tbody', 6, e); }
+};
+
+window.openLabourPayModal = (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  activeLabourPaymentId = id;
+  const balance = (w.totalEarned||0) - (w.totalPaid||0);
+  document.getElementById('lb-pay-modal-sub').innerHTML =
+    `${esc(w.name)} — ${esc(w.role||'')}<br>Earned: ₹${fmt(w.totalEarned||0)} &nbsp;|&nbsp; Paid: ₹${fmt(w.totalPaid||0)} &nbsp;|&nbsp; <strong style="color:var(--red)">Balance: ₹${fmt(Math.max(0,balance))}</strong>`;
+  document.getElementById('lb-pay-amount').value = balance > 0 ? balance : '';
+  document.getElementById('lb-pay-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('lb-pay-note').value = '';
+  document.getElementById('labour-pay-modal').style.display = 'flex';
+};
+
+window.closeLabourPayModal = () => {
+  document.getElementById('labour-pay-modal').style.display = 'none';
+  activeLabourPaymentId = null;
+};
+
+window.saveLabourPayment = async () => {
+  if (!activeLabourPaymentId) return;
+  const amount = parseFloat(document.getElementById('lb-pay-amount').value) || 0;
+  if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
+  const date = document.getElementById('lb-pay-date').value;
+  const mode = document.getElementById('lb-pay-mode').value;
+  const note = document.getElementById('lb-pay-note').value;
+  try {
+    const labRef = doc(db, 'labour', activeLabourPaymentId);
+    const payRef = doc(collection(db, 'wagePayments'));
+    let labourName = '';
+    await runTransaction(db, async (tx) => {
+      const labSnap = await tx.get(labRef);
+      if (!labSnap.exists()) throw new Error('Worker no longer exists.');
+      const lab = labSnap.data();
+      labourName = lab.name;
+      tx.set(payRef, {
+        labourId: activeLabourPaymentId, labourName: lab.name, amount, date, mode, note,
+        createdBy: auth.currentUser?.email || null, createdAt: serverTimestamp()
+      });
+      tx.update(labRef, { totalPaid: (lab.totalPaid || 0) + amount });
+    });
+    logActivity('wage_payment', `₹${fmt(amount)} paid to ${labourName}${note?' — '+note:''}`);
+    toast('Payment recorded!', 'success');
+    invalidateCache('labour');
+    closeLabourPayModal();
+    allLabour = await fetchCached('labour', 'labour');
+    renderWageSummary();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// Combined attendance + payment history for one worker, most recent first.
+// Two targeted queries (where labourId==...) rather than pulling the whole
+// collection — cheap even once the app has years of records.
+window.viewLabourHistory = async (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  document.getElementById('lb-hist-sub').innerHTML = `${esc(w.name)} — ${esc(w.role||'')} &middot; ₹${fmt(w.dailyWage||0)}/day`;
+  document.getElementById('lb-hist-content').innerHTML = 'Loading...';
+  document.getElementById('labour-history-modal').style.display = 'flex';
+  try {
+    const [attSnap, paySnap] = await Promise.all([
+      getDocs(query(collection(db,'attendance'), where('labourId','==',id), orderBy('date','desc'), limit(60))),
+      getDocs(query(collection(db,'wagePayments'), where('labourId','==',id), orderBy('createdAt','desc'), limit(60)))
+    ]);
+    const attRows = []; attSnap.forEach(d => attRows.push(d.data()));
+    const payRows = []; paySnap.forEach(d => payRows.push(d.data()));
+    const attHTML = attRows.length
+      ? attRows.map(a => `<div class="labour-hist-row"><span>${a.date} &middot; ${esc(a.status)}</span><strong class="mono">₹${fmt(a.wageAmount||0)}</strong></div>`).join('')
+      : '<div style="font-size:12.5px;color:#94a3b8">No attendance marked yet.</div>';
+    const payHTML = payRows.length
+      ? payRows.map(p => `<div class="labour-hist-row"><span>${p.date} &middot; ${esc(p.mode||'')}${p.note?' &middot; '+esc(p.note):''}</span><strong class="mono">₹${fmt(p.amount)}</strong></div>`).join('')
+      : '<div style="font-size:12.5px;color:#94a3b8">No payments recorded yet.</div>';
+    document.getElementById('lb-hist-content').innerHTML = `
+      <div class="form-section-title" style="margin-top:4px">ATTENDANCE (last 60)</div>
+      ${attHTML}
+      <div class="form-section-title" style="margin-top:16px">PAYMENTS (last 60)</div>
+      ${payHTML}`;
+  } catch(e) { reportError(e); document.getElementById('lb-hist-content').innerHTML = 'Failed to load history.'; }
+};
+
+window.closeLabourHistoryModal = () => {
+  document.getElementById('labour-history-modal').style.display = 'none';
 };
 
 // ── ACTIVITY LOG PAGE (Admin only) ──────────────────────────────
@@ -2512,6 +3032,32 @@ window.loadDashboard = async () => {
 
     if (access.quotations) {
       const finalized = quotes.filter(q => !q.isDraft && !q.deleted);
+
+      // Approval queue is Admin-only — Sales/Accounts never see this card,
+      // even though they may have quotations read access for other reasons.
+      const approvalCard = document.getElementById('dash-approval-card');
+      if (currentUserRole === 'Admin') {
+        approvalCard.style.display = '';
+        const pendingApproval = finalized
+          .filter(q => q.approvalStatus === 'pending')
+          .sort((a,b) => (b.approvalRequestedAt?.toMillis?.()||0) - (a.approvalRequestedAt?.toMillis?.()||0));
+        document.getElementById('dash-approval-list').innerHTML = pendingApproval.length === 0
+          ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Nothing awaiting approval</div>'
+          : pendingApproval.map((q,i) => {
+              const discPct = ((q.base||0)+(q.extra||0)) > 0 ? (q.discount||0)/((q.base||0)+(q.extra||0))*100 : 0;
+              return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
+                <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
+                  <br><small style="color:#94a3b8">Discount ${discPct.toFixed(1)}% (limit ${approvalThresholdPct}%) — requested by ${esc(q.createdBy||'—')}</small></div>
+                <div style="display:flex;gap:6px">
+                  <button onclick="decideQuotationApproval('${q.id}',true)" class="btn-icon" title="Approve" style="color:var(--green)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+                  <button onclick="decideQuotationApproval('${q.id}',false)" class="btn-icon btn-danger" title="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+                </div>
+              </div>`;
+            }).join('');
+      } else {
+        approvalCard.style.display = 'none';
+      }
+
       const pending = finalized.filter(q => ['Pending','Sent'].includes(q.dealStatus||'Pending'));
       const won = finalized.filter(q => q.dealStatus === 'Won');
       const lost = finalized.filter(q => q.dealStatus === 'Lost');
@@ -2642,7 +3188,7 @@ window.loadDashboard = async () => {
     }
   } catch(e) {
     reportError('Dashboard load error:', e);
-    ['dash-followup-list','dash-amc-list','dash-duesoon-list','dash-overdue-list','dash-stale-leads-list'].forEach(id => {
+    ['dash-followup-list','dash-approval-list','dash-amc-list','dash-duesoon-list','dash-overdue-list','dash-stale-leads-list'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Data failed to load — please refresh the page.</div>';
     });
@@ -2655,7 +3201,7 @@ function showDashboardSkeleton(access) {
     if (el && el.textContent === '—') el.innerHTML = '<span class="skel skel-num"></span>';
   });
   if (access.leads)      document.getElementById('dash-stale-leads-list').innerHTML = skeletonRows(3);
-  if (access.quotations) { document.getElementById('dash-followup-list').innerHTML = skeletonRows(3); document.getElementById('dash-amc-list').innerHTML = skeletonRows(3); }
+  if (access.quotations) { document.getElementById('dash-followup-list').innerHTML = skeletonRows(3); document.getElementById('dash-approval-list').innerHTML = skeletonRows(2); document.getElementById('dash-amc-list').innerHTML = skeletonRows(3); }
   if (access.invoices) { document.getElementById('dash-duesoon-list').innerHTML = skeletonRows(3); document.getElementById('dash-overdue-list').innerHTML = skeletonRows(3); }
 }
 
@@ -2884,6 +3430,7 @@ function renderSecurityCard() {
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
   leads:'Leads', customers:'Customers', tickets:'Support Tickets', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  labour:'Labour & Wages',
   team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
 window.toggleSidebar = () => {
@@ -2912,6 +3459,7 @@ window.showSection = id => {
   if (id === 'leads')     loadLeads();
   if (id === 'customers') loadCustomers();
   if (id === 'tickets')   loadTickets();
+  if (id === 'labour')    loadLabour();
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
   if (id === 'activity-log') loadActivityLog();
@@ -2921,6 +3469,19 @@ window.showSection = id => {
 // ── HELPERS ─────────────────────────────────────────────────────
 const fmt = n => Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// For free-text values (e.g. a customer's phone/name field, which a staff
+// member can type anything into) that get embedded inside an inline
+// onclick="...('${value}')" handler: esc() alone is NOT enough there,
+// because the browser HTML-decodes the attribute BEFORE handing it to the
+// JS parser, so an HTML-escaped quote (&#39;) still turns back into a
+// real ' at execution time and can break out of the JS string. This
+// escapes backslashes/quotes for the JS-string layer first, then
+// HTML-attribute-escapes the result — safe to drop straight into
+// onclick="fn('${escJsAttr(value)}')". Only needed for genuinely
+// free-text values; Firestore auto-IDs and numeric indices used
+// elsewhere in onclick handlers can't contain quote characters, so they
+// don't need this.
+const escJsAttr = s => esc(String(s ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 
 // Converts a whole rupee amount to words using the Indian numbering
 // system (Lakh/Crore), for the "Total Invoice Value (In Words)" line.
@@ -3086,6 +3647,29 @@ window.recalcNextRenewal = () => {
 // action from the AMC Renewals Due dashboard widget). Deliberately does
 // NOT touch editingId, so Save/Finalize always creates a new record —
 // the source quotation is never modified by duplicating it.
+// ── PRICING APPROVAL DECISION (Admin only — also enforced in Firestore
+// rules, so this isn't just a UI-level restriction) ─────────────────
+window.decideQuotationApproval = async (id, approve) => {
+  const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  let note = null;
+  if (!approve) {
+    note = await promptDialog('Reason for rejecting this discount (shown to Sales):', { title: 'Reject Quotation', placeholder: 'e.g. Discount too high for this project size' });
+    if (note === null) return; // cancelled
+  }
+  try {
+    await updateDoc(doc(db,'quotations',id), {
+      approvalStatus: approve ? 'approved' : 'rejected',
+      approvalNote: approve ? null : (note || 'Rejected by Admin'),
+      approvalDecidedAt: serverTimestamp(),
+      approvalDecidedBy: auth.currentUser?.email || null,
+      updatedAt: serverTimestamp()
+    });
+    toast(approve ? 'Quotation approved — it can now be shared.' : 'Quotation rejected.', 'success');
+    invalidateCache('quotations');
+    loadDashboard();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
 window.duplicateQuotation = id => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
   resetForm();
@@ -3133,6 +3717,20 @@ window.saveQuotation = async isDraft => {
   }
   const { discount, subtotal, gstAmt, total } = r;
   const isRecurring = document.getElementById('f-recurring').checked;
+
+  // ── PRICING APPROVAL ─────────────────────────────────────────
+  // Only matters for a Finalize (drafts aren't shared with anyone yet, so
+  // nothing to gate), and only Sales needs approval — Admin sets pricing
+  // policy, so an Admin's own quotation never needs Admin's own approval.
+  // Recomputed fresh on every save: if discount drops back under the
+  // threshold, approval requirement clears itself automatically; if it's
+  // raised back above threshold after a rejection, it goes back to
+  // pending. Sales can never set this to 'approved' directly — enforced
+  // in Firestore rules, not just this client-side check.
+  const discountPct = (base + extra) > 0 ? (discount / (base + extra)) * 100 : 0;
+  const needsApproval = !isDraft && currentUserRole === 'Sales' && discountPct > approvalThresholdPct;
+  const approvalStatus = needsApproval ? 'pending' : (isDraft ? null : 'none');
+
   const data  = {
     cname, cphone, cemail: g('f-cemail'), caddr: g('f-caddr'),
     ptype: g('f-ptype'), area, rate, extra, discount,
@@ -3145,6 +3743,10 @@ window.saveQuotation = async isDraft => {
     nextRenewalDate: isRecurring ? g('f-next-renewal') : null,
     isDraft, updatedAt: serverTimestamp()
   };
+  if (approvalStatus !== null) {
+    data.approvalStatus = approvalStatus;
+    if (needsApproval) { data.approvalRequestedAt = serverTimestamp(); data.approvalNote = null; }
+  }
   if (!isDraft) {
     const existing = editingId ? allQuotations.find(x=>x.id===editingId) : null;
     if (!existing || !existing.dealStatus) data.dealStatus = 'Pending';
@@ -3171,6 +3773,13 @@ window.saveQuotation = async isDraft => {
     setBtnLoading(btn, false);
     if (isDraft) {
       toast('Draft saved!', 'success');
+      resetForm(); showSection('history');
+    } else if (needsApproval) {
+      await showSuccessModal({
+        title: 'Quotation Saved — Pending Approval',
+        sub: `Discount is ${discountPct.toFixed(1)}%, above the ${approvalThresholdPct}% limit — an Admin needs to approve this before it can be shared with ${cname}.`,
+        id: data.qtId
+      });
       resetForm(); showSection('history');
     } else {
       await showSuccessModal({
@@ -3745,8 +4354,15 @@ window.renderHistory = (search='', keepPage=false) => {
   const { pageItems, page, totalPages, total } = paginateList(list, 'history', keepPage);
   tbody.innerHTML = pageItems.length === 0
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No quotations found</td></tr>`
-    : pageItems.map(q=>`<tr>
-        <td><span class="qt-id-badge">${esc(q.qtId)}</span>${q.isRecurring?` <span class="badge-inprogress" title="Renews ${esc(q.recurringFreq||'')}${q.nextRenewalDate?' — next: '+esc(q.nextRenewalDate):''}">AMC</span>`:''}</td>
+    : pageItems.map(q=>{
+        const isBlocked = q.approvalStatus === 'pending' || q.approvalStatus === 'rejected';
+        const approvalBadge = q.approvalStatus === 'pending'
+          ? ` <span class="badge-draft" title="Waiting for Admin approval — discount above ${approvalThresholdPct}%">Pending Approval</span>`
+          : q.approvalStatus === 'rejected'
+          ? ` <span class="badge-inprogress" style="background:#fee2e2;color:#991b1b" title="${esc(q.approvalNote||'Rejected by Admin')}">Rejected</span>`
+          : '';
+        return `<tr>
+        <td><span class="qt-id-badge">${esc(q.qtId)}</span>${q.isRecurring?` <span class="badge-inprogress" title="Renews ${esc(q.recurringFreq||'')}${q.nextRenewalDate?' — next: '+esc(q.nextRenewalDate):''}">AMC</span>`:''}${approvalBadge}</td>
         <td><strong>${esc(q.cname)}</strong><br><small>${esc(q.cphone)}</small></td>
         <td>${esc(q.ptype)}</td>
         <td>${(q.area||0).toLocaleString('en-IN')} sq.ft</td>
@@ -3758,18 +4374,28 @@ window.renderHistory = (search='', keepPage=false) => {
         <td class="action-btns">
           <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview">${ICONS.eye}</button>
           <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
-          <button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
-          <button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
-          ${!q.isDraft ? `<button onclick="generatePortalLink('quotation','${q.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>` : ''}
+          ${isBlocked
+            ? `<button class="btn-icon" disabled title="Pending approval — can't download until approved" style="opacity:.35;cursor:not-allowed">${ICONS.download}</button>`
+            : `<button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>`}
+          ${isBlocked
+            ? `<button class="btn-icon" disabled title="Pending approval — can't share until approved" style="opacity:.35;cursor:not-allowed">${ICONS.chat}</button>`
+            : `<button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>`}
+          ${!q.isDraft && !isBlocked ? `<button onclick="generatePortalLink('quotation','${q.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>` : ''}
           <button onclick="duplicateQuotation('${q.id}')" class="btn-icon" title="Duplicate as New Quotation">${ICONS.refresh}</button>
           <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
-        </td></tr>`).join('');
+        </td></tr>`;
+      }).join('');
   renderPaginationControls('history-pagination', 'history', page, totalPages, total);
 };
 
 // ── EDIT / DELETE ───────────────────────────────────────────────
 window.updateDealStatus = async (id, dealStatus) => {
   const q = allQuotations.find(x=>x.id===id); if (!q) return;
+  if (dealStatus === 'Won' && (q.approvalStatus === 'pending' || q.approvalStatus === 'rejected')) {
+    toast('This quotation is still ' + (q.approvalStatus === 'pending' ? 'awaiting' : 'refused') + ' Admin approval on its discount — it can\'t be marked Won until that\'s resolved.', 'warning');
+    renderHistory(document.getElementById('search-input')?.value || '', true);
+    return;
+  }
   try {
     const updates = { dealStatus, updatedAt: serverTimestamp() };
     let shouldGenerateInvoice = false;
@@ -4922,7 +5548,7 @@ function renderWorkPhotoGallery(inv) {
   const photos = inv.workPhotos || [];
   gallery.innerHTML = photos.map((p, idx) => `
     <div class="ws-photo-thumb">
-      <img src="${p.url}" alt="Site photo">
+      <img src="${esc(p.url)}" alt="Site photo">
       <div class="ws-photo-del" onclick="deleteWorkPhoto(${idx})" title="Remove"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
     </div>`).join('');
 }
@@ -5191,7 +5817,7 @@ function buildPortalPhotosHTML(d) {
   const photos = d.workPhotos || [];
   if (!photos.length) return '';
   const sorted = [...photos].sort((a,b) => (b.uploadedAt||'').localeCompare(a.uploadedAt||''));
-  const items = sorted.map(p => `<a href="${p.url}" target="_blank" rel="noopener noreferrer"><img src="${p.url}" alt="Site progress photo" loading="lazy"></a>`).join('');
+  const items = sorted.map(p => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer"><img src="${esc(p.url)}" alt="Site progress photo" loading="lazy"></a>`).join('');
   return `<div class="portal-photos">
       <div class="portal-photos-title">Site Photos</div>
       <div class="portal-photos-grid">${items}</div>
@@ -5405,7 +6031,7 @@ function renderGlobalSearchResults(q) {
     const matches = allCustomers.filter(x => (x.name||'').toLowerCase().includes(s) || (x.phone||'').includes(s)).slice(0, 6);
     if (matches.length) groups.push({ title: 'Customers', items: matches.map(x => ({
       icon: ICONS.building, title: x.name, sub: x.phone,
-      onClick: `closeGlobalSearch(); openCustomerFromSearch('${x.phone||''}')`
+      onClick: `closeGlobalSearch(); openCustomerFromSearch('${escJsAttr(x.phone||'')}')`
     })) });
   }
   {
