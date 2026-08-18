@@ -23,13 +23,10 @@
   if (new URLSearchParams(location.search).has('p') || new URLSearchParams(location.search).has('portal')) {
     document.documentElement.classList.add('portal-boot');
   }
+  if (new URLSearchParams(location.search).has('att')) {
+    document.documentElement.classList.add('attendance-boot');
+  }
 </script>
-<!-- PERFORMANCE: this is the largest visual element on the very first screen
-     every user sees (login hero photo), so it's the page's LCP candidate.
-     Without this hint the browser only discovers it once HTML parsing
-     reaches the <img> tag further down; preloading it here lets the
-     request start alongside (not after) the font/CSS requests. -->
-<link rel="preload" as="image" href="https://rrteensetsolution.com/images/login-bg.jpg" fetchpriority="high">
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
@@ -111,6 +108,21 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 html.portal-boot #login-screen{display:none!important}
 html.portal-boot #app{display:none!important}
 html.portal-boot #portal-screen{display:block!important}
+html.attendance-boot #login-screen{display:none!important}
+html.attendance-boot #app{display:none!important}
+html.attendance-boot #attendance-screen{display:block!important}
+#attendance-screen{display:none;min-height:100vh;background:var(--bg)}
+.att-mark-grid{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.att-mark-btn{padding:16px;border-radius:3px;border:2px solid var(--border);background:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--text)}
+.att-mark-btn:hover{border-color:var(--orange)}
+.att-mark-btn.att-mark-present{border-color:var(--green);color:var(--green)}
+.att-mark-btn.att-mark-half{border-color:#b45309;color:#b45309}
+.att-mark-btn.att-mark-absent{border-color:var(--red);color:var(--red)}
+.att-gps-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:2px}
+.att-gps-status.att-gps-ok{color:var(--green)}
+.att-gps-status.att-gps-fail{color:var(--red)}
+.att-confirmed-box{text-align:center;padding:30px 16px}
+.att-confirmed-box svg{width:52px;height:52px;stroke:var(--green);margin-bottom:12px}
 
 /* CUSTOMER PORTAL (public, no login) */
 #portal-screen{display:none;min-height:100vh;background:var(--bg)}
@@ -458,10 +470,9 @@ html.portal-boot #portal-screen{display:block!important}
   .sidebar.open{transform:translateX(0);z-index:120}
   .main{margin-left:0;padding:20px}
   #sidebar-overlay{
-    position:fixed;inset:0;background:rgba(15,18,21,.55);z-index:99;
-    opacity:0;visibility:hidden;transition:opacity .22s ease,visibility 0s linear .22s
+    display:none;position:fixed;inset:0;background:rgba(15,18,21,.55);z-index:99
   }
-  #sidebar-overlay.open{opacity:1;visibility:visible;transition:opacity .22s ease,visibility 0s linear 0s}
+  #sidebar-overlay.open{display:block}
   .stats-grid{grid-template-columns:1fr 1fr}
   .form-grid,.form-grid-3{grid-template-columns:1fr}
   .span-2{grid-column:span 1}
@@ -480,7 +491,7 @@ html.portal-boot #portal-screen{display:block!important}
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <img id="login-bg" src="https://rrteensetsolution.com/images/login-bg.jpg" alt="R.R Teen Set Solution steel fabrication warehouse" fetchpriority="high">
+  <img id="login-bg" src="https://rrteensetsolution.com/images/login-bg.jpg" alt="R.R Teen Set Solution steel fabrication warehouse">
   <div id="login-overlay"></div>
   <div class="login-card">
     <div class="login-logo">
@@ -519,6 +530,24 @@ html.portal-boot #portal-screen{display:block!important}
     </div>
   </div>
   <div id="portal-body" class="portal-body">
+    <div class="portal-loading">Loading…</div>
+  </div>
+</div>
+
+<!-- WORKER ATTENDANCE — read-only-ish public view, no login. Reached via a
+     ?att=<labourId>&token=<attendanceToken> link generated from the
+     Workers tab ("Get Attendance Link" button). Lets a worker mark their
+     own Present/Half Day/Absent from their phone, with a best-effort GPS
+     check against Admin-configured site/office locations. -->
+<div id="attendance-screen">
+  <div class="portal-topbar">
+    <img src="images/rr-logo-original.png" alt="R.R Teen Set Solution" class="portal-logo">
+    <div>
+      <div class="portal-wordmark">R.R Teen Set Solution</div>
+      <div class="portal-tagline">Daily Attendance</div>
+    </div>
+  </div>
+  <div id="attendance-body" class="portal-body">
     <div class="portal-loading">Loading…</div>
   </div>
 </div>
@@ -729,7 +758,7 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="handleHistorySearchDebounced(this.value)">
+            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="handleHistorySearch(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">From:</label>
@@ -859,14 +888,14 @@ html.portal-boot #portal-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="ld-notes" class="form-input"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveLead(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
+            <button class="btn btn-save" onclick="saveLead()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
             <button class="btn btn-reset" onclick="resetLeadForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </div>
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="handleLeadsSearchDebounced(this.value)">
+            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="handleLeadsSearch(this.value)">
           </div>
           <select id="lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="handleLeadsSearch(document.getElementById('lead-search-input').value)">
             <option value="">All Status</option>
@@ -884,12 +913,10 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
 
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th style="width:34px"><input type="checkbox" id="leads-select-all" onchange="toggleAllLeadsSelect(this.checked)"></th><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Age</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="leads-tbody"><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
-          </div>
             <div id="leads-pagination" class="pagination-wrap"></div>
             <div id="leads-loadmore"></div>
         </div>
@@ -903,17 +930,15 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomersDebounced(this.value)">
+            <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomers(this.value)">
           </div>
           <button class="btn-export" onclick="exportCustomersCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Quotations</th><th>Total Value</th><th>Last Activity</th></tr></thead>
             <tbody id="customers-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
-          </div>
             <div id="customers-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -940,12 +965,12 @@ html.portal-boot #portal-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label">Description *</label><textarea id="tkt-new-desc" class="form-input" rows="2" style="resize:vertical;font-family:inherit"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="createTicketByStaff(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
+            <button class="btn btn-save" onclick="createTicketByStaff()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
           </div>
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="ticket-search-input" class="search-input" placeholder="Search by ticket ID, name, phone, subject..." oninput="handleTicketsSearchDebounced(this.value)">
+            <input type="text" id="ticket-search-input" class="search-input" placeholder="Search by ticket ID, name, phone, subject..." oninput="handleTicketsSearch(this.value)">
           </div>
           <select id="ticket-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:150px" onchange="renderTickets(document.getElementById('ticket-search-input').value)">
             <option value="">All Status</option>
@@ -966,12 +991,10 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
 
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Ticket ID</th><th>Customer</th><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Last Update</th><th>Actions</th></tr></thead>
             <tbody id="tickets-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td></tr></tbody>
           </table>
-          </div>
           <div id="tickets-pagination" class="pagination-wrap"></div>
           <div id="tickets-loadmore"></div>
         </div>
@@ -1102,7 +1125,7 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="handleInvoicesSearchDebounced(this.value)">
+            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="handleInvoicesSearch(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">Status:</label>
@@ -1140,6 +1163,7 @@ html.portal-boot #portal-screen{display:block!important}
           <button class="subtab-btn active" id="labour-tab-workers" onclick="showLabourSubtab('workers')">Workers</button>
           <button class="subtab-btn" id="labour-tab-attendance" onclick="showLabourSubtab('attendance')">Attendance</button>
           <button class="subtab-btn" id="labour-tab-wages" onclick="showLabourSubtab('wages')">Wages &amp; Payments</button>
+          <button class="subtab-btn" id="labour-tab-locations" onclick="showLabourSubtab('locations')">Verification Locations</button>
         </div>
 
         <!-- WORKERS -->
@@ -1168,7 +1192,7 @@ html.portal-boot #portal-screen{display:block!important}
 
           <div class="history-controls">
             <div class="search-box">
-              <input type="text" id="labour-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderLabourListDebounced(this.value)">
+              <input type="text" id="labour-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderLabourList(this.value)">
             </div>
             <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none">
               <input type="checkbox" id="labour-show-inactive" onchange="renderLabourList(document.getElementById('labour-search-input').value)"> Show inactive
@@ -1177,12 +1201,10 @@ html.portal-boot #portal-screen{display:block!important}
           </div>
 
           <div class="table-card">
-            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Daily Wage</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="labour-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
             </table>
-            </div>
           </div>
         </div>
 
@@ -1195,24 +1217,56 @@ html.portal-boot #portal-screen{display:block!important}
             </div>
           </div>
           <div class="table-card">
-            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Role</th><th>Daily Wage</th><th>Today's Status</th><th>Wage for Day</th></tr></thead>
               <tbody id="attendance-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Pick a date to mark attendance</td></tr></tbody>
             </table>
-            </div>
           </div>
         </div>
 
         <!-- WAGES & PAYMENTS -->
         <div class="subtab-pane" id="labour-pane-wages">
           <div class="table-card">
-            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Role</th><th>Total Earned</th><th>Total Paid</th><th>Balance Due</th><th>Actions</th></tr></thead>
               <tbody id="wages-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td><td></td><td></td><td></td></tr></tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- VERIFICATION LOCATIONS (Admin only — used to GPS-check worker self-marked attendance) -->
+        <div class="subtab-pane" id="labour-pane-locations">
+          <div class="form-card">
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> WORK HOURS FOR PRESENT / HALF DAY</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">A worker's status is decided from the hours between their Time In and Time Out — not a manual choice. Below the Half Day threshold, it's marked Absent (the office can still override any of this manually in the Attendance tab).</p>
+            <div class="form-grid" style="max-width:400px">
+              <div class="form-group"><label class="form-label">Full Day = Present (hours)</label><input type="number" id="att-fullday-hours" class="form-input" value="8" min="1" max="24" step="0.5"></div>
+              <div class="form-group"><label class="form-label">Minimum for Half Day (hours)</label><input type="number" id="att-halfday-hours" class="form-input" value="4" min="0.5" max="24" step="0.5"></div>
             </div>
+            <div class="btn-row">
+              <button class="btn btn-save" onclick="saveAttendanceHourThresholds()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Hours</button>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> ADD SITE / OFFICE LOCATION</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When a worker self-marks attendance from their phone, their GPS location is checked against these — within range of any one of them counts as "Verified". Stand at the actual site or office and tap "Use My Current Location" for the easiest, most accurate setup.</p>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Location Name *</label><input type="text" id="loc-name" class="form-input" placeholder="e.g. Head Office, Site — Rajiv Bhargav Shed"></div>
+              <div class="form-group"><label class="form-label">Radius (meters)</label><input type="number" id="loc-radius" class="form-input" value="200" min="20" max="5000"></div>
+              <div class="form-group"><label class="form-label">Latitude</label><input type="number" id="loc-lat" class="form-input" step="any" readonly placeholder="Use the button below"></div>
+              <div class="form-group"><label class="form-label">Longitude</label><input type="number" id="loc-lng" class="form-input" step="any" readonly placeholder="Use the button below"></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-reset" onclick="captureCurrentLocation()" type="button"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> Use My Current Location</button>
+              <button class="btn btn-save" onclick="addAttendanceLocation()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Location</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="data-table">
+              <thead><tr><th>Name</th><th>Coordinates</th><th>Radius</th><th>Actions</th></tr></thead>
+              <tbody id="att-locations-tbody"><tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">Loading...</td></tr></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -1249,7 +1303,7 @@ html.portal-boot #portal-screen{display:block!important}
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="addTeamMember(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
+            <button class="btn btn-save" onclick="addTeamMember()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
           </div>
           <div style="font-size:12px;color:#64748b;margin-top:10px">
             Sales → New Quotation, History, Leads, Customers &nbsp;|&nbsp; Accounts → Invoices, Customers, Analytics &nbsp;|&nbsp; Admin → Everything
@@ -1257,12 +1311,10 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
 
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
             <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
-          </div>
         </div>
       </section>
 
@@ -1304,7 +1356,7 @@ html.portal-boot #portal-screen{display:block!important}
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItemsDebounced(this.value)">
+            <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItems(this.value)">
           </div>
           <select id="deleted-filter-type" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderDeletedItems(document.getElementById('deleted-search-input').value)">
             <option value="">All Types</option>
@@ -1315,14 +1367,12 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
 
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
               <th>Type</th><th>ID</th><th>Customer</th><th>Deleted On</th><th>Actions</th>
             </tr></thead>
             <tbody id="deleted-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
-          </div>
           <div id="deleted-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -1338,7 +1388,7 @@ html.portal-boot #portal-screen{display:block!important}
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="activity-search-input" class="search-input" placeholder="Search by user, action, details..." oninput="renderActivityLogDebounced(this.value)">
+            <input type="text" id="activity-search-input" class="search-input" placeholder="Search by user, action, details..." oninput="renderActivityLog(this.value)">
           </div>
           <select id="activity-filter-action" class="form-select" style="padding:9px 12px;font-size:13px;max-width:200px" onchange="renderActivityLog(document.getElementById('activity-search-input').value)">
             <option value="">All Actions</option>
@@ -1350,14 +1400,12 @@ html.portal-boot #portal-screen{display:block!important}
         </div>
 
         <div class="table-card">
-          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
               <th>When</th><th>By</th><th>Action</th><th>Details</th>
             </tr></thead>
             <tbody id="activity-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td></tr></tbody>
           </table>
-          </div>
           <div id="activity-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -1397,7 +1445,7 @@ html.portal-boot #portal-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="savePayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-save" onclick="savePayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
       <button class="btn btn-reset" onclick="closePaymentModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
     <div class="pay-history" id="pay-history"></div>
@@ -1449,7 +1497,7 @@ html.portal-boot #portal-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="saveLabourPayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-save" onclick="saveLabourPayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
       <button class="btn btn-reset" onclick="closeLabourPayModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
@@ -1498,7 +1546,7 @@ html.portal-boot #portal-screen{display:block!important}
     <div class="gs-input-row">
       <svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
       <input type="text" id="gs-input" placeholder="Search quotations, invoices, leads, customers, tickets..." oninput="runGlobalSearch(this.value)" autocomplete="off">
-      <button class="btn-icon" onclick="closeGlobalSearch()" title="Close" aria-label="Close search"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      <button class="btn-icon" onclick="closeGlobalSearch()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
     </div>
     <div id="gs-results" class="gs-results"></div>
   </div>
@@ -2033,15 +2081,6 @@ const CLOUDINARY_UPLOAD_PRESET = 'work-progress-photos';
 // `complete` tracks whether the cached array is the full collection or
 // just a partial page, so fetchCached() knows whether it's safe to reuse
 // what's already in memory or whether it must go fetch everything.
-// PERFORMANCE: generic debounce — used to stop search boxes from rebuilding
-// a whole table's HTML on every single keystroke. Only the last keystroke
-// within `wait` ms actually triggers the (potentially expensive) render.
-const SEARCH_DEBOUNCE_MS = 200;
-function debounce(fn, wait = SEARCH_DEBOUNCE_MS) {
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
-}
-
 const FETCH_PAGE_SIZE = 100;
 const _cache = {
   quotations:{data:null,ts:0,complete:false,lastDoc:null},
@@ -2296,12 +2335,11 @@ async function createTeamMemberAuth(email, pass) {
   }
 }
 
-window.addTeamMember = async (btn) => {
+window.addTeamMember = async () => {
   const g = id => document.getElementById(id).value;
   const name = g('tm-name').trim(), email = g('tm-email').trim(), pass = g('tm-pass'), role = g('tm-role');
   if (!name || !email || !pass) { toast('Name, email and password are required.', 'warning'); return; }
   if (pass.length < 8) { toast('Password must be at least 8 characters long.', 'warning'); return; }
-  setBtnLoading(btn, true, 'Creating...');
   try {
     // SECURITY: write the invite doc FIRST, before the Auth account even
     // exists. The Firestore rules now require invited/{email} to exist (with
@@ -2317,10 +2355,8 @@ window.addTeamMember = async (btn) => {
     document.getElementById('tm-name').value = '';
     document.getElementById('tm-email').value = '';
     document.getElementById('tm-pass').value = '';
-    setBtnLoading(btn, false);
     loadTeam();
   } catch(e) {
-    setBtnLoading(btn, false);
     if (e.code === 'auth/email-already-in-use') toast('This email is already registered.', 'error');
     else { reportError(e); toast('Error: ' + e.message, 'error'); }
   }
@@ -2603,7 +2639,7 @@ window.permanentlyDeleteItem = async (type, id) => {
 // the running total atomically — the same pattern already used for
 // invoice payments (savePayment) and sequential numbering (getNextSeq).
 window.showLabourSubtab = (tab) => {
-  ['workers','attendance','wages'].forEach(t => {
+  ['workers','attendance','wages','locations'].forEach(t => {
     document.getElementById(`labour-tab-${t}`).classList.toggle('active', t===tab);
     document.getElementById(`labour-pane-${t}`).classList.toggle('active', t===tab);
   });
@@ -2613,6 +2649,7 @@ window.showLabourSubtab = (tab) => {
     loadAttendanceForDate();
   }
   if (tab === 'wages') renderWageSummary();
+  if (tab === 'locations') loadAttendanceLocations();
 };
 
 window.loadLabour = async () => {
@@ -2620,6 +2657,133 @@ window.loadLabour = async () => {
     allLabour = await fetchCached('labour', 'labour');
     renderLabourList('');
   } catch(e) { reportError(e); showLoadError('labour-tbody', 7, e); }
+};
+
+// ── ATTENDANCE VERIFICATION LOCATIONS (Admin-configured) ─────────
+// A single settings doc holds the list — publicly gettable (workers'
+// devices need it to self-check their GPS with no login), Admin-only
+// write. See settings/{id} rule in firestore.rules.
+window.captureCurrentLocation = () => {
+  if (!navigator.geolocation) { toast('Your browser does not support location.', 'error'); return; }
+  toast('Getting your current location...', 'warning', 2500);
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById('loc-lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('loc-lng').value = pos.coords.longitude.toFixed(6);
+      toast('Location captured!', 'success');
+    },
+    err => toast('Could not get your location: ' + err.message, 'error'),
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+};
+
+window.addAttendanceLocation = async () => {
+  const name = document.getElementById('loc-name').value.trim();
+  const radiusMeters = parseInt(document.getElementById('loc-radius').value, 10) || 200;
+  const lat = parseFloat(document.getElementById('loc-lat').value);
+  const lng = parseFloat(document.getElementById('loc-lng').value);
+  if (!name) { toast('Enter a location name.', 'warning'); return; }
+  if (isNaN(lat) || isNaN(lng)) { toast('Use "Use My Current Location" to set coordinates first.', 'warning'); return; }
+  try {
+    const snap = await getDoc(doc(db,'settings','attendanceLocations'));
+    const locations = snap.exists() ? (snap.data().locations || []) : [];
+    locations.push({ name, lat, lng, radiusMeters });
+    await setDoc(doc(db,'settings','attendanceLocations'), { locations, updatedAt: serverTimestamp() }, { merge: true });
+    toast('Location added!', 'success');
+    document.getElementById('loc-name').value = '';
+    document.getElementById('loc-lat').value = '';
+    document.getElementById('loc-lng').value = '';
+    document.getElementById('loc-radius').value = '200';
+    loadAttendanceLocations();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.loadAttendanceLocations = async () => {
+  const tbody = document.getElementById('att-locations-tbody');
+  try {
+    const snap = await getDoc(doc(db,'settings','attendanceLocations'));
+    const data = snap.exists() ? snap.data() : {};
+    const locations = data.locations || [];
+    window._attLocations = locations;
+    document.getElementById('att-fullday-hours').value = typeof data.fullDayHours === 'number' ? data.fullDayHours : 8;
+    document.getElementById('att-halfday-hours').value = typeof data.halfDayHours === 'number' ? data.halfDayHours : 4;
+    tbody.innerHTML = locations.length === 0
+      ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">No locations added yet — add one above</td></tr>`
+      : locations.map((l, idx) => `<tr>
+          <td><strong>${esc(l.name)}</strong></td>
+          <td class="mono" style="font-size:12px">${l.lat.toFixed(5)}, ${l.lng.toFixed(5)}</td>
+          <td>${l.radiusMeters} m</td>
+          <td class="action-btns"><button onclick="deleteAttendanceLocation(${idx})" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button></td>
+        </tr>`).join('');
+  } catch(e) { reportError(e); tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--red)">Couldn't load locations</td></tr>`; }
+};
+
+window.saveAttendanceHourThresholds = async () => {
+  const fullDayHours = parseFloat(document.getElementById('att-fullday-hours').value);
+  const halfDayHours = parseFloat(document.getElementById('att-halfday-hours').value);
+  if (isNaN(fullDayHours) || isNaN(halfDayHours) || fullDayHours <= 0 || halfDayHours <= 0) { toast('Enter valid hour values.', 'warning'); return; }
+  if (halfDayHours >= fullDayHours) { toast('Half Day hours must be less than Full Day hours.', 'warning'); return; }
+  try {
+    await setDoc(doc(db,'settings','attendanceLocations'), { fullDayHours, halfDayHours, updatedAt: serverTimestamp() }, { merge: true });
+    toast('Work hour thresholds saved!', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.deleteAttendanceLocation = async (idx) => {
+  const locations = (window._attLocations || []).filter((_, i) => i !== idx);
+  try {
+    await setDoc(doc(db,'settings','attendanceLocations'), { locations, updatedAt: serverTimestamp() }, { merge: true });
+    toast('Location removed.', 'success');
+    loadAttendanceLocations();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// ── ATTENDANCE SELF-MARK LINK (per worker) ────────────────────────
+// Same bearer-token pattern as the customer portal — a random token on
+// the labour doc, required alongside the labourId to write to that
+// worker's attendance (see firestore.rules). No login for the worker.
+window.generateAttendanceLink = async (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  try {
+    let token = w.attendanceToken;
+    if (!token) {
+      token = crypto.randomUUID();
+      await updateDoc(doc(db,'labour',id), { attendanceToken: token });
+      w.attendanceToken = token;
+      invalidateCache('labour');
+    }
+    const url = `${location.origin}${location.pathname}?att=${id}&token=${token}`;
+    let copied = false;
+    try { await navigator.clipboard.writeText(url); copied = true; } catch(e) {}
+    const send = await confirmDialog(
+      copied
+        ? `Link copied to clipboard!\n\nSend it to ${w.name} on WhatsApp now? They can bookmark it and use it every day.\n\nReminder: this link alone isn't enough to mark attendance — they'll also need their PIN. Set one with the lock icon if you haven't already, and tell them the PIN separately (not in this same message).`
+        : `Couldn't auto-copy — here's the link:\n${url}\n\nSend it to ${w.name} on WhatsApp now?`,
+      { title: 'Worker Attendance Link', confirmText: 'Open WhatsApp', cancelText: copied ? 'Done' : 'Close' }
+    );
+    if (send && w.phone) {
+      const msg = `Hello ${w.name}, use this link every day to mark your own attendance (Present / Half Day / Absent) — from the office or from site, no login needed:\n${url}`;
+      window.open(waLink(w.phone, msg), '_blank', 'noopener,noreferrer');
+    }
+  } catch(e) { reportError(e); toast('Could not create attendance link: ' + e.message, 'error'); }
+};
+
+// The PIN lives in a separate labourPins/{id} doc that's NEVER readable by
+// anyone outside Admin/Accounts — not even indirectly through the worker's
+// own attendance link (see firestore.rules). Deliberately tell the worker
+// their PIN out loud or in a separate message from the link itself — if
+// both travel together in one WhatsApp forward, the PIN adds no real
+// protection against the exact sharing this is meant to prevent.
+window.setWorkerPin = async (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  const pin = String(Math.floor(1000 + Math.random()*9000));
+  try {
+    await setDoc(doc(db,'labourPins',id), { pin, updatedAt: serverTimestamp() });
+    await confirmDialog(
+      `${w.name}'s new attendance PIN is:\n\n${pin}\n\nTell them this in person or by phone call — NOT in the same message as their attendance link. Anyone who has both the link and the PIN can mark attendance as this worker, so keeping them separate is what makes the PIN worth having.`,
+      { title: 'New PIN Generated', confirmText: 'Got it', cancelText: 'Close' }
+    );
+  } catch(e) { reportError(e); toast('Could not set PIN: ' + e.message, 'error'); }
 };
 
 window.renderLabourList = (search='') => {
@@ -2640,6 +2804,8 @@ window.renderLabourList = (search='') => {
         <td class="action-btns">
           <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
           <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)">${ICONS.globe}</button>
+          <button onclick="setWorkerPin('${w.id}')" class="btn-icon" title="Set/Reset Attendance PIN">${ICONS.lock}</button>
           <button onclick="toggleLabourActive('${w.id}')" class="btn-icon" title="${w.active===false?'Reactivate':'Deactivate'}">${w.active===false?ICONS.restore:ICONS.trash}</button>
           <button onclick="delLabour('${w.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
         </td>
@@ -2658,8 +2824,6 @@ window.saveLabour = async () => {
     joinedDate: g('lb-joined') || new Date().toISOString().split('T')[0],
     notes: g('lb-notes'), updatedAt: serverTimestamp()
   };
-  const btn = document.getElementById('lb-save-btn');
-  setBtnLoading(btn, true, editingLabourId ? 'Updating...' : 'Saving...');
   try {
     if (editingLabourId) {
       await updateDoc(doc(db,'labour',editingLabourId), data);
@@ -2671,12 +2835,8 @@ window.saveLabour = async () => {
     }
     toast('Worker saved!', 'success');
     invalidateCache('labour');
-    setBtnLoading(btn, false); // clears btn-loading class; resetLabourForm() below sets the label text itself
     resetLabourForm(); loadLabour();
-  } catch(e) {
-    setBtnLoading(btn, false);
-    reportError(e); toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetLabourForm = () => {
@@ -2766,16 +2926,34 @@ window.loadAttendanceForDate = async () => {
 
 function renderAttendanceRows(active, marked, dateStr) {
   const tbody = document.getElementById('attendance-tbody');
+  const photoThumb = (photo, label) => photo ? `<img src="${photo}" alt="${esc(label)}" title="${esc(label)}" style="width:32px;height:32px;object-fit:cover;border-radius:3px;border:1px solid var(--border);cursor:pointer" onclick="window.open(this.src,'_blank')">` : '';
   tbody.innerHTML = active.map(w => {
     const m = marked[w.id];
     const status = m?.status || null;
     const wageForDay = m?.wageAmount ?? null;
     const btn = (val, cls, label) => `<button type="button" class="att-btn ${cls}${status===val?' active':''}" onclick="markAttendance('${w.id}','${dateStr}','${val}')">${label}</button>`;
-    return `<tr id="att-row-${w.id}">
+    let selfBadge = '', photos = '';
+    const needsConfirmation = m && m.markedBy === 'self' && !m.confirmed && m.timeIn && m.timeOut;
+    const inProgress = m && m.markedBy === 'self' && m.timeIn && !m.timeOut;
+    if (inProgress) {
+      selfBadge = `<br><small style="color:#0369a1;font-weight:700">Checked in at ${fmtTime(m.timeIn.time)}${m.timeIn.verified?' ✓':' ⚠️'} — not timed out yet</small>`;
+      photos = `<div style="display:flex;gap:4px;margin-top:4px">${photoThumb(m.timeIn.photo, `${w.name} — Time In selfie`)}</div>`;
+    } else if (m && m.markedBy === 'self' && m.timeIn && m.timeOut) {
+      const hrs = m.hoursWorked || 0, h = Math.floor(hrs), mi = Math.round((hrs-h)*60);
+      const bothVerified = m.timeIn.verified && m.timeOut.verified;
+      const verifyLabel = bothVerified
+        ? `Verified at both Time In and Time Out`
+        : `Time In ${m.timeIn.verified?'✓':'⚠️ unverified'}, Time Out ${m.timeOut.verified?'✓':'⚠️ unverified'}`;
+      selfBadge = needsConfirmation
+        ? `<br><small style="color:var(--orange);font-weight:700" title="${esc(verifyLabel)}">${h}h ${mi}m worked (${fmtTime(m.timeIn.time)}–${fmtTime(m.timeOut.time)}) ${bothVerified?'✓':'⚠️'} — check selfies, then tap a status to confirm</small>`
+        : `<br><small style="color:${bothVerified?'var(--green)':'var(--red)'}" title="${esc(verifyLabel)}">${h}h ${mi}m worked ${bothVerified?'✓':'⚠️'} — confirmed</small>`;
+      photos = `<div style="display:flex;gap:4px;margin-top:4px">${photoThumb(m.timeIn.photo, `${w.name} — Time In selfie`)}${photoThumb(m.timeOut.photo, `${w.name} — Time Out selfie`)}</div>`;
+    }
+    return `<tr id="att-row-${w.id}"${needsConfirmation || inProgress ? ' style="background:#fff7ed"' : ''}>
       <td><strong>${esc(w.name)}</strong></td>
       <td>${esc(w.role||'—')}</td>
       <td class="mono">₹${fmt(w.dailyWage||0)}</td>
-      <td><div class="att-btn-group">${btn('Present','att-present','Present')}${btn('Half Day','att-half','Half Day')}${btn('Absent','att-absent','Absent')}</div></td>
+      <td><div class="att-btn-group">${btn('Present','att-present','Present')}${btn('Half Day','att-half','Half Day')}${btn('Absent','att-absent','Absent')}</div>${selfBadge}${photos}</td>
       <td class="mono" id="att-wage-${w.id}">${wageForDay!=null ? '₹'+fmt(wageForDay) : '—'}</td>
     </tr>`;
   }).join('');
@@ -2792,13 +2970,22 @@ window.markAttendance = async (labourId, dateStr, status) => {
       const lab = labSnap.data();
       const dailyWage = lab.dailyWage || 0;
       const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
-      const oldWage = attSnap.exists() ? (attSnap.data().wageAmount || 0) : 0;
+      const existing = attSnap.exists() ? attSnap.data() : null;
+      const oldWage = existing?.wageAmount || 0;
       const delta = newWage - oldWage;
+      // merge:true — this is also how a staff member "confirms" a self-
+      // marked entry: it preserves that record's GPS/verification fields
+      // (location, verified, distanceMeters, selfMarkedAt) untouched,
+      // only setting the official payroll fields below and confirmed:true.
       tx.set(attRef, {
         labourId, labourName: lab.name, date: dateStr, status, wageAmount: newWage,
-        markedBy: auth.currentUser?.email || null, updatedAt: serverTimestamp(),
-        createdAt: attSnap.exists() ? attSnap.data().createdAt : serverTimestamp()
-      });
+        markedBy: existing?.markedBy || (auth.currentUser?.email || null),
+        confirmed: true,
+        confirmedBy: auth.currentUser?.email || null,
+        confirmedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        createdAt: existing?.createdAt || serverTimestamp()
+      }, { merge: true });
       tx.update(labRef, { totalEarned: (lab.totalEarned || 0) + delta });
     });
     // Reflect the change immediately without a full reload: update the
@@ -2807,10 +2994,12 @@ window.markAttendance = async (labourId, dateStr, status) => {
     const w = allLabour.find(x=>x.id===labourId);
     const dailyWage = w?.dailyWage || 0;
     const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
+    document.getElementById(`att-row-${labourId}`)?.removeAttribute('style');
     document.querySelectorAll(`#att-row-${labourId} .att-btn`).forEach(b => b.classList.remove('active'));
     document.querySelector(`#att-row-${labourId} .att-btn.${status==='Present'?'att-present':status==='Half Day'?'att-half':'att-absent'}`)?.classList.add('active');
     document.getElementById(`att-wage-${labourId}`).textContent = `₹${fmt(newWage)}`;
     invalidateCache('labour');
+    loadAttendanceForDate(); // re-render this row's confirmation badge too
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
@@ -2856,14 +3045,13 @@ window.closeLabourPayModal = () => {
   activeLabourPaymentId = null;
 };
 
-window.saveLabourPayment = async (btn) => {
+window.saveLabourPayment = async () => {
   if (!activeLabourPaymentId) return;
   const amount = parseFloat(document.getElementById('lb-pay-amount').value) || 0;
   if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
   const date = document.getElementById('lb-pay-date').value;
   const mode = document.getElementById('lb-pay-mode').value;
   const note = document.getElementById('lb-pay-note').value;
-  setBtnLoading(btn, true, 'Saving...');
   try {
     const labRef = doc(db, 'labour', activeLabourPaymentId);
     const payRef = doc(collection(db, 'wagePayments'));
@@ -2882,11 +3070,10 @@ window.saveLabourPayment = async (btn) => {
     logActivity('wage_payment', `₹${fmt(amount)} paid to ${labourName}${note?' — '+note:''}`);
     toast('Payment recorded!', 'success');
     invalidateCache('labour');
-    setBtnLoading(btn, false);
     closeLabourPayModal();
     allLabour = await fetchCached('labour', 'labour');
     renderWageSummary();
-  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // Combined attendance + payment history for one worker, most recent first.
@@ -2999,6 +3186,17 @@ function daysSince(dateVal) {
 function waLink(phone, message) {
   const digits = (phone||'').replace(/\D/g,'');
   return `https://wa.me/91${digits}?text=${encodeURIComponent(message)}`;
+}
+
+// Great-circle distance in meters between two lat/lng points — used to
+// check a worker's self-marked GPS position against configured site/
+// office locations for attendance verification.
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 // Small "Reminder sent N days ago" suffix so staff can see at a glance
@@ -3488,15 +3686,6 @@ window.closeSidebar = () => {
 };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
 
-// UX FIX: scrolling the page with the mouse wheel while it happens to be
-// over a number input (Area, Rate, Discount, Payment Amount, etc.) silently
-// increments/decrements that field instead of scrolling — a classic browser
-// default that's easy to trigger by accident on money fields. Blurring the
-// input on wheel lets the scroll pass through to the page as expected.
-document.addEventListener('wheel', () => {
-  if (document.activeElement?.type === 'number') document.activeElement.blur();
-}, { passive: true });
-
 window.showSection = id => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -3523,10 +3712,6 @@ window.showSection = id => {
 // ── HELPERS ─────────────────────────────────────────────────────
 const fmt = n => Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-// Loose but sufficient check — just catches obvious typos ("abc", "a@b")
-// before they get saved and later show up broken in a mailto: link or PDF.
-// Not meant to be a strict RFC-5322 validator.
-const isValidEmail = s => !s || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 // For free-text values (e.g. a customer's phone/name field, which a staff
 // member can type anything into) that get embedded inside an inline
 // onclick="...('${value}')" handler: esc() alone is NOT enough there,
@@ -3765,7 +3950,6 @@ window.saveQuotation = async isDraft => {
   // Phone validation — must be 10 digits
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
-  if (!isValidEmail(g('f-cemail').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('f-extra')) || 0);
   const base   = Math.round(area * rate);
   const rawDiscount = Math.max(0, parseFloat(g('f-discount')) || 0);
@@ -3871,19 +4055,17 @@ window.resetForm = () => {
 };
 
 // ── LEADS ───────────────────────────────────────────────────────
-window.saveLead = async (btn) => {
+window.saveLead = async () => {
   const g = id => document.getElementById(id).value;
   const name = g('ld-name').trim(), phone = g('ld-phone').trim();
   if (!name || !phone) { toast('Name and phone are required.', 'warning'); return; }
   const phoneDigits = phone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
-  if (!isValidEmail(g('ld-email').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const data = {
     name, phone: phoneDigits, email: g('ld-email'), addr: g('ld-addr'),
     ptype: g('ld-ptype'), source: g('ld-source'), notes: g('ld-notes'),
     updatedAt: serverTimestamp()
   };
-  setBtnLoading(btn, true, 'Saving...');
   try {
     if (editingLeadId) {
       await updateDoc(doc(db,'leads',editingLeadId), data);
@@ -3893,9 +4075,8 @@ window.saveLead = async (btn) => {
     }
     toast('Lead saved!', 'success');
     invalidateCache('leads');
-    setBtnLoading(btn, false);
     resetLeadForm(); loadLeads();
-  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetLeadForm = () => {
@@ -3913,7 +4094,6 @@ window.handleLeadsSearch = async (value) => {
   }
   renderLeads(value);
 };
-window.handleLeadsSearchDebounced = debounce(window.handleLeadsSearch);
 
 window.loadLeads = async () => {
   try {
@@ -4197,7 +4377,7 @@ function genPortalCode() {
   return Array.from(bytes, b => b.toString(36).padStart(7,'0')).join('').slice(0,10);
 }
 
-window.createTicketByStaff = async (btn) => {
+window.createTicketByStaff = async () => {
   const g = id => document.getElementById(id).value.trim();
   const customerName = g('tkt-new-name'), customerPhone = g('tkt-new-phone').replace(/\D/g,'');
   const subject = g('tkt-new-subject'), description = g('tkt-new-desc');
@@ -4212,15 +4392,13 @@ window.createTicketByStaff = async (btn) => {
     loggedByStaff: auth.currentUser?.email || null,
     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   };
-  setBtnLoading(btn, true, 'Saving...');
   try {
     await setDoc(doc(db,'tickets',ticketId), data);
     invalidateCache('tickets');
     toast(`Ticket ${ticketId} created!`, 'success');
     ['tkt-new-name','tkt-new-phone','tkt-new-subject','tkt-new-desc'].forEach(id => document.getElementById(id).value = '');
-    setBtnLoading(btn, false);
     loadTickets();
-  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.loadTickets = async () => {
@@ -4243,7 +4421,6 @@ window.handleTicketsSearch = async (value) => {
   }
   renderTickets(value);
 };
-window.handleTicketsSearchDebounced = debounce(window.handleTicketsSearch);
 
 // Open-ticket count badge in the sidebar — cheap: only needs a COUNT, so
 // this uses Firestore's aggregation query instead of downloading every
@@ -4385,7 +4562,6 @@ window.handleHistorySearch = async (value) => {
   }
   renderHistory(value);
 };
-window.handleHistorySearchDebounced = debounce(window.handleHistorySearch);
 
 // Date-range filtering means "show me everything in this window" — that
 // has to run against the complete collection, not just whatever page
@@ -5256,7 +5432,6 @@ window.saveInvoice = async () => {
   if (base <= 0) { toast('Base amount must be greater than 0.', 'warning'); return; }
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
-  if (!isValidEmail(g('i-cemail').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('i-extra')) || 0);
   const rawDiscount = Math.max(0, parseFloat(g('i-discount')) || 0);
   const gstPct = parseFloat(g('i-gst')) || 0;
@@ -5329,7 +5504,6 @@ window.handleInvoicesSearch = async (value) => {
   }
   renderInvoices(value);
 };
-window.handleInvoicesSearchDebounced = debounce(window.handleInvoicesSearch);
 
 window.loadInvoices = async () => {
   try {
@@ -5469,7 +5643,7 @@ window.closePaymentModal = () => {
   activePaymentInvoiceId = null;
 };
 
-window.savePayment = async (btn) => {
+window.savePayment = async () => {
   if (!activePaymentInvoiceId) return;
   const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
   if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
@@ -5482,7 +5656,6 @@ window.savePayment = async (btn) => {
     toast(`This amount (₹${fmt(amount)}) exceeds the invoice balance (₹${fmt(balance)}). Please enter a correct amount.`, 'warning');
     return;
   }
-  setBtnLoading(btn, true, 'Saving...');
   try {
     const invRef = doc(db,'invoices',activePaymentInvoiceId);
     const payRef = doc(collection(db,'payments')); // pre-generate ID so it can be set() inside the transaction
@@ -5508,10 +5681,9 @@ window.savePayment = async (btn) => {
     });
     toast('Payment recorded!', 'success');
     invalidateCache('invoices');
-    setBtnLoading(btn, false);
     closePaymentModal();
     loadInvoices();
-  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── WORK PROGRESS MODAL ─────────────────────────────────────────
@@ -5619,7 +5791,7 @@ function renderWorkPhotoGallery(inv) {
   const photos = inv.workPhotos || [];
   gallery.innerHTML = photos.map((p, idx) => `
     <div class="ws-photo-thumb">
-      <img src="${esc(p.url)}" alt="Site photo" loading="lazy">
+      <img src="${esc(p.url)}" alt="Site photo">
       <div class="ws-photo-del" onclick="deleteWorkPhoto(${idx})" title="Remove"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
     </div>`).join('');
 }
@@ -6029,6 +6201,264 @@ async function initPortalIfNeeded() {
   await renderPortalView(type, id, token);
 }
 
+// ── WORKER SELF-MARK ATTENDANCE (public, no login) ───────────────
+// Local calendar date, not UTC — toISOString() would read the wrong day
+// for part of the night in India (UTC+5:30), which matters here since
+// getting "today" right is the whole point of this page.
+function todayLocalDateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+async function initAttendanceIfNeeded() {
+  const params = new URLSearchParams(location.search);
+  const labourId = params.get('att');
+  const token = params.get('token');
+  if (!labourId || !token) return;
+  PORTAL_MODE = true; // reuses the same "don't let auth-state touch login/app" guard
+  document.documentElement.classList.add('attendance-boot');
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('attendance-screen').style.display = 'block';
+  await renderAttendanceMarkPage(labourId, token);
+}
+
+function attLocalKey(labourId, date) { return `att_${labourId}_${date}`; }
+
+async function renderAttendanceMarkPage(labourId, token) {
+  const body = document.getElementById('attendance-body');
+  try {
+    const labSnap = await getDoc(doc(db,'labour',labourId));
+    if (!labSnap.exists() || labSnap.data().attendanceToken !== token) {
+      body.innerHTML = `<div class="portal-error">This attendance link is invalid or has expired. Please contact the office for a new one.</div>`;
+      return;
+    }
+    const worker = { id: labSnap.id, ...labSnap.data() };
+    const today = todayLocalDateStr();
+
+    let locations = [], fullDayHours = 8, halfDayHours = 4;
+    try {
+      const locSnap = await getDoc(doc(db,'settings','attendanceLocations'));
+      if (locSnap.exists()) {
+        const d = locSnap.data();
+        locations = d.locations || [];
+        fullDayHours = typeof d.fullDayHours === 'number' ? d.fullDayHours : 8;
+        halfDayHours = typeof d.halfDayHours === 'number' ? d.halfDayHours : 4;
+      }
+    } catch(e) { /* non-fatal — attendance still works without verification/thresholds */ }
+
+    window._attWorker = worker;
+    window._attToday = today;
+    window._attLocationsList = locations;
+    window._attHourThresholds = { fullDayHours, halfDayHours };
+
+    // No Firestore read of `attendance` here by design — that collection
+    // stays staff-only for get/list (see firestore.rules), so today's
+    // progress is tracked in this browser's localStorage instead. Trade-
+    // off: Time In and Time Out need to happen from the SAME device/
+    // browser. Switching devices mid-day needs the office to step in —
+    // a deliberate, narrow limitation in exchange for never having to
+    // expose attendance records (which include each day's PIN submission)
+    // to an unauthenticated reader.
+    let localState = null;
+    try { localState = JSON.parse(localStorage.getItem(attLocalKey(labourId, today)) || 'null'); } catch(e) {}
+
+    if (localState && localState.timeOutAt) {
+      renderAttendanceCompletedView(worker, localState);
+    } else if (localState && localState.timeInAt) {
+      renderAttendanceForm('timeout', worker, localState);
+    } else {
+      renderAttendanceForm('timein', worker, null);
+    }
+  } catch(e) {
+    reportError(e);
+    body.innerHTML = `<div class="portal-error">Couldn't load this right now. Please check your connection and try again.</div>`;
+  }
+}
+
+function fmtTime(iso) {
+  return new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderAttendanceCompletedView(worker, state) {
+  const hrs = state.hoursWorked || 0;
+  const h = Math.floor(hrs), m = Math.round((hrs - h) * 60);
+  document.getElementById('attendance-body').innerHTML = `<div class="portal-card att-confirmed-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 12.5l5 5L20 6.5"/></svg>
+    <div style="font-size:16px;font-weight:700;color:var(--navy)">Day complete — ${h}h ${m}m worked</div>
+    <div style="font-size:13.5px;color:var(--muted);margin-top:4px">${esc(state.timeInDisplay)} → ${esc(state.timeOutDisplay)}</div>
+    <div style="font-size:14px;font-weight:700;color:var(--orange);margin-top:8px">Marked as ${esc(state.status)}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-top:10px">The office will confirm this shortly. Reopen this link tomorrow to time in again.</div>
+  </div>`;
+}
+
+// Shared form for both Time In and Time Out — PIN + a live selfie (camera
+// capture, not a file picker) are both required before the button
+// enables. See setWorkerPin()/generateAttendanceLink() for why: the link
+// alone isn't meant to be sufficient to mark someone's attendance.
+function renderAttendanceForm(mode, worker, localState) {
+  window._attPhotoData = null;
+  const isTimeOut = mode === 'timeout';
+  const header = isTimeOut
+    ? `<div class="att-gps-status" style="margin-top:16px">Checked in at <strong style="margin:0 4px">${esc(localState.timeInDisplay)}</strong>${localState.timeInVerified ? ' ✓' : ' ⚠️'}</div>`
+    : '';
+  document.getElementById('attendance-body').innerHTML = `
+    <div class="portal-card">
+      <div class="portal-cname">${esc(worker.name)}</div>
+      <div class="portal-ptype">${esc(worker.role||'')} · ${esc(window._attToday)}</div>
+      ${header}
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">Your 4-digit PIN</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="att-pin-input" class="form-input" placeholder="••••" style="letter-spacing:10px;font-size:20px;text-align:center" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,4); checkAttendanceFormReady();">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Take a Selfie (required)</label>
+        <input type="file" accept="image/*" capture="user" id="att-photo-input" class="form-input" onchange="handleAttendancePhotoSelect(this.files)">
+        <div id="att-photo-preview" style="margin-top:8px"></div>
+      </div>
+      <div class="att-mark-grid">
+        <button class="att-mark-btn ${isTimeOut?'att-mark-absent':'att-mark-present'}" id="att-submit-btn" onclick="${isTimeOut?'submitTimeOut()':'submitTimeIn()'}" disabled>
+          <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${isTimeOut?'Time Out — End My Day':'Time In — Start My Day'}
+        </button>
+      </div>
+      <div class="att-gps-status" id="att-gps-line">Your location &amp; selfie are checked only when you tap the button above.</div>
+    </div>`;
+}
+
+// Small and heavily compressed — this is a verification photo staff will
+// eyeball, not a portrait, and it's stored directly on the attendance
+// Firestore doc (no paid storage product), so it needs to stay tiny.
+function compressSelfieToBase64(file, maxDim = 320, quality = 0.55) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else { width = Math.round(width * maxDim / height); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read the photo')); };
+    img.src = url;
+  });
+}
+
+window.handleAttendancePhotoSelect = (files) => {
+  const file = files && files[0]; if (!file) return;
+  compressSelfieToBase64(file).then(dataUrl => {
+    window._attPhotoData = dataUrl;
+    document.getElementById('att-photo-preview').innerHTML = `<img src="${dataUrl}" alt="Selfie preview" style="width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">`;
+    checkAttendanceFormReady();
+  }).catch(e => { reportError(e); toast('Could not read that photo — please try again.', 'error'); });
+};
+
+window.checkAttendanceFormReady = () => {
+  const pin = document.getElementById('att-pin-input')?.value || '';
+  const btn = document.getElementById('att-submit-btn');
+  if (btn) btn.disabled = !(pin.length === 4 && window._attPhotoData);
+};
+
+function captureGpsAndVerify(callback) {
+  const gpsLine = document.getElementById('att-gps-line');
+  document.querySelectorAll('.att-mark-btn').forEach(b => b.disabled = true);
+  if (gpsLine) { gpsLine.className = 'att-gps-status'; gpsLine.textContent = 'Getting your location...'; }
+
+  const finish = (loc) => {
+    let verified = false, distanceMeters = null, nearestLocationName = null;
+    if (loc) {
+      const locations = window._attLocationsList || [];
+      for (const site of locations) {
+        const d = haversineMeters(loc.lat, loc.lng, site.lat, site.lng);
+        if (nearestLocationName === null || d < distanceMeters) { distanceMeters = d; nearestLocationName = site.name; }
+        if (d <= (site.radiusMeters || 200)) verified = true;
+      }
+    }
+    callback(loc, verified, distanceMeters, nearestLocationName);
+  };
+
+  if (!navigator.geolocation) { finish(null); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos => finish({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+    () => finish(null), // permission denied / unavailable — still let them proceed, just unverified
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+window.submitTimeIn = () => {
+  const pin = document.getElementById('att-pin-input').value;
+  const photo = window._attPhotoData;
+  if (pin.length !== 4 || !photo) return;
+  captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
+    const worker = window._attWorker, today = window._attToday;
+    const token = new URLSearchParams(location.search).get('token');
+    const gpsLine = document.getElementById('att-gps-line');
+    const nowIso = new Date().toISOString();
+    try {
+      await setDoc(doc(db, 'attendance', `${worker.id}_${today}`), {
+        labourId: worker.id, token, pin, date: today,
+        markedBy: 'self', confirmed: false, labourName: worker.name,
+        timeIn: {
+          time: nowIso, photo,
+          location: loc ? { lat: loc.lat, lng: loc.lng } : null,
+          verified, distanceMeters, nearestLocationName
+        }
+      }, { merge: true });
+      const localState = { timeInAt: nowIso, timeInDisplay: fmtTime(nowIso), timeInVerified: verified };
+      localStorage.setItem(attLocalKey(worker.id, today), JSON.stringify(localState));
+      renderAttendanceForm('timeout', worker, localState);
+    } catch(e) {
+      reportError(e);
+      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again.'; }
+      document.querySelectorAll('.att-mark-btn').forEach(b => b.disabled = false);
+    }
+  });
+};
+
+window.submitTimeOut = () => {
+  const pin = document.getElementById('att-pin-input').value;
+  const photo = window._attPhotoData;
+  if (pin.length !== 4 || !photo) return;
+  captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
+    const worker = window._attWorker, today = window._attToday;
+    const token = new URLSearchParams(location.search).get('token');
+    const gpsLine = document.getElementById('att-gps-line');
+    try {
+      let localState = null;
+      try { localState = JSON.parse(localStorage.getItem(attLocalKey(worker.id, today)) || 'null'); } catch(e) {}
+      if (!localState || !localState.timeInAt) { toast('No Time In found for today on this device — please Time In first.', 'warning'); renderAttendanceForm('timein', worker, null); return; }
+
+      const timeOutIso = new Date().toISOString();
+      const hoursWorked = Math.max(0, (new Date(timeOutIso) - new Date(localState.timeInAt)) / 3600000);
+      const { fullDayHours, halfDayHours } = window._attHourThresholds;
+      const status = hoursWorked >= fullDayHours ? 'Present' : hoursWorked >= halfDayHours ? 'Half Day' : 'Absent';
+
+      await setDoc(doc(db, 'attendance', `${worker.id}_${today}`), {
+        labourId: worker.id, token, pin,
+        timeOut: {
+          time: timeOutIso, photo,
+          location: loc ? { lat: loc.lat, lng: loc.lng } : null,
+          verified, distanceMeters, nearestLocationName
+        },
+        hoursWorked, status
+      }, { merge: true });
+
+      const finalState = { ...localState, timeOutAt: timeOutIso, timeOutDisplay: fmtTime(timeOutIso), hoursWorked, status };
+      localStorage.setItem(attLocalKey(worker.id, today), JSON.stringify(finalState));
+      renderAttendanceCompletedView(worker, finalState);
+    } catch(e) {
+      reportError(e);
+      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again.'; }
+      document.querySelectorAll('.att-mark-btn').forEach(b => b.disabled = false);
+    }
+  });
+};
+
 // ── GLOBAL SEARCH ────────────────────────────────────────────────
 // Searches whatever's already in memory (allQuotations, allInvoices, etc.)
 // rather than querying Firestore per keystroke. openGlobalSearch() warms
@@ -6149,19 +6579,11 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// PERFORMANCE: debounced entry points for the search boxes that call a
-// render function directly (Customers, Labour, Deleted Items, Activity Log)
-// rather than going through a handleXxxSearch() wrapper — same reasoning as
-// the debounced handlers above.
-window.renderCustomersDebounced = debounce((v) => window.renderCustomers(v));
-window.renderLabourListDebounced = debounce((v) => window.renderLabourList(v));
-window.renderDeletedItemsDebounced = debounce((v) => window.renderDeletedItems(v));
-window.renderActivityLogDebounced = debounce((v) => window.renderActivityLog(v));
-
 // ── INIT ─────────────────────────────────────────────────────────
 window.resetForm();
 window.resetInvoiceForm();
 initPortalIfNeeded();
+initAttendanceIfNeeded();
 </script>
 </body>
 </html>
