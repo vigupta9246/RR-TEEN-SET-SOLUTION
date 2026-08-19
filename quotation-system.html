@@ -27,6 +27,12 @@
     document.documentElement.classList.add('attendance-boot');
   }
 </script>
+<!-- PERFORMANCE: this is the largest visual element on the very first screen
+     every user sees (login hero photo), so it's the page's LCP candidate.
+     Without this hint the browser only discovers it once HTML parsing
+     reaches the <img> tag further down; preloading it here lets the
+     request start alongside (not after) the font/CSS requests. -->
+<link rel="preload" as="image" href="https://rrteensetsolution.com/images/login-bg.jpg" fetchpriority="high">
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
@@ -446,6 +452,28 @@ html.attendance-boot #attendance-screen{display:block!important}
 .labour-hist-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bg);font-size:13px}
 .labour-hist-row:last-child{border-bottom:none}
 
+#monthly-att-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(32,38,44,.6);align-items:center;justify-content:center;padding:20px}
+.monthly-att-box{background:#fff;border-radius:2px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:26px;border-top:4px solid var(--orange);box-shadow:var(--shadow-lg)}
+.mat-nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 16px}
+.mat-nav-btn{background:var(--bg);border:1px solid var(--border);border-radius:3px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mat-nav-btn:hover{border-color:var(--orange)}
+.mat-nav-label{font-size:15px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif}
+.mat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mat-dow{text-align:center;font-size:10px;font-weight:700;color:#9aa5ab;text-transform:uppercase;padding-bottom:4px}
+.mat-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg);color:#c7cfd3;position:relative;cursor:default}
+.mat-cell.mat-present{background:#dcfce7;color:#166534}
+.mat-cell.mat-half{background:#fef3c7;color:#92400e}
+.mat-cell.mat-absent{background:#fee2e2;color:#991b1b}
+.mat-cell.mat-unconfirmed{box-shadow:inset 0 0 0 2px var(--orange)}
+.mat-cell.mat-future{background:transparent;color:transparent}
+.mat-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11.5px;color:var(--muted)}
+.mat-legend span{display:inline-flex;align-items:center;gap:5px}
+.mat-legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+.mat-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.mat-stat{background:var(--bg);border-radius:3px;padding:10px 12px}
+.mat-stat-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.mat-stat-value{font-size:17px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+
 /* MOBILE TOPBAR (hidden on desktop) */
 .mobile-topbar{display:none}
 #sidebar-overlay{display:none}
@@ -470,9 +498,10 @@ html.attendance-boot #attendance-screen{display:block!important}
   .sidebar.open{transform:translateX(0);z-index:120}
   .main{margin-left:0;padding:20px}
   #sidebar-overlay{
-    display:none;position:fixed;inset:0;background:rgba(15,18,21,.55);z-index:99
+    position:fixed;inset:0;background:rgba(15,18,21,.55);z-index:99;
+    opacity:0;visibility:hidden;transition:opacity .22s ease,visibility 0s linear .22s
   }
-  #sidebar-overlay.open{display:block}
+  #sidebar-overlay.open{opacity:1;visibility:visible;transition:opacity .22s ease,visibility 0s linear 0s}
   .stats-grid{grid-template-columns:1fr 1fr}
   .form-grid,.form-grid-3{grid-template-columns:1fr}
   .span-2{grid-column:span 1}
@@ -491,7 +520,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <img id="login-bg" src="https://rrteensetsolution.com/images/login-bg.jpg" alt="R.R Teen Set Solution steel fabrication warehouse">
+  <img id="login-bg" src="https://rrteensetsolution.com/images/login-bg.jpg" alt="R.R Teen Set Solution steel fabrication warehouse" fetchpriority="high">
   <div id="login-overlay"></div>
   <div class="login-card">
     <div class="login-logo">
@@ -758,7 +787,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="handleHistorySearch(this.value)">
+            <input type="text" id="search-input" class="search-input" placeholder="Search by name, phone, QT ID..." oninput="handleHistorySearchDebounced(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">From:</label>
@@ -888,14 +917,14 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="ld-notes" class="form-input"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveLead()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
+            <button class="btn btn-save" onclick="saveLead(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
             <button class="btn btn-reset" onclick="resetLeadForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </div>
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="handleLeadsSearch(this.value)">
+            <input type="text" id="lead-search-input" class="search-input" placeholder="Search by name, phone..." oninput="handleLeadsSearchDebounced(this.value)">
           </div>
           <select id="lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="handleLeadsSearch(document.getElementById('lead-search-input').value)">
             <option value="">All Status</option>
@@ -913,10 +942,12 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th style="width:34px"><input type="checkbox" id="leads-select-all" onchange="toggleAllLeadsSelect(this.checked)"></th><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Age</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="leads-tbody"><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
+          </div>
             <div id="leads-pagination" class="pagination-wrap"></div>
             <div id="leads-loadmore"></div>
         </div>
@@ -930,15 +961,17 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomers(this.value)">
+            <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomersDebounced(this.value)">
           </div>
           <button class="btn-export" onclick="exportCustomersCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Quotations</th><th>Total Value</th><th>Last Activity</th></tr></thead>
             <tbody id="customers-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
+          </div>
             <div id="customers-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -965,12 +998,12 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label">Description *</label><textarea id="tkt-new-desc" class="form-input" rows="2" style="resize:vertical;font-family:inherit"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="createTicketByStaff()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
+            <button class="btn btn-save" onclick="createTicketByStaff(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
           </div>
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="ticket-search-input" class="search-input" placeholder="Search by ticket ID, name, phone, subject..." oninput="handleTicketsSearch(this.value)">
+            <input type="text" id="ticket-search-input" class="search-input" placeholder="Search by ticket ID, name, phone, subject..." oninput="handleTicketsSearchDebounced(this.value)">
           </div>
           <select id="ticket-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:150px" onchange="renderTickets(document.getElementById('ticket-search-input').value)">
             <option value="">All Status</option>
@@ -991,10 +1024,12 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Ticket ID</th><th>Customer</th><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Last Update</th><th>Actions</th></tr></thead>
             <tbody id="tickets-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td></tr></tbody>
           </table>
+          </div>
           <div id="tickets-pagination" class="pagination-wrap"></div>
           <div id="tickets-loadmore"></div>
         </div>
@@ -1125,7 +1160,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="handleInvoicesSearch(this.value)">
+            <input type="text" id="inv-search-input" class="search-input" placeholder="Search by name, phone, invoice ID..." oninput="handleInvoicesSearchDebounced(this.value)">
           </div>
           <div class="filter-row">
             <label style="font-size:13px;font-weight:700;color:var(--muted)">Status:</label>
@@ -1192,7 +1227,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
           <div class="history-controls">
             <div class="search-box">
-              <input type="text" id="labour-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderLabourList(this.value)">
+              <input type="text" id="labour-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderLabourListDebounced(this.value)">
             </div>
             <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none">
               <input type="checkbox" id="labour-show-inactive" onchange="renderLabourList(document.getElementById('labour-search-input').value)"> Show inactive
@@ -1201,10 +1236,12 @@ html.attendance-boot #attendance-screen{display:block!important}
           </div>
 
           <div class="table-card">
+            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Daily Wage</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="labour-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1217,20 +1254,24 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="table-card">
+            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Role</th><th>Daily Wage</th><th>Today's Status</th><th>Wage for Day</th></tr></thead>
               <tbody id="attendance-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Pick a date to mark attendance</td></tr></tbody>
             </table>
+            </div>
           </div>
         </div>
 
         <!-- WAGES & PAYMENTS -->
         <div class="subtab-pane" id="labour-pane-wages">
           <div class="table-card">
+            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Role</th><th>Total Earned</th><th>Total Paid</th><th>Balance Due</th><th>Actions</th></tr></thead>
               <tbody id="wages-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td><td></td><td></td><td></td></tr></tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1263,10 +1304,12 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="table-card">
+            <div style="overflow-x:auto">
             <table class="data-table">
               <thead><tr><th>Name</th><th>Coordinates</th><th>Radius</th><th>Actions</th></tr></thead>
               <tbody id="att-locations-tbody"><tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">Loading...</td></tr></tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>
@@ -1303,7 +1346,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="addTeamMember()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
+            <button class="btn btn-save" onclick="addTeamMember(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
           </div>
           <div style="font-size:12px;color:#64748b;margin-top:10px">
             Sales → New Quotation, History, Leads, Customers &nbsp;|&nbsp; Accounts → Invoices, Customers, Analytics &nbsp;|&nbsp; Admin → Everything
@@ -1311,10 +1354,12 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
             <tbody id="team-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
+          </div>
         </div>
       </section>
 
@@ -1356,7 +1401,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItems(this.value)">
+            <input type="text" id="deleted-search-input" class="search-input" placeholder="Search by name, phone, ID..." oninput="renderDeletedItemsDebounced(this.value)">
           </div>
           <select id="deleted-filter-type" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderDeletedItems(document.getElementById('deleted-search-input').value)">
             <option value="">All Types</option>
@@ -1367,12 +1412,14 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
               <th>Type</th><th>ID</th><th>Customer</th><th>Deleted On</th><th>Actions</th>
             </tr></thead>
             <tbody id="deleted-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
           </table>
+          </div>
           <div id="deleted-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -1388,7 +1435,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
         <div class="history-controls">
           <div class="search-box">
-            <input type="text" id="activity-search-input" class="search-input" placeholder="Search by user, action, details..." oninput="renderActivityLog(this.value)">
+            <input type="text" id="activity-search-input" class="search-input" placeholder="Search by user, action, details..." oninput="renderActivityLogDebounced(this.value)">
           </div>
           <select id="activity-filter-action" class="form-select" style="padding:9px 12px;font-size:13px;max-width:200px" onchange="renderActivityLog(document.getElementById('activity-search-input').value)">
             <option value="">All Actions</option>
@@ -1400,12 +1447,14 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="table-card">
+          <div style="overflow-x:auto">
           <table class="data-table">
             <thead><tr>
               <th>When</th><th>By</th><th>Action</th><th>Details</th>
             </tr></thead>
             <tbody id="activity-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td></tr></tbody>
           </table>
+          </div>
           <div id="activity-pagination" class="pagination-wrap"></div>
         </div>
       </section>
@@ -1445,7 +1494,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="savePayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-save" onclick="savePayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
       <button class="btn btn-reset" onclick="closePaymentModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
     <div class="pay-history" id="pay-history"></div>
@@ -1497,7 +1546,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="saveLabourPayment()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-save" onclick="saveLabourPayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
       <button class="btn btn-reset" onclick="closeLabourPayModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
@@ -1511,6 +1560,35 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div id="lb-hist-content">Loading...</div>
     <div class="btn-row">
       <button class="btn btn-reset" onclick="closeLabourHistoryModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY ATTENDANCE CALENDAR (per worker) -->
+<div id="monthly-att-modal">
+  <div class="monthly-att-box">
+    <div class="pay-modal-title">Monthly Attendance</div>
+    <div class="pay-modal-sub" id="mat-sub">Worker —</div>
+    <div class="mat-nav">
+      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(-1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px"><path d="M15 18l-6-6 6-6"/></svg></div>
+      <div class="mat-nav-label" id="mat-month-label">—</div>
+      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+    <div id="mat-grid-wrap">
+      <div class="mat-grid" id="mat-dow-row">
+        <div class="mat-dow">Sun</div><div class="mat-dow">Mon</div><div class="mat-dow">Tue</div><div class="mat-dow">Wed</div><div class="mat-dow">Thu</div><div class="mat-dow">Fri</div><div class="mat-dow">Sat</div>
+      </div>
+      <div class="mat-grid" id="mat-cells" style="margin-top:4px">Loading...</div>
+    </div>
+    <div class="mat-legend">
+      <span><i style="background:#dcfce7"></i> Present</span>
+      <span><i style="background:#fef3c7"></i> Half Day</span>
+      <span><i style="background:#fee2e2"></i> Absent</span>
+      <span><i style="background:var(--bg);box-shadow:inset 0 0 0 2px var(--orange)"></i> Awaiting confirmation</span>
+    </div>
+    <div class="mat-stats" id="mat-stats"></div>
+    <div class="btn-row">
+      <button class="btn btn-reset" onclick="closeMonthlyAttendanceModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
     </div>
   </div>
 </div>
@@ -1546,7 +1624,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="gs-input-row">
       <svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
       <input type="text" id="gs-input" placeholder="Search quotations, invoices, leads, customers, tickets..." oninput="runGlobalSearch(this.value)" autocomplete="off">
-      <button class="btn-icon" onclick="closeGlobalSearch()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      <button class="btn-icon" onclick="closeGlobalSearch()" title="Close" aria-label="Close search"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
     </div>
     <div id="gs-results" class="gs-results"></div>
   </div>
@@ -2081,6 +2159,15 @@ const CLOUDINARY_UPLOAD_PRESET = 'work-progress-photos';
 // `complete` tracks whether the cached array is the full collection or
 // just a partial page, so fetchCached() knows whether it's safe to reuse
 // what's already in memory or whether it must go fetch everything.
+// PERFORMANCE: generic debounce — used to stop search boxes from rebuilding
+// a whole table's HTML on every single keystroke. Only the last keystroke
+// within `wait` ms actually triggers the (potentially expensive) render.
+const SEARCH_DEBOUNCE_MS = 200;
+function debounce(fn, wait = SEARCH_DEBOUNCE_MS) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+}
+
 const FETCH_PAGE_SIZE = 100;
 const _cache = {
   quotations:{data:null,ts:0,complete:false,lastDoc:null},
@@ -2335,11 +2422,12 @@ async function createTeamMemberAuth(email, pass) {
   }
 }
 
-window.addTeamMember = async () => {
+window.addTeamMember = async (btn) => {
   const g = id => document.getElementById(id).value;
   const name = g('tm-name').trim(), email = g('tm-email').trim(), pass = g('tm-pass'), role = g('tm-role');
   if (!name || !email || !pass) { toast('Name, email and password are required.', 'warning'); return; }
   if (pass.length < 8) { toast('Password must be at least 8 characters long.', 'warning'); return; }
+  setBtnLoading(btn, true, 'Creating...');
   try {
     // SECURITY: write the invite doc FIRST, before the Auth account even
     // exists. The Firestore rules now require invited/{email} to exist (with
@@ -2355,8 +2443,10 @@ window.addTeamMember = async () => {
     document.getElementById('tm-name').value = '';
     document.getElementById('tm-email').value = '';
     document.getElementById('tm-pass').value = '';
+    setBtnLoading(btn, false);
     loadTeam();
   } catch(e) {
+    setBtnLoading(btn, false);
     if (e.code === 'auth/email-already-in-use') toast('This email is already registered.', 'error');
     else { reportError(e); toast('Error: ' + e.message, 'error'); }
   }
@@ -2652,12 +2742,16 @@ window.showLabourSubtab = (tab) => {
   if (tab === 'locations') loadAttendanceLocations();
 };
 
-window.loadLabour = async () => {
-  try {
-    allLabour = await fetchCached('labour', 'labour');
-    renderLabourList('');
-  } catch(e) { reportError(e); showLoadError('labour-tbody', 7, e); }
-};
+// Great-circle distance in meters between two lat/lng points — used to
+// check a worker's self-marked GPS position against configured site/
+// office locations for attendance verification.
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 
 // ── ATTENDANCE VERIFICATION LOCATIONS (Admin-configured) ─────────
 // A single settings doc holds the list — publicly gettable (workers'
@@ -2786,6 +2880,13 @@ window.setWorkerPin = async (id) => {
   } catch(e) { reportError(e); toast('Could not set PIN: ' + e.message, 'error'); }
 };
 
+window.loadLabour = async () => {
+  try {
+    allLabour = await fetchCached('labour', 'labour');
+    renderLabourList('');
+  } catch(e) { reportError(e); showLoadError('labour-tbody', 7, e); }
+};
+
 window.renderLabourList = (search='') => {
   const tbody = document.getElementById('labour-tbody');
   const showInactive = document.getElementById('labour-show-inactive')?.checked;
@@ -2803,6 +2904,7 @@ window.renderLabourList = (search='') => {
         <td>${w.active===false?'<span class="badge-draft">Inactive</span>':'<span style="color:var(--green);font-size:12px;font-weight:700">Active</span>'}</td>
         <td class="action-btns">
           <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
+          <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
           <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
           <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)">${ICONS.globe}</button>
           <button onclick="setWorkerPin('${w.id}')" class="btn-icon" title="Set/Reset Attendance PIN">${ICONS.lock}</button>
@@ -2824,6 +2926,8 @@ window.saveLabour = async () => {
     joinedDate: g('lb-joined') || new Date().toISOString().split('T')[0],
     notes: g('lb-notes'), updatedAt: serverTimestamp()
   };
+  const btn = document.getElementById('lb-save-btn');
+  setBtnLoading(btn, true, editingLabourId ? 'Updating...' : 'Saving...');
   try {
     if (editingLabourId) {
       await updateDoc(doc(db,'labour',editingLabourId), data);
@@ -2835,8 +2939,12 @@ window.saveLabour = async () => {
     }
     toast('Worker saved!', 'success');
     invalidateCache('labour');
+    setBtnLoading(btn, false); // clears btn-loading class; resetLabourForm() below sets the label text itself
     resetLabourForm(); loadLabour();
-  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) {
+    setBtnLoading(btn, false);
+    reportError(e); toast('Error: ' + e.message, 'error');
+  }
 };
 
 window.resetLabourForm = () => {
@@ -2975,8 +3083,8 @@ window.markAttendance = async (labourId, dateStr, status) => {
       const delta = newWage - oldWage;
       // merge:true — this is also how a staff member "confirms" a self-
       // marked entry: it preserves that record's GPS/verification fields
-      // (location, verified, distanceMeters, selfMarkedAt) untouched,
-      // only setting the official payroll fields below and confirmed:true.
+      // (timeIn, timeOut, selfie photos) untouched, only setting the
+      // official payroll fields below and confirmed:true.
       tx.set(attRef, {
         labourId, labourName: lab.name, date: dateStr, status, wageAmount: newWage,
         markedBy: existing?.markedBy || (auth.currentUser?.email || null),
@@ -3021,6 +3129,7 @@ window.renderWageSummary = async () => {
             <td class="mono ${balance>0?'balance-due':'balance-clear'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</td>
             <td class="action-btns">
               <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
+              <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
               <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
             </td>
           </tr>`;
@@ -3045,13 +3154,14 @@ window.closeLabourPayModal = () => {
   activeLabourPaymentId = null;
 };
 
-window.saveLabourPayment = async () => {
+window.saveLabourPayment = async (btn) => {
   if (!activeLabourPaymentId) return;
   const amount = parseFloat(document.getElementById('lb-pay-amount').value) || 0;
   if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
   const date = document.getElementById('lb-pay-date').value;
   const mode = document.getElementById('lb-pay-mode').value;
   const note = document.getElementById('lb-pay-note').value;
+  setBtnLoading(btn, true, 'Saving...');
   try {
     const labRef = doc(db, 'labour', activeLabourPaymentId);
     const payRef = doc(collection(db, 'wagePayments'));
@@ -3070,10 +3180,11 @@ window.saveLabourPayment = async () => {
     logActivity('wage_payment', `₹${fmt(amount)} paid to ${labourName}${note?' — '+note:''}`);
     toast('Payment recorded!', 'success');
     invalidateCache('labour');
+    setBtnLoading(btn, false);
     closeLabourPayModal();
     allLabour = await fetchCached('labour', 'labour');
     renderWageSummary();
-  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // Combined attendance + payment history for one worker, most recent first.
@@ -3108,6 +3219,92 @@ window.viewLabourHistory = async (id) => {
 window.closeLabourHistoryModal = () => {
   document.getElementById('labour-history-modal').style.display = 'none';
 };
+
+// ── MONTHLY ATTENDANCE CALENDAR (per worker) ─────────────────────
+let matState = { workerId: null, year: null, month: null }; // month is 0-indexed
+
+window.viewMonthlyAttendance = (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  const now = new Date();
+  matState = { workerId: id, year: now.getFullYear(), month: now.getMonth() };
+  document.getElementById('mat-sub').innerHTML = `${esc(w.name)} — ${esc(w.role||'')} &middot; ₹${fmt(w.dailyWage||0)}/day`;
+  document.getElementById('monthly-att-modal').style.display = 'flex';
+  loadMonthlyAttendanceData();
+};
+
+window.navigateMonthlyAttendance = (dir) => {
+  matState.month += dir;
+  if (matState.month < 0) { matState.month = 11; matState.year--; }
+  if (matState.month > 11) { matState.month = 0; matState.year++; }
+  loadMonthlyAttendanceData();
+};
+
+window.closeMonthlyAttendanceModal = () => {
+  document.getElementById('monthly-att-modal').style.display = 'none';
+};
+
+async function loadMonthlyAttendanceData() {
+  const { workerId, year, month } = matState;
+  document.getElementById('mat-month-label').textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  const cellsEl = document.getElementById('mat-cells');
+  cellsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#94a3b8;font-size:12.5px">Loading...</div>';
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const startStr = `${year}-${String(month+1).padStart(2,'0')}-01`;
+  const endStr = `${year}-${String(month+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+  try {
+    // Same (labourId, date) composite index as the Worker History view
+    // above — if this is the very first time this exact query shape
+    // runs, Firestore may show a "requires an index" error in the
+    // browser console with a direct link to create it.
+    const snap = await getDocs(query(collection(db,'attendance'),
+      where('labourId','==',workerId), where('date','>=',startStr), where('date','<=',endStr)));
+    const byDate = {};
+    snap.forEach(d => { const data = d.data(); byDate[data.date] = data; });
+    renderMonthlyAttendanceGrid(year, month, byDate);
+  } catch(e) {
+    reportError(e);
+    cellsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--red);font-size:12.5px">Could not load this month\'s attendance.</div>';
+  }
+}
+
+function renderMonthlyAttendanceGrid(year, month, byDate) {
+  const cellsEl = document.getElementById('mat-cells');
+  const firstDow = new Date(year, month, 1).getDay(); // 0 = Sunday
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const todayStr = todayLocalDateStr();
+  let html = '';
+  for (let i = 0; i < firstDow; i++) html += `<div class="mat-cell mat-future"></div>`;
+
+  let present = 0, half = 0, absent = 0, hours = 0, wage = 0, unconfirmedCount = 0;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const rec = byDate[dateStr];
+    const isFuture = dateStr > todayStr;
+    let cls = 'mat-cell';
+    let tooltip = dateStr;
+    if (isFuture) {
+      cls += ' mat-future';
+    } else if (rec) {
+      if (rec.status === 'Present') { cls += ' mat-present'; present++; }
+      else if (rec.status === 'Half Day') { cls += ' mat-half'; half++; }
+      else if (rec.status === 'Absent') { cls += ' mat-absent'; absent++; }
+      if (rec.markedBy === 'self' && !rec.confirmed) { cls += ' mat-unconfirmed'; unconfirmedCount++; }
+      hours += rec.hoursWorked || 0;
+      wage += rec.wageAmount || 0;
+      tooltip = `${dateStr} — ${rec.status}${rec.hoursWorked ? ` (${rec.hoursWorked.toFixed(1)}h)` : ''}${rec.markedBy==='self' && !rec.confirmed ? ' — awaiting confirmation' : ''}`;
+    }
+    html += `<div class="${cls}" title="${esc(tooltip)}">${day}</div>`;
+  }
+  cellsEl.innerHTML = html;
+
+  document.getElementById('mat-stats').innerHTML = `
+    <div class="mat-stat"><div class="mat-stat-label">Present</div><div class="mat-stat-value">${present}</div></div>
+    <div class="mat-stat"><div class="mat-stat-label">Half Day</div><div class="mat-stat-value">${half}</div></div>
+    <div class="mat-stat"><div class="mat-stat-label">Absent</div><div class="mat-stat-value">${absent}</div></div>
+    <div class="mat-stat"><div class="mat-stat-label">Total Hours</div><div class="mat-stat-value">${hours.toFixed(1)}h</div></div>
+    <div class="mat-stat" style="grid-column:1/-1"><div class="mat-stat-label">Total Wage Earned${unconfirmedCount ? ` — ${unconfirmedCount} day${unconfirmedCount===1?'':'s'} still awaiting confirmation` : ''}</div><div class="mat-stat-value">₹${fmt(wage)}</div></div>
+  `;
+}
 
 // ── ACTIVITY LOG PAGE (Admin only) ──────────────────────────────
 // Loaded fresh each time (not run through fetchCached) since this is a
@@ -3186,17 +3383,6 @@ function daysSince(dateVal) {
 function waLink(phone, message) {
   const digits = (phone||'').replace(/\D/g,'');
   return `https://wa.me/91${digits}?text=${encodeURIComponent(message)}`;
-}
-
-// Great-circle distance in meters between two lat/lng points — used to
-// check a worker's self-marked GPS position against configured site/
-// office locations for attendance verification.
-function haversineMeters(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const toRad = d => d * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 // Small "Reminder sent N days ago" suffix so staff can see at a glance
@@ -3686,6 +3872,15 @@ window.closeSidebar = () => {
 };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
 
+// UX FIX: scrolling the page with the mouse wheel while it happens to be
+// over a number input (Area, Rate, Discount, Payment Amount, etc.) silently
+// increments/decrements that field instead of scrolling — a classic browser
+// default that's easy to trigger by accident on money fields. Blurring the
+// input on wheel lets the scroll pass through to the page as expected.
+document.addEventListener('wheel', () => {
+  if (document.activeElement?.type === 'number') document.activeElement.blur();
+}, { passive: true });
+
 window.showSection = id => {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -3712,6 +3907,10 @@ window.showSection = id => {
 // ── HELPERS ─────────────────────────────────────────────────────
 const fmt = n => Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Loose but sufficient check — just catches obvious typos ("abc", "a@b")
+// before they get saved and later show up broken in a mailto: link or PDF.
+// Not meant to be a strict RFC-5322 validator.
+const isValidEmail = s => !s || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 // For free-text values (e.g. a customer's phone/name field, which a staff
 // member can type anything into) that get embedded inside an inline
 // onclick="...('${value}')" handler: esc() alone is NOT enough there,
@@ -3950,6 +4149,7 @@ window.saveQuotation = async isDraft => {
   // Phone validation — must be 10 digits
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
+  if (!isValidEmail(g('f-cemail').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('f-extra')) || 0);
   const base   = Math.round(area * rate);
   const rawDiscount = Math.max(0, parseFloat(g('f-discount')) || 0);
@@ -4055,17 +4255,19 @@ window.resetForm = () => {
 };
 
 // ── LEADS ───────────────────────────────────────────────────────
-window.saveLead = async () => {
+window.saveLead = async (btn) => {
   const g = id => document.getElementById(id).value;
   const name = g('ld-name').trim(), phone = g('ld-phone').trim();
   if (!name || !phone) { toast('Name and phone are required.', 'warning'); return; }
   const phoneDigits = phone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
+  if (!isValidEmail(g('ld-email').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const data = {
     name, phone: phoneDigits, email: g('ld-email'), addr: g('ld-addr'),
     ptype: g('ld-ptype'), source: g('ld-source'), notes: g('ld-notes'),
     updatedAt: serverTimestamp()
   };
+  setBtnLoading(btn, true, 'Saving...');
   try {
     if (editingLeadId) {
       await updateDoc(doc(db,'leads',editingLeadId), data);
@@ -4075,8 +4277,9 @@ window.saveLead = async () => {
     }
     toast('Lead saved!', 'success');
     invalidateCache('leads');
+    setBtnLoading(btn, false);
     resetLeadForm(); loadLeads();
-  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.resetLeadForm = () => {
@@ -4094,6 +4297,7 @@ window.handleLeadsSearch = async (value) => {
   }
   renderLeads(value);
 };
+window.handleLeadsSearchDebounced = debounce(window.handleLeadsSearch);
 
 window.loadLeads = async () => {
   try {
@@ -4377,7 +4581,7 @@ function genPortalCode() {
   return Array.from(bytes, b => b.toString(36).padStart(7,'0')).join('').slice(0,10);
 }
 
-window.createTicketByStaff = async () => {
+window.createTicketByStaff = async (btn) => {
   const g = id => document.getElementById(id).value.trim();
   const customerName = g('tkt-new-name'), customerPhone = g('tkt-new-phone').replace(/\D/g,'');
   const subject = g('tkt-new-subject'), description = g('tkt-new-desc');
@@ -4392,13 +4596,15 @@ window.createTicketByStaff = async () => {
     loggedByStaff: auth.currentUser?.email || null,
     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   };
+  setBtnLoading(btn, true, 'Saving...');
   try {
     await setDoc(doc(db,'tickets',ticketId), data);
     invalidateCache('tickets');
     toast(`Ticket ${ticketId} created!`, 'success');
     ['tkt-new-name','tkt-new-phone','tkt-new-subject','tkt-new-desc'].forEach(id => document.getElementById(id).value = '');
+    setBtnLoading(btn, false);
     loadTickets();
-  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.loadTickets = async () => {
@@ -4421,6 +4627,7 @@ window.handleTicketsSearch = async (value) => {
   }
   renderTickets(value);
 };
+window.handleTicketsSearchDebounced = debounce(window.handleTicketsSearch);
 
 // Open-ticket count badge in the sidebar — cheap: only needs a COUNT, so
 // this uses Firestore's aggregation query instead of downloading every
@@ -4562,6 +4769,7 @@ window.handleHistorySearch = async (value) => {
   }
   renderHistory(value);
 };
+window.handleHistorySearchDebounced = debounce(window.handleHistorySearch);
 
 // Date-range filtering means "show me everything in this window" — that
 // has to run against the complete collection, not just whatever page
@@ -5432,6 +5640,7 @@ window.saveInvoice = async () => {
   if (base <= 0) { toast('Base amount must be greater than 0.', 'warning'); return; }
   const phoneDigits = cphone.replace(/\D/g,'');
   if (phoneDigits.length !== 10) { toast('Phone number must be 10 digits.', 'warning'); return; }
+  if (!isValidEmail(g('i-cemail').trim())) { toast('Please enter a valid email address, or leave it blank.', 'warning'); return; }
   const extra  = Math.max(0, parseFloat(g('i-extra')) || 0);
   const rawDiscount = Math.max(0, parseFloat(g('i-discount')) || 0);
   const gstPct = parseFloat(g('i-gst')) || 0;
@@ -5504,6 +5713,7 @@ window.handleInvoicesSearch = async (value) => {
   }
   renderInvoices(value);
 };
+window.handleInvoicesSearchDebounced = debounce(window.handleInvoicesSearch);
 
 window.loadInvoices = async () => {
   try {
@@ -5643,7 +5853,7 @@ window.closePaymentModal = () => {
   activePaymentInvoiceId = null;
 };
 
-window.savePayment = async () => {
+window.savePayment = async (btn) => {
   if (!activePaymentInvoiceId) return;
   const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
   if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
@@ -5656,6 +5866,7 @@ window.savePayment = async () => {
     toast(`This amount (₹${fmt(amount)}) exceeds the invoice balance (₹${fmt(balance)}). Please enter a correct amount.`, 'warning');
     return;
   }
+  setBtnLoading(btn, true, 'Saving...');
   try {
     const invRef = doc(db,'invoices',activePaymentInvoiceId);
     const payRef = doc(collection(db,'payments')); // pre-generate ID so it can be set() inside the transaction
@@ -5681,9 +5892,10 @@ window.savePayment = async () => {
     });
     toast('Payment recorded!', 'success');
     invalidateCache('invoices');
+    setBtnLoading(btn, false);
     closePaymentModal();
     loadInvoices();
-  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 // ── WORK PROGRESS MODAL ─────────────────────────────────────────
@@ -5791,7 +6003,7 @@ function renderWorkPhotoGallery(inv) {
   const photos = inv.workPhotos || [];
   gallery.innerHTML = photos.map((p, idx) => `
     <div class="ws-photo-thumb">
-      <img src="${esc(p.url)}" alt="Site photo">
+      <img src="${esc(p.url)}" alt="Site photo" loading="lazy">
       <div class="ws-photo-del" onclick="deleteWorkPhoto(${idx})" title="Remove"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
     </div>`).join('');
 }
@@ -6414,7 +6626,7 @@ window.submitTimeIn = () => {
       renderAttendanceForm('timeout', worker, localState);
     } catch(e) {
       reportError(e);
-      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again. [DEBUG: ' + (e.code || '') + ' ' + (e.message || '') + ']'; }
+      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again.'; }
       document.querySelectorAll('.att-mark-btn').forEach(b => b.disabled = false);
     }
   });
@@ -6453,7 +6665,7 @@ window.submitTimeOut = () => {
       renderAttendanceCompletedView(worker, finalState);
     } catch(e) {
       reportError(e);
-      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again. [DEBUG: ' + (e.code || '') + ' ' + (e.message || '') + ']'; }
+      if (gpsLine) { gpsLine.className = 'att-gps-status att-gps-fail'; gpsLine.textContent = 'Incorrect PIN, or could not save — please check and try again.'; }
       document.querySelectorAll('.att-mark-btn').forEach(b => b.disabled = false);
     }
   });
@@ -6578,6 +6790,15 @@ document.addEventListener('keydown', (e) => {
     if (modal && modal.style.display === 'flex') closeGlobalSearch();
   }
 });
+
+// PERFORMANCE: debounced entry points for the search boxes that call a
+// render function directly (Customers, Labour, Deleted Items, Activity Log)
+// rather than going through a handleXxxSearch() wrapper — same reasoning as
+// the debounced handlers above.
+window.renderCustomersDebounced = debounce((v) => window.renderCustomers(v));
+window.renderLabourListDebounced = debounce((v) => window.renderLabourList(v));
+window.renderDeletedItemsDebounced = debounce((v) => window.renderDeletedItems(v));
+window.renderActivityLogDebounced = debounce((v) => window.renderActivityLog(v));
 
 // ── INIT ─────────────────────────────────────────────────────────
 window.resetForm();
