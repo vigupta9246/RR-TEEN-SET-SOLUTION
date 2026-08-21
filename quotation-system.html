@@ -443,11 +443,14 @@ html.attendance-boot #attendance-screen{display:block!important}
 .att-btn:hover{border-color:var(--steel)}
 .att-btn.att-present.active{background:#e8f3ec;border-color:var(--green);color:var(--green)}
 .att-btn.att-half.active{background:#fdeee3;border-color:var(--orange);color:var(--orange)}
+.att-btn.att-leave.active{background:#e5edff;border-color:#3b5bdb;color:#3b5bdb}
+.att-btn.att-holiday.active{background:#f2e8fd;border-color:#8134af;color:#8134af}
 .att-btn.att-absent.active{background:#fbeae8;border-color:var(--red);color:var(--red)}
+.holiday-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#f2e8fd;border:1px solid #d9c2f0;border-left:4px solid #8134af;border-radius:2px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#5c2680}
 /* Reuses the same floating box chrome as #payment-modal for the wage-payment
    and worker-history popups, so it matches the rest of the app visually
    without duplicating the whole modal look-and-feel. */
-#labour-pay-modal,#labour-history-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(32,38,44,.6);align-items:center;justify-content:center;padding:20px}
+#labour-pay-modal,#labour-history-modal,#salary-slip-modal{display:none;position:fixed;inset:0;z-index:210;background:rgba(32,38,44,.6);align-items:center;justify-content:center;padding:20px}
 .labour-history-box{background:#fff;border-radius:2px;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;padding:28px;border-top:4px solid var(--orange);box-shadow:var(--shadow-lg)}
 .labour-hist-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bg);font-size:13px}
 .labour-hist-row:last-child{border-bottom:none}
@@ -461,12 +464,17 @@ html.attendance-boot #attendance-screen{display:block!important}
 .mat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .mat-dow{text-align:center;font-size:10px;font-weight:700;color:#9aa5ab;text-transform:uppercase;padding-bottom:4px}
 .mat-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg);color:#c7cfd3;position:relative;cursor:default}
+.mat-cell[onclick]{cursor:pointer}
+.mat-cell.mat-selected{box-shadow:0 0 0 2px var(--navy);z-index:1}
 .mat-cell.mat-present{background:#dcfce7;color:#166534}
 .mat-cell.mat-half{background:#fef3c7;color:#92400e}
+.mat-cell.mat-leave{background:#e5edff;color:#3b5bdb}
+.mat-cell.mat-holiday{background:#f2e8fd;color:#8134af}
 .mat-cell.mat-absent{background:#fee2e2;color:#991b1b}
 .mat-cell.mat-unconfirmed{box-shadow:inset 0 0 0 2px var(--orange)}
 .mat-cell.mat-future{background:transparent;color:transparent}
 .mat-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11.5px;color:var(--muted)}
+.mat-selected-detail{margin-top:12px;padding:9px 12px;background:var(--bg);border-radius:3px;font-size:12.5px;color:var(--navy);border-left:3px solid var(--orange);line-height:1.5}
 .mat-legend span{display:inline-flex;align-items:center;gap:5px}
 .mat-legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
 .mat-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
@@ -1199,6 +1207,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <button class="subtab-btn" id="labour-tab-attendance" onclick="showLabourSubtab('attendance')">Attendance</button>
           <button class="subtab-btn" id="labour-tab-wages" onclick="showLabourSubtab('wages')">Wages &amp; Payments</button>
           <button class="subtab-btn" id="labour-tab-locations" onclick="showLabourSubtab('locations')">Verification Locations</button>
+          <button class="subtab-btn" id="labour-tab-holidays" onclick="showLabourSubtab('holidays')">Holidays</button>
         </div>
 
         <!-- WORKERS -->
@@ -1252,6 +1261,10 @@ html.attendance-boot #attendance-screen{display:block!important}
               <label class="form-label">Date</label>
               <input type="date" id="att-date" class="form-input" onchange="loadAttendanceForDate()">
             </div>
+          </div>
+          <div id="att-holiday-banner" class="holiday-banner" style="display:none">
+            <span id="att-holiday-banner-text"></span>
+            <button class="btn btn-save" style="padding:5px 12px;font-size:11.5px" onclick="markAllHoliday()">Mark All As Holiday (Paid)</button>
           </div>
           <div class="table-card">
             <div style="overflow-x:auto">
@@ -1308,6 +1321,32 @@ html.attendance-boot #attendance-screen{display:block!important}
             <table class="data-table">
               <thead><tr><th>Name</th><th>Coordinates</th><th>Radius</th><th>Actions</th></tr></thead>
               <tbody id="att-locations-tbody"><tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">Loading...</td></tr></tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <!-- HOLIDAYS (Admin only — company-wide paid holiday calendar. A date
+             marked here shows a banner in the Attendance tab that day and
+             lets the office bulk-mark every active worker as a paid
+             Holiday in one tap, instead of having to know to type "Paid
+             Leave" for each worker manually. -->
+        <div class="subtab-pane" id="labour-pane-holidays">
+          <div class="form-card">
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> ADD COMPANY HOLIDAY</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Dates added here are paid holidays for everyone (Diwali, Independence Day, etc.). They show a reminder banner in the Attendance tab so office staff never confuses a holiday with an unmarked absent day.</p>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Date *</label><input type="date" id="hol-date" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Holiday Name *</label><input type="text" id="hol-name" class="form-input" placeholder="e.g. Diwali, Independence Day"></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-save" onclick="addHoliday()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Holiday</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Holiday Name</th><th>Actions</th></tr></thead>
+              <tbody id="holidays-tbody"><tr><td colspan="3" style="text-align:center;padding:32px;color:#64748b">Loading...</td></tr></tbody>
             </table>
             </div>
           </div>
@@ -1580,15 +1619,41 @@ html.attendance-boot #attendance-screen{display:block!important}
       </div>
       <div class="mat-grid" id="mat-cells" style="margin-top:4px">Loading...</div>
     </div>
+    <div id="mat-selected-detail" class="mat-selected-detail">Tap a date above to see full details</div>
     <div class="mat-legend">
       <span><i style="background:#dcfce7"></i> Present</span>
       <span><i style="background:#fef3c7"></i> Half Day</span>
+      <span><i style="background:#e5edff"></i> Paid Leave</span>
+      <span><i style="background:#f2e8fd"></i> Holiday</span>
       <span><i style="background:#fee2e2"></i> Absent</span>
       <span><i style="background:var(--bg);box-shadow:inset 0 0 0 2px var(--orange)"></i> Awaiting confirmation</span>
     </div>
     <div class="mat-stats" id="mat-stats"></div>
     <div class="btn-row">
       <button class="btn btn-reset" onclick="closeMonthlyAttendanceModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SALARY SLIP MODAL — pick a month, download that worker's PDF slip -->
+<div id="salary-slip-modal">
+  <div class="pay-modal-box">
+    <div class="pay-modal-title">Generate Salary Slip</div>
+    <div class="pay-modal-sub" id="ss-sub">Worker —</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Month</label>
+        <select id="ss-month" class="form-select">
+          <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+          <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+          <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+          <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Year</label><input type="number" id="ss-year" class="form-input"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-save" id="ss-generate-btn" onclick="generateSalarySlipPDF(this)"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Generate PDF</button>
+      <button class="btn btn-reset" onclick="closeSalarySlipModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
 </div>
@@ -2729,7 +2794,7 @@ window.permanentlyDeleteItem = async (type, id) => {
 // the running total atomically — the same pattern already used for
 // invoice payments (savePayment) and sequential numbering (getNextSeq).
 window.showLabourSubtab = (tab) => {
-  ['workers','attendance','wages','locations'].forEach(t => {
+  ['workers','attendance','wages','locations','holidays'].forEach(t => {
     document.getElementById(`labour-tab-${t}`).classList.toggle('active', t===tab);
     document.getElementById(`labour-pane-${t}`).classList.toggle('active', t===tab);
   });
@@ -2740,6 +2805,7 @@ window.showLabourSubtab = (tab) => {
   }
   if (tab === 'wages') renderWageSummary();
   if (tab === 'locations') loadAttendanceLocations();
+  if (tab === 'holidays') loadHolidays();
 };
 
 // Great-circle distance in meters between two lat/lng points — used to
@@ -2832,6 +2898,79 @@ window.deleteAttendanceLocation = async (idx) => {
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
+// ── HOLIDAY CALENDAR (company-wide paid holidays) ─────────────────
+// Doc id IS the date string ("YYYY-MM-DD") — one holiday per date, and it
+// doubles as an O(1) lookup key from the Attendance tab (no query needed,
+// just holidaysById[dateStr]) to decide whether to show the banner.
+let allHolidays = [];
+let holidaysById = {};
+
+window.loadHolidays = async () => {
+  const tbody = document.getElementById('holidays-tbody');
+  try {
+    const snap = await getDocs(query(collection(db,'holidays'), orderBy('date','asc')));
+    allHolidays = []; snap.forEach(d => allHolidays.push({ id: d.id, ...d.data() }));
+    holidaysById = {}; allHolidays.forEach(h => { holidaysById[h.date] = h; });
+    renderHolidayList();
+  } catch(e) { reportError(e); tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--red)">Could not load holidays.</td></tr>`; }
+};
+
+function renderHolidayList() {
+  const tbody = document.getElementById('holidays-tbody');
+  const fmtDate = d => new Date(d+'T00:00:00').toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric', weekday:'short' });
+  tbody.innerHTML = allHolidays.length === 0
+    ? `<tr><td colspan="3" style="text-align:center;padding:32px;color:#64748b">No holidays added yet</td></tr>`
+    : allHolidays.map(h => `<tr>
+        <td class="mono">${fmtDate(h.date)}</td>
+        <td>${esc(h.name)}</td>
+        <td class="action-btns"><button onclick="deleteHoliday('${h.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button></td>
+      </tr>`).join('');
+}
+
+window.addHoliday = async () => {
+  const dateStr = document.getElementById('hol-date').value;
+  const name = document.getElementById('hol-name').value.trim();
+  if (!dateStr || !name) { toast('Please enter both date and holiday name.', 'warning'); return; }
+  try {
+    await setDoc(doc(db,'holidays',dateStr), { date: dateStr, name, createdBy: auth.currentUser?.email || null, createdAt: serverTimestamp() });
+    toast('Holiday added!', 'success');
+    document.getElementById('hol-date').value = '';
+    document.getElementById('hol-name').value = '';
+    loadHolidays();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.deleteHoliday = async (dateStr) => {
+  if (!(await confirmDialog('Remove this holiday from the calendar?', { title: 'Delete Holiday', danger: true, confirmText: 'Delete' }))) return;
+  try {
+    await deleteDoc(doc(db,'holidays',dateStr));
+    toast('Holiday removed.', 'success');
+    loadHolidays();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// Bulk-marks every active worker Present on a holiday as a paid Holiday
+// in one go, reusing the same per-worker markAttendance() transaction the
+// manual buttons use — so wage snapshots, totalEarned, and confirmed
+// state all stay consistent with a normal attendance write. Skips anyone
+// already marked for that date (e.g. someone who actually worked, or was
+// already set) so a re-click never overwrites a deliberate override.
+window.markAllHoliday = async () => {
+  const dateStr = document.getElementById('att-date').value;
+  if (!dateStr) return;
+  if (!(await confirmDialog(`Mark every active worker as a paid Holiday on ${dateStr}? Anyone already marked for this date will be skipped.`, { title: 'Mark All As Holiday', confirmText: 'Mark All' }))) return;
+  try {
+    if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
+    const active = allLabour.filter(w => !w.deleted && w.active !== false);
+    const snap = await getDocs(query(collection(db,'attendance'), where('date','==',dateStr)));
+    const alreadyMarked = new Set(); snap.forEach(d => alreadyMarked.add(d.data().labourId));
+    const toMark = active.filter(w => !alreadyMarked.has(w.id));
+    for (const w of toMark) { await markAttendance(w.id, dateStr, 'Holiday', true); }
+    toast(`Marked ${toMark.length} worker${toMark.length===1?'':'s'} as Holiday${alreadyMarked.size ? ` (${alreadyMarked.size} already marked, skipped)` : ''}.`, 'success');
+    loadAttendanceForDate();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
 // ── ATTENDANCE SELF-MARK LINK (per worker) ────────────────────────
 // Same bearer-token pattern as the customer portal — a random token on
 // the labour doc, required alongside the labourId to write to that
@@ -2905,6 +3044,7 @@ window.renderLabourList = (search='') => {
         <td class="action-btns">
           <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
           <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
+          <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF">${ICONS.download}</button>
           <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
           <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)">${ICONS.globe}</button>
           <button onclick="setWorkerPin('${w.id}')" class="btn-icon" title="Set/Reset Attendance PIN">${ICONS.lock}</button>
@@ -3021,6 +3161,7 @@ window.loadAttendanceForDate = async () => {
   const tbody = document.getElementById('attendance-tbody');
   if (!dateStr) return;
   tbody.innerHTML = `<tr><td colspan="5"><span class="skel skel-line" style="width:70%"></span></td></tr><tr><td colspan="5"><span class="skel skel-line" style="width:60%"></span></td></tr>`;
+  updateHolidayBanner(dateStr);
   try {
     if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
     const active = allLabour.filter(w => !w.deleted && w.active !== false).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
@@ -3031,6 +3172,24 @@ window.loadAttendanceForDate = async () => {
     renderAttendanceRows(active, marked, dateStr);
   } catch(e) { reportError(e); showLoadError('attendance-tbody', 5, e); }
 };
+
+// Looks up a single holiday doc by date (doc id = date string, so this is
+// a direct getDoc, not a query) and shows/hides the banner + bulk-mark
+// button in the Attendance tab. Runs on every date change so the office
+// never has to remember to check the Holidays tab separately.
+async function updateHolidayBanner(dateStr) {
+  const banner = document.getElementById('att-holiday-banner');
+  const textEl = document.getElementById('att-holiday-banner-text');
+  try {
+    const snap = await getDoc(doc(db,'holidays',dateStr));
+    if (snap.exists()) {
+      textEl.textContent = `🎉 ${snap.data().name} — this is a company holiday.`;
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  } catch(e) { banner.style.display = 'none'; }
+}
 
 function renderAttendanceRows(active, marked, dateStr) {
   const tbody = document.getElementById('attendance-tbody');
@@ -3061,13 +3220,30 @@ function renderAttendanceRows(active, marked, dateStr) {
       <td><strong>${esc(w.name)}</strong></td>
       <td>${esc(w.role||'—')}</td>
       <td class="mono">₹${fmt(w.dailyWage||0)}</td>
-      <td><div class="att-btn-group">${btn('Present','att-present','Present')}${btn('Half Day','att-half','Half Day')}${btn('Absent','att-absent','Absent')}</div>${selfBadge}${photos}</td>
+      <td><div class="att-btn-group">${btn('Present','att-present','Present')}${btn('Half Day','att-half','Half Day')}${btn('Paid Leave','att-leave','Paid Leave')}${btn('Holiday','att-holiday','Holiday')}${btn('Absent','att-absent','Absent')}</div>${selfBadge}${photos}</td>
       <td class="mono" id="att-wage-${w.id}">${wageForDay!=null ? '₹'+fmt(wageForDay) : '—'}</td>
     </tr>`;
   }).join('');
 }
 
-window.markAttendance = async (labourId, dateStr, status) => {
+// Present, Paid Leave and Holiday are all full-pay; Half Day is half;
+// Absent is unpaid. Centralised here so the Attendance tab, monthly
+// grid, and salary slip can never drift out of sync on what each status
+// is worth.
+function wageForAttendanceStatus(status, dailyWage) {
+  if (status === 'Half Day') return Math.round(dailyWage/2);
+  if (status === 'Absent') return 0;
+  return dailyWage; // Present, Paid Leave, Holiday
+}
+function attClassForStatus(status) {
+  return status === 'Present' ? 'att-present'
+       : status === 'Half Day' ? 'att-half'
+       : status === 'Paid Leave' ? 'att-leave'
+       : status === 'Holiday' ? 'att-holiday'
+       : 'att-absent';
+}
+
+window.markAttendance = async (labourId, dateStr, status, silent=false) => {
   const attId = `${labourId}_${dateStr}`;
   const attRef = doc(db, 'attendance', attId);
   const labRef = doc(db, 'labour', labourId);
@@ -3077,7 +3253,7 @@ window.markAttendance = async (labourId, dateStr, status) => {
       if (!labSnap.exists()) throw new Error('Worker no longer exists.');
       const lab = labSnap.data();
       const dailyWage = lab.dailyWage || 0;
-      const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
+      const newWage = wageForAttendanceStatus(status, dailyWage);
       const existing = attSnap.exists() ? attSnap.data() : null;
       const oldWage = existing?.wageAmount || 0;
       const delta = newWage - oldWage;
@@ -3101,13 +3277,18 @@ window.markAttendance = async (labourId, dateStr, status) => {
     // just this one row's buttons/wage cell.
     const w = allLabour.find(x=>x.id===labourId);
     const dailyWage = w?.dailyWage || 0;
-    const newWage = status === 'Present' ? dailyWage : status === 'Half Day' ? Math.round(dailyWage/2) : 0;
+    const newWage = wageForAttendanceStatus(status, dailyWage);
     document.getElementById(`att-row-${labourId}`)?.removeAttribute('style');
     document.querySelectorAll(`#att-row-${labourId} .att-btn`).forEach(b => b.classList.remove('active'));
-    document.querySelector(`#att-row-${labourId} .att-btn.${status==='Present'?'att-present':status==='Half Day'?'att-half':'att-absent'}`)?.classList.add('active');
-    document.getElementById(`att-wage-${labourId}`).textContent = `₹${fmt(newWage)}`;
+    document.querySelector(`#att-row-${labourId} .att-btn.${attClassForStatus(status)}`)?.classList.add('active');
+    const wageCell = document.getElementById(`att-wage-${labourId}`);
+    if (wageCell) wageCell.textContent = `₹${fmt(newWage)}`;
     invalidateCache('labour');
-    loadAttendanceForDate(); // re-render this row's confirmation badge too
+    // silent=true (used by the "Mark All As Holiday" bulk action) skips
+    // this per-call reload — the caller reloads once after the whole
+    // batch instead, so marking 20 workers doesn't re-query and re-render
+    // the table 20 times in a row.
+    if (!silent) loadAttendanceForDate(); // re-render this row's confirmation badge too
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
@@ -3131,6 +3312,7 @@ window.renderWageSummary = async () => {
               <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
               <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
               <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
+              <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF">${ICONS.download}</button>
             </td>
           </tr>`;
         }).join('');
@@ -3275,35 +3457,212 @@ function renderMonthlyAttendanceGrid(year, month, byDate) {
   let html = '';
   for (let i = 0; i < firstDow; i++) html += `<div class="mat-cell mat-future"></div>`;
 
-  let present = 0, half = 0, absent = 0, hours = 0, wage = 0, unconfirmedCount = 0;
+  let present = 0, half = 0, leave = 0, holiday = 0, absent = 0, hours = 0, wage = 0, unconfirmedCount = 0;
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const rec = byDate[dateStr];
     const isFuture = dateStr > todayStr;
     let cls = 'mat-cell';
-    let tooltip = dateStr;
+    let statusText = 'No record';
     if (isFuture) {
       cls += ' mat-future';
     } else if (rec) {
       if (rec.status === 'Present') { cls += ' mat-present'; present++; }
       else if (rec.status === 'Half Day') { cls += ' mat-half'; half++; }
+      else if (rec.status === 'Paid Leave') { cls += ' mat-leave'; leave++; }
+      else if (rec.status === 'Holiday') { cls += ' mat-holiday'; holiday++; }
       else if (rec.status === 'Absent') { cls += ' mat-absent'; absent++; }
       if (rec.markedBy === 'self' && !rec.confirmed) { cls += ' mat-unconfirmed'; unconfirmedCount++; }
       hours += rec.hoursWorked || 0;
       wage += rec.wageAmount || 0;
-      tooltip = `${dateStr} — ${rec.status}${rec.hoursWorked ? ` (${rec.hoursWorked.toFixed(1)}h)` : ''}${rec.markedBy==='self' && !rec.confirmed ? ' — awaiting confirmation' : ''}`;
+      statusText = `${rec.status}${rec.hoursWorked ? ` — ${rec.hoursWorked.toFixed(1)}h` : ''}${rec.wageAmount ? ` — ₹${fmt(rec.wageAmount)}` : ''}${rec.markedBy==='self' && !rec.confirmed ? ' — awaiting confirmation' : ''}`;
+    } else if (!isFuture) {
+      statusText = 'Not marked';
     }
-    html += `<div class="${cls}" title="${esc(tooltip)}">${day}</div>`;
+    // Full weekday + date shown via tap/click below (title kept too, for desktop hover) —
+    // tooltips don't open on mobile taps, so mat-selected-detail is the primary way
+    // a worker's exact date+status is readable on a phone.
+    const fullDateLabel = isFuture ? '' : new Date(year, month, day).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    html += `<div class="${cls}" title="${esc(isFuture ? '' : `${dateStr} — ${statusText}`)}"${isFuture ? '' : ` onclick="selectMatCell(this)" data-date="${esc(fullDateLabel)}" data-status="${esc(statusText)}"`}>${day}</div>`;
   }
   cellsEl.innerHTML = html;
+  document.getElementById('mat-selected-detail').innerHTML = '<span style="color:#94a3b8">Tap a date above to see full details</span>';
 
   document.getElementById('mat-stats').innerHTML = `
     <div class="mat-stat"><div class="mat-stat-label">Present</div><div class="mat-stat-value">${present}</div></div>
     <div class="mat-stat"><div class="mat-stat-label">Half Day</div><div class="mat-stat-value">${half}</div></div>
+    <div class="mat-stat"><div class="mat-stat-label">Paid Leave</div><div class="mat-stat-value">${leave}</div></div>
+    <div class="mat-stat"><div class="mat-stat-label">Holiday</div><div class="mat-stat-value">${holiday}</div></div>
     <div class="mat-stat"><div class="mat-stat-label">Absent</div><div class="mat-stat-value">${absent}</div></div>
     <div class="mat-stat"><div class="mat-stat-label">Total Hours</div><div class="mat-stat-value">${hours.toFixed(1)}h</div></div>
     <div class="mat-stat" style="grid-column:1/-1"><div class="mat-stat-label">Total Wage Earned${unconfirmedCount ? ` — ${unconfirmedCount} day${unconfirmedCount===1?'':'s'} still awaiting confirmation` : ''}</div><div class="mat-stat-value">₹${fmt(wage)}</div></div>
   `;
+}
+
+// Tap-to-reveal date detail — mat-cell `title` tooltips never open on a
+// phone tap, so without this a worker/admin on mobile had no way to see
+// which exact date a colored square referred to. Click/tap sets this box
+// as the visible, always-readable source of truth for date+status.
+window.selectMatCell = (el) => {
+  document.querySelectorAll('.mat-cell.mat-selected').forEach(c => c.classList.remove('mat-selected'));
+  el.classList.add('mat-selected');
+  const date = el.dataset.date, status = el.dataset.status;
+  document.getElementById('mat-selected-detail').innerHTML =
+    `<strong>${esc(date)}</strong><br>${esc(status)}`;
+};
+
+// ── SALARY SLIP PDF (monthly, per worker) ────────────────────────
+// Reuses the same generateRealPDF() pipeline as quotations/invoices, so
+// the download is a real .pdf (not a print-dialog "Save as PDF"). Pulls
+// that month's attendance + payments with two targeted queries (same
+// (labourId, date) shape as Monthly Attendance / Worker History above),
+// then renders a branded A4 slip. "Overall Balance Due" is the worker's
+// running lifetime balance (totalEarned - totalPaid on the labour doc),
+// not scoped to the month — labelled as such so it isn't misread as a
+// month-only figure.
+let activeSalarySlipId = null;
+
+window.openSalarySlipModal = (id) => {
+  const w = allLabour.find(x=>x.id===id); if (!w) return;
+  activeSalarySlipId = id;
+  document.getElementById('ss-sub').innerHTML = `${esc(w.name)} — ${esc(w.role||'')} &middot; ₹${fmt(w.dailyWage||0)}/day`;
+  const now = new Date();
+  document.getElementById('ss-month').value = now.getMonth();
+  document.getElementById('ss-year').value = now.getFullYear();
+  document.getElementById('salary-slip-modal').style.display = 'flex';
+};
+
+window.closeSalarySlipModal = () => {
+  document.getElementById('salary-slip-modal').style.display = 'none';
+  activeSalarySlipId = null;
+};
+
+window.generateSalarySlipPDF = async (btn) => {
+  if (!activeSalarySlipId) return;
+  const w = allLabour.find(x=>x.id===activeSalarySlipId); if (!w) return;
+  const year = parseInt(document.getElementById('ss-year').value, 10);
+  const month = parseInt(document.getElementById('ss-month').value, 10); // 0-indexed
+  if (!year || year < 2000) { toast('Please enter a valid year.', 'warning'); return; }
+  setBtnLoading(btn, true, 'Generating...');
+  try {
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const startStr = `${year}-${String(month+1).padStart(2,'0')}-01`;
+    const endStr = `${year}-${String(month+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+    const [attSnap, paySnap] = await Promise.all([
+      getDocs(query(collection(db,'attendance'), where('labourId','==',activeSalarySlipId), where('date','>=',startStr), where('date','<=',endStr))),
+      getDocs(query(collection(db,'wagePayments'), where('labourId','==',activeSalarySlipId), where('date','>=',startStr), where('date','<=',endStr)))
+    ]);
+    const attRows = []; attSnap.forEach(d => attRows.push(d.data()));
+    const payRows = []; paySnap.forEach(d => payRows.push(d.data()));
+    attRows.sort((a,b) => a.date < b.date ? -1 : 1);
+    payRows.sort((a,b) => (a.date||'') < (b.date||'') ? -1 : 1);
+
+    let present = 0, half = 0, leave = 0, holiday = 0, absent = 0, hours = 0, earned = 0;
+    attRows.forEach(a => {
+      if (a.status === 'Present') present++;
+      else if (a.status === 'Half Day') half++;
+      else if (a.status === 'Paid Leave') leave++;
+      else if (a.status === 'Holiday') holiday++;
+      else if (a.status === 'Absent') absent++;
+      hours += a.hoursWorked || 0;
+      earned += a.wageAmount || 0;
+    });
+    const paidThisMonth = payRows.reduce((sum,p) => sum + (p.amount||0), 0);
+    const balance = (w.totalEarned||0) - (w.totalPaid||0);
+    const monthLabel = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+    const html = buildSalarySlipHTML(w, monthLabel, { present, half, leave, holiday, absent, hours, earned, payRows, paidThisMonth, balance });
+    const filename = `Salary_Slip_${(w.name||'Worker').replace(/\s+/g,'_')}_${monthLabel.replace(' ','_')}.pdf`;
+    const ok = await generateRealPDF(html, filename);
+    setBtnLoading(btn, false);
+    if (ok) { toast('Salary slip downloaded!', 'success'); closeSalarySlipModal(); }
+  } catch(e) { setBtnLoading(btn, false); reportError(e); toast('Error generating slip: ' + e.message, 'error'); }
+};
+
+function buildSalarySlipHTML(w, monthLabel, s) {
+  const R = '&#8377;';
+  const payRowsHTML = s.payRows.length
+    ? s.payRows.map(p => `<tr><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.date||'—')}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.mode||'—')}${p.note?' — '+esc(p.note):''}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;text-align:right;" class="mono">${R}${fmt(p.amount||0)}</td></tr>`).join('')
+    : `<tr><td colspan="3" style="padding:8px;color:#94a3b8;text-align:center;">No payments recorded this month</td></tr>`;
+
+  return `
+<div style="font-family:Arial,Helvetica,sans-serif;width:794px;background:#ffffff;color:#1a1a1a;box-sizing:border-box;margin:0;padding:26px 32px;font-size:11px;">
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="vertical-align:middle;width:60%;">
+        <table style="border-collapse:collapse;">
+          <tr>
+            <td style="vertical-align:middle;padding-right:12px;">
+              <img src="https://rrteensetsolution.com/images/rr-logo-original.png" alt="R.R Teen Set Solution" style="width:52px;height:52px;object-fit:contain;">
+            </td>
+            <td style="vertical-align:middle;">
+              <div style="font-size:17px;font-weight:800;color:#20262c;letter-spacing:-0.3px;">R.R Teen Set Solution</div>
+              <div style="font-size:8.5px;color:#d9480f;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Steel &amp; Shed Fabrication Experts</div>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td style="vertical-align:top;text-align:right;width:40%;">
+        <div style="font-size:15px;font-weight:800;color:#20262c;letter-spacing:0.5px;">SALARY SLIP</div>
+        <div style="font-size:9px;color:#667077;margin-top:4px;">${esc(monthLabel)}</div>
+      </td>
+    </tr>
+  </table>
+  <div style="height:2px;background:#20262c;margin-top:8px;"></div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:10px;margin-top:14px;">
+    <tr>
+      <td style="width:50%;vertical-align:top;">
+        <table style="border-collapse:collapse;width:100%;">
+          <tr><td style="padding:2px 0;color:#667077;width:80px;">Worker Name</td><td style="padding:2px 0;font-weight:700;">: ${esc(w.name)}</td></tr>
+          <tr><td style="padding:2px 0;color:#667077;">Role</td><td style="padding:2px 0;">: ${esc(w.role||'—')}</td></tr>
+          <tr><td style="padding:2px 0;color:#667077;">Phone</td><td style="padding:2px 0;">: ${esc(w.phone||'—')}</td></tr>
+        </table>
+      </td>
+      <td style="width:50%;vertical-align:top;">
+        <table style="border-collapse:collapse;width:100%;">
+          <tr><td style="padding:2px 0;color:#667077;width:90px;">Daily Wage</td><td style="padding:2px 0;">: ${R}${fmt(w.dailyWage||0)}</td></tr>
+          <tr><td style="padding:2px 0;color:#667077;">Period</td><td style="padding:2px 0;font-weight:700;">: ${esc(monthLabel)}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div style="margin-top:16px;background:#eceff1;padding:6px 10px;font-weight:700;font-size:10px;letter-spacing:0.3px;">ATTENDANCE SUMMARY</div>
+  <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:10.5px;">
+    <tr>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Present</div><div style="font-weight:800;font-size:14px;">${s.present}</div></td>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Half Day</div><div style="font-weight:800;font-size:14px;">${s.half}</div></td>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Paid Leave</div><div style="font-weight:800;font-size:14px;">${s.leave}</div></td>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Holiday</div><div style="font-weight:800;font-size:14px;">${s.holiday}</div></td>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Absent</div><div style="font-weight:800;font-size:14px;">${s.absent}</div></td>
+      <td style="border:1px solid #c9ccd0;padding:8px;text-align:center;"><div style="color:#667077;font-size:9px;">Hours Worked</div><div style="font-weight:800;font-size:14px;">${s.hours.toFixed(1)}h</div></td>
+    </tr>
+  </table>
+
+  <div style="margin-top:16px;background:#eceff1;padding:6px 10px;font-weight:700;font-size:10px;letter-spacing:0.3px;">PAYMENTS RECORDED THIS MONTH</div>
+  <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:10.5px;">
+    <thead><tr style="background:#f6f7f8;"><th style="padding:4px 8px;text-align:left;border-bottom:1px solid #c9ccd0;">Date</th><th style="padding:4px 8px;text-align:left;border-bottom:1px solid #c9ccd0;">Mode / Note</th><th style="padding:4px 8px;text-align:right;border-bottom:1px solid #c9ccd0;">Amount</th></tr></thead>
+    <tbody>${payRowsHTML}</tbody>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;margin-top:18px;">
+    <tr>
+      <td style="width:60%;"></td>
+      <td style="width:40%;">
+        <table style="border-collapse:collapse;width:100%;font-size:11px;">
+          <tr><td style="padding:5px 8px;color:#667077;">Wage Earned (this month)</td><td style="padding:5px 8px;text-align:right;font-weight:700;" class="mono">${R}${fmt(s.earned)}</td></tr>
+          <tr><td style="padding:5px 8px;color:#667077;">Paid (this month)</td><td style="padding:5px 8px;text-align:right;font-weight:700;" class="mono">${R}${fmt(s.paidThisMonth)}</td></tr>
+          <tr style="border-top:2px solid #20262c;"><td style="padding:7px 8px;font-weight:800;">Overall Balance Due</td><td style="padding:7px 8px;text-align:right;font-weight:800;color:${s.balance>0?'#991b1b':'#166534'};" class="mono">${R}${fmt(Math.abs(s.balance))}${s.balance<0?' (advance)':''}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div style="margin-top:26px;font-size:8.5px;color:#94a3b8;border-top:1px solid #eceff1;padding-top:8px;">
+    R.R Teen Set Solution &middot; GSTIN: 07DJCPK0635M1Z5 &middot; +91 85272 58462 &middot; Generated on ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+  </div>
+</div>`;
 }
 
 // ── ACTIVITY LOG PAGE (Admin only) ──────────────────────────────
