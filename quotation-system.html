@@ -463,7 +463,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 .mat-nav-label{font-size:15px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif}
 .mat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .mat-dow{text-align:center;font-size:10px;font-weight:700;color:#9aa5ab;text-transform:uppercase;padding-bottom:4px}
-.mat-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg);color:#c7cfd3;position:relative;cursor:default}
+.mat-cell{aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg);color:#6b757c;position:relative;cursor:default}
 .mat-cell[onclick]{cursor:pointer}
 .mat-cell.mat-selected{box-shadow:0 0 0 2px var(--navy);z-index:1}
 .mat-cell.mat-present{background:#dcfce7;color:#166534}
@@ -472,7 +472,12 @@ html.attendance-boot #attendance-screen{display:block!important}
 .mat-cell.mat-holiday{background:#f2e8fd;color:#8134af}
 .mat-cell.mat-absent{background:#fee2e2;color:#991b1b}
 .mat-cell.mat-unconfirmed{box-shadow:inset 0 0 0 2px var(--orange)}
-.mat-cell.mat-future{background:transparent;color:transparent}
+/* mat-pad: blank filler cells before day 1 of the month — no date, stays invisible */
+.mat-cell.mat-pad{background:transparent;color:transparent;cursor:default}
+/* mat-future: real upcoming dates *within* this month — must still show the day
+   number (previously shared mat-pad's transparent color, which hid it entirely) */
+.mat-cell.mat-future{background:transparent;color:#b9c1c6;font-weight:600;cursor:default}
+.mat-cell.mat-today{box-shadow:0 0 0 2px var(--orange);z-index:1}
 .mat-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11.5px;color:var(--muted)}
 .mat-selected-detail{margin-top:12px;padding:9px 12px;background:var(--bg);border-radius:3px;font-size:12.5px;color:var(--navy);border-left:3px solid var(--orange);line-height:1.5}
 .mat-legend span{display:inline-flex;align-items:center;gap:5px}
@@ -1631,6 +1636,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="mat-stats" id="mat-stats"></div>
     <div class="btn-row">
       <button class="btn btn-reset" onclick="closeMonthlyAttendanceModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+      <button class="btn" onclick="exportMonthlyAttendanceCSV()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download Report (CSV)</button>
     </div>
   </div>
 </div>
@@ -3442,12 +3448,66 @@ async function loadMonthlyAttendanceData() {
       where('labourId','==',workerId), where('date','>=',startStr), where('date','<=',endStr)));
     const byDate = {};
     snap.forEach(d => { const data = d.data(); byDate[data.date] = data; });
+    matState.byDate = byDate; // cached for exportMonthlyAttendanceCSV — avoids a second query
     renderMonthlyAttendanceGrid(year, month, byDate);
   } catch(e) {
     reportError(e);
+    matState.byDate = null;
     cellsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--red);font-size:12.5px">Could not load this month\'s attendance.</div>';
   }
 }
+
+// ── EXPORT: current month's attendance grid → CSV ─────────────────
+// Reuses the same byDate map the calendar just rendered from (cached on
+// matState by loadMonthlyAttendanceData), so this is instant — no extra
+// Firestore read. One row per calendar day, plus a totals row at the end
+// mirroring the on-screen mat-stats summary.
+window.exportMonthlyAttendanceCSV = () => {
+  const { workerId, year, month, byDate } = matState;
+  if (!byDate) { toast('Attendance data is still loading — try again in a moment.', 'warning'); return; }
+  const w = allLabour.find(x => x.id === workerId);
+  const monthLabel = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr = todayLocalDateStr();
+
+  let present = 0, half = 0, leave = 0, holiday = 0, absent = 0, notMarked = 0, hours = 0, wage = 0;
+  const rows = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const rec = byDate[dateStr];
+    const isFuture = dateStr > todayStr;
+    const weekday = new Date(year, month, day).toLocaleDateString('en-IN', { weekday: 'short' });
+    let status = 'Upcoming';
+    if (!isFuture) {
+      status = rec ? rec.status : 'Not Marked';
+      if (rec) {
+        if (rec.status === 'Present') present++;
+        else if (rec.status === 'Half Day') half++;
+        else if (rec.status === 'Paid Leave') leave++;
+        else if (rec.status === 'Holiday') holiday++;
+        else if (rec.status === 'Absent') absent++;
+        hours += rec.hoursWorked || 0;
+        wage += rec.wageAmount || 0;
+      } else notMarked++;
+    }
+    rows.push({
+      date: dateStr, weekday, status,
+      hours: rec?.hoursWorked ? rec.hoursWorked.toFixed(1) : '',
+      wage: rec?.wageAmount ? rec.wageAmount : '',
+      confirmed: rec ? (rec.markedBy === 'self' ? (rec.confirmed ? 'Yes' : 'No — awaiting confirmation') : 'N/A (marked by admin)') : ''
+    });
+  }
+  rows.push({ date: '', weekday: '', status: '', hours: '', wage: '', confirmed: '' });
+  rows.push({ date: 'TOTAL', weekday: '', status: `Present: ${present}, Half Day: ${half}, Paid Leave: ${leave}, Holiday: ${holiday}, Absent: ${absent}, Not Marked: ${notMarked}`, hours: hours.toFixed(1), wage: wage, confirmed: '' });
+
+  const csv = toCSV(rows, [
+    ['Date', 'date'], ['Day', 'weekday'], ['Status', 'status'],
+    ['Hours Worked', 'hours'], ['Wage Amount', 'wage'], ['Confirmation', 'confirmed']
+  ]);
+  const safeName = (w?.name || 'Worker').replace(/\s+/g, '_');
+  downloadCSV(`Attendance_${safeName}_${monthLabel.replace(' ', '_')}.csv`, csv);
+  toast('Monthly attendance report downloaded!', 'success');
+};
 
 function renderMonthlyAttendanceGrid(year, month, byDate) {
   const cellsEl = document.getElementById('mat-cells');
@@ -3455,15 +3515,17 @@ function renderMonthlyAttendanceGrid(year, month, byDate) {
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const todayStr = todayLocalDateStr();
   let html = '';
-  for (let i = 0; i < firstDow; i++) html += `<div class="mat-cell mat-future"></div>`;
+  for (let i = 0; i < firstDow; i++) html += `<div class="mat-cell mat-pad"></div>`;
 
   let present = 0, half = 0, leave = 0, holiday = 0, absent = 0, hours = 0, wage = 0, unconfirmedCount = 0;
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const rec = byDate[dateStr];
     const isFuture = dateStr > todayStr;
+    const isToday = dateStr === todayStr;
     let cls = 'mat-cell';
     let statusText = 'No record';
+    if (isToday) cls += ' mat-today';
     if (isFuture) {
       cls += ' mat-future';
     } else if (rec) {
