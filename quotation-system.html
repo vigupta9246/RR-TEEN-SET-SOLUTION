@@ -1297,6 +1297,7 @@ html.attendance-boot #attendance-screen{display:block!important}
               <label class="form-label">Date</label>
               <input type="date" id="att-date" class="form-input" onchange="loadAttendanceForDate()">
             </div>
+            <button class="btn btn-reset" style="align-self:flex-end;padding:9px 14px;font-size:12px" onclick="markAllPresent()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg> Mark All Present</button>
           </div>
           <div id="att-holiday-banner" class="holiday-banner" style="display:none">
             <span id="att-holiday-banner-text"></span>
@@ -1314,6 +1315,10 @@ html.attendance-boot #attendance-screen{display:block!important}
 
         <!-- WAGES & PAYMENTS -->
         <div class="subtab-pane" id="labour-pane-wages">
+          <div class="btn-row" style="margin-bottom:14px">
+            <div class="form-group" style="min-width:150px;margin-bottom:0"><input type="month" id="team-report-month" class="form-input"></div>
+            <button class="btn btn-reset" onclick="exportTeamMonthlyReport()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Export Team Monthly Report (CSV)</button>
+          </div>
           <div class="table-card">
             <div style="overflow-x:auto">
             <table class="data-table">
@@ -1629,6 +1634,9 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group"><label class="form-label">Date</label><input type="date" id="lb-pay-date" class="form-input"></div>
       <div class="form-group"><label class="form-label">Mode</label>
         <select id="lb-pay-mode" class="form-select"><option>Cash</option><option>UPI</option><option>Bank Transfer</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Type</label>
+        <select id="lb-pay-type" class="form-select"><option>Wage Settlement</option><option>Advance</option></select>
       </div>
       <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
     </div>
@@ -2854,7 +2862,11 @@ window.showLabourSubtab = (tab) => {
     loadAttendanceForDate();
   }
   if (tab === 'leaves') loadLeaveRequests();
-  if (tab === 'wages') renderWageSummary();
+  if (tab === 'wages') {
+    const monthInput = document.getElementById('team-report-month');
+    if (monthInput && !monthInput.value) monthInput.value = new Date().toISOString().slice(0,7);
+    renderWageSummary();
+  }
   if (tab === 'locations') loadAttendanceLocations();
   if (tab === 'holidays') loadHolidays();
 };
@@ -3018,6 +3030,26 @@ window.markAllHoliday = async () => {
     const toMark = active.filter(w => !alreadyMarked.has(w.id));
     for (const w of toMark) { await markAttendance(w.id, dateStr, 'Holiday', true); }
     toast(`Marked ${toMark.length} worker${toMark.length===1?'':'s'} as Holiday${alreadyMarked.size ? ` (${alreadyMarked.size} already marked, skipped)` : ''}.`, 'success');
+    loadAttendanceForDate();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// Same skip-if-already-marked pattern as markAllHoliday above — for the
+// common case of "everyone showed up today", one click instead of tapping
+// Present on every row. Anyone already marked (including a self-marked-
+// but-unconfirmed entry) is left untouched rather than overwritten.
+window.markAllPresent = async () => {
+  const dateStr = document.getElementById('att-date').value;
+  if (!dateStr) return;
+  if (!(await confirmDialog(`Mark every active worker as Present on ${dateStr}? Anyone already marked for this date will be skipped.`, { title: 'Mark All Present', confirmText: 'Mark All' }))) return;
+  try {
+    if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
+    const active = allLabour.filter(w => !w.deleted && w.active !== false);
+    const snap = await getDocs(query(collection(db,'attendance'), where('date','==',dateStr)));
+    const alreadyMarked = new Set(); snap.forEach(d => alreadyMarked.add(d.data().labourId));
+    const toMark = active.filter(w => !alreadyMarked.has(w.id));
+    for (const w of toMark) { await markAttendance(w.id, dateStr, 'Present', true); }
+    toast(`Marked ${toMark.length} worker${toMark.length===1?'':'s'} as Present${alreadyMarked.size ? ` (${alreadyMarked.size} already marked, skipped)` : ''}.`, 'success');
     loadAttendanceForDate();
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
@@ -3500,6 +3532,45 @@ window.markAttendance = async (labourId, dateStr, status, silent=false) => {
 };
 
 // ── WAGES & PAYMENTS ────────────────────────────────────────────
+// Team-wide monthly report — one row per active worker, computed entirely
+// from the attendanceSummary map already sitting on each labour doc (see
+// markAttendance() and firestore.rules changelog #16) instead of a
+// per-worker Firestore query. This is what makes it "instant" for any
+// number of workers — allLabour is already loaded for this tab, so the
+// whole report is a client-side reduce, not N attendance reads.
+window.exportTeamMonthlyReport = async () => {
+  const monthInput = document.getElementById('team-report-month').value; // "YYYY-MM"
+  if (!monthInput) { toast('Please pick a month first.', 'warning'); return; }
+  try {
+    if (!allLabour.length) allLabour = await fetchCached('labour', 'labour');
+    const active = allLabour.filter(w => !w.deleted).sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    const prefix = `${monthInput}-`;
+    const monthLabel = new Date(monthInput + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    const rows = active.map(w => {
+      const summary = w.attendanceSummary || {};
+      let present=0, half=0, leave=0, holiday=0, absent=0, earned=0;
+      Object.keys(summary).filter(d => d.startsWith(prefix)).forEach(d => {
+        const r = summary[d];
+        if (r.status === 'Present') present++;
+        else if (r.status === 'Half Day') half++;
+        else if (r.status === 'Paid Leave') leave++;
+        else if (r.status === 'Holiday') holiday++;
+        else if (r.status === 'Absent') absent++;
+        earned += r.wageAmount || 0;
+      });
+      return { name: w.name, role: w.role||'', dailyWage: w.dailyWage||0, present, half, leave, holiday, absent, earned };
+    });
+    if (!rows.length) { toast('No workers to report on.', 'warning'); return; }
+    const csv = toCSV(rows, [
+      ['Name','name'], ['Role','role'], ['Daily Wage','dailyWage'],
+      ['Present','present'], ['Half Day','half'], ['Paid Leave','leave'], ['Holiday','holiday'], ['Absent','absent'],
+      ['Wage Earned (Month)','earned']
+    ]);
+    downloadCSV(`Team_Attendance_Report_${monthLabel.replace(' ','_')}.csv`, csv);
+    toast('Team monthly report downloaded!', 'success');
+  } catch(e) { reportError(e); toast('Error generating report: ' + e.message, 'error'); }
+};
+
 window.renderWageSummary = async () => {
   const tbody = document.getElementById('wages-tbody');
   try {
@@ -3534,6 +3605,7 @@ window.openLabourPayModal = (id) => {
     `${esc(w.name)} — ${esc(w.role||'')}<br>Earned: ₹${fmt(w.totalEarned||0)} &nbsp;|&nbsp; Paid: ₹${fmt(w.totalPaid||0)} &nbsp;|&nbsp; <strong style="color:var(--red)">Balance: ₹${fmt(Math.max(0,balance))}</strong>`;
   document.getElementById('lb-pay-amount').value = balance > 0 ? balance : '';
   document.getElementById('lb-pay-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('lb-pay-type').value = 'Wage Settlement';
   document.getElementById('lb-pay-note').value = '';
   document.getElementById('labour-pay-modal').style.display = 'flex';
 };
@@ -3549,6 +3621,7 @@ window.saveLabourPayment = async (btn) => {
   if (amount <= 0) { toast('Please enter a valid payment amount.', 'warning'); return; }
   const date = document.getElementById('lb-pay-date').value;
   const mode = document.getElementById('lb-pay-mode').value;
+  const type = document.getElementById('lb-pay-type').value;
   const note = document.getElementById('lb-pay-note').value;
   setBtnLoading(btn, true, 'Saving...');
   try {
@@ -3561,13 +3634,13 @@ window.saveLabourPayment = async (btn) => {
       const lab = labSnap.data();
       labourName = lab.name;
       tx.set(payRef, {
-        labourId: activeLabourPaymentId, labourName: lab.name, amount, date, mode, note,
+        labourId: activeLabourPaymentId, labourName: lab.name, amount, date, mode, type, note,
         createdBy: auth.currentUser?.email || null, createdAt: serverTimestamp()
       });
       tx.update(labRef, { totalPaid: (lab.totalPaid || 0) + amount });
     });
-    logActivity('wage_payment', `₹${fmt(amount)} paid to ${labourName}${note?' — '+note:''}`);
-    toast('Payment recorded!', 'success');
+    logActivity('wage_payment', `₹${fmt(amount)} ${type === 'Advance' ? 'advance ' : ''}paid to ${labourName}${note?' — '+note:''}`);
+    toast(`${type === 'Advance' ? 'Advance' : 'Payment'} recorded!`, 'success');
     invalidateCache('labour');
     setBtnLoading(btn, false);
     closeLabourPayModal();
@@ -3595,7 +3668,7 @@ window.viewLabourHistory = async (id) => {
       ? attRows.map(a => `<div class="labour-hist-row"><span>${a.date} &middot; ${esc(a.status)}</span><strong class="mono">₹${fmt(a.wageAmount||0)}</strong></div>`).join('')
       : '<div style="font-size:12.5px;color:#94a3b8">No attendance marked yet.</div>';
     const payHTML = payRows.length
-      ? payRows.map(p => `<div class="labour-hist-row"><span>${p.date} &middot; ${esc(p.mode||'')}${p.note?' &middot; '+esc(p.note):''}</span><strong class="mono">₹${fmt(p.amount)}</strong></div>`).join('')
+      ? payRows.map(p => `<div class="labour-hist-row"><span>${p.date} &middot; ${esc(p.mode||'')}${p.type==='Advance' ? ' &middot; <strong style="color:var(--orange)">Advance</strong>' : ''}${p.note?' &middot; '+esc(p.note):''}</span><strong class="mono">₹${fmt(p.amount)}</strong></div>`).join('')
       : '<div style="font-size:12.5px;color:#94a3b8">No payments recorded yet.</div>';
     document.getElementById('lb-hist-content').innerHTML = `
       <div class="form-section-title" style="margin-top:4px">ATTENDANCE (last 60)</div>
@@ -3849,7 +3922,7 @@ window.generateSalarySlipPDF = async (btn) => {
 function buildSalarySlipHTML(w, monthLabel, s) {
   const R = '&#8377;';
   const payRowsHTML = s.payRows.length
-    ? s.payRows.map(p => `<tr><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.date||'—')}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.mode||'—')}${p.note?' — '+esc(p.note):''}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;text-align:right;" class="mono">${R}${fmt(p.amount||0)}</td></tr>`).join('')
+    ? s.payRows.map(p => `<tr><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.date||'—')}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;">${esc(p.mode||'—')}${p.type==='Advance' ? ' (Advance)' : ''}${p.note?' — '+esc(p.note):''}</td><td style="padding:4px 8px;border-bottom:1px solid #eceff1;text-align:right;" class="mono">${R}${fmt(p.amount||0)}</td></tr>`).join('')
     : `<tr><td colspan="3" style="padding:8px;color:#94a3b8;text-align:center;">No payments recorded this month</td></tr>`;
 
   return `
