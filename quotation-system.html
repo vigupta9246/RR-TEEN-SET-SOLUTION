@@ -127,8 +127,8 @@ html.attendance-boot #attendance-screen{display:block!important}
 .att-gps-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:2px}
 .att-gps-status.att-gps-ok{color:var(--green)}
 .att-gps-status.att-gps-fail{color:var(--red)}
-.att-confirmed-box{text-align:center;padding:30px 16px}
-.att-confirmed-box svg{width:52px;height:52px;stroke:var(--green);margin-bottom:12px}
+.att-confirmed-box{text-align:center;padding:30px 16px;animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both}
+.att-confirmed-box .success-check-circle{width:64px;height:64px}
 
 /* CUSTOMER PORTAL (public, no login) */
 #portal-screen{display:none;min-height:100vh;background:var(--bg)}
@@ -138,13 +138,21 @@ html.attendance-boot #attendance-screen{display:block!important}
 .portal-wordmark{font-size:16px;font-weight:700;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:.3px;position:relative;z-index:1}
 .portal-tagline{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1.2px;text-transform:uppercase;position:relative;z-index:1}
 .portal-body{max-width:640px;margin:0 auto;padding:28px 20px 60px}
+.portal-body > *{animation:sectionIn .3s ease both}
 .emp-portal-tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;-webkit-overflow-scrolling:touch}
 .emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 14px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:10.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .emp-tab-btn .ic{width:18px;height:18px}
 .emp-tab-btn.active{color:var(--navy);border-bottom-color:var(--orange)}
-.emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:8px;padding:18px;text-align:center;margin-bottom:16px}
-.emp-leave-balance-card .num{font-size:32px;font-weight:800;line-height:1}
-.emp-leave-balance-card .lbl{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:8px;padding:18px;text-align:center;margin-bottom:16px;animation:cardIn .4s ease both;position:relative;overflow:hidden}
+.emp-leave-balance-card::before{content:'';position:absolute;top:-40%;right:-20%;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);pointer-events:none}
+.emp-leave-ring{position:relative;width:104px;height:104px;margin:0 auto}
+.emp-leave-ring svg{width:104px;height:104px;transform:rotate(-90deg)}
+.emp-leave-ring circle{fill:none;stroke-width:9}
+.emp-leave-ring .ring-track{stroke:rgba(255,255,255,.18)}
+.emp-leave-ring .ring-fill{stroke:var(--orange);stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.34,1.56,.64,1)}
+.emp-leave-ring .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.emp-leave-balance-card .num{font-size:30px;font-weight:800;line-height:1}
+.emp-leave-balance-card .lbl{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 .emp-leave-sub{display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:11.5px;opacity:.9}
 .emp-month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .emp-month-nav button{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -154,6 +162,8 @@ html.attendance-boot #attendance-screen{display:block!important}
 .emp-profile-row:last-child{border-bottom:none}
 .emp-profile-row .lbl{color:var(--muted)}
 .emp-profile-row .val{font-weight:700;color:var(--navy)}
+.emp-sal-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--bg);margin-top:16px}
+.emp-sal-bar-seg{transition:width .6s cubic-bezier(.34,1.56,.64,1);height:100%}
 .portal-loading,.portal-error{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 .portal-error{color:var(--red)}
 .portal-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:26px 24px;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
@@ -419,6 +429,10 @@ html.attendance-boot #attendance-screen{display:block!important}
 
 /* Table rows fade in on render, and nav buttons feel snappier */
 .data-table tbody tr{animation:cardIn .3s ease both}
+.leave-row-flash-approve{animation:flashGreen .5s ease}
+.leave-row-flash-reject{animation:flashRed .5s ease}
+@keyframes flashGreen{0%{background:#dcfce7}100%{background:transparent}}
+@keyframes flashRed{0%{background:#fee2e2}100%{background:transparent}}
 .pagination-wrap{display:flex;justify-content:center;padding:16px}
 .pagination{display:flex;align-items:center;gap:14px}
 .pagination button{padding:8px 16px;border-radius:2px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);transition:all .15s}
@@ -479,7 +493,10 @@ html.attendance-boot #attendance-screen{display:block!important}
 .mat-nav-label{font-size:15px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif}
 .mat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .mat-dow{text-align:center;font-size:10px;font-weight:700;color:#9aa5ab;text-transform:uppercase;padding-bottom:4px}
-.mat-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:12.5px;font-weight:700;background:#fef3e2;color:#9a6a1f;border:1px solid transparent;position:relative;cursor:default}
+.mat-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:12.5px;font-weight:700;background:#fef3e2;color:#9a6a1f;border:1px solid transparent;position:relative;cursor:default;animation:cardIn .3s ease both;transition:transform .15s ease,box-shadow .15s ease}
+.mat-cell[onclick]:hover{transform:scale(1.12);box-shadow:0 3px 10px rgba(0,0,0,.18);z-index:2}
+.mat-cell.mat-today{animation:cardIn .3s ease both,todayPulse 2s ease-in-out infinite}
+@keyframes todayPulse{0%,100%{box-shadow:0 0 0 0 rgba(32,38,44,.25)}50%{box-shadow:0 0 0 4px rgba(32,38,44,0)}}
 .mat-cell[onclick]{cursor:pointer}
 .mat-cell .mat-day-code{font-size:8px;font-weight:700;letter-spacing:.3px;opacity:.85;text-transform:uppercase}
 .mat-cell.mat-selected{box-shadow:0 0 0 2px var(--navy);z-index:1}
@@ -3144,7 +3161,7 @@ window.renderLeaveRequests = () => {
   rows.sort((a, b) => (b.appliedAt || '').localeCompare(a.appliedAt || '') || (a.status === 'Pending' ? -1 : 1));
   tbody.innerHTML = rows.length === 0
     ? `<tr><td colspan="8" style="text-align:center;padding:32px;color:#64748b">No leave requests yet</td></tr>`
-    : rows.map(r => {
+    : rows.map((r, i) => {
         const statusBadge = r.status === 'Approved' ? '<span style="color:var(--green);font-weight:700;font-size:12px">Approved</span>'
           : r.status === 'Rejected' ? '<span style="color:var(--red);font-weight:700;font-size:12px">Rejected</span>'
           : '<span class="badge-draft">Pending</span>';
@@ -3154,7 +3171,7 @@ window.renderLeaveRequests = () => {
               <button onclick="rejectLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon btn-danger" title="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             </div>`
           : `<small style="color:#94a3b8">${esc(r.decidedBy || '')}</small>`;
-        return `<tr>
+        return `<tr id="leave-row-${r.id}" class="reveal-row" style="animation-delay:${i*35}ms">
           <td><strong>${esc(r.workerName)}</strong></td>
           <td>${esc(r.fromDate)}</td>
           <td>${esc(r.toDate)}</td>
@@ -3181,6 +3198,7 @@ window.approveLeaveRequest = async (workerId, reqId) => {
   const req = reqs[idx];
   const ok = await confirmDialog(`Approve ${req.days} day(s) leave for ${w.name} (${req.fromDate} to ${req.toDate})?\n\nThis will mark those dates as Paid Leave and deduct them from the leave balance.`, { title: 'Approve Leave', confirmText: 'Approve' });
   if (!ok) return;
+  document.getElementById(`leave-row-${reqId}`)?.classList.add('leave-row-flash-approve');
   try {
     let d = new Date(req.fromDate + 'T00:00:00');
     const end = new Date(req.toDate + 'T00:00:00');
@@ -3204,6 +3222,7 @@ window.rejectLeaveRequest = async (workerId, reqId) => {
   const reqs = w.leaveRequests || [];
   const ok = await confirmDialog('Reject this leave request?', { title: 'Reject Leave', confirmText: 'Reject' });
   if (!ok) return;
+  document.getElementById(`leave-row-${reqId}`)?.classList.add('leave-row-flash-reject');
   try {
     const newReqs = reqs.map(r => r.id === reqId ? { ...r, status: 'Rejected', decidedAt: new Date().toISOString(), decidedBy: auth.currentUser?.email || null } : r);
     await updateDoc(doc(db, 'labour', workerId), { leaveRequests: newReqs });
@@ -3823,7 +3842,7 @@ function renderMonthlyAttendanceGrid(year, month, byDate) {
     // a worker's exact date+status is readable on a phone.
     const fullDateLabel = isFuture ? '' : new Date(year, month, day).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     const codeHtml = code ? `<span class="mat-day-code">${code}</span>` : '';
-    html += `<div class="${cls}" title="${esc(isFuture ? '' : `${dateStr} — ${statusText}`)}"${isFuture ? '' : ` onclick="selectMatCell(this)" data-date="${esc(fullDateLabel)}" data-status="${esc(statusText)}"`}>${day}${codeHtml}</div>`;
+    html += `<div class="${cls}" style="animation-delay:${day*12}ms" title="${esc(isFuture ? '' : `${dateStr} — ${statusText}`)}"${isFuture ? '' : ` onclick="selectMatCell(this)" data-date="${esc(fullDateLabel)}" data-status="${esc(statusText)}"`}>${day}${codeHtml}</div>`;
   }
   cellsEl.innerHTML = html;
   document.getElementById('mat-selected-detail').innerHTML = '<span style="color:#94a3b8">Tap a date above to see full details</span>';
@@ -7305,7 +7324,7 @@ function renderEmpCalendarTab(worker) {
       if (provisional) cls += ' mat-unconfirmed';
     }
     const title = isFuture ? '' : (rec ? `${dateStr} — ${rec.status}${provisional ? ' (awaiting office confirmation)' : ''}` : `${dateStr} — Not marked`);
-    cellsHtml += `<div class="${cls}" title="${esc(title)}">${day}${code ? `<span class="mat-day-code">${code}</span>` : ''}</div>`;
+    cellsHtml += `<div class="${cls}" style="animation-delay:${day*12}ms" title="${esc(title)}">${day}${code ? `<span class="mat-day-code">${code}</span>` : ''}</div>`;
   }
 
   document.getElementById('attendance-body').innerHTML = `
@@ -7352,19 +7371,35 @@ function renderEmpLeaveTab(worker) {
 
   const historyHtml = history.length === 0
     ? `<div style="text-align:center;color:var(--muted);font-size:12.5px;padding:16px 0">No leave applications yet</div>`
-    : history.map(r => {
+    : history.map((r, i) => {
         const color = r.status === 'Approved' ? 'var(--green)' : r.status === 'Rejected' ? 'var(--red)' : 'var(--orange)';
-        return `<div class="emp-leave-history-row">
+        return `<div class="emp-leave-history-row reveal-row" style="animation-delay:${i*50}ms">
           <div><strong>${esc(r.fromDate)} → ${esc(r.toDate)}</strong> (${r.days} day${r.days===1?'':'s'})<br><small style="color:var(--muted)">${esc(r.reason||'—')}</small></div>
           <span style="color:${color};font-weight:700;font-size:12px">${esc(r.status)}</span>
         </div>`;
       }).join('');
 
+  // Circular progress ring — radius 45, so circumference = 2*pi*45 ≈ 282.7.
+  // Starts fully "empty" (offset = full circumference) and animates to the
+  // remaining-leave fraction via the CSS transition on .ring-fill (see
+  // stylesheet) once the fill-fraction class/style is applied a tick later.
+  const circumference = 2 * Math.PI * 45;
+  const fraction = allocation > 0 ? remaining / allocation : 0;
+
   document.getElementById('attendance-body').innerHTML = `
     <div class="emp-leave-balance-card">
-      <div class="num">${remaining}</div>
-      <div class="lbl">Paid Leave Remaining</div>
-      <div class="emp-leave-sub"><span>Total: ${allocation}</span><span>Used: ${used}</span></div>
+      <div class="lbl" style="margin-bottom:8px">Paid Leave Remaining</div>
+      <div class="emp-leave-ring">
+        <svg viewBox="0 0 100 100">
+          <circle class="ring-track" cx="50" cy="50" r="45"></circle>
+          <circle class="ring-fill" id="leave-ring-fill" cx="50" cy="50" r="45" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"></circle>
+        </svg>
+        <div class="ring-center">
+          <div class="num" id="leave-ring-num">0</div>
+          <div class="lbl" style="margin-top:0">of ${allocation}</div>
+        </div>
+      </div>
+      <div class="emp-leave-sub" style="margin-top:14px"><span>Total: ${allocation}</span><span>Used: ${used}</span></div>
     </div>
     <div class="portal-card">
       <div class="portal-cname" style="font-size:14px">Apply for Leave</div>
@@ -7381,6 +7416,15 @@ function renderEmpLeaveTab(worker) {
       <div class="portal-cname" style="font-size:14px">Your Leave History</div>
       <div style="margin-top:12px">${historyHtml}</div>
     </div>`;
+
+  // Trigger the ring + number animation a tick after paint so the CSS
+  // transition on stroke-dashoffset actually runs (setting it inline at
+  // creation time would jump straight to the final value, no animation).
+  requestAnimationFrame(() => {
+    const fillEl = document.getElementById('leave-ring-fill');
+    if (fillEl) fillEl.style.strokeDashoffset = circumference - (circumference * fraction);
+    animateCount('leave-ring-num', remaining);
+  });
 }
 
 window.submitEmpLeaveRequest = async () => {
@@ -7434,6 +7478,12 @@ function renderEmpSalaryTab(worker) {
     earned += r.wageAmount || 0;
   });
   const balance = (worker.totalEarned||0) - (worker.totalPaid||0);
+  const totalDays = present + half + leave + holiday + absent;
+  // Animated horizontal bar breakdown — each segment's WIDTH is what
+  // animates (0 → its share of the month), driven by the same
+  // requestAnimationFrame pattern as the leave ring so it actually plays
+  // instead of snapping straight to its final width.
+  const bar = (val, color) => totalDays > 0 ? `<div class="emp-sal-bar-seg" data-w="${(val/totalDays*100).toFixed(1)}" style="background:${color};width:0"></div>` : '';
 
   document.getElementById('attendance-body').innerHTML = `
     <div class="portal-card">
@@ -7444,14 +7494,15 @@ function renderEmpSalaryTab(worker) {
         <strong>${monthLabel}</strong>
         <button onclick="empSalNav(1)"><svg viewBox="0 0 24 24" class="ic"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
-      <div class="mat-legend" style="margin-top:14px;justify-content:space-between">
+      <div class="emp-sal-bar">${bar(present,'#22a35e')}${bar(half,'#f2b705')}${bar(leave,'#3b6fe0')}${bar(holiday,'#9b4fd1')}${bar(absent,'#e0473a')}</div>
+      <div class="mat-legend" style="margin-top:10px;justify-content:space-between">
         <span>Present: <strong>${present}</strong></span>
         <span>Half Day: <strong>${half}</strong></span>
         <span>Paid Leave: <strong>${leave}</strong></span>
         <span>Absent: <strong>${absent}</strong></span>
       </div>
       <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
-        <div class="emp-profile-row"><span class="lbl">Wage Earned (this month)</span><span class="val">₹${fmt(earned)}</span></div>
+        <div class="emp-profile-row"><span class="lbl">Wage Earned (this month)</span><span class="val">₹<span id="emp-sal-earned">0</span></span></div>
         <div class="emp-profile-row"><span class="lbl">Total Paid (lifetime)</span><span class="val">₹${fmt(worker.totalPaid||0)}</span></div>
         <div class="emp-profile-row"><span class="lbl">Overall Balance Due</span><span class="val" style="color:${balance>0?'var(--red)':'var(--green)'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</span></div>
       </div>
@@ -7459,6 +7510,13 @@ function renderEmpSalaryTab(worker) {
         <button class="btn btn-save" style="width:100%;justify-content:center" onclick="downloadEmpSalarySlip()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download PDF</button>
       </div>
     </div>`;
+
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#attendance-body .emp-sal-bar-seg').forEach((el, i) => {
+      setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 100);
+    });
+    animateCount('emp-sal-earned', earned);
+  });
 
   window._empSalStats = { present, half, leave, holiday, absent, hours: 0, earned, payRows: [], paidThisMonth: 0, balance };
   window._empSalMonthLabel = monthLabel;
@@ -7514,7 +7572,7 @@ function renderAttendanceCompletedView(worker, state) {
   const hrs = state.hoursWorked || 0;
   const h = Math.floor(hrs), m = Math.round((hrs - h) * 60);
   document.getElementById('attendance-body').innerHTML = `<div class="portal-card att-confirmed-box">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 12.5l5 5L20 6.5"/></svg>
+    <div class="success-check-circle" style="margin:0 auto 14px"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
     <div style="font-size:16px;font-weight:700;color:var(--navy)">Day complete — ${h}h ${m}m worked</div>
     <div style="font-size:13.5px;color:var(--muted);margin-top:4px">${esc(state.timeInDisplay)} → ${esc(state.timeOutDisplay)}</div>
     <div style="font-size:14px;font-weight:700;color:var(--orange);margin-top:8px">Marked as ${esc(state.status)}</div>
