@@ -6212,14 +6212,21 @@ function buildFunnelHTML(stages) {
   if (!stages.length || stages[0].value === 0) return '<div style="color:#64748b;font-size:14px;padding:8px 0">No data yet</div>';
   const max = stages[0].value || 1;
   return stages.map((s,i) => {
-    const pct = Math.max(10, Math.round((s.value/max)*100));
+    // A later stage can legitimately have MORE entries than "Leads
+    // Received" (e.g. quotations created directly without a lead first) —
+    // that's real, useful information and stays in the "% of previous
+    // stage" text below. But the BAR's width must never exceed 100% of
+    // its container or it visibly breaks out of the card on the right —
+    // clamp only the rendered width, not the number shown to the user.
+    const rawPct = Math.round((s.value/max)*100);
+    const pct = Math.min(100, Math.max(10, rawPct));
     const convFromPrev = i>0 && stages[i-1].value>0 ? Math.round((s.value/stages[i-1].value)*100) : null;
     return `<div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
         <span style="font-weight:600;color:var(--text)">${esc(s.label)}</span>
         <span style="color:var(--muted)">${s.value}${convFromPrev!==null ? ` <span style="color:#94a3b8">(${convFromPrev}% of previous stage)</span>` : ''}</span>
       </div>
-      <div style="background:#eef1f4;border-radius:2px;height:24px;overflow:hidden;width:${pct}%;min-width:60px">
+      <div style="background:#eef1f4;border-radius:2px;height:24px;overflow:hidden;width:${pct}%;min-width:60px;max-width:100%">
         <div style="width:100%;height:100%;background:linear-gradient(90deg,var(--navy),var(--orange))"></div>
       </div>
     </div>`;
