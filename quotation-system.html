@@ -132,16 +132,16 @@ html.attendance-boot #attendance-screen{display:block!important}
 
 /* CUSTOMER PORTAL (public, no login) */
 #portal-screen{display:none;min-height:100vh;background:var(--bg)}
-.portal-topbar{background:var(--navy);padding:18px 24px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.portal-topbar{background:var(--navy);padding:max(18px,env(safe-area-inset-top)) 24px 18px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 .portal-topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
 .portal-logo{height:36px;width:auto;object-fit:contain;position:relative;z-index:1}
 .portal-wordmark{font-size:16px;font-weight:700;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:.3px;position:relative;z-index:1}
 .portal-tagline{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1.2px;text-transform:uppercase;position:relative;z-index:1}
-.portal-body{max-width:640px;margin:0 auto;padding:28px 20px 60px}
+.portal-body{max-width:640px;margin:0 auto;padding:28px 20px max(60px,calc(env(safe-area-inset-bottom) + 24px))}
 .portal-body > *{animation:sectionIn .3s ease both}
-.emp-portal-tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;-webkit-overflow-scrolling:touch}
-.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 14px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:10.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
-.emp-tab-btn .ic{width:18px;height:18px}
+.emp-portal-tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;padding-top:env(safe-area-inset-top);z-index:5;-webkit-overflow-scrolling:touch}
+.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:44px}
+.emp-tab-btn .ic{width:20px;height:20px}
 .emp-tab-btn.active{color:var(--navy);border-bottom-color:var(--orange)}
 .emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:8px;padding:18px;text-align:center;margin-bottom:16px;animation:cardIn .4s ease both;position:relative;overflow:hidden}
 .emp-leave-balance-card::before{content:'';position:absolute;top:-40%;right:-20%;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);pointer-events:none}
@@ -253,7 +253,11 @@ html.attendance-boot #attendance-screen{display:block!important}
 .span-2{grid-column:span 2}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-label{font-size:12.5px;font-weight:700;color:var(--text)}
-.form-input,.form-select,.form-textarea{padding:11px 13px;border:1.5px solid var(--border);border-radius:2px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .18s,box-shadow .18s}
+.form-input,.form-select,.form-textarea{padding:11px 13px;border:1.5px solid var(--border);border-radius:2px;font-size:16px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .18s,box-shadow .18s}
+/* 16px above is the iOS Safari auto-zoom threshold — anything smaller
+   makes the whole page jump-zoom on every field tap. Desktop can afford
+   the denser 14px look since there's no zoom-on-focus behavior there. */
+@media(min-width:901px){.form-input,.form-select,.form-textarea{font-size:14px}}
 .form-input:focus,.form-select:focus,.form-textarea:focus{box-shadow:0 0 0 3px rgba(217,72,15,.1)}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange)}
 .form-textarea{resize:vertical;min-height:90px}
@@ -560,6 +564,51 @@ html.attendance-boot #attendance-screen{display:block!important}
   .main{padding:16px}
   .btn-row{flex-direction:column}
   .btn-row .btn{width:100%;justify-content:center}
+  /* Card layout for the tables people actually work through on a phone
+     (Labour, Leads) instead of a shrunk, horizontally-scrolling table —
+     see the .mobile-cards class added on those two <table> elements. Each
+     <td> already carries a data-label matching its header (added via JS),
+     which ::before turns into the left-hand field name in card view. */
+  .data-table.mobile-cards{font-size:13px}
+  .data-table.mobile-cards thead{display:none}
+  .data-table.mobile-cards tbody tr{display:block;margin-bottom:12px;border:1px solid var(--border);border-radius:6px;padding:4px 12px;background:#fff}
+  .data-table.mobile-cards tbody tr:hover{background:#fff}
+  .data-table.mobile-cards td{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #f1f3f4;text-align:right}
+  .data-table.mobile-cards td:last-child{border-bottom:none}
+  .data-table.mobile-cards td::before{content:attr(data-label);font-weight:700;color:var(--muted);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
+  .data-table.mobile-cards td[data-label=""]::before,
+  .data-table.mobile-cards td:not([data-label])::before{content:none}
+  .data-table.mobile-cards td.action-btns{justify-content:flex-end;flex-wrap:wrap}
+  .data-table.mobile-cards td select,.data-table.mobile-cards td input[type="checkbox"]{margin-left:auto}
+  .data-table.mobile-cards td[colspan]{display:block;text-align:center}
+}
+/* Touch targets: Google/Apple/WCAG all recommend >=44x44px for tap
+   targets. .btn-icon at its default padding (6px 8px around a 16px icon)
+   comes out to roughly 28-32px — fine with a mouse cursor, too small for
+   a fingertip. Scoped to touch/small-screen contexts only, so the dense
+   desktop table look (lots of icon buttons per row) is unaffected. */
+@media(max-width:900px),(pointer:coarse){
+  .btn-icon{min-width:44px;min-height:44px;padding:10px}
+  .action-btns{gap:8px}
+}
+/* Respects the OS-level "reduce motion" setting some users turn on for
+   motion sensitivity / vestibular disorders — collapses every animation
+   and transition in the app (including the recently-added calendar
+   stagger, leave-balance ring draw, count-up numbers, card entrances) to
+   effectively instant, without having to touch each one individually. */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.001ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+/* Very small phones (320-380px, still common on budget Android devices) —
+   flat 26-28px padding on modals eats a disproportionate share of the
+   usable width. Tighten it just on these narrow viewports. */
+@media(max-width:380px){
+  .confirm-box,.pay-modal-box,.monthly-att-box{padding:18px}
 }
 </style>
 </head>
@@ -749,41 +798,41 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Quotation ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="f-qtid" class="form-input" readonly></div>
-              <div class="form-group"><label class="form-label">Date</label><input type="date" id="f-date" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="f-qtid">Quotation ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="f-qtid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label" for="f-date">Date</label><input type="date" id="f-date" class="form-input"></div>
               <input type="hidden" id="f-leadid" value="">
             </div>
           </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="f-cname" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="f-cphone" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Email</label><input type="email" id="f-cemail" class="form-input"></div>
-              <div class="form-group span-2"><label class="form-label">Customer Address</label><input type="text" id="f-caddr" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="f-cname">Customer Name *</label><input type="text" id="f-cname" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="f-cphone">Phone *</label><input type="tel" id="f-cphone" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="f-cemail">Email</label><input type="email" id="f-cemail" class="form-input"></div>
+              <div class="form-group span-2"><label class="form-label" for="f-caddr">Customer Address</label><input type="text" id="f-caddr" class="form-input"></div>
             </div>
           </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT DETAILS</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Project Type *</label>
+              <div class="form-group"><label class="form-label" for="f-ptype">Project Type *</label>
                 <select id="f-ptype" class="form-select">
                   <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
                   <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
                   <option>Car Parking Shed</option><option>Roofing Work</option><option>Steel Structure</option><option>Custom</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">Area (sq.ft) *</label><input type="number" id="f-area" class="form-input" oninput="recalculate()"></div>
-              <div class="form-group"><label class="form-label">Rate per sq.ft (₹) *</label><input type="number" id="f-rate" class="form-input" oninput="recalculate()"></div>
-              <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="f-extra" class="form-input" oninput="recalculate()"></div>
-              <div class="form-group"><label class="form-label">Discount (₹)</label><input type="number" id="f-discount" class="form-input" oninput="recalculate()"></div>
-              <div class="form-group"><label class="form-label">GST %</label>
+              <div class="form-group"><label class="form-label" for="f-area">Area (sq.ft) *</label><input type="number" id="f-area" class="form-input" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label" for="f-rate">Rate per sq.ft (₹) *</label><input type="number" id="f-rate" class="form-input" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label" for="f-extra">Additional Charges (₹)</label><input type="number" id="f-extra" class="form-input" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label" for="f-discount">Discount (₹)</label><input type="number" id="f-discount" class="form-input" oninput="recalculate()"></div>
+              <div class="form-group"><label class="form-label" for="f-gst">GST %</label>
                 <select id="f-gst" class="form-select" onchange="recalculate()">
                   <option value="0">0% — Not Applicable</option>
                   <option value="18">18% — Standard GST</option>
                 </select>
               </div>
-              <div class="form-group span-2"><label class="form-label">Notes (additional charges detail)</label><input type="text" id="f-notes" class="form-input"></div>
+              <div class="form-group span-2"><label class="form-label" for="f-notes">Notes (additional charges detail)</label><input type="text" id="f-notes" class="form-input"></div>
             </div>
             <div class="cost-box" style="margin-top:20px;">
               <div>
@@ -816,14 +865,14 @@ html.attendance-boot #attendance-screen{display:block!important}
               This is a recurring / AMC (Annual Maintenance) contract
             </label>
             <div class="form-grid" id="f-recurring-fields" style="display:none">
-              <div class="form-group"><label class="form-label">Renewal Frequency</label>
+              <div class="form-group"><label class="form-label" for="f-recurring-freq">Renewal Frequency</label>
                 <select id="f-recurring-freq" class="form-select" onchange="recalcNextRenewal()">
                   <option value="Yearly">Yearly</option>
                   <option value="Half-Yearly">Half-Yearly</option>
                   <option value="Quarterly">Quarterly</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">Next Renewal Date</label><input type="date" id="f-next-renewal" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="f-next-renewal">Next Renewal Date</label><input type="date" id="f-next-renewal" class="form-input"></div>
             </div>
           </div>
           <div class="form-card">
@@ -955,12 +1004,12 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="form-card">
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW LEAD</div>
           <div class="form-grid" style="margin-bottom:16px">
-            <div class="form-group"><label class="form-label">Name *</label><input type="text" id="ld-name" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="ld-phone" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Email</label><input type="email" id="ld-email" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Address / Area</label><input type="text" id="ld-addr" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="ld-name">Name *</label><input type="text" id="ld-name" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="ld-phone">Phone *</label><input type="tel" id="ld-phone" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="ld-email">Email</label><input type="email" id="ld-email" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="ld-addr">Address / Area</label><input type="text" id="ld-addr" class="form-input"></div>
             <div class="form-group">
-              <label class="form-label">Project Type</label>
+              <label class="form-label" for="ld-ptype">Project Type</label>
               <select id="ld-ptype" class="form-select">
                 <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
                 <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
@@ -968,12 +1017,12 @@ html.attendance-boot #attendance-screen{display:block!important}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Source</label>
+              <label class="form-label" for="ld-source">Source</label>
               <select id="ld-source" class="form-select">
                 <option>Website</option><option>WhatsApp</option><option>Phone Call</option><option>Referral</option><option>Walk-in</option><option>Other</option>
               </select>
             </div>
-            <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="ld-notes" class="form-input"></div>
+            <div class="form-group span-2"><label class="form-label" for="ld-notes">Notes</label><input type="text" id="ld-notes" class="form-input"></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-save" onclick="saveLead(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
@@ -995,14 +1044,14 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="bulk-bar" id="leads-bulk-bar">
           <div class="bulk-bar-count"><span id="leads-selected-count">0</span> lead(s) selected</div>
           <div style="display:flex;gap:8px">
-            <button class="btn-icon btn-whatsapp" title="Bulk WhatsApp Follow-up" onclick="openBulkWhatsAppModal()" style="width:auto;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Bulk WhatsApp</button>
-            <button class="btn-icon" title="Clear Selection" onclick="toggleAllLeadsSelect(false)" style="width:auto;padding:0 14px;font-size:12.5px">Clear</button>
+            <button class="btn-icon btn-whatsapp" title="Bulk WhatsApp Follow-up" aria-label="Bulk WhatsApp Follow-up" onclick="openBulkWhatsAppModal()" style="width:auto;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Bulk WhatsApp</button>
+            <button class="btn-icon" title="Clear Selection" aria-label="Clear Selection" onclick="toggleAllLeadsSelect(false)" style="width:auto;padding:0 14px;font-size:12.5px">Clear</button>
           </div>
         </div>
 
         <div class="table-card">
           <div style="overflow-x:auto">
-          <table class="data-table">
+          <table class="data-table mobile-cards">
             <thead><tr><th style="width:34px"><input type="checkbox" id="leads-select-all" onchange="toggleAllLeadsSelect(this.checked)"></th><th>Name</th><th>Phone / Area</th><th>Project</th><th>Source</th><th>Age</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="leads-tbody"><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr><tr><td></td><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
           </table>
@@ -1045,16 +1094,16 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="form-card">
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> LOG A CALL-IN COMPLAINT</div>
           <div class="form-grid">
-            <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="tkt-new-name" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="tkt-new-phone" class="form-input" maxlength="10"></div>
-            <div class="form-group"><label class="form-label">Subject *</label><input type="text" id="tkt-new-subject" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Category</label>
+            <div class="form-group"><label class="form-label" for="tkt-new-name">Customer Name *</label><input type="text" id="tkt-new-name" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="tkt-new-phone">Phone *</label><input type="tel" id="tkt-new-phone" class="form-input" maxlength="10"></div>
+            <div class="form-group"><label class="form-label" for="tkt-new-subject">Subject *</label><input type="text" id="tkt-new-subject" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="tkt-new-category">Category</label>
               <select id="tkt-new-category" class="form-select"><option>Quality Issue</option><option>Delay</option><option>Billing</option><option>Other</option></select>
             </div>
-            <div class="form-group"><label class="form-label">Priority</label>
+            <div class="form-group"><label class="form-label" for="tkt-new-priority">Priority</label>
               <select id="tkt-new-priority" class="form-select"><option>Medium</option><option>High</option><option>Low</option></select>
             </div>
-            <div class="form-group span-2"><label class="form-label">Description *</label><textarea id="tkt-new-desc" class="form-input" rows="2" style="resize:vertical;font-family:inherit"></textarea></div>
+            <div class="form-group span-2"><label class="form-label" for="tkt-new-desc">Description *</label><textarea id="tkt-new-desc" class="form-input" rows="2" style="resize:vertical;font-family:inherit"></textarea></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-save" onclick="createTicketByStaff(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
@@ -1104,7 +1153,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg> QUICK LOAD FROM QUOTATION</div>
           <div class="load-qt-row">
             <div class="form-group" style="flex:1;min-width:220px">
-              <label class="form-label">Select Finalized Quotation</label>
+              <label class="form-label" for="inv-load-qt">Select Finalized Quotation</label>
               <select id="inv-load-qt" class="form-select">
                 <option value="">— Select a quotation to auto-fill —</option>
               </select>
@@ -1116,36 +1165,36 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> INVOICE META</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Invoice ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="i-invid" class="form-input" readonly></div>
-              <div class="form-group"><label class="form-label">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Due Date</label><input type="date" id="i-duedate" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Linked Quotation ID</label><input type="text" id="i-qtref" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-invid">Invoice ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="i-invid" class="form-input" readonly></div>
+              <div class="form-group"><label class="form-label" for="i-date">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-duedate">Due Date</label><input type="date" id="i-duedate" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-qtref">Linked Quotation ID</label><input type="text" id="i-qtref" class="form-input"></div>
             </div>
           </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Customer Name *</label><input type="text" id="i-cname" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Phone *</label><input type="tel" id="i-cphone" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Email</label><input type="email" id="i-cemail" class="form-input"></div>
-              <div class="form-group span-2"><label class="form-label">Customer Address</label><input type="text" id="i-caddr" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-cname">Customer Name *</label><input type="text" id="i-cname" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-cphone">Phone *</label><input type="tel" id="i-cphone" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-cemail">Email</label><input type="email" id="i-cemail" class="form-input"></div>
+              <div class="form-group span-2"><label class="form-label" for="i-caddr">Customer Address</label><input type="text" id="i-caddr" class="form-input"></div>
             </div>
           </div>
           <div class="form-card">
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT &amp; AMOUNT</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Project Type</label>
+              <div class="form-group"><label class="form-label" for="i-ptype">Project Type</label>
                 <select id="i-ptype" class="form-select">
                   <option>Tin Shed</option><option>Industrial Shed</option><option>PEB Structure</option>
                   <option>Prefab Warehouse</option><option>Factory Shed</option><option>Agricultural Shed</option>
                   <option>Car Parking Shed</option><option>Roofing Work</option><option>Steel Structure</option><option>Custom</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">Description</label><input type="text" id="i-desc" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Base Amount (₹) *</label><input type="number" id="i-base" class="form-input" oninput="recalculateInvoice()"></div>
-              <div class="form-group"><label class="form-label">Additional Charges (₹)</label><input type="number" id="i-extra" class="form-input" oninput="recalculateInvoice()"></div>
-              <div class="form-group"><label class="form-label">Discount (₹)</label><input type="number" id="i-discount" class="form-input" oninput="recalculateInvoice()"></div>
-              <div class="form-group"><label class="form-label">GST %</label>
+              <div class="form-group"><label class="form-label" for="i-desc">Description</label><input type="text" id="i-desc" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="i-base">Base Amount (₹) *</label><input type="number" id="i-base" class="form-input" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label" for="i-extra">Additional Charges (₹)</label><input type="number" id="i-extra" class="form-input" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label" for="i-discount">Discount (₹)</label><input type="number" id="i-discount" class="form-input" oninput="recalculateInvoice()"></div>
+              <div class="form-group"><label class="form-label" for="i-gst">GST %</label>
                 <select id="i-gst" class="form-select" onchange="recalculateInvoice()">
                   <option value="0">0% — Not Applicable</option>
                   <option value="18">18% — Standard GST</option>
@@ -1178,7 +1227,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg> WORK PROGRESS (shown to customer on their portal link)</div>
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">Current Stage</label>
+                <label class="form-label" for="i-workstage">Current Stage</label>
                 <select id="i-workstage" class="form-select">
                   <option value="0">Order Confirmed</option>
                   <option value="1">Material Procurement</option>
@@ -1189,7 +1238,7 @@ html.attendance-boot #attendance-screen{display:block!important}
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Progress Note (optional)</label>
+                <label class="form-label" for="i-worknote">Progress Note (optional)</label>
                 <input type="text" id="i-worknote" class="form-input" placeholder="e.g. Fabrication 60% done, expected delivery next week" maxlength="200">
               </div>
             </div>
@@ -1267,19 +1316,19 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="form-card">
             <div class="form-section-title" id="labour-form-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Name *</label><input type="text" id="lb-name" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Phone</label><input type="tel" id="lb-phone" class="form-input" maxlength="10"></div>
+              <div class="form-group"><label class="form-label" for="lb-name">Name *</label><input type="text" id="lb-name" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="lb-phone">Phone</label><input type="tel" id="lb-phone" class="form-input" maxlength="10"></div>
               <div class="form-group">
-                <label class="form-label">Role / Skill</label>
+                <label class="form-label" for="lb-role">Role / Skill</label>
                 <select id="lb-role" class="form-select">
                   <option>Welder</option><option>Fitter</option><option>Helper</option><option>Mason</option>
                   <option>Electrician</option><option>Supervisor</option><option>Driver</option><option>Other</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">Daily Wage (₹) *</label><input type="number" id="lb-wage" class="form-input" min="0"></div>
-              <div class="form-group"><label class="form-label">Joined Date</label><input type="date" id="lb-joined" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Paid Leave Allowed / Year</label><input type="number" id="lb-leave-allocation" class="form-input" min="0" value="12"></div>
-              <div class="form-group span-2"><label class="form-label">Notes</label><input type="text" id="lb-notes" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="lb-wage">Daily Wage (₹) *</label><input type="number" id="lb-wage" class="form-input" min="0"></div>
+              <div class="form-group"><label class="form-label" for="lb-joined">Joined Date</label><input type="date" id="lb-joined" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="lb-leave-allocation">Paid Leave Allowed / Year</label><input type="number" id="lb-leave-allocation" class="form-input" min="0" value="12"></div>
+              <div class="form-group span-2"><label class="form-label" for="lb-notes">Notes</label><input type="text" id="lb-notes" class="form-input"></div>
             </div>
             <div class="btn-row">
               <button class="btn btn-save" id="lb-save-btn" onclick="saveLabour()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker</button>
@@ -1299,7 +1348,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
           <div class="table-card">
             <div style="overflow-x:auto">
-            <table class="data-table">
+            <table class="data-table mobile-cards">
               <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Daily Wage</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="labour-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
             </table>
@@ -1311,7 +1360,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="subtab-pane" id="labour-pane-attendance">
           <div class="history-controls">
             <div class="form-group" style="min-width:170px">
-              <label class="form-label">Date</label>
+              <label class="form-label" for="att-date">Date</label>
               <input type="date" id="att-date" class="form-input" onchange="loadAttendanceForDate()">
             </div>
             <button class="btn btn-reset" style="align-self:flex-end;padding:9px 14px;font-size:12px" onclick="markAllPresent()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg> Mark All Present</button>
@@ -1352,8 +1401,8 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> WORK HOURS FOR PRESENT / HALF DAY</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">A worker's status is decided from the hours between their Time In and Time Out — not a manual choice. Below the Half Day threshold, it's marked Absent (the office can still override any of this manually in the Attendance tab).</p>
             <div class="form-grid" style="max-width:400px">
-              <div class="form-group"><label class="form-label">Full Day = Present (hours)</label><input type="number" id="att-fullday-hours" class="form-input" value="8" min="1" max="24" step="0.5"></div>
-              <div class="form-group"><label class="form-label">Minimum for Half Day (hours)</label><input type="number" id="att-halfday-hours" class="form-input" value="4" min="0.5" max="24" step="0.5"></div>
+              <div class="form-group"><label class="form-label" for="att-fullday-hours">Full Day = Present (hours)</label><input type="number" id="att-fullday-hours" class="form-input" value="8" min="1" max="24" step="0.5"></div>
+              <div class="form-group"><label class="form-label" for="att-halfday-hours">Minimum for Half Day (hours)</label><input type="number" id="att-halfday-hours" class="form-input" value="4" min="0.5" max="24" step="0.5"></div>
             </div>
             <div class="btn-row">
               <button class="btn btn-save" onclick="saveAttendanceHourThresholds()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Hours</button>
@@ -1364,10 +1413,10 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> ADD SITE / OFFICE LOCATION</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When a worker self-marks attendance from their phone, their GPS location is checked against these — within range of any one of them counts as "Verified". Stand at the actual site or office and tap "Use My Current Location" for the easiest, most accurate setup.</p>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Location Name *</label><input type="text" id="loc-name" class="form-input" placeholder="e.g. Head Office, Site — Rajiv Bhargav Shed"></div>
-              <div class="form-group"><label class="form-label">Radius (meters)</label><input type="number" id="loc-radius" class="form-input" value="200" min="20" max="5000"></div>
-              <div class="form-group"><label class="form-label">Latitude</label><input type="number" id="loc-lat" class="form-input" step="any" readonly placeholder="Use the button below"></div>
-              <div class="form-group"><label class="form-label">Longitude</label><input type="number" id="loc-lng" class="form-input" step="any" readonly placeholder="Use the button below"></div>
+              <div class="form-group"><label class="form-label" for="loc-name">Location Name *</label><input type="text" id="loc-name" class="form-input" placeholder="e.g. Head Office, Site — Rajiv Bhargav Shed"></div>
+              <div class="form-group"><label class="form-label" for="loc-radius">Radius (meters)</label><input type="number" id="loc-radius" class="form-input" value="200" min="20" max="5000"></div>
+              <div class="form-group"><label class="form-label" for="loc-lat">Latitude</label><input type="number" id="loc-lat" class="form-input" step="any" readonly placeholder="Use the button below"></div>
+              <div class="form-group"><label class="form-label" for="loc-lng">Longitude</label><input type="number" id="loc-lng" class="form-input" step="any" readonly placeholder="Use the button below"></div>
             </div>
             <div class="btn-row">
               <button class="btn btn-reset" onclick="captureCurrentLocation()" type="button"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> Use My Current Location</button>
@@ -1393,8 +1442,8 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> ADD COMPANY HOLIDAY</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Dates added here are paid holidays for everyone (Diwali, Independence Day, etc.). They show a reminder banner in the Attendance tab so office staff never confuses a holiday with an unmarked absent day.</p>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Date *</label><input type="date" id="hol-date" class="form-input"></div>
-              <div class="form-group"><label class="form-label">Holiday Name *</label><input type="text" id="hol-name" class="form-input" placeholder="e.g. Diwali, Independence Day"></div>
+              <div class="form-group"><label class="form-label" for="hol-date">Date *</label><input type="date" id="hol-date" class="form-input"></div>
+              <div class="form-group"><label class="form-label" for="hol-name">Holiday Name *</label><input type="text" id="hol-name" class="form-input" placeholder="e.g. Diwali, Independence Day"></div>
             </div>
             <div class="btn-row">
               <button class="btn btn-save" onclick="addHoliday()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Holiday</button>
@@ -1434,7 +1483,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> PRICING APPROVAL SETTINGS</div>
           <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When Sales finalizes a quotation with a discount above this percentage of (base + extra), it's saved as "Pending Approval" — it can't be downloaded, shared on WhatsApp, or given a customer portal link until an Admin approves it here or on the Dashboard.</p>
           <div class="form-grid" style="max-width:320px">
-            <div class="form-group"><label class="form-label">Discount Threshold (%)</label><input type="number" id="approval-threshold-input" class="form-input" min="0" max="100" step="0.5"></div>
+            <div class="form-group"><label class="form-label" for="approval-threshold-input">Discount Threshold (%)</label><input type="number" id="approval-threshold-input" class="form-input" min="0" max="100" step="0.5"></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-save" onclick="saveApprovalThreshold()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Threshold</button>
@@ -1444,11 +1493,11 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="form-card">
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD TEAM MEMBER</div>
           <div class="form-grid" style="margin-bottom:16px">
-            <div class="form-group"><label class="form-label">Full Name *</label><input type="text" id="tm-name" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Email *</label><input type="email" id="tm-email" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Temporary Password *</label><input type="text" id="tm-pass" class="form-input" placeholder="Min 8 characters" minlength="8"></div>
+            <div class="form-group"><label class="form-label" for="tm-name">Full Name *</label><input type="text" id="tm-name" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="tm-email">Email *</label><input type="email" id="tm-email" class="form-input"></div>
+            <div class="form-group"><label class="form-label" for="tm-pass">Temporary Password *</label><input type="text" id="tm-pass" class="form-input" placeholder="Min 8 characters" minlength="8"></div>
             <div class="form-group">
-              <label class="form-label">Role</label>
+              <label class="form-label" for="tm-role">Role</label>
               <select id="tm-role" class="form-select">
                 <option>Sales</option><option>Accounts</option><option>Admin</option>
               </select>
@@ -1593,14 +1642,14 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Record Payment</div>
     <div class="pay-modal-sub" id="pay-modal-sub">Invoice —</div>
     <div class="form-grid">
-      <div class="form-group span-2"><label class="form-label">Amount Received (₹) *</label><input type="number" id="pay-amount" class="form-input"></div>
-      <div class="form-group"><label class="form-label">Mode</label>
+      <div class="form-group span-2"><label class="form-label" for="pay-amount">Amount Received (₹) *</label><input type="number" id="pay-amount" class="form-input"></div>
+      <div class="form-group"><label class="form-label" for="pay-mode">Mode</label>
         <select id="pay-mode" class="form-select">
           <option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Date</label><input type="date" id="pay-date" class="form-input"></div>
-      <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="pay-note" class="form-input"></div>
+      <div class="form-group"><label class="form-label" for="pay-date">Date</label><input type="date" id="pay-date" class="form-input"></div>
+      <div class="form-group span-2"><label class="form-label" for="pay-note">Note</label><input type="text" id="pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-save" onclick="savePayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
@@ -1616,7 +1665,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Update Work Progress</div>
     <div class="pay-modal-sub" id="ws-modal-sub">Invoice —</div>
     <div class="form-grid">
-      <div class="form-group span-2"><label class="form-label">Current Stage</label>
+      <div class="form-group span-2"><label class="form-label" for="ws-stage">Current Stage</label>
         <select id="ws-stage" class="form-select">
           <option value="0">Order Confirmed</option>
           <option value="1">Material Procurement</option>
@@ -1626,10 +1675,10 @@ html.attendance-boot #attendance-screen{display:block!important}
           <option value="5">Completed</option>
         </select>
       </div>
-      <div class="form-group span-2"><label class="form-label">Progress Note (optional, shown to customer)</label><input type="text" id="ws-note" class="form-input" maxlength="200" placeholder="e.g. Fabrication 60% done, expected delivery next week"></div>
+      <div class="form-group span-2"><label class="form-label" for="ws-note">Progress Note (optional, shown to customer)</label><input type="text" id="ws-note" class="form-input" maxlength="200" placeholder="e.g. Fabrication 60% done, expected delivery next week"></div>
     </div>
     <div class="form-group" style="margin-top:4px">
-      <label class="form-label">Site Photos (shown to customer on their portal link)</label>
+      <label class="form-label" for="ws-photo-input">Site Photos (shown to customer on their portal link)</label>
       <input type="file" id="ws-photo-input" accept="image/*" multiple onchange="handleWorkPhotoSelect(this.files)" style="font-size:12.5px">
       <div id="ws-photo-uploading" style="display:none;font-size:12px;color:var(--muted);margin-top:6px">Uploading &amp; compressing...</div>
       <div id="ws-photo-gallery" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
@@ -1647,15 +1696,15 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Record Wage Payment</div>
     <div class="pay-modal-sub" id="lb-pay-modal-sub">Worker —</div>
     <div class="form-grid">
-      <div class="form-group span-2"><label class="form-label">Amount Paid (₹) *</label><input type="number" id="lb-pay-amount" class="form-input" min="0"></div>
-      <div class="form-group"><label class="form-label">Date</label><input type="date" id="lb-pay-date" class="form-input"></div>
-      <div class="form-group"><label class="form-label">Mode</label>
+      <div class="form-group span-2"><label class="form-label" for="lb-pay-amount">Amount Paid (₹) *</label><input type="number" id="lb-pay-amount" class="form-input" min="0"></div>
+      <div class="form-group"><label class="form-label" for="lb-pay-date">Date</label><input type="date" id="lb-pay-date" class="form-input"></div>
+      <div class="form-group"><label class="form-label" for="lb-pay-mode">Mode</label>
         <select id="lb-pay-mode" class="form-select"><option>Cash</option><option>UPI</option><option>Bank Transfer</option></select>
       </div>
-      <div class="form-group"><label class="form-label">Type</label>
+      <div class="form-group"><label class="form-label" for="lb-pay-type">Type</label>
         <select id="lb-pay-type" class="form-select"><option>Wage Settlement</option><option>Advance</option></select>
       </div>
-      <div class="form-group span-2"><label class="form-label">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
+      <div class="form-group span-2"><label class="form-label" for="lb-pay-note">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-save" onclick="saveLabourPayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
@@ -1716,7 +1765,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Generate Salary Slip</div>
     <div class="pay-modal-sub" id="ss-sub">Worker —</div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label">Month</label>
+      <div class="form-group"><label class="form-label" for="ss-month">Month</label>
         <select id="ss-month" class="form-select">
           <option value="0">January</option><option value="1">February</option><option value="2">March</option>
           <option value="3">April</option><option value="4">May</option><option value="5">June</option>
@@ -1724,7 +1773,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <option value="9">October</option><option value="10">November</option><option value="11">December</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Year</label><input type="number" id="ss-year" class="form-input"></div>
+      <div class="form-group"><label class="form-label" for="ss-year">Year</label><input type="number" id="ss-year" class="form-input"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-save" id="ss-generate-btn" onclick="generateSalarySlipPDF(this)"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Generate PDF</button>
@@ -1739,7 +1788,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Bulk WhatsApp Follow-up</div>
     <div class="pay-modal-sub" id="bulk-wa-sub">0 leads selected</div>
     <div class="form-group">
-      <label class="form-label">Message Template</label>
+      <label class="form-label" for="bulk-wa-template">Message Template</label>
       <textarea id="bulk-wa-template" class="form-textarea" rows="4"></textarea>
       <div style="font-size:11.5px;color:var(--muted);margin-top:5px">Use <strong>{name}</strong> and <strong>{project}</strong> — replaced automatically for each lead.</div>
     </div>
@@ -1784,13 +1833,13 @@ html.attendance-boot #attendance-screen{display:block!important}
 
       <div class="form-grid" style="margin-bottom:16px">
         <div class="form-group">
-          <label class="form-label">Status</label>
+          <label class="form-label" for="tkt-status-select">Status</label>
           <select id="tkt-status-select" class="form-select" onchange="updateTicketField(window._activeTicketId,'status',this.value)">
             <option>Open</option><option>In Progress</option><option>Resolved</option><option>Closed</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Priority</label>
+          <label class="form-label" for="tkt-priority-select">Priority</label>
           <select id="tkt-priority-select" class="form-select" onchange="updateTicketField(window._activeTicketId,'priority',this.value)">
             <option>Low</option><option>Medium</option><option>High</option>
           </select>
@@ -1800,7 +1849,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="ticket-thread" id="tkt-thread"></div>
 
       <div class="form-group">
-        <label class="form-label">Reply to Customer</label>
+        <label class="form-label" for="tkt-reply-input">Reply to Customer</label>
         <textarea id="tkt-reply-input" class="form-input" rows="3" style="resize:vertical;font-family:inherit" placeholder="Type your reply here..."></textarea>
       </div>
       <div class="btn-row">
@@ -2739,7 +2788,7 @@ window.renderTeam = () => {
                  <svg viewBox="0 0 24 24" class="ic" style="width:12px;height:12px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
                  ${esc(t.role)}
                </span>
-               <button type="button" class="btn-icon" title="Unlock role to change it" onclick="unlockRoleForChange('${t.id}')" style="margin-left:6px">
+               <button type="button" class="btn-icon" title="Unlock role to change it" aria-label="Unlock role to change it" onclick="unlockRoleForChange('${t.id}')" style="margin-left:6px">
                  <svg viewBox="0 0 24 24" class="ic" style="width:13px;height:13px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg> Unlock
                </button>`
             : `<select onchange="changeTeamRole('${t.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
@@ -2819,8 +2868,8 @@ window.renderDeletedItems = (search='', keepPage=false) => {
         <td>${esc(x.label)}</td>
         <td>${x.deletedAt?.toDate ? x.deletedAt.toDate().toLocaleString('en-IN') : '—'}</td>
         <td class="action-btns">
-          <button onclick="restoreItem('${x.type}','${x.id}')" class="btn-icon" title="Restore">${ICONS.restore}</button>
-          <button onclick="permanentlyDeleteItem('${x.type}','${x.id}')" class="btn-icon btn-danger" title="Delete Permanently">${ICONS.trash}</button>
+          <button onclick="restoreItem('${x.type}','${x.id}')" class="btn-icon" title="Restore" aria-label="Restore">${ICONS.restore}</button>
+          <button onclick="permanentlyDeleteItem('${x.type}','${x.id}')" class="btn-icon btn-danger" title="Delete Permanently" aria-label="Delete Permanently">${ICONS.trash}</button>
         </td>
       </tr>`).join('');
   _pageState.deleted = page;
@@ -2953,7 +3002,7 @@ window.loadAttendanceLocations = async () => {
           <td><strong>${esc(l.name)}</strong></td>
           <td class="mono" style="font-size:12px">${l.lat.toFixed(5)}, ${l.lng.toFixed(5)}</td>
           <td>${l.radiusMeters} m</td>
-          <td class="action-btns"><button onclick="deleteAttendanceLocation(${idx})" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button></td>
+          <td class="action-btns"><button onclick="deleteAttendanceLocation(${idx})" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button></td>
         </tr>`).join('');
   } catch(e) { reportError(e); tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--red)">Couldn't load locations</td></tr>`; }
 };
@@ -3003,7 +3052,7 @@ function renderHolidayList() {
     : allHolidays.map(h => `<tr>
         <td class="mono">${fmtDate(h.date)}</td>
         <td>${esc(h.name)}</td>
-        <td class="action-btns"><button onclick="deleteHoliday('${h.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button></td>
+        <td class="action-btns"><button onclick="deleteHoliday('${h.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button></td>
       </tr>`).join('');
 }
 
@@ -3167,8 +3216,8 @@ window.renderLeaveRequests = () => {
           : '<span class="badge-draft">Pending</span>';
         const actions = r.status === 'Pending'
           ? `<div class="action-btns">
-              <button onclick="approveLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon" title="Approve"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
-              <button onclick="rejectLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon btn-danger" title="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+              <button onclick="approveLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon" title="Approve" aria-label="Approve"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+              <button onclick="rejectLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             </div>`
           : `<small style="color:#94a3b8">${esc(r.decidedBy || '')}</small>`;
         return `<tr id="leave-row-${r.id}" class="reveal-row" style="animation-delay:${i*35}ms">
@@ -3243,21 +3292,21 @@ window.renderLabourList = (search='') => {
   tbody.innerHTML = list.length === 0
     ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No workers found</td></tr>`
     : list.map(w => `<tr${w.active===false?' style="opacity:.55"':''}>
-        <td><strong>${esc(w.name)}</strong></td>
-        <td>${esc(w.phone||'—')}</td>
-        <td>${esc(w.role||'—')}</td>
-        <td class="mono">₹${fmt(w.dailyWage||0)}</td>
-        <td>${w.joinedDate||'—'}</td>
-        <td>${w.active===false?'<span class="badge-draft">Inactive</span>':'<span style="color:var(--green);font-size:12px;font-weight:700">Active</span>'}</td>
-        <td class="action-btns">
-          <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
-          <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
-          <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF">${ICONS.download}</button>
-          <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
-          <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)">${ICONS.globe}</button>
-          <button onclick="setWorkerPin('${w.id}')" class="btn-icon" title="Set/Reset Attendance PIN">${ICONS.lock}</button>
-          <button onclick="toggleLabourActive('${w.id}')" class="btn-icon" title="${w.active===false?'Reactivate':'Deactivate'}">${w.active===false?ICONS.restore:ICONS.trash}</button>
-          <button onclick="delLabour('${w.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
+        <td data-label="Name"><strong>${esc(w.name)}</strong></td>
+        <td data-label="Phone">${esc(w.phone||'—')}</td>
+        <td data-label="Role">${esc(w.role||'—')}</td>
+        <td data-label="Daily Wage" class="mono">₹${fmt(w.dailyWage||0)}</td>
+        <td data-label="Joined">${w.joinedDate||'—'}</td>
+        <td data-label="Status">${w.active===false?'<span class="badge-draft">Inactive</span>':'<span style="color:var(--green);font-size:12px;font-weight:700">Active</span>'}</td>
+        <td data-label="Actions" class="action-btns">
+          <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History" aria-label="History">${ICONS.eye}</button>
+          <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
+          <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF" aria-label="Salary Slip PDF">${ICONS.download}</button>
+          <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit" aria-label="Edit">${ICONS.edit}</button>
+          <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)" aria-label="Get Attendance Link (self-marking)">${ICONS.globe}</button>
+          <button onclick="setWorkerPin('${w.id}')" class="btn-icon" title="Set/Reset Attendance PIN" aria-label="Set/Reset Attendance PIN">${ICONS.lock}</button>
+          <button onclick="toggleLabourActive('${w.id}')" class="btn-icon" title="${w.active===false?'Reactivate':'Deactivate'}" aria-label="${w.active===false?'Reactivate':'Deactivate'}">${w.active===false?ICONS.restore:ICONS.trash}</button>
+          <button onclick="delLabour('${w.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
         </td>
       </tr>`).join('');
 };
@@ -3606,10 +3655,10 @@ window.renderWageSummary = async () => {
             <td class="mono">₹${fmt(paid)}</td>
             <td class="mono ${balance>0?'balance-due':'balance-clear'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</td>
             <td class="action-btns">
-              <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
-              <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
-              <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History">${ICONS.eye}</button>
-              <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF">${ICONS.download}</button>
+              <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment" aria-label="Record Payment">${ICONS.coin}</button>
+              <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
+              <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History" aria-label="History">${ICONS.eye}</button>
+              <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF" aria-label="Salary Slip PDF">${ICONS.download}</button>
             </td>
           </tr>`;
         }).join('');
@@ -4172,7 +4221,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(l.name)}</strong> — ${esc(l.status)} — ${esc(l.ptype||'—')}
                 <br><small style="color:#94a3b8">${l.days} days with no update</small></div>
-              <a href="${waLink(l.phone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(l.phone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -4196,8 +4245,8 @@ window.loadDashboard = async () => {
                 <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                   <br><small style="color:#94a3b8">Discount ${discPct.toFixed(1)}% (limit ${approvalThresholdPct}%) — requested by ${esc(q.createdBy||'—')}</small></div>
                 <div style="display:flex;gap:6px">
-                  <button onclick="decideQuotationApproval('${q.id}',true)" class="btn-icon" title="Approve" style="color:var(--green)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
-                  <button onclick="decideQuotationApproval('${q.id}',false)" class="btn-icon btn-danger" title="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+                  <button onclick="decideQuotationApproval('${q.id}',true)" class="btn-icon" title="Approve" aria-label="Approve" style="color:var(--green)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+                  <button onclick="decideQuotationApproval('${q.id}',false)" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
                 </div>
               </div>`;
             }).join('');
@@ -4235,7 +4284,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                 <br><small style="color:#94a3b8">${q.days} days pending</small></div>
-              <a href="${waLink(q.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(q.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
 
@@ -4258,7 +4307,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ${esc(q.recurringFreq||'')}
                 <br><small style="color:#94a3b8">${dueLabel}</small></div>
-              <button onclick="duplicateQuotation('${q.id}')" class="btn-icon" title="Renew (duplicate as new quotation)">${ICONS.refresh}</button>
+              <button onclick="duplicateQuotation('${q.id}')" class="btn-icon" title="Renew (duplicate as new quotation)" aria-label="Renew (duplicate as new quotation)">${ICONS.refresh}</button>
             </div>`;
           }).join('');
     }
@@ -4286,7 +4335,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${dueLabel}${reminderNote(i)}</small></div>
-              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
+              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
             </div>`;
           }).join('');
 
@@ -4312,7 +4361,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${ageLabel}${reminderNote(i)}</small></div>
-              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
+              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
             </div>`;
           }).join('');
     }
@@ -4349,7 +4398,7 @@ window.loadDashboard = async () => {
             : missed.map((w, i) => `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
                 <div><strong>${esc(w.name)}</strong> — ${esc(w.role || 'Worker')}
                   <br><small style="color:#94a3b8">Not marked for ${todayStr}</small></div>
-                <button onclick="showSection('labour');showLabourSubtab('attendance')" class="btn-icon" title="Mark Attendance"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></button>
+                <button onclick="showSection('labour');showLabourSubtab('attendance')" class="btn-icon" title="Mark Attendance" aria-label="Mark Attendance"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></button>
               </div>`).join('');
         }
       } catch(e) {
@@ -5085,24 +5134,24 @@ window.renderLeads = (search='', keepPage=false) => {
         const isOpen = !['Won','Lost'].includes(l.status);
         const age = daysSince(l.updatedAt || l.createdAt);
         const ageClass = isOpen && age >= 5 ? 'balance-due' : isOpen && age >= 2 ? '' : 'balance-clear';
-        const followUpBtn = isOpen ? `<a href="${waLink(l.phone, `Hello ${l.name}, this is R.R Teen Set Solution. We wanted to discuss your ${l.ptype||'requirement'}. Please let us know how you'd like to proceed. Thank you!`)}" target="_blank" rel="noopener noreferrer" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
+        const followUpBtn = isOpen ? `<a href="${waLink(l.phone, `Hello ${l.name}, this is R.R Teen Set Solution. We wanted to discuss your ${l.ptype||'requirement'}. Please let us know how you'd like to proceed. Thank you!`)}" target="_blank" rel="noopener noreferrer" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
         return `<tr>
-        <td><input type="checkbox" class="lead-select-cb" value="${l.id}" onchange="updateLeadsBulkBar()"></td>
-        <td><strong>${esc(l.name)}</strong></td>
-        <td>${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
-        <td>${esc(l.ptype||'—')}</td>
-        <td>${esc(l.source||'—')}</td>
-        <td><span class="mono ${ageClass}">${age}d</span></td>
-        <td>
+        <td data-label="Select"><input type="checkbox" class="lead-select-cb" value="${l.id}" onchange="updateLeadsBulkBar()"></td>
+        <td data-label="Name"><strong>${esc(l.name)}</strong></td>
+        <td data-label="Phone / Area">${esc(l.phone)}<br><small>${esc(l.addr||'')}</small></td>
+        <td data-label="Project">${esc(l.ptype||'—')}</td>
+        <td data-label="Source">${esc(l.source||'—')}</td>
+        <td data-label="Age"><span class="mono ${ageClass}">${age}d</span></td>
+        <td data-label="Status">
           <select onchange="updateLeadStatus('${l.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
             ${['New','Contacted','Site Visit','Quoted','Won','Lost'].map(s=>`<option ${l.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
         </td>
-        <td class="action-btns">
+        <td data-label="Actions" class="action-btns">
           ${followUpBtn}
-          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation">${ICONS.fileText}</button>
-          <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
-          <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
+          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation" aria-label="Convert to Quotation">${ICONS.fileText}</button>
+          <button onclick="editLead('${l.id}')" class="btn-icon" title="Edit" aria-label="Edit">${ICONS.edit}</button>
+          <button onclick="delLead('${l.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
         </td></tr>`;
       }).join('');
   renderPaginationControls('leads-pagination', 'leads', page, totalPages, total);
@@ -5584,17 +5633,17 @@ window.renderHistory = (search='', keepPage=false) => {
             ${['Pending','Sent','Won','Lost'].map(s=>`<option ${(q.dealStatus||'Pending')===s?'selected':''}>${s}</option>`).join('')}
           </select>`}</td>
         <td class="action-btns">
-          <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview">${ICONS.eye}</button>
-          <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
+          <button onclick="viewQT('${q.id}')" class="btn-icon" title="Preview" aria-label="Preview">${ICONS.eye}</button>
+          <button onclick="editQT('${q.id}')" class="btn-icon" title="Edit" aria-label="Edit">${ICONS.edit}</button>
           ${isBlocked
-            ? `<button class="btn-icon" disabled title="Pending approval — can't download until approved" style="opacity:.35;cursor:not-allowed">${ICONS.download}</button>`
-            : `<button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>`}
+            ? `<button class="btn-icon" disabled title="Pending approval — can't download until approved" aria-label="Pending approval — can't download until approved" style="opacity:.35;cursor:not-allowed">${ICONS.download}</button>`
+            : `<button onclick="dlPDF('${q.id}')" class="btn-icon" title="Download PDF" aria-label="Download PDF">${ICONS.download}</button>`}
           ${isBlocked
-            ? `<button class="btn-icon" disabled title="Pending approval — can't share until approved" style="opacity:.35;cursor:not-allowed">${ICONS.chat}</button>`
-            : `<button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>`}
-          ${!q.isDraft && !isBlocked ? `<button onclick="generatePortalLink('quotation','${q.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>` : ''}
-          <button onclick="duplicateQuotation('${q.id}')" class="btn-icon" title="Duplicate as New Quotation">${ICONS.refresh}</button>
-          <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
+            ? `<button class="btn-icon" disabled title="Pending approval — can't share until approved" aria-label="Pending approval — can't share until approved" style="opacity:.35;cursor:not-allowed">${ICONS.chat}</button>`
+            : `<button onclick="shareWhatsApp('${q.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp" aria-label="Share on WhatsApp">${ICONS.chat}</button>`}
+          ${!q.isDraft && !isBlocked ? `<button onclick="generatePortalLink('quotation','${q.id}')" class="btn-icon" title="Share Customer Link" aria-label="Share Customer Link">${ICONS.globe}</button>` : ''}
+          <button onclick="duplicateQuotation('${q.id}')" class="btn-icon" title="Duplicate as New Quotation" aria-label="Duplicate as New Quotation">${ICONS.refresh}</button>
+          <button onclick="delQT('${q.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
         </td></tr>`;
       }).join('');
   renderPaginationControls('history-pagination', 'history', page, totalPages, total);
@@ -6520,15 +6569,15 @@ window.renderInvoices = (search='', keepPage=false) => {
         <td class="${balance>0?'balance-due':'balance-clear'}">₹${fmt(balance)}</td>
         <td>${badge}<br><small>${i.date||'—'}</small></td>
         <td class="action-btns">
-          <button onclick="viewInvoice('${i.id}')" class="btn-icon" title="Preview">${ICONS.eye}</button>
-          <button onclick="editInvoice('${i.id}')" class="btn-icon" title="Edit">${ICONS.edit}</button>
-          <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment">${ICONS.coin}</button>
-          <button onclick="openWorkStatusModal('${i.id}')" class="btn-icon" title="Update Work Progress">${ICONS.chart}</button>
-          <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF">${ICONS.download}</button>
-          <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp">${ICONS.chat}</button>
-          <button onclick="generatePortalLink('invoice','${i.id}')" class="btn-icon" title="Share Customer Link">${ICONS.globe}</button>
-          <button onclick="shareInvoiceEmail('${i.id}')" class="btn-icon" title="Share via Email">${ICONS.mail}</button>
-          <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete">${ICONS.trash}</button>
+          <button onclick="viewInvoice('${i.id}')" class="btn-icon" title="Preview" aria-label="Preview">${ICONS.eye}</button>
+          <button onclick="editInvoice('${i.id}')" class="btn-icon" title="Edit" aria-label="Edit">${ICONS.edit}</button>
+          <button onclick="openPaymentModal('${i.id}')" class="btn-icon" title="Record Payment" aria-label="Record Payment">${ICONS.coin}</button>
+          <button onclick="openWorkStatusModal('${i.id}')" class="btn-icon" title="Update Work Progress" aria-label="Update Work Progress">${ICONS.chart}</button>
+          <button onclick="dlInvoicePDF('${i.id}')" class="btn-icon" title="Download PDF" aria-label="Download PDF">${ICONS.download}</button>
+          <button onclick="shareInvoiceWhatsApp('${i.id}')" class="btn-icon btn-whatsapp" title="Share on WhatsApp" aria-label="Share on WhatsApp">${ICONS.chat}</button>
+          <button onclick="generatePortalLink('invoice','${i.id}')" class="btn-icon" title="Share Customer Link" aria-label="Share Customer Link">${ICONS.globe}</button>
+          <button onclick="shareInvoiceEmail('${i.id}')" class="btn-icon" title="Share via Email" aria-label="Share via Email">${ICONS.mail}</button>
+          <button onclick="delInvoice('${i.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
         </td></tr>`;
       }).join('');
   renderPaginationControls('invoices-pagination', 'invoices', page, totalPages, total);
@@ -7404,9 +7453,9 @@ function renderEmpLeaveTab(worker) {
     <div class="portal-card">
       <div class="portal-cname" style="font-size:14px">Apply for Leave</div>
       <div class="form-grid" style="margin-top:12px">
-        <div class="form-group"><label class="form-label">From</label><input type="date" id="leave-from" class="form-input"></div>
-        <div class="form-group"><label class="form-label">To</label><input type="date" id="leave-to" class="form-input"></div>
-        <div class="form-group span-2"><label class="form-label">Reason</label><input type="text" id="leave-reason" class="form-input" placeholder="e.g. Family function" maxlength="300"></div>
+        <div class="form-group"><label class="form-label" for="leave-from">From</label><input type="date" id="leave-from" class="form-input"></div>
+        <div class="form-group"><label class="form-label" for="leave-to">To</label><input type="date" id="leave-to" class="form-input"></div>
+        <div class="form-group span-2"><label class="form-label" for="leave-reason">Reason</label><input type="text" id="leave-reason" class="form-input" placeholder="e.g. Family function" maxlength="300"></div>
       </div>
       <div class="btn-row" style="margin-top:12px">
         <button class="btn btn-save" style="width:100%;justify-content:center" onclick="submitEmpLeaveRequest()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit Application</button>
@@ -7596,11 +7645,11 @@ function renderAttendanceForm(mode, worker, localState) {
       <div class="portal-ptype">${esc(worker.role||'')} · ${esc(window._attToday)}</div>
       ${header}
       <div class="form-group" style="margin-top:16px">
-        <label class="form-label">Your 4-digit PIN</label>
+        <label class="form-label" for="att-pin-input">Your 4-digit PIN</label>
         <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="att-pin-input" class="form-input" placeholder="••••" style="letter-spacing:10px;font-size:20px;text-align:center" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,4); checkAttendanceFormReady();">
       </div>
       <div class="form-group">
-        <label class="form-label">Take a Selfie (required)</label>
+        <label class="form-label" for="att-photo-input">Take a Selfie (required)</label>
         <input type="file" accept="image/*" capture="user" id="att-photo-input" class="form-input" onchange="handleAttendancePhotoSelect(this.files)">
         <div id="att-photo-preview" style="margin-top:8px"></div>
       </div>
