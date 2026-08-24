@@ -119,31 +119,57 @@ html.attendance-boot #app{display:none!important}
 html.attendance-boot #attendance-screen{display:block!important}
 #attendance-screen{display:none;min-height:100vh;background:var(--bg)}
 .att-mark-grid{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.att-mark-btn{padding:16px;border-radius:3px;border:2px solid var(--border);background:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--text)}
-.att-mark-btn:hover{border-color:var(--orange)}
-.att-mark-btn.att-mark-present{border-color:var(--green);color:var(--green)}
-.att-mark-btn.att-mark-half{border-color:#b45309;color:#b45309}
-.att-mark-btn.att-mark-absent{border-color:var(--red);color:var(--red)}
-.att-gps-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:2px}
+.att-mark-btn{padding:17px;border-radius:14px;border:none;background:var(--bg);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);transition:transform .12s ease,box-shadow .2s ease,background .2s ease,color .2s ease}
+.att-mark-btn:not(:disabled):active{transform:scale(.98)}
+.att-mark-btn.att-mark-present:not(:disabled){background:linear-gradient(135deg,#22a35e,#1d8a4e);color:#fff;box-shadow:0 10px 24px -8px rgba(34,163,94,.55)}
+.att-mark-btn.att-mark-half:not(:disabled){background:linear-gradient(135deg,#f2b705,#d99e00);color:#3d2c00;box-shadow:0 10px 24px -8px rgba(217,158,0,.45)}
+.att-mark-btn.att-mark-absent:not(:disabled){background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;box-shadow:0 10px 24px -8px rgba(32,38,44,.5)}
+.att-mark-btn:disabled{cursor:not-allowed;opacity:.6}
+.att-gps-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:16px;padding:12px 14px;background:var(--bg);border-radius:12px}
+/* PIN entry — 4 separate boxes (OTP-style) instead of one plain text
+   field. Visually clearer at a glance and matches the pattern people
+   already know from bank/OTP apps. */
+.pin-box-row{display:flex;gap:10px;justify-content:center;margin-top:6px}
+.pin-box{width:52px;height:58px;border:2px solid var(--border);border-radius:12px;text-align:center;font-size:24px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--navy);background:var(--bg);transition:border-color .15s ease,box-shadow .15s ease,transform .1s ease}
+.pin-box:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(217,72,15,.12);background:#fff}
+.pin-box.filled{border-color:var(--navy);background:#fff}
+/* Selfie capture — a circular avatar-style picker with a camera badge,
+   replacing the browser's plain "Choose file" button. The real
+   <input type=file> stays functionally in charge (capture="user" still
+   opens the front camera on phones); it's just visually hidden and
+   triggered via the circle. */
+.selfie-picker{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px}
+.selfie-picker input[type="file"]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.selfie-circle{width:104px;height:104px;border-radius:50%;border:2.5px dashed var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s ease,transform .12s ease}
+.selfie-circle:active{transform:scale(.96)}
+.selfie-circle.has-photo{border:2.5px solid var(--green)}
+.selfie-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.selfie-circle .selfie-placeholder-ic{width:34px;height:34px;stroke:var(--muted)}
+.selfie-camera-badge{position:absolute;bottom:2px;right:2px;width:30px;height:30px;border-radius:50%;background:var(--orange);border:3px solid #fff;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.selfie-camera-badge svg{width:14px;height:14px;stroke:#fff}
+.selfie-hint{font-size:11.5px;color:var(--muted);text-align:center}
 .att-gps-status.att-gps-ok{color:var(--green)}
 .att-gps-status.att-gps-fail{color:var(--red)}
 .att-confirmed-box{text-align:center;padding:30px 16px;animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) both}
-.att-confirmed-box .success-check-circle{width:64px;height:64px}
+.att-confirmed-box .success-check-circle{width:84px;height:84px;background:linear-gradient(135deg,#e8fbf0,#d5f5e3);box-shadow:0 10px 26px -10px rgba(30,158,90,.4)}
+.att-confirmed-box .success-check-circle svg{width:44px;height:44px}
 
 /* CUSTOMER PORTAL (public, no login) */
 #portal-screen{display:none;min-height:100vh;background:var(--bg)}
-.portal-topbar{background:var(--navy);padding:max(18px,env(safe-area-inset-top)) 24px 18px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.portal-topbar{background:linear-gradient(135deg,var(--navy) 0%,#2b3540 55%,#1a2129 100%);padding:max(18px,env(safe-area-inset-top)) 24px 18px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 .portal-topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
 .portal-logo{height:36px;width:auto;object-fit:contain;position:relative;z-index:1}
 .portal-wordmark{font-size:16px;font-weight:700;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:.3px;position:relative;z-index:1}
 .portal-tagline{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1.2px;text-transform:uppercase;position:relative;z-index:1}
 .portal-body{max-width:640px;margin:0 auto;padding:28px 20px max(60px,calc(env(safe-area-inset-bottom) + 24px))}
-.portal-body > *{animation:sectionIn .3s ease both}
-.emp-portal-tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;padding-top:env(safe-area-inset-top);z-index:5;-webkit-overflow-scrolling:touch}
-.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;background:none;border:none;border-bottom:2.5px solid transparent;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:44px}
-.emp-tab-btn .ic{width:20px;height:20px}
-.emp-tab-btn.active{color:var(--navy);border-bottom-color:var(--orange)}
-.emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:8px;padding:18px;text-align:center;margin-bottom:16px;animation:cardIn .4s ease both;position:relative;overflow:hidden}
+.portal-body > *{animation:popIn .38s cubic-bezier(.22,1.4,.42,1) both}
+.emp-portal-tabs{display:flex;gap:2px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;padding:env(safe-area-inset-top) 6px 0;z-index:5;-webkit-overflow-scrolling:touch}
+.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px 9px;margin-bottom:4px;background:none;border:none;border-radius:10px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:44px;transition:background .18s ease,color .18s ease}
+.emp-tab-btn .ic{width:20px;height:20px;transition:transform .18s ease}
+.emp-tab-btn.active{color:var(--orange);background:#fdf1e9}
+.emp-tab-btn.active .ic{transform:translateY(-1px) scale(1.08)}
+@keyframes popIn{0%{opacity:0;transform:translateY(10px) scale(.97)}60%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1)}}
+.emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:18px;padding:22px 18px;text-align:center;margin-bottom:16px;animation:popIn .4s cubic-bezier(.22,1.4,.42,1) both;position:relative;overflow:hidden;box-shadow:0 10px 30px -8px rgba(32,38,44,.45)}
 .emp-leave-balance-card::before{content:'';position:absolute;top:-40%;right:-20%;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);pointer-events:none}
 .emp-leave-ring{position:relative;width:104px;height:104px;margin:0 auto}
 .emp-leave-ring svg{width:104px;height:104px;transform:rotate(-90deg)}
@@ -155,10 +181,11 @@ html.attendance-boot #attendance-screen{display:block!important}
 .emp-leave-balance-card .lbl{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 .emp-leave-sub{display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:11.5px;opacity:.9}
 .emp-month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.emp-month-nav button{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.emp-month-nav button{background:var(--bg);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease,transform .1s ease}
+.emp-month-nav button:active{transform:scale(.92)}
 .emp-month-nav .ic{width:18px;height:18px}
-.emp-leave-history-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:12.5px}
-.emp-profile-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.emp-leave-history-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;font-size:12.5px;transition:box-shadow .15s ease}
+.emp-profile-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}
 .emp-profile-row:last-child{border-bottom:none}
 .emp-profile-row .lbl{color:var(--muted)}
 .emp-profile-row .val{font-weight:700;color:var(--navy)}
@@ -166,10 +193,10 @@ html.attendance-boot #attendance-screen{display:block!important}
 .emp-sal-bar-seg{transition:width .6s cubic-bezier(.34,1.56,.64,1);height:100%}
 .portal-loading,.portal-error{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 .portal-error{color:var(--red)}
-.portal-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:26px 24px;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
+.portal-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 24px;box-shadow:0 10px 30px -12px rgba(20,25,30,.18);position:relative;overflow:hidden;margin-bottom:16px}
 .portal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
 .portal-id{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);letter-spacing:.5px}
-.portal-cname{font-size:20px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;margin-top:4px}
+.portal-cname{font-size:22px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;margin-top:4px}
 .portal-ptype{font-size:12.5px;color:var(--muted);margin-top:2px}
 .portal-badge{display:inline-block;padding:4px 12px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:10px}
 .portal-badge-paid,.portal-badge-won{background:#dcfce7;color:#166534}
@@ -7651,14 +7678,22 @@ function renderAttendanceForm(mode, worker, localState) {
       <div class="portal-cname">${esc(worker.name)}</div>
       <div class="portal-ptype">${esc(worker.role||'')} · ${esc(window._attToday)}</div>
       ${header}
-      <div class="form-group" style="margin-top:16px">
-        <label class="form-label" for="att-pin-input">Your 4-digit PIN</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="att-pin-input" class="form-input" placeholder="••••" style="letter-spacing:10px;font-size:20px;text-align:center" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,4); checkAttendanceFormReady();">
+      <div class="form-group" style="margin-top:20px;text-align:center">
+        <label class="form-label" style="display:block;text-align:center;margin-bottom:10px">Your 4-digit PIN</label>
+        <div class="pin-box-row">
+          ${[0,1,2,3].map(i => `<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" data-pin-idx="${i}" oninput="handlePinBoxInput(this,${i})" onkeydown="handlePinBoxKeydown(event,${i})">`).join('')}
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="att-photo-input">Take a Selfie (required)</label>
-        <input type="file" accept="image/*" capture="user" id="att-photo-input" class="form-input" onchange="handleAttendancePhotoSelect(this.files)">
-        <div id="att-photo-preview" style="margin-top:8px"></div>
+      <div class="form-group" style="text-align:center">
+        <label class="form-label" style="display:block;text-align:center;margin-bottom:2px">Take a Selfie (required)</label>
+        <div class="selfie-picker">
+          <label class="selfie-circle" id="selfie-circle" for="att-photo-input">
+            <svg viewBox="0 0 24 24" class="selfie-placeholder-ic" fill="none" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+            <div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div>
+            <input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">
+          </label>
+          <div class="selfie-hint" id="selfie-hint">Tap the circle to open your camera</div>
+        </div>
       </div>
       <div class="att-mark-grid">
         <button class="att-mark-btn ${isTimeOut?'att-mark-absent':'att-mark-present'}" id="att-submit-btn" onclick="${isTimeOut?'submitTimeOut()':'submitTimeIn()'}" disabled>
@@ -7667,6 +7702,28 @@ function renderAttendanceForm(mode, worker, localState) {
       </div>
       <div class="att-gps-status" id="att-gps-line">Your location &amp; selfie are checked only when you tap the button above.</div>
     </div>`;
+}
+
+// One digit per box, auto-advances to the next box and auto-focuses back
+// on backspace from an empty box — the standard OTP-input feel. The
+// combined 4-digit value is read directly from the DOM in
+// checkAttendanceFormReady() and submitTimeIn/submitTimeOut, so there's
+// no hidden mirror field to keep in sync.
+window.handlePinBoxInput = (el, idx) => {
+  el.value = el.value.replace(/\D/g, '').slice(0, 1);
+  el.classList.toggle('filled', el.value.length === 1);
+  if (el.value && idx < 3) {
+    document.querySelector(`.pin-box[data-pin-idx="${idx+1}"]`)?.focus();
+  }
+  checkAttendanceFormReady();
+};
+window.handlePinBoxKeydown = (e, idx) => {
+  if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+    document.querySelector(`.pin-box[data-pin-idx="${idx-1}"]`)?.focus();
+  }
+};
+function getPinBoxValue() {
+  return [0,1,2,3].map(i => document.querySelector(`.pin-box[data-pin-idx="${i}"]`)?.value || '').join('');
 }
 
 // Small and heavily compressed — this is a verification photo staff will
@@ -7697,13 +7754,19 @@ window.handleAttendancePhotoSelect = (files) => {
   const file = files && files[0]; if (!file) return;
   compressSelfieToBase64(file).then(dataUrl => {
     window._attPhotoData = dataUrl;
-    document.getElementById('att-photo-preview').innerHTML = `<img src="${dataUrl}" alt="Selfie preview" style="width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">`;
+    const circle = document.getElementById('selfie-circle');
+    if (circle) {
+      circle.classList.add('has-photo');
+      circle.innerHTML = `<img src="${dataUrl}" alt="Selfie preview"><div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div><input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">`;
+    }
+    const hint = document.getElementById('selfie-hint');
+    if (hint) hint.textContent = 'Looking good — tap to retake';
     checkAttendanceFormReady();
   }).catch(e => { reportError(e); toast('Could not read that photo — please try again.', 'error'); });
 };
 
 window.checkAttendanceFormReady = () => {
-  const pin = document.getElementById('att-pin-input')?.value || '';
+  const pin = getPinBoxValue();
   const btn = document.getElementById('att-submit-btn');
   if (btn) btn.disabled = !(pin.length === 4 && window._attPhotoData);
 };
@@ -7735,7 +7798,7 @@ function captureGpsAndVerify(callback) {
 }
 
 window.submitTimeIn = () => {
-  const pin = document.getElementById('att-pin-input').value;
+  const pin = getPinBoxValue();
   const photo = window._attPhotoData;
   if (pin.length !== 4 || !photo) return;
   captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
@@ -7765,7 +7828,7 @@ window.submitTimeIn = () => {
 };
 
 window.submitTimeOut = () => {
-  const pin = document.getElementById('att-pin-input').value;
+  const pin = getPinBoxValue();
   const photo = window._attPhotoData;
   if (pin.length !== 4 || !photo) return;
   captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
