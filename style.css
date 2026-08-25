@@ -346,6 +346,8 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 .social-btn.fb:hover { background:#0d6efd; transform:translateY(-2px); }
 .social-btn.ig { background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:#fff; }
 .social-btn.ig:hover { opacity:.85; transform:translateY(-2px); }
+.social-btn.li { background:#0A66C2; color:#fff; }
+.social-btn.li:hover { background:#004182; transform:translateY(-2px); }
 
 /* ═══════════════════════════════════════════════════════
    FLOATING CALL + WHATSAPP BUTTONS
