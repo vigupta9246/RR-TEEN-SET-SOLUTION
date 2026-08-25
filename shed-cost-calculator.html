@@ -864,6 +864,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   <!-- STEP 4: Location -->
   <p class="calc-step-label" data-num="4">Location chunein</p>
+  <button type="button" id="geo-btn" onclick="detectMyLocation()" style="display:flex;align-items:center;gap:6px;background:#eef4ff;border:1px solid #cddcf5;color:#1a4fb8;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:8px;margin-bottom:10px;cursor:pointer;width:100%;justify-content:center">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="geo-btn-text">Auto-detect my location</span>
+  </button>
   <select id="sl-loc" onchange="calcResult()" style="width:100%;font-size:13px;margin-bottom:28px;box-sizing:border-box">
     <option value="1">Delhi / Najafgarh</option>
     <option value="1.05">Gurgaon / Manesar</option>
@@ -1198,6 +1202,47 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   var dispLen=50,dispWid=40,dispHt=14; /* smoothly-animated display values */
   var animRAF=null;
 
+  /* ── GEOLOCATION AUTO-DETECT ── */
+  var NCR_ZONES=[
+    {value:'1',    name:'Delhi / Najafgarh',       lat:28.6139, lon:77.2090},
+    {value:'1.05', name:'Gurgaon / Manesar',       lat:28.4595, lon:77.0266},
+    {value:'1.03', name:'Noida / Greater Noida',   lat:28.5355, lon:77.3910},
+    {value:'1.02', name:'Faridabad / Ballabhgarh', lat:28.4089, lon:77.3178},
+    {value:'1.07', name:'Ghaziabad',               lat:28.6692, lon:77.4538}
+  ];
+  function haversineKm(lat1,lon1,lat2,lon2){
+    var R2=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    return R2*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
+  window.detectMyLocation=function(){
+    var btn=document.getElementById('geo-btn'), txt=document.getElementById('geo-btn-text');
+    if(!navigator.geolocation){ txt.textContent='Not supported on this browser'; return; }
+    txt.textContent='Detecting…'; btn.style.opacity='.7';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude, lon=pos.coords.longitude;
+      var best=null, bestDist=Infinity;
+      NCR_ZONES.forEach(function(z){
+        var d=haversineKm(lat,lon,z.lat,z.lon);
+        if(d<bestDist){ bestDist=d; best=z; }
+      });
+      var sel=document.getElementById('sl-loc');
+      if(bestDist>70){
+        /* Outside core NCR radius */
+        for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value==='1.10'){ sel.selectedIndex=i; break; } }
+        txt.textContent='Detected: Outside Delhi NCR';
+      } else {
+        for(var j=0;j<sel.options.length;j++){ if(sel.options[j].value===best.value){ sel.selectedIndex=j; break; } }
+        txt.textContent='Detected: '+best.name;
+      }
+      btn.style.opacity='1'; btn.style.background='#e8f7ee'; btn.style.borderColor='#b6e6c6'; btn.style.color='#1a7d3f';
+      if(typeof calcResult==='function') calcResult();
+    }, function(err){
+      btn.style.opacity='1';
+      txt.textContent = err.code===1 ? 'Location access denied — select manually' : 'Could not detect — select manually';
+      setTimeout(function(){ txt.textContent='Auto-detect my location'; }, 3500);
+    }, {enableHighAccuracy:false, timeout:8000, maximumAge:600000});
+  };
   /* ── ADD-ONS DATA ── */
   var ADDONS={
     windows:{label:'Extra Windows',flat:900},      /* ₹450 x 2 windows */
