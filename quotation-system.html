@@ -119,33 +119,53 @@ html.attendance-boot #app{display:none!important}
 html.attendance-boot #attendance-screen{display:block!important}
 #attendance-screen{display:none;min-height:100vh;background:var(--bg)}
 .att-mark-grid{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.att-mark-btn{padding:17px;border-radius:14px;border:none;background:var(--bg);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);transition:transform .12s ease,box-shadow .2s ease,background .2s ease,color .2s ease}
-.att-mark-btn:not(:disabled):active{transform:scale(.98)}
-.att-mark-btn.att-mark-present:not(:disabled){background:linear-gradient(135deg,#22a35e,#1d8a4e);color:#fff;box-shadow:0 10px 24px -8px rgba(34,163,94,.55)}
-.att-mark-btn.att-mark-half:not(:disabled){background:linear-gradient(135deg,#f2b705,#d99e00);color:#3d2c00;box-shadow:0 10px 24px -8px rgba(217,158,0,.45)}
-.att-mark-btn.att-mark-absent:not(:disabled){background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;box-shadow:0 10px 24px -8px rgba(32,38,44,.5)}
-.att-mark-btn:disabled{cursor:not-allowed;opacity:.6}
-.att-gps-status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:16px;padding:12px 14px;background:var(--bg);border-radius:12px}
+.att-mark-btn{padding:19px;border-radius:14px;border:none;background:var(--bg);font-size:15px;font-weight:800;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);transition:transform .1s ease,box-shadow .2s ease,background .2s ease,color .2s ease;position:relative}
+.att-mark-btn:not(:disabled){box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 6px 0 rgba(0,0,0,.16),0 10px 22px -8px rgba(0,0,0,.35)}
+.att-mark-btn:not(:disabled):active{transform:translateY(5px);box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 1px 0 rgba(0,0,0,.16),0 4px 10px -4px rgba(0,0,0,.3)}
+.att-mark-btn.att-mark-present:not(:disabled){background:linear-gradient(180deg,#2bb872,#1d8a4e)}
+.att-mark-btn.att-mark-half:not(:disabled){background:linear-gradient(180deg,#f2b705,#c98a00);color:#3d2c00}
+.att-mark-btn.att-mark-absent:not(:disabled){background:linear-gradient(180deg,var(--orange-light),var(--orange))}
+.att-mark-btn.att-mark-present:not(:disabled),.att-mark-btn.att-mark-absent:not(:disabled){color:#fff}
+.att-mark-btn:disabled{cursor:not-allowed;opacity:.5;box-shadow:none}
+.att-mark-btn.stamping{animation:stampPress .32s ease}
+@keyframes stampPress{0%{transform:translateY(0)}35%{transform:translateY(6px) scale(.98)}100%{transform:translateY(0) scale(1)}}
+.att-gps-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:16px;padding:11px 14px;background:var(--bg);border-radius:10px;font-family:'IBM Plex Mono',monospace}
+/* ── TIME-CLOCK / ID-BADGE THEME ──────────────────────────────────
+   These workers are welders/fitters/supervisors clocking in on a shop
+   floor — the design leans into an actual industrial punch-clock and
+   laminated ID-badge, rather than a generic soft "app card" look. */
+.badge-card{background:var(--card);border-radius:16px;padding:0;box-shadow:0 14px 34px -14px rgba(20,24,28,.35),0 2px 0 rgba(0,0,0,.04);position:relative;overflow:hidden;margin-bottom:16px}
+.badge-card-stripe{height:7px;background:repeating-linear-gradient(-45deg,var(--orange) 0px,var(--orange) 8px,var(--navy) 8px,var(--navy) 16px)}
+.badge-card-grommet{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:15px;height:15px;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 3px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.6);z-index:2}
+.badge-card-body{padding:30px 24px 24px}
+.badge-worker-name{font-size:23px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.4px;text-align:center}
+.badge-worker-role{font-size:11.5px;color:var(--muted);text-align:center;margin-top:2px;font-family:'IBM Plex Mono',monospace;letter-spacing:.4px}
+.time-clock-panel{background:linear-gradient(160deg,#171b1f,#20262c 70%);border-radius:12px;padding:16px 14px;text-align:center;margin-top:20px;box-shadow:inset 0 2px 6px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.04)}
+.time-clock-readout{font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:700;color:#ffb27a;letter-spacing:2px;text-shadow:0 0 12px rgba(255,140,60,.55),0 0 2px rgba(255,140,60,.8);line-height:1}
+.time-clock-date{font-size:10px;color:rgba(255,178,122,.55);text-transform:uppercase;letter-spacing:1.6px;margin-top:5px;font-family:'IBM Plex Mono',monospace}
+.time-clock-status{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.65)}
+.time-clock-status .dot{width:6px;height:6px;border-radius:50%;background:#3ee07a;box-shadow:0 0 6px #3ee07a;animation:dotPulse 1.8s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.35}}
 /* PIN entry — 4 separate boxes (OTP-style) instead of one plain text
    field. Visually clearer at a glance and matches the pattern people
    already know from bank/OTP apps. */
 .pin-box-row{display:flex;gap:10px;justify-content:center;margin-top:6px}
-.pin-box{width:52px;height:58px;border:2px solid var(--border);border-radius:12px;text-align:center;font-size:24px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--navy);background:var(--bg);transition:border-color .15s ease,box-shadow .15s ease,transform .1s ease}
-.pin-box:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(217,72,15,.12);background:#fff}
-.pin-box.filled{border-color:var(--navy);background:#fff}
-/* Selfie capture — a circular avatar-style picker with a camera badge,
-   replacing the browser's plain "Choose file" button. The real
-   <input type=file> stays functionally in charge (capture="user" still
-   opens the front camera on phones); it's just visually hidden and
-   triggered via the circle. */
+.pin-box{width:50px;height:58px;border:none;border-radius:10px;text-align:center;font-size:24px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:#ffb27a;background:linear-gradient(160deg,#171b1f,#262d34);box-shadow:inset 0 2px 5px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.06);transition:box-shadow .15s ease,transform .1s ease}
+.pin-box:focus{outline:none;box-shadow:inset 0 2px 5px rgba(0,0,0,.5),0 0 0 3px rgba(217,72,15,.45)}
+.pin-box.filled{box-shadow:inset 0 2px 5px rgba(0,0,0,.5),0 0 0 2px rgba(62,224,122,.5)}
+/* Selfie capture — an ID-badge photo slot (rounded square, like a real
+   laminated badge photo) with a camera corner-badge, replacing the
+   browser's plain "Choose file" button. The real <input type=file> stays
+   functionally in charge (capture="user" still opens the front camera on
+   phones); it's just visually hidden and triggered via the slot. */
 .selfie-picker{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px}
 .selfie-picker input[type="file"]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
-.selfie-circle{width:104px;height:104px;border-radius:50%;border:2.5px dashed var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s ease,transform .12s ease}
+.selfie-circle{width:96px;height:96px;border-radius:14px;border:2.5px dashed var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .18s ease,transform .12s ease}
 .selfie-circle:active{transform:scale(.96)}
-.selfie-circle.has-photo{border:2.5px solid var(--green)}
-.selfie-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.selfie-circle .selfie-placeholder-ic{width:34px;height:34px;stroke:var(--muted)}
-.selfie-camera-badge{position:absolute;bottom:2px;right:2px;width:30px;height:30px;border-radius:50%;background:var(--orange);border:3px solid #fff;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.selfie-circle.has-photo{border:2.5px solid var(--green);border-style:solid}
+.selfie-circle img{width:100%;height:100%;object-fit:cover;border-radius:11px}
+.selfie-circle .selfie-placeholder-ic{width:32px;height:32px;stroke:var(--muted)}
+.selfie-camera-badge{position:absolute;bottom:-4px;right:-4px;width:30px;height:30px;border-radius:50%;background:var(--orange);border:3px solid #fff;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 3px 8px rgba(217,72,15,.4)}
 .selfie-camera-badge svg{width:14px;height:14px;stroke:#fff}
 .selfie-hint{font-size:11.5px;color:var(--muted);text-align:center}
 .att-gps-status.att-gps-ok{color:var(--green)}
@@ -163,10 +183,10 @@ html.attendance-boot #attendance-screen{display:block!important}
 .portal-tagline{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:1.2px;text-transform:uppercase;position:relative;z-index:1}
 .portal-body{max-width:640px;margin:0 auto;padding:28px 20px max(60px,calc(env(safe-area-inset-bottom) + 24px))}
 .portal-body > *{animation:popIn .38s cubic-bezier(.22,1.4,.42,1) both}
-.emp-portal-tabs{display:flex;gap:2px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;padding:env(safe-area-inset-top) 6px 0;z-index:5;-webkit-overflow-scrolling:touch}
-.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px 9px;margin-bottom:4px;background:none;border:none;border-radius:10px;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:44px;transition:background .18s ease,color .18s ease}
-.emp-tab-btn .ic{width:20px;height:20px;transition:transform .18s ease}
-.emp-tab-btn.active{color:var(--orange);background:#fdf1e9}
+.emp-portal-tabs{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;padding:calc(env(safe-area-inset-top) + 6px) 8px 6px;z-index:5;-webkit-overflow-scrolling:touch}
+.emp-tab-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 12px;background:none;border:none;border-radius:10px;font-size:9.5px;font-weight:700;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:48px;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.emp-tab-btn .ic{width:19px;height:19px;transition:transform .18s ease}
+.emp-tab-btn.active{color:#ffb27a;background:linear-gradient(160deg,#20262c,#2b333b);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),0 4px 10px -4px rgba(32,38,44,.5)}
 .emp-tab-btn.active .ic{transform:translateY(-1px) scale(1.08)}
 @keyframes popIn{0%{opacity:0;transform:translateY(10px) scale(.97)}60%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1)}}
 .emp-leave-balance-card{background:linear-gradient(135deg,var(--navy),#2d3846);color:#fff;border-radius:18px;padding:22px 18px;text-align:center;margin-bottom:16px;animation:popIn .4s cubic-bezier(.22,1.4,.42,1) both;position:relative;overflow:hidden;box-shadow:0 10px 30px -8px rgba(32,38,44,.45)}
@@ -196,7 +216,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 .portal-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px 24px;box-shadow:0 10px 30px -12px rgba(20,25,30,.18);position:relative;overflow:hidden;margin-bottom:16px}
 .portal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,var(--orange) 0px,var(--orange) 3px,transparent 3px,transparent 11px)}
 .portal-id{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--orange);letter-spacing:.5px}
-.portal-cname{font-size:22px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;margin-top:4px}
+.portal-cname{font-size:22px;font-weight:700;color:var(--navy);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.3px;margin-top:4px}
 .portal-ptype{font-size:12.5px;color:var(--muted);margin-top:2px}
 .portal-badge{display:inline-block;padding:4px 12px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:10px}
 .portal-badge-paid,.portal-badge-won{background:#dcfce7;color:#166534}
@@ -700,11 +720,11 @@ html.attendance-boot #attendance-screen{display:block!important}
     </div>
   </div>
   <div id="emp-portal-tabs" class="emp-portal-tabs" style="display:none">
-    <button class="emp-tab-btn active" id="emp-tab-attendance" onclick="showEmpTab('attendance')"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Time In/Out</span></button>
-    <button class="emp-tab-btn" id="emp-tab-calendar" onclick="showEmpTab('calendar')"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg><span>Calendar</span></button>
-    <button class="emp-tab-btn" id="emp-tab-leave" onclick="showEmpTab('leave')"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg><span>Leave</span></button>
-    <button class="emp-tab-btn" id="emp-tab-salary" onclick="showEmpTab('salary')"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg><span>Salary Slip</span></button>
-    <button class="emp-tab-btn" id="emp-tab-profile" onclick="showEmpTab('profile')"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg><span>Profile</span></button>
+    <button class="emp-tab-btn active" id="emp-tab-attendance" onclick="showEmpTab('attendance')"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Time In/Out</span></button>
+    <button class="emp-tab-btn" id="emp-tab-calendar" onclick="showEmpTab('calendar')"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg><span>Calendar</span></button>
+    <button class="emp-tab-btn" id="emp-tab-leave" onclick="showEmpTab('leave')"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg><span>Leave</span></button>
+    <button class="emp-tab-btn" id="emp-tab-salary" onclick="showEmpTab('salary')"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg><span>Salary Slip</span></button>
+    <button class="emp-tab-btn" id="emp-tab-profile" onclick="showEmpTab('profile')"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg><span>Profile</span></button>
   </div>
   <div id="attendance-body" class="portal-body">
     <div class="portal-loading">Loading…</div>
@@ -715,7 +735,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 <div id="app">
   <div class="mobile-topbar">
     <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
-      <svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      <svg viewBox="0 0 24 24" class="ic"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
     </button>
     <div class="mobile-topbar-title" id="mobile-topbar-title">R.R Teen Set Solution</div>
   </div>
@@ -727,35 +747,35 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div><div class="sidebar-title">R.R Teen Set</div><div class="sidebar-sub">Quotation System</div></div>
       </div>
       <button class="global-search-trigger" onclick="openGlobalSearch()">
-        <svg viewBox="0 0 24 24" class="ic" style="width:15px;height:15px" width="18" height="18"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <svg viewBox="0 0 24 24" class="ic" style="width:15px;height:15px"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
         <span class="gs-label">Search everything...</span>
         <span class="global-search-kbd">Ctrl K</span>
       </button>
       <div class="nav-section">MAIN</div>
-      <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></span><span>Dashboard</span></button>
-      <button class="nav-btn" data-section="create" onclick="resetForm(); showSection('create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg></span><span>New Quotation</span></button>
-      <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg></span><span>History</span></button>
-      <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg></span><span>Analytics</span></button>
-      <button class="nav-btn" data-section="employee-profile" onclick="showSection('employee-profile')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></span><span>My Profile</span></button>
+      <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></span><span>Dashboard</span></button>
+      <button class="nav-btn" data-section="create" onclick="resetForm(); showSection('create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="14" y2="16"/></svg></span><span>New Quotation</span></button>
+      <button class="nav-btn" data-section="history" onclick="showSection('history')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg></span><span>History</span></button>
+      <button class="nav-btn" data-section="analytics" onclick="showSection('analytics')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg></span><span>Analytics</span></button>
+      <button class="nav-btn" data-section="employee-profile" onclick="showSection('employee-profile')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></span><span>My Profile</span></button>
       <div class="nav-section">CRM</div>
-      <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
-      <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
-      <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
+      <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
+      <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
+      <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <div class="nav-section">BILLING</div>
-      <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
-      <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
+      <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
+      <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
       <div class="nav-section">OPERATIONS</div>
-      <button class="nav-btn" data-section="labour" onclick="showSection('labour')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="8" cy="7" r="3"/><path d="M2.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17" cy="8" r="2.3"/><path d="M14.5 20c.3-2.7 2-5 4.5-5"/></svg></span><span>Labour &amp; Wages</span></button>
+      <button class="nav-btn" data-section="labour" onclick="showSection('labour')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="8" cy="7" r="3"/><path d="M2.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17" cy="8" r="2.3"/><path d="M14.5 20c.3-2.7 2-5 4.5-5"/></svg></span><span>Labour &amp; Wages</span></button>
       <div class="nav-section">ADMIN</div>
-      <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
-      <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
-      <button class="nav-btn" data-section="activity-log" onclick="showSection('activity-log')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span>Activity Log</span></button>
+      <button class="nav-btn" data-section="team" onclick="showSection('team')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg></span><span>Team</span></button>
+      <button class="nav-btn" data-section="deleted-items" onclick="showSection('deleted-items')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg></span><span>Deleted Items</span></button>
+      <button class="nav-btn" data-section="activity-log" onclick="showSection('activity-log')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span>Activity Log</span></button>
       <div class="nav-section">LINKS</div>
-      <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg></span><span>Main Website</span></button>
+      <button class="nav-btn" onclick="window.open('https://rrteensetsolution.com','_blank')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg></span><span>Main Website</span></button>
       <div class="sidebar-footer">
         <div class="user-info" id="user-email">admin</div>
         <div class="user-info" id="user-role-badge" style="font-size:11px;opacity:0.75;margin-top:-6px">—</div>
-        <button class="btn-logout" onclick="doLogout()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg> Logout</button>
+        <button class="btn-logout" onclick="doLogout()"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg> Logout</button>
       </div>
     </aside>
 
@@ -780,37 +800,37 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="leads">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg> Leads Needing Follow-up (2+ days in New/Contacted/Site Visit)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg> Leads Needing Follow-up (2+ days in New/Contacted/Site Visit)</div>
           <div id="dash-stale-leads-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Needs Follow-up (quotation sent 3+ days ago, no response)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Needs Follow-up (quotation sent 3+ days ago, no response)</div>
           <div id="dash-followup-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations" id="dash-approval-card">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> Quotations Awaiting Approval (discount above threshold)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> Quotations Awaiting Approval (discount above threshold)</div>
           <div id="dash-approval-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="quotations">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg> AMC Renewals Due (next 30 days — nothing renews automatically)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg> AMC Renewals Due (next 30 days — nothing renews automatically)</div>
           <div id="dash-amc-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="invoices">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Due Soon (payment due in the next 3 days — nothing sends automatically)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Due Soon (payment due in the next 3 days — nothing sends automatically)</div>
           <div id="dash-duesoon-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-bottom:20px" data-requires="labour">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="8" cy="7" r="3.2"/><path d="M2.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17" cy="8" r="2.3"/><path d="M14.5 20c.3-2.7 2-5 4.5-5"/></svg> Today's Attendance — Not Yet Marked</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="8" cy="7" r="3.2"/><path d="M2.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17" cy="8" r="2.3"/><path d="M14.5 20c.3-2.7 2-5 4.5-5"/></svg> Today's Attendance — Not Yet Marked</div>
           <div id="dash-missed-att-list">Loading...</div>
         </div>
 
         <div class="type-breakdown" data-requires="invoices">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Overdue Payments (past the due date)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Overdue Payments (past the due date)</div>
           <div id="dash-overdue-list">Loading...</div>
         </div>
       </section>
@@ -823,7 +843,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
         <form id="qt-form" onsubmit="return false;">
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg> QUOTATION META</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="f-qtid">Quotation ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="f-qtid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label" for="f-date">Date</label><input type="date" id="f-date" class="form-input"></div>
@@ -831,7 +851,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="f-cname">Customer Name *</label><input type="text" id="f-cname" class="form-input"></div>
               <div class="form-group"><label class="form-label" for="f-cphone">Phone *</label><input type="tel" id="f-cphone" class="form-input"></div>
@@ -840,7 +860,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="f-ptype">Project Type *</label>
                 <select id="f-ptype" class="form-select">
@@ -882,11 +902,11 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> PAYMENT DETAILS (optional — shown on quotation if filled)</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> PAYMENT DETAILS (optional — shown on quotation if filled)</div>
             <div class="form-group"><textarea id="f-payment" class="form-textarea" rows="3"></textarea></div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg> RECURRING / AMC CONTRACT</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg> RECURRING / AMC CONTRACT</div>
             <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:14px">
               <input type="checkbox" id="f-recurring" onchange="toggleRecurringFields()" style="width:16px;height:16px">
               This is a recurring / AMC (Annual Maintenance) contract
@@ -903,13 +923,13 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg> TERMS &amp; CONDITIONS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg> TERMS &amp; CONDITIONS</div>
             <div class="form-group"><textarea id="f-terms" class="form-textarea" rows="6"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" id="qt-save-btn" onclick="saveQuotation(false)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save &amp; Finalize</button>
-            <button class="btn btn-draft" id="qt-draft-btn" onclick="saveQuotation(true)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Save as Draft</button>
-            <button class="btn btn-reset" onclick="resetForm()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
+            <button class="btn btn-save" id="qt-save-btn" onclick="saveQuotation(false)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save &amp; Finalize</button>
+            <button class="btn btn-draft" id="qt-draft-btn" onclick="saveQuotation(true)"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg> Save as Draft</button>
+            <button class="btn btn-reset" onclick="resetForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </form>
       </section>
@@ -930,7 +950,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <label style="font-size:13px;font-weight:700;color:var(--muted)">To:</label>
             <input type="date" id="filter-to" class="date-input" onchange="handleHistoryDateFilter()">
           </div>
-          <button class="btn-export" onclick="exportHistoryCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          <button class="btn-export" onclick="exportHistoryCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto">
@@ -961,7 +981,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="stat-card"><div class="stat-label">THIS MONTH REVENUE</div><div class="stat-value orange" id="stat-monthly">—</div></div>
         </div>
         <div class="type-breakdown">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3-4 3 2.5L18 8"/></svg> Monthly Revenue Trend (last 6 months)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3-4 3 2.5L18 8"/></svg> Monthly Revenue Trend (last 6 months)</div>
           <div id="chart-revenue-trend">Loading...</div>
         </div>
 
@@ -971,17 +991,17 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="type-breakdown" style="margin-top:20px">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="4" y="10" width="4" height="10"/><rect x="10" y="5" width="4" height="15"/><rect x="16" y="13" width="4" height="7"/></svg> Revenue by Project Type</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><rect x="4" y="10" width="4" height="10"/><rect x="10" y="5" width="4" height="15"/><rect x="16" y="13" width="4" height="7"/></svg> Revenue by Project Type</div>
           <div id="chart-type-revenue">Loading...</div>
         </div>
 
         <div class="type-breakdown" style="margin-top:20px">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M3 4h18l-7 9v6l-4 2v-8Z"/></svg> Conversion Funnel</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M3 4h18l-7 9v6l-4 2v-8Z"/></svg> Conversion Funnel</div>
           <div id="chart-funnel">Loading...</div>
         </div>
 
         <div class="type-breakdown" id="team-performance-panel" style="display:none;margin-top:20px">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.3c2.4.4 4 2.4 4 5.7"/></svg> Team Performance</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.3c2.4.4 4 2.4 4 5.7"/></svg> Team Performance</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Only new records created after this feature was added are counted — older records will appear in the "Legacy Data" row and won't be attributed to any member.</div>
           <div style="overflow-x:auto">
             <table class="data-table">
@@ -1004,7 +1024,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="type-breakdown">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 6h6v6"/></svg> Top Pages — Traffic &amp; Enquiries (Last 30 Days)</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 6h6v6"/></svg> Top Pages — Traffic &amp; Enquiries (Last 30 Days)</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Which pages bring visitors in, and which of those visits turn into a lead, call, or WhatsApp message.</div>
           <div style="overflow-x:auto">
             <table class="data-table">
@@ -1015,7 +1035,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="type-breakdown" style="margin-top:20px">
-          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/></svg> Website Leads by Service Type</div>
+          <div class="breakdown-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/></svg> Website Leads by Service Type</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Which service people are actually enquiring about through the website's enquiry forms.</div>
           <div id="mkt-service-breakdown">Loading...</div>
         </div>
@@ -1029,7 +1049,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW LEAD</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW LEAD</div>
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label" for="ld-name">Name *</label><input type="text" id="ld-name" class="form-input"></div>
             <div class="form-group"><label class="form-label" for="ld-phone">Phone *</label><input type="tel" id="ld-phone" class="form-input"></div>
@@ -1052,8 +1072,8 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label" for="ld-notes">Notes</label><input type="text" id="ld-notes" class="form-input"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveLead(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
-            <button class="btn btn-reset" onclick="resetLeadForm()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
+            <button class="btn btn-save" onclick="saveLead(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Lead</button>
+            <button class="btn btn-reset" onclick="resetLeadForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </div>
 
@@ -1065,13 +1085,13 @@ html.attendance-boot #attendance-screen{display:block!important}
             <option value="">All Status</option>
             <option>New</option><option>Contacted</option><option>Site Visit</option><option>Quoted</option><option>Won</option><option>Lost</option>
           </select>
-          <button class="btn-export" onclick="exportLeadsCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          <button class="btn-export" onclick="exportLeadsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
 
         <div class="bulk-bar" id="leads-bulk-bar">
           <div class="bulk-bar-count"><span id="leads-selected-count">0</span> lead(s) selected</div>
           <div style="display:flex;gap:8px">
-            <button class="btn-icon btn-whatsapp" title="Bulk WhatsApp Follow-up" aria-label="Bulk WhatsApp Follow-up" onclick="openBulkWhatsAppModal()" style="width:auto;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Bulk WhatsApp</button>
+            <button class="btn-icon btn-whatsapp" title="Bulk WhatsApp Follow-up" aria-label="Bulk WhatsApp Follow-up" onclick="openBulkWhatsAppModal()" style="width:auto;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Bulk WhatsApp</button>
             <button class="btn-icon" title="Clear Selection" aria-label="Clear Selection" onclick="toggleAllLeadsSelect(false)" style="width:auto;padding:0 14px;font-size:12.5px">Clear</button>
           </div>
         </div>
@@ -1098,7 +1118,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="search-box">
             <input type="text" id="cust-search-input" class="search-input" placeholder="Search by name or phone..." oninput="renderCustomersDebounced(this.value)">
           </div>
-          <button class="btn-export" onclick="exportCustomersCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          <button class="btn-export" onclick="exportCustomersCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto">
@@ -1119,7 +1139,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> LOG A CALL-IN COMPLAINT</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> LOG A CALL-IN COMPLAINT</div>
           <div class="form-grid">
             <div class="form-group"><label class="form-label" for="tkt-new-name">Customer Name *</label><input type="text" id="tkt-new-name" class="form-input"></div>
             <div class="form-group"><label class="form-label" for="tkt-new-phone">Phone *</label><input type="tel" id="tkt-new-phone" class="form-input" maxlength="10"></div>
@@ -1133,7 +1153,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div class="form-group span-2"><label class="form-label" for="tkt-new-desc">Description *</label><textarea id="tkt-new-desc" class="form-input" rows="2" style="resize:vertical;font-family:inherit"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="createTicketByStaff(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
+            <button class="btn btn-save" onclick="createTicketByStaff(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Log Ticket</button>
           </div>
         </div>
         <div class="history-controls">
@@ -1148,7 +1168,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <option value="">All Priority</option>
             <option>High</option><option>Medium</option><option>Low</option>
           </select>
-          <button class="btn-export" onclick="exportTicketsCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          <button class="btn-export" onclick="exportTicketsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
 
         <div class="stats-grid" style="margin-bottom:16px">
@@ -1177,7 +1197,7 @@ html.attendance-boot #attendance-screen{display:block!important}
           <div class="page-sub">Generate an invoice — load from an existing quotation or fill manually</div>
         </div>
         <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg> QUICK LOAD FROM QUOTATION</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg> QUICK LOAD FROM QUOTATION</div>
           <div class="load-qt-row">
             <div class="form-group" style="flex:1;min-width:220px">
               <label class="form-label" for="inv-load-qt">Select Finalized Quotation</label>
@@ -1185,12 +1205,12 @@ html.attendance-boot #attendance-screen{display:block!important}
                 <option value="">— Select a quotation to auto-fill —</option>
               </select>
             </div>
-            <button type="button" class="btn btn-draft" onclick="loadQuotationIntoInvoice()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Load Details</button>
+            <button type="button" class="btn btn-draft" onclick="loadQuotationIntoInvoice()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Load Details</button>
           </div>
         </div>
         <form id="inv-form" onsubmit="return false;">
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> INVOICE META</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> INVOICE META</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="i-invid">Invoice ID <span style="font-weight:400;color:#94a3b8">(auto, sequential)</span></label><input type="text" id="i-invid" class="form-input" readonly></div>
               <div class="form-group"><label class="form-label" for="i-date">Invoice Date</label><input type="date" id="i-date" class="form-input"></div>
@@ -1199,7 +1219,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg> CUSTOMER DETAILS</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="i-cname">Customer Name *</label><input type="text" id="i-cname" class="form-input"></div>
               <div class="form-group"><label class="form-label" for="i-cphone">Phone *</label><input type="tel" id="i-cphone" class="form-input"></div>
@@ -1208,7 +1228,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT &amp; AMOUNT</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg> PROJECT &amp; AMOUNT</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="i-ptype">Project Type</label>
                 <select id="i-ptype" class="form-select">
@@ -1247,11 +1267,11 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> BANK / PAYMENT INFO (shown on invoice)</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg> BANK / PAYMENT INFO (shown on invoice)</div>
             <div class="form-group"><textarea id="i-payment" class="form-textarea" rows="3"></textarea></div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg> WORK PROGRESS (shown to customer on their portal link)</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg> WORK PROGRESS (shown to customer on their portal link)</div>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label" for="i-workstage">Current Stage</label>
@@ -1271,12 +1291,12 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="13" x2="14" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg> NOTES</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="13" x2="14" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg> NOTES</div>
             <div class="form-group"><textarea id="i-notes" class="form-textarea" rows="3" placeholder="Any additional notes for this invoice"></textarea></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" id="inv-save-btn" onclick="saveInvoice()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Invoice</button>
-            <button class="btn btn-reset" onclick="resetInvoiceForm()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
+            <button class="btn btn-save" id="inv-save-btn" onclick="saveInvoice()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Invoice</button>
+            <button class="btn btn-reset" onclick="resetInvoiceForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
           </div>
         </form>
       </section>
@@ -1306,7 +1326,7 @@ html.attendance-boot #attendance-screen{display:block!important}
               <option value="paid">Paid</option>
             </select>
           </div>
-          <button class="btn-export" onclick="exportInvoicesCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+          <button class="btn-export" onclick="exportInvoicesCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
         </div>
         <div class="table-card">
           <div style="overflow-x:auto">
@@ -1341,7 +1361,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         <!-- WORKERS -->
         <div class="subtab-pane active" id="labour-pane-workers">
           <div class="form-card">
-            <div class="form-section-title" id="labour-form-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER</div>
+            <div class="form-section-title" id="labour-form-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="lb-name">Name *</label><input type="text" id="lb-name" class="form-input"></div>
               <div class="form-group"><label class="form-label" for="lb-phone">Phone</label><input type="tel" id="lb-phone" class="form-input" maxlength="10"></div>
@@ -1358,8 +1378,8 @@ html.attendance-boot #attendance-screen{display:block!important}
               <div class="form-group span-2"><label class="form-label" for="lb-notes">Notes</label><input type="text" id="lb-notes" class="form-input"></div>
             </div>
             <div class="btn-row">
-              <button class="btn btn-save" id="lb-save-btn" onclick="saveLabour()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker</button>
-              <button class="btn btn-reset" onclick="resetLabourForm()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
+              <button class="btn btn-save" id="lb-save-btn" onclick="saveLabour()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker</button>
+              <button class="btn btn-reset" onclick="resetLabourForm()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg> Reset</button>
             </div>
           </div>
 
@@ -1370,7 +1390,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none">
               <input type="checkbox" id="labour-show-inactive" onchange="renderLabourList(document.getElementById('labour-search-input').value)"> Show inactive
             </label>
-            <button class="btn-export" onclick="exportLabourCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+            <button class="btn-export" onclick="exportLabourCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
           </div>
 
           <div class="table-card">
@@ -1390,7 +1410,7 @@ html.attendance-boot #attendance-screen{display:block!important}
               <label class="form-label" for="att-date">Date</label>
               <input type="date" id="att-date" class="form-input" onchange="loadAttendanceForDate()">
             </div>
-            <button class="btn btn-reset" style="align-self:flex-end;padding:9px 14px;font-size:12px" onclick="markAllPresent()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12.5l5 5L20 6.5"/></svg> Mark All Present</button>
+            <button class="btn btn-reset" style="align-self:flex-end;padding:9px 14px;font-size:12px" onclick="markAllPresent()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg> Mark All Present</button>
           </div>
           <div id="att-holiday-banner" class="holiday-banner" style="display:none">
             <span id="att-holiday-banner-text"></span>
@@ -1410,7 +1430,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="subtab-pane" id="labour-pane-wages">
           <div class="btn-row" style="margin-bottom:14px">
             <div class="form-group" style="min-width:150px;margin-bottom:0"><input type="month" id="team-report-month" class="form-input"></div>
-            <button class="btn btn-reset" onclick="exportTeamMonthlyReport()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Export Team Monthly Report (CSV)</button>
+            <button class="btn btn-reset" onclick="exportTeamMonthlyReport()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Export Team Monthly Report (CSV)</button>
           </div>
           <div class="table-card">
             <div style="overflow-x:auto">
@@ -1425,19 +1445,19 @@ html.attendance-boot #attendance-screen{display:block!important}
         <!-- VERIFICATION LOCATIONS (Admin only — used to GPS-check worker self-marked attendance) -->
         <div class="subtab-pane" id="labour-pane-locations">
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> WORK HOURS FOR PRESENT / HALF DAY</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> WORK HOURS FOR PRESENT / HALF DAY</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">A worker's status is decided from the hours between their Time In and Time Out — not a manual choice. Below the Half Day threshold, it's marked Absent (the office can still override any of this manually in the Attendance tab).</p>
             <div class="form-grid" style="max-width:400px">
               <div class="form-group"><label class="form-label" for="att-fullday-hours">Full Day = Present (hours)</label><input type="number" id="att-fullday-hours" class="form-input" value="8" min="1" max="24" step="0.5"></div>
               <div class="form-group"><label class="form-label" for="att-halfday-hours">Minimum for Half Day (hours)</label><input type="number" id="att-halfday-hours" class="form-input" value="4" min="0.5" max="24" step="0.5"></div>
             </div>
             <div class="btn-row">
-              <button class="btn btn-save" onclick="saveAttendanceHourThresholds()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Hours</button>
+              <button class="btn btn-save" onclick="saveAttendanceHourThresholds()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Hours</button>
             </div>
           </div>
 
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> ADD SITE / OFFICE LOCATION</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> ADD SITE / OFFICE LOCATION</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When a worker self-marks attendance from their phone, their GPS location is checked against these — within range of any one of them counts as "Verified". Stand at the actual site or office and tap "Use My Current Location" for the easiest, most accurate setup.</p>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="loc-name">Location Name *</label><input type="text" id="loc-name" class="form-input" placeholder="e.g. Head Office, Site — Rajiv Bhargav Shed"></div>
@@ -1446,8 +1466,8 @@ html.attendance-boot #attendance-screen{display:block!important}
               <div class="form-group"><label class="form-label" for="loc-lng">Longitude</label><input type="number" id="loc-lng" class="form-input" step="any" readonly placeholder="Use the button below"></div>
             </div>
             <div class="btn-row">
-              <button class="btn btn-reset" onclick="captureCurrentLocation()" type="button"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> Use My Current Location</button>
-              <button class="btn btn-save" onclick="addAttendanceLocation()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Location</button>
+              <button class="btn btn-reset" onclick="captureCurrentLocation()" type="button"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg> Use My Current Location</button>
+              <button class="btn btn-save" onclick="addAttendanceLocation()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Location</button>
             </div>
           </div>
           <div class="table-card">
@@ -1466,14 +1486,14 @@ html.attendance-boot #attendance-screen{display:block!important}
              Leave" for each worker manually. -->
         <div class="subtab-pane" id="labour-pane-holidays">
           <div class="form-card">
-            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> ADD COMPANY HOLIDAY</div>
+            <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg> ADD COMPANY HOLIDAY</div>
             <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Dates added here are paid holidays for everyone (Diwali, Independence Day, etc.). They show a reminder banner in the Attendance tab so office staff never confuses a holiday with an unmarked absent day.</p>
             <div class="form-grid">
               <div class="form-group"><label class="form-label" for="hol-date">Date *</label><input type="date" id="hol-date" class="form-input"></div>
               <div class="form-group"><label class="form-label" for="hol-name">Holiday Name *</label><input type="text" id="hol-name" class="form-input" placeholder="e.g. Diwali, Independence Day"></div>
             </div>
             <div class="btn-row">
-              <button class="btn btn-save" onclick="addHoliday()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Holiday</button>
+              <button class="btn btn-save" onclick="addHoliday()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Add Holiday</button>
             </div>
           </div>
           <div class="table-card">
@@ -1507,18 +1527,18 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> PRICING APPROVAL SETTINGS</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> PRICING APPROVAL SETTINGS</div>
           <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">When Sales finalizes a quotation with a discount above this percentage of (base + extra), it's saved as "Pending Approval" — it can't be downloaded, shared on WhatsApp, or given a customer portal link until an Admin approves it here or on the Dashboard.</p>
           <div class="form-grid" style="max-width:320px">
             <div class="form-group"><label class="form-label" for="approval-threshold-input">Discount Threshold (%)</label><input type="number" id="approval-threshold-input" class="form-input" min="0" max="100" step="0.5"></div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="saveApprovalThreshold()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Threshold</button>
+            <button class="btn btn-save" onclick="saveApprovalThreshold()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Threshold</button>
           </div>
         </div>
 
         <div class="form-card">
-          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD TEAM MEMBER</div>
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD TEAM MEMBER</div>
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label" for="tm-name">Full Name *</label><input type="text" id="tm-name" class="form-input"></div>
             <div class="form-group"><label class="form-label" for="tm-email">Email *</label><input type="email" id="tm-email" class="form-input"></div>
@@ -1531,7 +1551,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-save" onclick="addTeamMember(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
+            <button class="btn btn-save" onclick="addTeamMember(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Create Login</button>
           </div>
           <div style="font-size:12px;color:#64748b;margin-top:10px">
             Sales → New Quotation, History, Leads, Customers &nbsp;|&nbsp; Accounts → Invoices, Customers, Analytics &nbsp;|&nbsp; Admin → Everything
@@ -1573,7 +1593,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div style="font-weight:700;font-size:14px;color:var(--navy)">Full Data Backup</div>
             <div style="font-size:12.5px;color:#667077;margin-top:3px">Downloads everything — quotations, invoices, leads, customers, payments, team &amp; tickets — as one file. Keep it somewhere safe (Google Drive, etc).</div>
           </div>
-          <button class="btn-export" onclick="downloadFullBackup()" style="white-space:nowrap"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Download Full Backup</button>
+          <button class="btn-export" onclick="downloadFullBackup()" style="white-space:nowrap"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Download Full Backup</button>
         </div>
 
         <div style="background:#fef2f2;border:1.5px solid #dc2626;border-radius:12px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
@@ -1581,7 +1601,7 @@ html.attendance-boot #attendance-screen{display:block!important}
             <div style="font-weight:700;font-size:14px;color:#991b1b">Renumber All Quotations (one-time)</div>
             <div style="font-size:12.5px;color:#667077;margin-top:3px">Switches every quotation — old and new — to the sequential QT-&lt;FY&gt;-&lt;seq&gt; format. Take a backup above first. This does NOT touch invoice numbers.</div>
           </div>
-          <button class="btn-export" onclick="migrateQuotationNumbers()" style="white-space:nowrap;border-color:#dc2626;color:#dc2626"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14.5 3.5M19.5 9A8 8 0 0 0 5 5.5"/></svg> Renumber Quotations</button>
+          <button class="btn-export" onclick="migrateQuotationNumbers()" style="white-space:nowrap;border-color:#dc2626;color:#dc2626"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M4.5 15a8 8 0 0 0 14.5 3.5M19.5 9A8 8 0 0 0 5 5.5"/></svg> Renumber Quotations</button>
         </div>
 
         <div class="history-controls">
@@ -1653,10 +1673,10 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="modal-header">
       <div class="modal-title">Quotation Preview</div>
       <div class="modal-actions">
-        <button class="btn-modal btn-modal-pdf" onclick="downloadPreviewPDF()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> PDF</button>
-        <button class="btn-modal" onclick="shareEmail(window._previewId)" style="background:#1565c0;color:#fff"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg> Email</button>
-        <button class="btn-modal" onclick="shareWhatsApp(window._previewId)" style="background:#25d366;color:#fff"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> WhatsApp</button>
-        <button class="btn-modal btn-modal-close" onclick="closePreview()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+        <button class="btn-modal btn-modal-pdf" onclick="downloadPreviewPDF()"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg> PDF</button>
+        <button class="btn-modal" onclick="shareEmail(window._previewId)" style="background:#1565c0;color:#fff"><svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg> Email</button>
+        <button class="btn-modal" onclick="shareWhatsApp(window._previewId)" style="background:#25d366;color:#fff"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> WhatsApp</button>
+        <button class="btn-modal btn-modal-close" onclick="closePreview()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
       </div>
     </div>
     <div id="preview-content"></div>
@@ -1679,8 +1699,8 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label" for="pay-note">Note</label><input type="text" id="pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="savePayment(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
-      <button class="btn btn-reset" onclick="closePaymentModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+      <button class="btn btn-save" onclick="savePayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-reset" onclick="closePaymentModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
     <div class="pay-history" id="pay-history"></div>
   </div>
@@ -1711,8 +1731,8 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div id="ws-photo-gallery" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="saveWorkStatus()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Progress</button>
-      <button class="btn btn-reset" onclick="closeWorkStatusModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+      <button class="btn btn-save" onclick="saveWorkStatus()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Progress</button>
+      <button class="btn btn-reset" onclick="closeWorkStatusModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
 </div>
@@ -1734,8 +1754,8 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group span-2"><label class="form-label" for="lb-pay-note">Note</label><input type="text" id="lb-pay-note" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" onclick="saveLabourPayment(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
-      <button class="btn btn-reset" onclick="closeLabourPayModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+      <button class="btn btn-save" onclick="saveLabourPayment(this)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Payment</button>
+      <button class="btn btn-reset" onclick="closeLabourPayModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
 </div>
@@ -1747,7 +1767,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-sub" id="lb-hist-sub">Worker —</div>
     <div id="lb-hist-content">Loading...</div>
     <div class="btn-row">
-      <button class="btn btn-reset" onclick="closeLabourHistoryModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+      <button class="btn btn-reset" onclick="closeLabourHistoryModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
     </div>
   </div>
 </div>
@@ -1758,9 +1778,9 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="pay-modal-title">Monthly Attendance</div>
     <div class="pay-modal-sub" id="mat-sub">Worker —</div>
     <div class="mat-nav">
-      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(-1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg></div>
+      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(-1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px"><path d="M15 18l-6-6 6-6"/></svg></div>
       <div class="mat-nav-label" id="mat-month-label">—</div>
-      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="mat-nav-btn" onclick="navigateMonthlyAttendance(1)"><svg viewBox="0 0 24 24" class="ic" style="width:16px;height:16px"><path d="M9 18l6-6-6-6"/></svg></div>
     </div>
     <div id="mat-grid-wrap">
       <div class="mat-grid" id="mat-dow-row">
@@ -1780,8 +1800,8 @@ html.attendance-boot #attendance-screen{display:block!important}
     </div>
     <div class="mat-stats" id="mat-stats"></div>
     <div class="btn-row">
-      <button class="btn btn-reset" onclick="closeMonthlyAttendanceModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
-      <button class="btn" onclick="exportMonthlyAttendanceCSV()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download Report (CSV)</button>
+      <button class="btn btn-reset" onclick="closeMonthlyAttendanceModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+      <button class="btn" onclick="exportMonthlyAttendanceCSV()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download Report (CSV)</button>
     </div>
   </div>
 </div>
@@ -1803,8 +1823,8 @@ html.attendance-boot #attendance-screen{display:block!important}
       <div class="form-group"><label class="form-label" for="ss-year">Year</label><input type="number" id="ss-year" class="form-input"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-save" id="ss-generate-btn" onclick="generateSalarySlipPDF(this)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Generate PDF</button>
-      <button class="btn btn-reset" onclick="closeSalarySlipModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
+      <button class="btn btn-save" id="ss-generate-btn" onclick="generateSalarySlipPDF(this)"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Generate PDF</button>
+      <button class="btn btn-reset" onclick="closeSalarySlipModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Cancel</button>
     </div>
   </div>
 </div>
@@ -1829,7 +1849,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     </div>
     <div class="btn-row">
       <button class="btn btn-save" id="bulk-wa-action-btn" onclick="bulkWhatsAppNext()"></button>
-      <button class="btn btn-reset" onclick="closeBulkWhatsAppModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+      <button class="btn btn-reset" onclick="closeBulkWhatsAppModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
     </div>
   </div>
 </div>
@@ -1838,9 +1858,9 @@ html.attendance-boot #attendance-screen{display:block!important}
 <div id="global-search-modal">
   <div class="gs-box">
     <div class="gs-input-row">
-      <svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
       <input type="text" id="gs-input" placeholder="Search quotations, invoices, leads, customers, tickets..." oninput="runGlobalSearch(this.value)" autocomplete="off">
-      <button class="btn-icon" onclick="closeGlobalSearch()" title="Close" aria-label="Close search"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      <button class="btn-icon" onclick="closeGlobalSearch()" title="Close" aria-label="Close search"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
     </div>
     <div id="gs-results" class="gs-results"></div>
   </div>
@@ -1852,7 +1872,7 @@ html.attendance-boot #attendance-screen{display:block!important}
     <div class="modal-header">
       <div class="modal-title" id="tkt-modal-title">Ticket</div>
       <div class="modal-actions">
-        <button class="btn-modal btn-modal-close" onclick="closeTicketModal()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
+        <button class="btn-modal btn-modal-close" onclick="closeTicketModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg> Close</button>
       </div>
     </div>
     <div style="padding:20px">
@@ -1880,7 +1900,7 @@ html.attendance-boot #attendance-screen{display:block!important}
         <textarea id="tkt-reply-input" class="form-input" rows="3" style="resize:vertical;font-family:inherit" placeholder="Type your reply here..."></textarea>
       </div>
       <div class="btn-row">
-        <button class="btn btn-save" onclick="sendTicketReply()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4l16 8-16 8 4-8Z"/></svg> Send Reply</button>
+        <button class="btn btn-save" onclick="sendTicketReply()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4l16 8-16 8 4-8Z"/></svg> Send Reply</button>
       </div>
     </div>
   </div>
@@ -1904,7 +1924,7 @@ html.attendance-boot #attendance-screen{display:block!important}
 
 <div id="success-modal">
   <div class="success-box">
-    <div class="success-check-circle"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12.5l5 5L20 6"/></svg></div>
+    <div class="success-check-circle"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></div>
     <div class="success-title" id="success-title">Saved Successfully!</div>
     <div class="success-sub" id="success-sub"></div>
     <div class="success-id-chip" id="success-id-chip"></div>
@@ -1946,9 +1966,9 @@ function reportError(...args) {
 // ── TOAST (replaces window.alert) ──────────────────────────────
 // type: 'success' | 'error' | 'warning'
 const TOAST_ICONS = {
-  success: `<svg viewBox="0 0 24 24" class="ic toast-icon" width="18" height="18"><path d="M20 6 9 17l-5-5"/></svg>`,
-  error:   `<svg viewBox="0 0 24 24" class="ic toast-icon" width="18" height="18"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>`,
-  warning: `<svg viewBox="0 0 24 24" class="ic toast-icon" width="18" height="18"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`
+  success: `<svg viewBox="0 0 24 24" class="ic toast-icon"><path d="M20 6 9 17l-5-5"/></svg>`,
+  error:   `<svg viewBox="0 0 24 24" class="ic toast-icon"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>`,
+  warning: `<svg viewBox="0 0 24 24" class="ic toast-icon"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`
 };
 window.toast = (message, type = 'success', duration = 4200) => {
   const container = document.getElementById('toast-container');
@@ -2299,36 +2319,36 @@ let activeLabourPaymentId = null;
 
 // ── ICONS — flat line-icon set (replaces emoji throughout the UI) ──────
 const ICONS = {
-  home:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>`,
-  plusCirc: `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
-  list:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg>`,
-  chart:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg>`,
-  phone:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg>`,
-  users:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg>`,
-  receipt:  `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg>`,
-  wallet:   `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg>`,
-  shield:   `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg>`,
-  trash:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg>`,
-  globe:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg>`,
-  lock:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>`,
-  bell:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
-  mail:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
-  alert:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`,
-  plus:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-  save:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg>`,
-  refresh:  `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg>`,
-  pin:      `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>`,
-  zap:      `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg>`,
-  edit:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 17.5 15.5 6l2.5 2.5L6.5 20H4Z"/><line x1="14" y1="7.5" x2="16.5" y2="10"/></svg>`,
-  fileText: `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg>`,
-  mail:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
-  chat:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg>`,
-  close:    `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>`,
-  eye:      `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="2.6"/></svg>`,
-  download: `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg>`,
-  restore:  `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>`,
-  coin:     `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`,
-  building: `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>`
+  home:     `<svg viewBox="0 0 24 24" class="ic"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>`,
+  plusCirc: `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  list:     `<svg viewBox="0 0 24 24" class="ic"><line x1="8" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="8" y1="18" x2="20" y2="18"/><line x1="4" y1="6" x2="4.01" y2="6"/><line x1="4" y1="12" x2="4.01" y2="12"/><line x1="4" y1="18" x2="4.01" y2="18"/></svg>`,
+  chart:    `<svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="20" x2="5" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="19" y1="20" x2="19" y2="4"/><line x1="3" y1="20" x2="21" y2="20"/></svg>`,
+  phone:    `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg>`,
+  users:    `<svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg>`,
+  receipt:  `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg>`,
+  wallet:   `<svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg>`,
+  shield:   `<svg viewBox="0 0 24 24" class="ic"><path d="M12 3 5 5.5V11c0 5 3 8 7 9.5 4-1.5 7-4.5 7-9.5V5.5Z"/></svg>`,
+  trash:    `<svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><path d="M9 7V4.5h6V7"/><path d="M7 7l1 13h8l1-13"/><line x1="10" y1="10.5" x2="10" y2="17"/><line x1="14" y1="10.5" x2="14" y2="17"/></svg>`,
+  globe:    `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><line x1="3.6" y1="12" x2="20.4" y2="12"/></svg>`,
+  lock:     `<svg viewBox="0 0 24 24" class="ic"><rect x="5" y="10.5" width="14" height="9" rx="1.2"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>`,
+  bell:     `<svg viewBox="0 0 24 24" class="ic"><path d="M6 16V10a6 6 0 0 1 12 0v6l1.6 2.2H4.4Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+  mail:     `<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
+  alert:    `<svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg>`,
+  plus:     `<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  save:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg>`,
+  refresh:  `<svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 3v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 21v-5h5"/></svg>`,
+  pin:      `<svg viewBox="0 0 24 24" class="ic"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>`,
+  zap:      `<svg viewBox="0 0 24 24" class="ic"><path d="M12.5 3 5 13.5h5.5L11 21l7.5-10.5H13Z"/></svg>`,
+  edit:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 17.5 15.5 6l2.5 2.5L6.5 20H4Z"/><line x1="14" y1="7.5" x2="16.5" y2="10"/></svg>`,
+  fileText: `<svg viewBox="0 0 24 24" class="ic"><path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><line x1="9" y1="12" x2="16" y2="12"/><line x1="9" y1="16" x2="16" y2="16"/></svg>`,
+  mail:     `<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="M4 6.5 12 13l8-6.5"/></svg>`,
+  chat:     `<svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg>`,
+  close:    `<svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>`,
+  eye:      `<svg viewBox="0 0 24 24" class="ic"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="2.6"/></svg>`,
+  download: `<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg>`,
+  restore:  `<svg viewBox="0 0 24 24" class="ic"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>`,
+  coin:     `<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`,
+  building: `<svg viewBox="0 0 24 24" class="ic"><rect x="5" y="4" width="10" height="16"/><rect x="15" y="9" width="4" height="11"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="8" y1="12" x2="8" y2="12.01"/><line x1="12" y1="12" x2="12" y2="12.01"/><line x1="8" y1="16" x2="8" y2="16.01"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>`
 };
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
@@ -2513,7 +2533,7 @@ function showLoadError(tbodyId, colspan, err) {
   const msg = err?.code === 'permission-denied'
     ? 'Your role does not have access to this data.'
     : 'Data failed to load — check your internet connection and refresh the page.';
-  tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;padding:32px;color:var(--red);display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> ${msg}</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;padding:32px;color:var(--red);display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> ${msg}</td></tr>`;
 }
 
 // ── PAGINATION (client-side — keeps large tables fast to render) ──────
@@ -2734,7 +2754,7 @@ window.showEmployeeProfile = async (uid, isSelf=false) => {
   const roleLockBadge = (member.email === ADMIN_EMAIL)
     ? ''
     : (member.roleLocked !== false
-        ? `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);padding:2px 7px;border-radius:2px;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" class="ic" style="width:10px;height:10px" width="18" height="18"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Role Locked</span>`
+        ? `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);padding:2px 7px;border-radius:2px;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" class="ic" style="width:10px;height:10px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Role Locked</span>`
         : `<span style="font-size:11px;color:var(--muted)">Role Unlocked</span>`);
 
   content.innerHTML = `
@@ -2812,11 +2832,11 @@ window.renderTeam = () => {
           ? `<select class="form-select" style="padding:4px 8px;font-size:12px" disabled title="Primary admin role fixed"><option selected>Admin</option></select>`
           : isLocked
             ? `<span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);padding:3px 8px;border-radius:2px;font-size:12px;font-weight:600">
-                 <svg viewBox="0 0 24 24" class="ic" style="width:12px;height:12px" width="18" height="18"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                 <svg viewBox="0 0 24 24" class="ic" style="width:12px;height:12px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
                  ${esc(t.role)}
                </span>
                <button type="button" class="btn-icon" title="Unlock role to change it" aria-label="Unlock role to change it" onclick="unlockRoleForChange('${t.id}')" style="margin-left:6px">
-                 <svg viewBox="0 0 24 24" class="ic" style="width:13px;height:13px" width="18" height="18"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg> Unlock
+                 <svg viewBox="0 0 24 24" class="ic" style="width:13px;height:13px"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg> Unlock
                </button>`
             : `<select onchange="changeTeamRole('${t.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
                  ${['Admin','Sales','Accounts'].map(r=>`<option ${t.role===r?'selected':''}>${r}</option>`).join('')}
@@ -3243,8 +3263,8 @@ window.renderLeaveRequests = () => {
           : '<span class="badge-draft">Pending</span>';
         const actions = r.status === 'Pending'
           ? `<div class="action-btns">
-              <button onclick="approveLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon" title="Approve" aria-label="Approve"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
-              <button onclick="rejectLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+              <button onclick="approveLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon" title="Approve" aria-label="Approve"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+              <button onclick="rejectLeaveRequest('${r.workerId}','${r.id}')" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             </div>`
           : `<small style="color:#94a3b8">${esc(r.decidedBy || '')}</small>`;
         return `<tr id="leave-row-${r.id}" class="reveal-row" style="animation-delay:${i*35}ms">
@@ -3327,7 +3347,7 @@ window.renderLabourList = (search='') => {
         <td data-label="Status">${w.active===false?'<span class="badge-draft">Inactive</span>':'<span style="color:var(--green);font-size:12px;font-weight:700">Active</span>'}</td>
         <td data-label="Actions" class="action-btns">
           <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History" aria-label="History">${ICONS.eye}</button>
-          <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
+          <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
           <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF" aria-label="Salary Slip PDF">${ICONS.download}</button>
           <button onclick="editLabour('${w.id}')" class="btn-icon" title="Edit" aria-label="Edit">${ICONS.edit}</button>
           <button onclick="generateAttendanceLink('${w.id}')" class="btn-icon" title="Get Attendance Link (self-marking)" aria-label="Get Attendance Link (self-marking)">${ICONS.globe}</button>
@@ -3378,8 +3398,8 @@ window.resetLabourForm = () => {
   ['lb-name','lb-phone','lb-wage','lb-joined','lb-notes'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('lb-leave-allocation').value = '12';
   document.getElementById('lb-role').selectedIndex = 0;
-  document.getElementById('labour-form-title').innerHTML = '<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER';
-  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker';
+  document.getElementById('labour-form-title').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> NEW WORKER';
+  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Save Worker';
   editingLabourId = null;
 };
 
@@ -3393,8 +3413,8 @@ window.editLabour = id => {
   document.getElementById('lb-joined').value = w.joinedDate||'';
   document.getElementById('lb-leave-allocation').value = w.leaveAllocationPerYear ?? 12;
   document.getElementById('lb-notes').value = w.notes||'';
-  document.getElementById('labour-form-title').innerHTML = `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 20h4l10-10-4-4L4 16Z"/></svg> EDIT WORKER — ${esc(w.name)}`;
-  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Update Worker';
+  document.getElementById('labour-form-title').innerHTML = `<svg viewBox="0 0 24 24" class="ic"><path d="M4 20h4l10-10-4-4L4 16Z"/></svg> EDIT WORKER — ${esc(w.name)}`;
+  document.getElementById('lb-save-btn').innerHTML = '<svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Update Worker';
   showLabourSubtab('workers');
   window.scrollTo(0,0);
 };
@@ -3683,7 +3703,7 @@ window.renderWageSummary = async () => {
             <td class="mono ${balance>0?'balance-due':'balance-clear'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</td>
             <td class="action-btns">
               <button onclick="openLabourPayModal('${w.id}')" class="btn-icon" title="Record Payment" aria-label="Record Payment">${ICONS.coin}</button>
-              <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
+              <button onclick="viewMonthlyAttendance('${w.id}')" class="btn-icon" title="Monthly Attendance Report" aria-label="Monthly Attendance Report"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></button>
               <button onclick="viewLabourHistory('${w.id}')" class="btn-icon" title="History" aria-label="History">${ICONS.eye}</button>
               <button onclick="openSalarySlipModal('${w.id}')" class="btn-icon" title="Salary Slip PDF" aria-label="Salary Slip PDF">${ICONS.download}</button>
             </td>
@@ -4242,13 +4262,13 @@ window.loadDashboard = async () => {
       animateCount('dash-stale-leads-count', staleLeads.length);
       document.getElementById('dash-stale-leads-count').closest('.stat-card').classList.toggle('stat-alert', staleLeads.length > 0);
       document.getElementById('dash-stale-leads-list').innerHTML = staleLeads.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> All leads are up to date on follow-up</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> All leads are up to date on follow-up</div>'
         : staleLeads.map((l,i) => {
             const msg = `Hello ${l.name}, this is R.R Teen Set Solution. We wanted to discuss your ${l.ptype||'requirement'}. Please let us know how you'd like to proceed. Thank you!`;
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(l.name)}</strong> — ${esc(l.status)} — ${esc(l.ptype||'—')}
                 <br><small style="color:#94a3b8">${l.days} days with no update</small></div>
-              <a href="${waLink(l.phone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(l.phone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
     }
@@ -4265,15 +4285,15 @@ window.loadDashboard = async () => {
           .filter(q => q.approvalStatus === 'pending')
           .sort((a,b) => (b.approvalRequestedAt?.toMillis?.()||0) - (a.approvalRequestedAt?.toMillis?.()||0));
         document.getElementById('dash-approval-list').innerHTML = pendingApproval.length === 0
-          ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Nothing awaiting approval</div>'
+          ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Nothing awaiting approval</div>'
           : pendingApproval.map((q,i) => {
               const discPct = ((q.base||0)+(q.extra||0)) > 0 ? (q.discount||0)/((q.base||0)+(q.extra||0))*100 : 0;
               return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
                 <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                   <br><small style="color:#94a3b8">Discount ${discPct.toFixed(1)}% (limit ${approvalThresholdPct}%) — requested by ${esc(q.createdBy||'—')}</small></div>
                 <div style="display:flex;gap:6px">
-                  <button onclick="decideQuotationApproval('${q.id}',true)" class="btn-icon" title="Approve" aria-label="Approve" style="color:var(--green)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
-                  <button onclick="decideQuotationApproval('${q.id}',false)" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+                  <button onclick="decideQuotationApproval('${q.id}',true)" class="btn-icon" title="Approve" aria-label="Approve" style="color:var(--green)"><svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+                  <button onclick="decideQuotationApproval('${q.id}',false)" class="btn-icon btn-danger" title="Reject" aria-label="Reject"><svg viewBox="0 0 24 24" class="ic"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
                 </div>
               </div>`;
             }).join('');
@@ -4305,13 +4325,13 @@ window.loadDashboard = async () => {
       animateCount('dash-followup-count', followups.length);
       document.getElementById('dash-followup-count').closest('.stat-card').classList.toggle('stat-alert', followups.length > 0);
       document.getElementById('dash-followup-list').innerHTML = followups.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> All follow-ups are clear</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> All follow-ups are clear</div>'
         : followups.map((q,i) => {
             const msg = `Hello ${q.cname}, this is R.R Teen Set Solution. Your quotation ${q.qtId} (₹${fmt(q.total)}) is currently pending. If you have any questions, please let us know — we're happy to help. Thank you!`;
             return `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
               <div><strong>${esc(q.cname)}</strong> — ${esc(q.qtId)} — ₹${fmt(q.total)}
                 <br><small style="color:#94a3b8">${q.days} days pending</small></div>
-              <a href="${waLink(q.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
+              <a href="${waLink(q.cphone, msg)}" target="_blank" rel="noopener noreferrer" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></a>
             </div>`;
           }).join('');
 
@@ -4326,7 +4346,7 @@ window.loadDashboard = async () => {
         .slice(0, 10);
 
       document.getElementById('dash-amc-list').innerHTML = amcDue.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> No AMC renewals due in the next 30 days</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> No AMC renewals due in the next 30 days</div>'
         : amcDue.map((q,i) => {
             const dueLabel = q.daysUntil < 0
               ? `${Math.abs(q.daysUntil)} day${Math.abs(q.daysUntil)===1?'':'s'} overdue for renewal`
@@ -4356,13 +4376,13 @@ window.loadDashboard = async () => {
         .slice(0, 10);
 
       document.getElementById('dash-duesoon-list').innerHTML = dueSoon.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Nothing due in the next 3 days</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Nothing due in the next 3 days</div>'
         : dueSoon.map((i,idx) => {
             const dueLabel = i.daysUntilDue === 0 ? 'Due today' : `Due in ${i.daysUntilDue} day${i.daysUntilDue===1?'':'s'}`;
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${dueLabel}${reminderNote(i)}</small></div>
-              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
+              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
             </div>`;
           }).join('');
 
@@ -4380,7 +4400,7 @@ window.loadDashboard = async () => {
         .slice(0, 10);
 
       document.getElementById('dash-overdue-list').innerHTML = overdue.length === 0
-        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> No overdue payments</div>'
+        ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> No overdue payments</div>'
         : overdue.map((i,idx) => {
             const ageLabel = i.dueDate
               ? `${i.days} day${i.days===1?'':'s'} past due date`
@@ -4388,7 +4408,7 @@ window.loadDashboard = async () => {
             return `<div class="followup-row reveal-row" style="animation-delay:${idx*40}ms">
               <div><strong>${esc(i.cname)}</strong> — ${esc(i.invId)} — ₹${fmt(i.due)} due
                 <br><small style="color:#94a3b8">${ageLabel}${reminderNote(i)}</small></div>
-              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
+              <button onclick="sendDueReminder('${i.id}')" class="btn-icon" title="Send WhatsApp Reminder" aria-label="Send WhatsApp Reminder"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg></button>
             </div>`;
           }).join('');
     }
@@ -4421,11 +4441,11 @@ window.loadDashboard = async () => {
             .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
           missedListEl.innerHTML = missed.length === 0
-            ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Every active worker has been marked for today</div>'
+            ? '<div style="padding:16px;color:#64748b;font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" style="stroke:var(--green)"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-6"/></svg> Every active worker has been marked for today</div>'
             : missed.map((w, i) => `<div class="followup-row reveal-row" style="animation-delay:${i*40}ms">
                 <div><strong>${esc(w.name)}</strong> — ${esc(w.role || 'Worker')}
                   <br><small style="color:#94a3b8">Not marked for ${todayStr}</small></div>
-                <button onclick="showSection('labour');showLabourSubtab('attendance')" class="btn-icon" title="Mark Attendance" aria-label="Mark Attendance"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></button>
+                <button onclick="showSection('labour');showLabourSubtab('attendance')" class="btn-icon" title="Mark Attendance" aria-label="Mark Attendance"><svg viewBox="0 0 24 24" class="ic"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></button>
               </div>`).join('');
         }
       } catch(e) {
@@ -4455,7 +4475,7 @@ window.loadDashboard = async () => {
     reportError('Dashboard load error:', e);
     ['dash-followup-list','dash-approval-list','dash-amc-list','dash-duesoon-list','dash-overdue-list','dash-stale-leads-list','dash-missed-att-list'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Data failed to load — please refresh the page.</div>';
+      if (el) el.innerHTML = '<div style="padding:16px;color:var(--red);font-size:13px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3 21.5 20H2.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="16.7" x2="12" y2="16.71"/></svg> Data failed to load — please refresh the page.</div>';
     });
   }
 };
@@ -5260,11 +5280,11 @@ function updateBulkWaModalUI() {
   document.getElementById('bulk-wa-progress-bar').style.width = pct + '%';
   if (bulkWaIndex >= total) {
     document.getElementById('bulk-wa-current').textContent = `All ${total} done!`;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 12.5l5 5L20 6.5"/></svg> Done`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" class="ic"><path d="M4 12.5l5 5L20 6.5"/></svg> Done`;
   } else {
     const next = bulkWaQueue[bulkWaIndex];
     document.getElementById('bulk-wa-current').textContent = `${bulkWaIndex} of ${total} sent`;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Send to ${esc(next.name)}`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/></svg> Send to ${esc(next.name)}`;
   }
 }
 
@@ -6848,7 +6868,7 @@ function renderWorkPhotoGallery(inv) {
   gallery.innerHTML = photos.map((p, idx) => `
     <div class="ws-photo-thumb">
       <img src="${esc(p.url)}" alt="Site photo" loading="lazy">
-      <div class="ws-photo-del" onclick="deleteWorkPhoto(${idx})" title="Remove"><svg viewBox="0 0 24 24" width="18" height="18"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
+      <div class="ws-photo-del" onclick="deleteWorkPhoto(${idx})" title="Remove"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></div>
     </div>`).join('');
 }
 
@@ -7326,6 +7346,7 @@ window.showEmpTab = (tab) => {
   ['attendance','calendar','leave','salary','profile'].forEach(t => {
     document.getElementById(`emp-tab-${t}`)?.classList.toggle('active', t === tab);
   });
+  if (tab !== 'attendance' && window._liveClockInterval) { clearInterval(window._liveClockInterval); window._liveClockInterval = null; }
   const worker = window._attWorker;
   if (!worker) return;
   if (tab === 'attendance') renderEmpAttendanceTab(worker);
@@ -7415,9 +7436,9 @@ function renderEmpCalendarTab(worker) {
       <div class="portal-cname">${esc(worker.name)}</div>
       <div class="portal-ptype">${esc(worker.role || '')} · Monthly Calendar</div>
       <div class="emp-month-nav" style="margin-top:16px">
-        <button onclick="empCalNav(-1)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button onclick="empCalNav(-1)"><svg viewBox="0 0 24 24" class="ic"><path d="M15 6l-6 6 6 6"/></svg></button>
         <strong>${monthLabel}</strong>
-        <button onclick="empCalNav(1)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button onclick="empCalNav(1)"><svg viewBox="0 0 24 24" class="ic"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
       <div class="mat-grid">
         <div class="mat-dow">Sun</div><div class="mat-dow">Mon</div><div class="mat-dow">Tue</div><div class="mat-dow">Wed</div><div class="mat-dow">Thu</div><div class="mat-dow">Fri</div><div class="mat-dow">Sat</div>
@@ -7492,7 +7513,7 @@ function renderEmpLeaveTab(worker) {
         <div class="form-group span-2"><label class="form-label" for="leave-reason">Reason</label><input type="text" id="leave-reason" class="form-input" placeholder="e.g. Family function" maxlength="300"></div>
       </div>
       <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-save" style="width:100%;justify-content:center" onclick="submitEmpLeaveRequest()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit Application</button>
+        <button class="btn btn-save" style="width:100%;justify-content:center" onclick="submitEmpLeaveRequest()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit Application</button>
       </div>
     </div>
     <div class="portal-card">
@@ -7573,9 +7594,9 @@ function renderEmpSalaryTab(worker) {
       <div class="portal-cname">${esc(worker.name)}</div>
       <div class="portal-ptype">${esc(worker.role || '')} · Salary Slip</div>
       <div class="emp-month-nav" style="margin-top:16px">
-        <button onclick="empSalNav(-1)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button onclick="empSalNav(-1)"><svg viewBox="0 0 24 24" class="ic"><path d="M15 6l-6 6 6 6"/></svg></button>
         <strong>${monthLabel}</strong>
-        <button onclick="empSalNav(1)"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button onclick="empSalNav(1)"><svg viewBox="0 0 24 24" class="ic"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
       <div class="emp-sal-bar">${bar(present,'#22a35e')}${bar(half,'#f2b705')}${bar(leave,'#3b6fe0')}${bar(holiday,'#9b4fd1')}${bar(absent,'#e0473a')}</div>
       <div class="mat-legend" style="margin-top:10px;justify-content:space-between">
@@ -7590,7 +7611,7 @@ function renderEmpSalaryTab(worker) {
         <div class="emp-profile-row"><span class="lbl">Overall Balance Due</span><span class="val" style="color:${balance>0?'var(--red)':'var(--green)'}">₹${fmt(Math.abs(balance))}${balance<0?' (advance)':''}</span></div>
       </div>
       <div class="btn-row" style="margin-top:16px">
-        <button class="btn btn-save" style="width:100%;justify-content:center" onclick="downloadEmpSalarySlip()"><svg viewBox="0 0 24 24" class="ic" width="18" height="18"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download PDF</button>
+        <button class="btn btn-save" style="width:100%;justify-content:center" onclick="downloadEmpSalarySlip()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="3" x2="12" y2="14"/><path d="M7 10l5 5 5-5"/><line x1="4" y1="19" x2="20" y2="19"/></svg> Download PDF</button>
       </div>
     </div>`;
 
@@ -7655,7 +7676,7 @@ function renderAttendanceCompletedView(worker, state) {
   const hrs = state.hoursWorked || 0;
   const h = Math.floor(hrs), m = Math.round((hrs - h) * 60);
   document.getElementById('attendance-body').innerHTML = `<div class="portal-card att-confirmed-box">
-    <div class="success-check-circle" style="margin:0 auto 14px"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+    <div class="success-check-circle" style="margin:0 auto 14px"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
     <div style="font-size:16px;font-weight:700;color:var(--navy)">Day complete — ${h}h ${m}m worked</div>
     <div style="font-size:13.5px;color:var(--muted);margin-top:4px">${esc(state.timeInDisplay)} → ${esc(state.timeOutDisplay)}</div>
     <div style="font-size:14px;font-weight:700;color:var(--orange);margin-top:8px">Marked as ${esc(state.status)}</div>
@@ -7670,39 +7691,65 @@ function renderAttendanceCompletedView(worker, state) {
 function renderAttendanceForm(mode, worker, localState) {
   window._attPhotoData = null;
   const isTimeOut = mode === 'timeout';
-  const header = isTimeOut
-    ? `<div class="att-gps-status" style="margin-top:16px">Checked in at <strong style="margin:0 4px">${esc(localState.timeInDisplay)}</strong>${localState.timeInVerified ? ' ✓' : ' ⚠️'}</div>`
+  const checkedInLine = isTimeOut
+    ? `<div class="time-clock-status"><span class="dot"></span> Checked in ${esc(localState.timeInDisplay)}${localState.timeInVerified ? '' : ' (location unverified)'}</div>`
     : '';
   document.getElementById('attendance-body').innerHTML = `
-    <div class="portal-card">
-      <div class="portal-cname">${esc(worker.name)}</div>
-      <div class="portal-ptype">${esc(worker.role||'')} · ${esc(window._attToday)}</div>
-      ${header}
-      <div class="form-group" style="margin-top:20px;text-align:center">
-        <label class="form-label" style="display:block;text-align:center;margin-bottom:10px">Your 4-digit PIN</label>
-        <div class="pin-box-row">
-          ${[0,1,2,3].map(i => `<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" data-pin-idx="${i}" oninput="handlePinBoxInput(this,${i})" onkeydown="handlePinBoxKeydown(event,${i})">`).join('')}
+    <div class="badge-card">
+      <div class="badge-card-stripe"></div>
+      <div class="badge-card-grommet"></div>
+      <div class="badge-card-body">
+        <div class="badge-worker-name">${esc(worker.name)}</div>
+        <div class="badge-worker-role">${esc((worker.role||'WORKER').toUpperCase())} · ID ${esc(worker.id.slice(0,6).toUpperCase())}</div>
+        <div class="time-clock-panel">
+          <div class="time-clock-readout" id="live-clock">--:--:--</div>
+          <div class="time-clock-date" id="live-clock-date">${esc(window._attToday)}</div>
+          ${checkedInLine}
         </div>
-      </div>
-      <div class="form-group" style="text-align:center">
-        <label class="form-label" style="display:block;text-align:center;margin-bottom:2px">Take a Selfie (required)</label>
-        <div class="selfie-picker">
-          <label class="selfie-circle" id="selfie-circle" for="att-photo-input">
-            <svg viewBox="0 0 24 24" class="selfie-placeholder-ic" fill="none" stroke-width="1.8" width="18" height="18"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
-            <div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" width="18" height="18"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div>
-            <input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">
-          </label>
-          <div class="selfie-hint" id="selfie-hint">Tap the circle to open your camera</div>
+        <div class="form-group" style="margin-top:22px;text-align:center">
+          <label class="form-label" style="display:block;text-align:center;margin-bottom:10px">Enter your PIN</label>
+          <div class="pin-box-row">
+            ${[0,1,2,3].map(i => `<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-box" data-pin-idx="${i}" oninput="handlePinBoxInput(this,${i})" onkeydown="handlePinBoxKeydown(event,${i})">`).join('')}
+          </div>
         </div>
+        <div class="form-group" style="text-align:center">
+          <label class="form-label" style="display:block;text-align:center;margin-bottom:2px">Badge Photo (required)</label>
+          <div class="selfie-picker">
+            <label class="selfie-circle" id="selfie-circle" for="att-photo-input">
+              <svg viewBox="0 0 24 24" class="selfie-placeholder-ic" fill="none" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+              <div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div>
+              <input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">
+            </label>
+            <div class="selfie-hint" id="selfie-hint">Tap to open your camera</div>
+          </div>
+        </div>
+        <div class="att-mark-grid">
+          <button class="att-mark-btn ${isTimeOut?'att-mark-absent':'att-mark-present'}" id="att-submit-btn" onclick="${isTimeOut?'submitTimeOut()':'submitTimeIn()'}" disabled>
+            <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${isTimeOut?'Punch Out':'Punch In'}
+          </button>
+        </div>
+        <div class="att-gps-status" id="att-gps-line">Location &amp; photo are checked only when you punch.</div>
       </div>
-      <div class="att-mark-grid">
-        <button class="att-mark-btn ${isTimeOut?'att-mark-absent':'att-mark-present'}" id="att-submit-btn" onclick="${isTimeOut?'submitTimeOut()':'submitTimeIn()'}" disabled>
-          <svg viewBox="0 0 24 24" class="ic" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${isTimeOut?'Time Out — End My Day':'Time In — Start My Day'}
-        </button>
-      </div>
-      <div class="att-gps-status" id="att-gps-line">Your location &amp; selfie are checked only when you tap the button above.</div>
     </div>`;
+  startLiveClock();
 }
+
+// Live HH:MM:SS readout on the punch-clock panel — purely cosmetic (the
+// actual attendance timestamp is captured server-side via serverTimestamp()
+// when Time In/Out is submitted, not read from this clock), but it's what
+// makes the "time clock" metaphor feel real rather than decorative. Cleared
+// whenever the worker navigates to a different portal tab.
+function startLiveClock() {
+  if (window._liveClockInterval) clearInterval(window._liveClockInterval);
+  const tick = () => {
+    const el = document.getElementById('live-clock');
+    if (!el) { clearInterval(window._liveClockInterval); return; }
+    el.textContent = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+  };
+  tick();
+  window._liveClockInterval = setInterval(tick, 1000);
+}
+
 
 // One digit per box, auto-advances to the next box and auto-focuses back
 // on backspace from an empty box — the standard OTP-input feel. The
@@ -7757,7 +7804,7 @@ window.handleAttendancePhotoSelect = (files) => {
     const circle = document.getElementById('selfie-circle');
     if (circle) {
       circle.classList.add('has-photo');
-      circle.innerHTML = `<img src="${dataUrl}" alt="Selfie preview"><div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" width="18" height="18"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div><input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">`;
+      circle.innerHTML = `<img src="${dataUrl}" alt="Selfie preview"><div class="selfie-camera-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg></div><input type="file" accept="image/*" capture="user" id="att-photo-input" onchange="handleAttendancePhotoSelect(this.files)">`;
     }
     const hint = document.getElementById('selfie-hint');
     if (hint) hint.textContent = 'Looking good — tap to retake';
@@ -7801,6 +7848,7 @@ window.submitTimeIn = () => {
   const pin = getPinBoxValue();
   const photo = window._attPhotoData;
   if (pin.length !== 4 || !photo) return;
+  document.getElementById('att-submit-btn')?.classList.add('stamping');
   captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
     const worker = window._attWorker, today = window._attToday;
     const token = new URLSearchParams(location.search).get('token');
@@ -7831,6 +7879,7 @@ window.submitTimeOut = () => {
   const pin = getPinBoxValue();
   const photo = window._attPhotoData;
   if (pin.length !== 4 || !photo) return;
+  document.getElementById('att-submit-btn')?.classList.add('stamping');
   captureGpsAndVerify(async (loc, verified, distanceMeters, nearestLocationName) => {
     const worker = window._attWorker, today = window._attToday;
     const token = new URLSearchParams(location.search).get('token');
