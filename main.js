@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var fa=document.querySelector('.footer-about');
     if(fa){var d=document.createElement('div');d.innerHTML=mkIcons();fa.appendChild(d);}
     var last=document.querySelector('.cinfo-item:last-of-type');
-    if(last){var item=document.createElement('div');item.className='cinfo-item';item.innerHTML='<div class="cinfo-icon"><span class="icn icn-mobile"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm0 3v13h10V5H7zm5 14.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg></span></div><div><div class="cinfo-label">Follow Us</div>'+mkIcons()+'</div>';last.after(item);}
+    if(last){var item=document.createElement('div');item.className='cinfo-item';item.innerHTML='<div class="cinfo-icon"><span class="icn icn-mobile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg></span></div><div><div class="cinfo-label">Follow Us</div>'+mkIcons()+'</div>';last.after(item);}
   });
 })();
 
