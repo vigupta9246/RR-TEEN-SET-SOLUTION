@@ -349,6 +349,19 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 .social-btn.li { background:#0A66C2; color:#fff; }
 .social-btn.li:hover { background:#004182; transform:translateY(-2px); }
 
+/* ===== Contact / footer icon set (SVG, replaces emoji) ===== */
+.icn { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.icn svg { width:16px; height:16px; display:block; }
+.icn-pin      { color: var(--accent); }
+.icn-phone    { color: var(--blue); }
+.icn-whatsapp { color: var(--green); }
+.icn-clock    { color: var(--accent-2); }
+.icn-gst      { color: var(--navy); }
+.icn-star     { color: var(--accent-2); }
+.icn-person   { color: var(--sky); }
+.icn-mobile   { color: var(--steel); }
+.cinfo-icon .icn svg { width:22px; height:22px; }
+
 /* ═══════════════════════════════════════════════════════
    FLOATING CALL + WHATSAPP BUTTONS
 ═══════════════════════════════════════════════════════ */
