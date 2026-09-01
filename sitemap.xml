@@ -21,6 +21,12 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://rrteensetsolution.com/support.html</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://rrteensetsolution.com/services.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>weekly</changefreq>
