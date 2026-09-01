@@ -73,13 +73,21 @@ document.addEventListener('DOMContentLoaded',function(){
 ════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',function(){
   if(!('IntersectionObserver' in window)) return;
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var io=new IntersectionObserver(function(entries){
     entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; io.unobserve(e.target); }
+      if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0) scale(1)'; io.unobserve(e.target); }
     });
   },{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+  var groups={};
   document.querySelectorAll('.scard,.wcard,.tcard,.pstep,.gallery-item').forEach(function(el){
-    el.style.opacity='0'; el.style.transform='translateY(18px)'; el.style.transition='opacity .5s ease,transform .5s ease';
+    var parentKey = el.parentElement ? (el.parentElement.className||'g') : 'g';
+    groups[parentKey] = groups[parentKey] || 0;
+    var idx = groups[parentKey]++;
+    var delay = reduceMotion ? 0 : Math.min(idx,7) * 70;
+    el.style.opacity='0';
+    el.style.transform='translateY(18px) scale(.98)';
+    el.style.transition='opacity .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms, transform .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms';
     io.observe(el);
   });
 });
@@ -351,6 +359,73 @@ function scrollVideoSlider(sliderId, direction){
   var step = card ? card.offsetWidth + 16 : 236;
   el.scrollBy({ left: direction * step, behavior: 'smooth' });
 }
+
+/* ════════════════════════════════════════════════════════════
+   12. STATS COUNT-UP ANIMATION
+   Animates numbers like "500+", "8+", "5.0" from 0 to their
+   target value when scrolled into view. Preserves any suffix
+   (+, ⭐, decimal places) and skips non-numeric stats safely.
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    if(!('IntersectionObserver' in window)) return;
+    var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var nodes = document.querySelectorAll('.stat-num');
+    if(!nodes.length) return;
+
+    function animateCount(el){
+      var raw = el.textContent.trim();
+      var m = raw.match(/^(\d+(?:\.\d+)?)(.*)$/);
+      if(!m){ return; } // non-numeric stat (e.g. "Delhi NCR") — leave as-is
+      var target = parseFloat(m[1]);
+      var suffix = m[2] || '';
+      var decimals = (m[1].split('.')[1] || '').length;
+      if(reduceMotion){ el.textContent = m[1] + suffix; return; }
+
+      var duration = 1400, start = null;
+      function step(ts){
+        if(!start) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        var current = target * eased;
+        el.textContent = current.toFixed(decimals) + suffix;
+        if(progress < 1){ requestAnimationFrame(step); }
+        else { el.textContent = target.toFixed(decimals) + suffix; }
+      }
+      requestAnimationFrame(step);
+    }
+
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ animateCount(e.target); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.4 });
+    nodes.forEach(function(el){ io.observe(el); });
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   13. BUTTON RIPPLE MICRO-INTERACTION
+   Adds a small expanding ripple from the click point on any
+   .btn element — pure CSS-driven animation, cleans itself up.
+════════════════════════════════════════════════════════════ */
+(function(){
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.btn');
+    if(!btn) return;
+    var rect = btn.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height);
+    var ripple = document.createElement('span');
+    ripple.className = 'btn-ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', function(){ ripple.remove(); });
+  }, true);
+})();
 
 
 
