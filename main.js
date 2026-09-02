@@ -294,15 +294,57 @@ document.addEventListener('DOMContentLoaded',function(){
     if(navLinks){
       // Already added check
       if(!navLinks.querySelector('a[href*="shed-cost-calculator"]')){
-        var contactLi = navLinks.querySelector('a[href="contact.html"]');
-        if(contactLi && contactLi.parentNode){
-          var li = document.createElement('li');
-          li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>';
-          navLinks.insertBefore(li, contactLi.parentNode);
+        // Insert before the last direct <li> child (works whether that's
+        // Contact, or the "More ▾" dropdown li — avoids inserting inside
+        // a nested .dropdown, which throws since it isn't a direct child)
+        var directLis = navLinks.querySelectorAll(':scope > li');
+        var lastLi = directLis.length ? directLis[directLis.length - 1] : null;
+        var li = document.createElement('li');
+        li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>';
+        if(lastLi){
+          navLinks.insertBefore(li, lastLi);
+        } else {
+          navLinks.appendChild(li);
         }
       }
     }
 
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   TOUCH-FRIENDLY DROPDOWN NAV (Services ▾ / More ▾)
+   CSS :hover alone doesn't work on touchscreen laptops/tablets —
+   first tap was either navigating straight through (Services) or
+   doing nothing at all (More). This makes first tap open the
+   dropdown; a second tap on the same trigger follows its link
+   (if it has one). Desktop mouse hover keeps working as before.
+════════════════════════════════════════════════════════════ */
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    var triggers = document.querySelectorAll('.has-dropdown > a');
+    triggers.forEach(function(trigger){
+      trigger.addEventListener('click', function(e){
+        var parent = trigger.parentElement;
+        var isOpen = parent.classList.contains('dropdown-open');
+        if(!isOpen){
+          e.preventDefault();
+          document.querySelectorAll('.has-dropdown.dropdown-open').forEach(function(el){
+            if(el !== parent) el.classList.remove('dropdown-open');
+          });
+          parent.classList.add('dropdown-open');
+        }
+        // if already open, let the default action happen (navigate, or
+        // do nothing for javascript:void(0) triggers like "More")
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.has-dropdown')){
+        document.querySelectorAll('.has-dropdown.dropdown-open').forEach(function(el){
+          el.classList.remove('dropdown-open');
+        });
+      }
+    });
   });
 })();
 
