@@ -132,9 +132,8 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
   .logo-img { height:42px; }
   .logo-tag { font-size:9px; max-width:130px; }
 }
-.nav-links { display:flex; flex-wrap:nowrap; gap:15px; list-style:none; }
-.nav-links li { flex-shrink:0; }
-.nav-links a { color:#0a1628; font-size:11px; font-weight:700; letter-spacing:.2px; text-transform:uppercase; padding:4px 0; border-bottom:2px solid transparent; transition:all var(--t); white-space:nowrap; }
+.nav-links { display:flex; gap:24px; list-style:none; }
+.nav-links a { color:#0a1628; font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:4px 0; border-bottom:2px solid transparent; transition:all var(--t); }
 .nav-links a:hover, .nav-links a.active { color:var(--accent); border-bottom-color:var(--accent); }
 .has-dropdown { position:relative; }
 .dropdown { display:none; position:absolute; top:calc(100% + 10px); left:0; background:#ffffff; border:1px solid rgba(10,22,40,.1); box-shadow:0 8px 24px rgba(10,22,40,.12); border-radius:10px; padding:10px 0; min-width:230px; z-index:100; }
@@ -419,23 +418,6 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
   .process-grid  { grid-template-columns:1fr 1fr; gap:20px; }
   .process-grid::before { display:none; }
   .grid-4        { grid-template-columns:1fr 1fr; }
-}
-
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE — NAV OVERFLOW GUARD (desktop, ≤1400px)
-   Nav now carries 8 static links + 1 JS-injected Calculator
-   link (main.js). Below this width, drop the logo tagline
-   and tighten spacing further so links never wrap/overlap.
-═══════════════════════════════════════════════════════ */
-@media(max-width:1400px) and (min-width:769px) {
-  .logo-tag { display:none; }
-  .nav-links { gap:10px; }
-  .nav-links a { font-size:10px; }
-  .nav-cta { padding:9px 14px; font-size:12px; }
-}
-@media(max-width:900px) and (min-width:769px) {
-  .nav-links { gap:7px; }
-  .nav-links a { font-size:9px; }
 }
 
 /* ═══════════════════════════════════════════════════════
