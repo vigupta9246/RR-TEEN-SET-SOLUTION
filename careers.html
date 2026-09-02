@@ -34,7 +34,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20260902b">
+<link rel="stylesheet" href="style.css?v=20260902c">
 <meta name="geo.region" content="IN-DL">
 <meta name="geo.placename" content="Najafgarh, Delhi">
 <meta name="geo.position" content="28.6092;76.9798">
@@ -52,10 +52,13 @@
 .jc-intro{max-width:760px;margin:0 auto 8px}
 .jc-intro p{font-size:15px;color:var(--text-muted);line-height:1.85;margin-bottom:14px}
 
-.job-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px 26px 24px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:all var(--t)}
-.job-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent-2),var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.job-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:0 0 24px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:all var(--t)}
+.job-card-img{width:100%;height:170px;object-fit:cover;display:block}
+.job-card-body{padding:22px 26px 0;display:flex;flex-direction:column;flex:1}
+.job-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent-2),var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .35s;z-index:2}
 .job-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-accent);border-color:rgba(241,60,32,.25)}
 .job-card:hover::before{transform:scaleX(1)}
+.job-card:hover .job-card-img{filter:brightness(1.04)}
 .job-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
 .job-card-icon{width:46px;height:46px;background:rgba(241,60,32,.09);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
 .job-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap}
@@ -145,6 +148,8 @@
   <div class="grid-auto">
 
     <div class="job-card">
+      <img src="images/careers/job-welder.jpg" alt="Welder doing arc welding on steel shed structure" class="job-card-img" loading="lazy" width="900" height="540">
+      <div class="job-card-body">
       <div class="job-card-top"><div class="job-card-icon">🔥</div><span class="job-badge mix">Freshers (ITI) + Experienced</span></div>
       <h3>Welder</h3>
       <p class="job-sum">Arc/MIG welding of MS columns, trusses, purlins &amp; site joints for tin sheds, industrial sheds and PEB structures.</p>
@@ -156,9 +161,12 @@
       </ul>
       <div class="job-card-req"><strong>Experience:</strong> 2+ yrs arc/MIG welding preferred. Freshers with ITI welding certificate can apply for the trainee role — training given on-site.</div>
       <a href="#apply-form" class="btn btn-orange btn-full job-apply-btn" onclick="prefillRole('Welder')">Apply for Welder →</a>
+      </div>
     </div>
 
     <div class="job-card">
+      <img src="images/careers/job-fabricator.jpg" alt="Fabricator measuring and fitting a steel structural member with a technical drawing" class="job-card-img" loading="lazy" width="900" height="540">
+      <div class="job-card-body">
       <div class="job-card-top"><div class="job-card-icon">🔩</div><span class="job-badge exp">Experienced</span></div>
       <h3>Fabricator / Fitter</h3>
       <p class="job-sum">Fitting &amp; assembling MS structural members — columns, trusses, purlins — reading fabrication drawings and coordinating with the welding team.</p>
@@ -170,9 +178,12 @@
       </ul>
       <div class="job-card-req"><strong>Experience:</strong> 2+ yrs fabrication/fitting experience in steel structure work. Should be able to read basic technical drawings.</div>
       <a href="#apply-form" class="btn btn-orange btn-full job-apply-btn" onclick="prefillRole('Fabricator / Fitter')">Apply for Fabricator →</a>
+      </div>
     </div>
 
     <div class="job-card">
+      <img src="images/careers/job-supervisor.jpg" alt="Site supervisor at a steel shed construction site" class="job-card-img" loading="lazy" width="900" height="540">
+      <div class="job-card-body">
       <div class="job-card-top"><div class="job-card-icon">📋</div><span class="job-badge exp">Experienced</span></div>
       <h3>Site Supervisor</h3>
       <p class="job-sum">Overseeing on-site installation crews, ensuring work matches approved drawings &amp; quality standards, coordinating directly with clients and the owner.</p>
@@ -184,9 +195,12 @@
       </ul>
       <div class="job-card-req"><strong>Experience:</strong> 3+ yrs site supervision in steel/civil construction. Own two-wheeler helpful — sites are spread across Delhi NCR.</div>
       <a href="#apply-form" class="btn btn-orange btn-full job-apply-btn" onclick="prefillRole('Site Supervisor')">Apply for Supervisor →</a>
+      </div>
     </div>
 
     <div class="job-card">
+      <img src="images/careers/job-helper.jpg" alt="Site helper carrying steel material at a fabrication project site" class="job-card-img" loading="lazy" width="900" height="540">
+      <div class="job-card-body">
       <div class="job-card-top"><div class="job-card-icon">🧱</div><span class="job-badge fresher">Freshers Welcome</span></div>
       <h3>Site Helper / Labour</h3>
       <p class="job-sum">General on-site assistance for our installation crews — material handling, supporting the welding &amp; fitting team, and keeping the site organized.</p>
@@ -198,6 +212,7 @@
       </ul>
       <div class="job-card-req"><strong>Experience:</strong> No prior experience needed — full on-the-job training given. Just need to be physically fit, reliable and willing to travel to project sites.</div>
       <a href="#apply-form" class="btn btn-orange btn-full job-apply-btn" onclick="prefillRole('Site Helper / Labour')">Apply for Helper →</a>
+      </div>
     </div>
 
   </div>
