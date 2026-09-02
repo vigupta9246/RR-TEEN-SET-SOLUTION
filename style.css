@@ -119,7 +119,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .logo { display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
 .logo-box  { width:40px; height:40px; background:linear-gradient(135deg,var(--sky),var(--blue)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-size:17px; color:#fff; flex-shrink:0; }
 .logo-name { font-family:var(--font-h); font-size:20px; color:var(--navy,#0a1628); letter-spacing:1.5px; line-height:1; }
-.logo-tag  { font-size:9px; color:var(--accent); text-transform:uppercase; letter-spacing:2px; font-weight:700; }
+.logo-tag  { font-size:10.5px; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; font-weight:700; }
 .logo-img-wrap { background:transparent; border-radius:0; padding:0; display:flex; align-items:center; flex-shrink:0; box-shadow:none; }
 .logo-img { height:58px; width:auto; display:block; object-fit:contain; }
 @media (max-width: 768px) {
@@ -132,8 +132,8 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
   .logo-img { height:42px; }
   .logo-tag { font-size:9px; max-width:130px; }
 }
-.nav-links { display:flex; gap:24px; list-style:none; }
-.nav-links a { color:#0a1628; font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:4px 0; border-bottom:2px solid transparent; transition:all var(--t); }
+.nav-links { display:flex; gap:28px; list-style:none; }
+.nav-links a { color:#0a1628; font-size:13.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:4px 0; border-bottom:2px solid transparent; transition:all var(--t); }
 .nav-links a:hover, .nav-links a.active { color:var(--accent); border-bottom-color:var(--accent); }
 .has-dropdown { position:relative; }
 .dropdown { display:none; position:absolute; top:calc(100% + 10px); left:0; background:#ffffff; border:1px solid rgba(10,22,40,.1); box-shadow:0 8px 24px rgba(10,22,40,.12); border-radius:10px; padding:10px 0; min-width:230px; z-index:100; }
