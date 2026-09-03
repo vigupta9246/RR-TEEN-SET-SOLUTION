@@ -30,7 +30,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20260902c">
+<link rel="stylesheet" href="style.css?v=20260902d">
 <script type="application/ld+json">{
   "@context":"https://schema.org","@type":"LocalBusiness",
   "name":"R.R Teen Set Solution",
@@ -165,6 +165,69 @@
     </div>
   </div>
 </section>
+
+<!-- Service Area Map -->
+<section style="background:var(--gray)">
+  <div class="section-center"><div class="tag">Where We Work</div><h2 class="section-title">Our <span>Service Area</span></h2><p class="section-sub" style="margin:0 auto">21 locations across Delhi NCR — click any pin to see contractor details for that city.</p></div>
+  <div id="service-map" style="max-width:1100px;margin:0 auto;height:480px;border-radius:16px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 12px 32px rgba(10,22,40,.1)"></div>
+  <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">🟠 Head Office &nbsp;·&nbsp; 🔵 Service Locations &nbsp;·&nbsp; Map data © OpenStreetMap contributors</p>
+</section>
+
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+(function(){
+  function initServiceMap(){
+    var el = document.getElementById('service-map');
+    if(!el || typeof L === 'undefined') return;
+    var map = L.map('service-map', {scrollWheelZoom:false}).setView([28.75, 77.15], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var hqIcon = L.divIcon({className:'', html:'<div style="width:18px;height:18px;background:#f13c20;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>', iconSize:[18,18], iconAnchor:[9,9]});
+    var cityIcon = L.divIcon({className:'', html:'<div style="width:13px;height:13px;background:#16264f;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>', iconSize:[13,13], iconAnchor:[7,7]});
+
+    var hq = {name:"Najafgarh, Delhi (Head Office)", lat:28.6092, lng:76.9797, url:"index.html"};
+    var cities = [
+      {name:"Dwarka", lat:28.5921, lng:77.0460, url:"tin-shed-contractor-dwarka.html"},
+      {name:"Noida", lat:28.5355, lng:77.3910, url:"tin-shed-contractor-noida.html"},
+      {name:"Greater Noida", lat:28.4744, lng:77.5040, url:"tin-shed-contractor-greater-noida.html"},
+      {name:"Ghaziabad", lat:28.6692, lng:77.4538, url:"tin-shed-contractor-ghaziabad.html"},
+      {name:"Gurugram (Gurgaon)", lat:28.4595, lng:77.0266, url:"tin-shed-contractor-gurugram.html"},
+      {name:"Faridabad", lat:28.4089, lng:77.3178, url:"tin-shed-contractor-faridabad.html"},
+      {name:"Sonipat", lat:28.9931, lng:77.0151, url:"tin-shed-contractor-sonipat.html"},
+      {name:"Kundli", lat:28.8850, lng:77.1170, url:"tin-shed-contractor-kundli.html"},
+      {name:"Panipat", lat:29.3909, lng:76.9635, url:"tin-shed-contractor-panipat.html"},
+      {name:"Bahadurgarh", lat:28.6919, lng:76.9333, url:"tin-shed-contractor-bahadurgarh.html"},
+      {name:"Rohtak", lat:28.8955, lng:76.6066, url:"tin-shed-contractor-rohtak.html"},
+      {name:"Bhiwadi", lat:28.2100, lng:76.8646, url:"tin-shed-contractor-bhiwadi.html"},
+      {name:"Manesar", lat:28.3536, lng:76.9354, url:"tin-shed-contractor-manesar.html"},
+      {name:"Narela", lat:28.8553, lng:77.0921, url:"tin-shed-contractor-narela.html"},
+      {name:"Bawana", lat:28.7996, lng:77.0339, url:"tin-shed-contractor-bawana.html"},
+      {name:"Meerut", lat:28.9845, lng:77.7064, url:"tin-shed-contractor-meerut.html"},
+      {name:"Karnal", lat:29.6857, lng:76.9905, url:"tin-shed-contractor-karnal.html"},
+      {name:"Rewari", lat:28.1994, lng:76.6198, url:"tin-shed-contractor-rewari.html"},
+      {name:"Palwal", lat:28.1447, lng:77.3260, url:"tin-shed-contractor-palwal.html"},
+      {name:"Yamunanagar", lat:30.1290, lng:77.2674, url:null}
+    ];
+
+    L.marker([hq.lat, hq.lng], {icon:hqIcon}).addTo(map)
+      .bindPopup('<strong>' + hq.name + '</strong><br><a href="' + hq.url + '" style="color:#f13c20;font-weight:700">View Details →</a>');
+
+    cities.forEach(function(c){
+      var popupHtml = '<strong>' + c.name + '</strong>' + (c.url ? '<br><a href="' + c.url + '" style="color:#f13c20;font-weight:700">View Details →</a>' : '<br><span style="color:#888">Contact us for this area</span>');
+      L.marker([c.lat, c.lng], {icon:cityIcon}).addTo(map).bindPopup(popupHtml);
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initServiceMap);
+  } else {
+    initServiceMap();
+  }
+})();
+</script>
 
 <!-- FAQ -->
 <section>
