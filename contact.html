@@ -30,7 +30,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20260902e">
+<link rel="stylesheet" href="style.css?v=20260902f">
 <script type="application/ld+json">{
   "@context":"https://schema.org","@type":"LocalBusiness",
   "name":"R.R Teen Set Solution",
@@ -181,14 +181,10 @@
     var el = document.getElementById('service-map');
     if(!el || typeof L === 'undefined') return;
     var map = L.map('service-map', {
-      scrollWheelZoom: false,
-      minZoom: 9,
-      maxBounds: [[27.55, 75.9], [30.75, 78.3]],
-      maxBoundsViscosity: 1.0
+      scrollWheelZoom: true
     }).setView([28.75, 77.15], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
-      minZoom: 9,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
@@ -227,10 +223,9 @@
       L.marker([c.lat, c.lng], {icon:cityIcon}).addTo(map).bindPopup(popupHtml);
     });
 
-    // Frame the view tightly around all NCR pins only — never show
-    // Kashmir/Pakistan/China border areas even on load.
+    // Fit the initial view to all NCR pins (user can freely zoom/pan out from here)
     var allPts = [[hq.lat, hq.lng]].concat(cities.map(function(c){ return [c.lat, c.lng]; }));
-    map.fitBounds(allPts, {padding:[30,30], maxZoom:10});
+    map.fitBounds(allPts, {padding:[30,30]});
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', initServiceMap);
