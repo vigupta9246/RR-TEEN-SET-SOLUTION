@@ -170,26 +170,15 @@
 <section style="background:var(--gray)">
   <div class="section-center"><div class="tag">Where We Work</div><h2 class="section-title">Our <span>Service Area</span></h2><p class="section-sub" style="margin:0 auto">21 locations across Delhi NCR — click any pin to see contractor details for that city.</p></div>
   <div id="service-map" style="max-width:1100px;margin:0 auto;height:480px;border-radius:16px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 12px 32px rgba(10,22,40,.1)"></div>
-  <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">🟠 Head Office &nbsp;·&nbsp; 🔵 Service Locations &nbsp;·&nbsp; Map data © OpenStreetMap contributors</p>
+  <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">🔴 Head Office &nbsp;·&nbsp; 🔵 Service Locations &nbsp;·&nbsp; Powered by Mappls (MapmyIndia)</p>
 </section>
 
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-<script src="vendor/leaflet/leaflet.js"></script>
+<script src="https://apis.mappls.com/advancedmaps/api/kajnpovskrpulfpsmldsscartnxtenodfkzd/map_sdk?v=3.0&layer=vector"></script>
 <script>
 (function(){
   function initServiceMap(){
     var el = document.getElementById('service-map');
-    if(!el || typeof L === 'undefined') return;
-    var map = L.map('service-map', {
-      scrollWheelZoom: true
-    }).setView([28.75, 77.15], 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    var hqIcon = L.divIcon({className:'', html:'<div style="width:18px;height:18px;background:#f13c20;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>', iconSize:[18,18], iconAnchor:[9,9]});
-    var cityIcon = L.divIcon({className:'', html:'<div style="width:13px;height:13px;background:#16264f;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>', iconSize:[13,13], iconAnchor:[7,7]});
+    if(!el || typeof mappls === 'undefined') return;
 
     var hq = {name:"Najafgarh, Delhi (Head Office)", lat:28.6092, lng:76.9797, url:"index.html"};
     var cities = [
@@ -215,17 +204,21 @@
       {name:"Yamunanagar", lat:30.1290, lng:77.2674, url:null}
     ];
 
-    L.marker([hq.lat, hq.lng], {icon:hqIcon}).addTo(map)
-      .bindPopup('<strong>' + hq.name + '</strong><br><a href="' + hq.url + '" style="color:#f13c20;font-weight:700">View Details →</a>');
-
-    cities.forEach(function(c){
-      var popupHtml = '<strong>' + c.name + '</strong>' + (c.url ? '<br><a href="' + c.url + '" style="color:#f13c20;font-weight:700">View Details →</a>' : '<br><span style="color:#888">Contact us for this area</span>');
-      L.marker([c.lat, c.lng], {icon:cityIcon}).addTo(map).bindPopup(popupHtml);
+    var map = mappls.Map('service-map', {
+      center: [28.75, 77.15],
+      zoom: 9,
+      zoomControl: true
     });
 
-    // Fit the initial view to all NCR pins (user can freely zoom/pan out from here)
-    var allPts = [[hq.lat, hq.lng]].concat(cities.map(function(c){ return [c.lat, c.lng]; }));
-    map.fitBounds(allPts, {padding:[30,30]});
+    map.addListener('load', function(){
+      var hqPopup = '<strong>' + hq.name + '</strong><br><a href="' + hq.url + '" style="color:#f13c20;font-weight:700">View Details →</a>';
+      new mappls.Marker({ map: map, position: {lat:hq.lat, lng:hq.lng}, popupHtml: hqPopup, fitbounds:false });
+
+      cities.forEach(function(c){
+        var popupHtml = '<strong>' + c.name + '</strong>' + (c.url ? '<br><a href="' + c.url + '" style="color:#f13c20;font-weight:700">View Details →</a>' : '<br><span style="color:#888">Contact us for this area</span>');
+        new mappls.Marker({ map: map, position: {lat:c.lat, lng:c.lng}, popupHtml: popupHtml, fitbounds:false });
+      });
+    });
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', initServiceMap);
