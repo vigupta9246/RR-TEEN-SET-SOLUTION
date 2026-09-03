@@ -30,7 +30,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20260902d">
+<link rel="stylesheet" href="style.css?v=20260902e">
 <script type="application/ld+json">{
   "@context":"https://schema.org","@type":"LocalBusiness",
   "name":"R.R Teen Set Solution",
@@ -180,9 +180,15 @@
   function initServiceMap(){
     var el = document.getElementById('service-map');
     if(!el || typeof L === 'undefined') return;
-    var map = L.map('service-map', {scrollWheelZoom:false}).setView([28.75, 77.15], 8);
+    var map = L.map('service-map', {
+      scrollWheelZoom: false,
+      minZoom: 9,
+      maxBounds: [[27.55, 75.9], [30.75, 78.3]],
+      maxBoundsViscosity: 1.0
+    }).setView([28.75, 77.15], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
+      minZoom: 9,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
@@ -220,6 +226,11 @@
       var popupHtml = '<strong>' + c.name + '</strong>' + (c.url ? '<br><a href="' + c.url + '" style="color:#f13c20;font-weight:700">View Details →</a>' : '<br><span style="color:#888">Contact us for this area</span>');
       L.marker([c.lat, c.lng], {icon:cityIcon}).addTo(map).bindPopup(popupHtml);
     });
+
+    // Frame the view tightly around all NCR pins only — never show
+    // Kashmir/Pakistan/China border areas even on load.
+    var allPts = [[hq.lat, hq.lng]].concat(cities.map(function(c){ return [c.lat, c.lng]; }));
+    map.fitBounds(allPts, {padding:[30,30], maxZoom:10});
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', initServiceMap);
