@@ -12,10 +12,12 @@ body{font-family:'Nunito',sans-serif;background:#f4f6f9;color:#0a1628;min-height
 .wrap{max-width:900px;margin:0 auto;padding:30px 5% 60px}
 h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-bottom:6px}
 .sub{color:#6b7f96;font-size:14px;margin-bottom:28px}
-.lock-screen{max-width:360px;margin:80px auto;background:#fff;border-radius:14px;padding:32px;box-shadow:0 10px 40px rgba(10,22,40,.1);text-align:center}
-.lock-screen input{width:100%;padding:12px 14px;border:1.5px solid #dde5ee;border-radius:9px;font-size:15px;margin:16px 0;text-align:center;letter-spacing:2px}
-.lock-screen button{width:100%;padding:12px;border:none;border-radius:9px;background:#1565c0;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
-.lock-err{color:#c0392b;font-size:12.5px;margin-top:10px;display:none}
+.login-screen{max-width:360px;margin:80px auto;background:#fff;border-radius:14px;padding:32px;box-shadow:0 10px 40px rgba(10,22,40,.1);text-align:center}
+.login-screen input{width:100%;padding:12px 14px;border:1.5px solid #dde5ee;border-radius:9px;font-size:14px;margin-bottom:12px}
+.login-screen button{width:100%;padding:12px;border:none;border-radius:9px;background:#1565c0;color:#fff;font-weight:800;font-size:14px;cursor:pointer;margin-top:6px}
+.login-err{color:#c0392b;font-size:12.5px;margin-top:10px;display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.signout-btn{background:none;border:1.5px solid #dde5ee;border-radius:7px;padding:6px 14px;font-size:12.5px;font-weight:700;color:#6b7f96;cursor:pointer}
 .tabs{display:flex;gap:8px;margin-bottom:20px}
 .tab-btn{padding:9px 18px;border-radius:8px;border:1.5px solid #dde5ee;background:#fff;font-weight:700;font-size:13px;cursor:pointer;color:#6b7f96}
 .tab-btn.active{background:#1565c0;border-color:#1565c0;color:#fff}
@@ -40,17 +42,21 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-
 </head>
 <body>
 
-<div class="lock-screen" id="lock-screen">
+<div class="login-screen" id="login-screen">
   <div style="font-size:32px;margin-bottom:6px">🔒</div>
-  <h1 style="font-size:20px">Admin Access</h1>
-  <p style="font-size:12.5px;color:#8a9bb5;margin-top:6px">Enter the passcode to review testimonials</p>
-  <input type="password" id="passcode-input" placeholder="Passcode" autocomplete="off">
-  <button onclick="checkPasscode()">Unlock</button>
-  <p class="lock-err" id="lock-err">Incorrect passcode.</p>
+  <h1 style="font-size:20px">Admin Sign In</h1>
+  <p style="font-size:12.5px;color:#8a9bb5;margin:6px 0 18px">Use the same login as the CRM</p>
+  <input type="email" id="login-email" placeholder="Email" autocomplete="username">
+  <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+  <button onclick="doLogin()">Sign In</button>
+  <p class="login-err" id="login-err"></p>
 </div>
 
 <div class="wrap" id="admin-wrap" style="display:none">
-  <h1>Testimonials Admin</h1>
+  <div class="topbar">
+    <div><h1>Testimonials Admin</h1><p class="sub" style="margin-bottom:0" id="who-line"></p></div>
+    <button class="signout-btn" onclick="doSignOut()">Sign Out</button>
+  </div>
   <p class="sub">Approve reviews before they appear on the public reviews page.</p>
   <div class="tabs">
     <button class="tab-btn active" data-f="pending" onclick="setFilter('pending')">Pending</button>
@@ -63,6 +69,8 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDocs, updateDoc, deleteDoc, orderBy, query }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
@@ -77,34 +85,41 @@ const firebaseConfig = {
   measurementId: "G-N28CZBQ66C"
 };
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-// NOTE: this is a lightweight front-desk lock, not real authentication —
-// it keeps casual visitors out but is visible in this file's source.
-// If stronger protection is ever needed, move this to proper Firebase Auth.
-const ADMIN_PASSCODE = 'RRTS2026';
-
-window.checkPasscode = function(){
-  const val = document.getElementById('passcode-input').value;
-  if (val === ADMIN_PASSCODE){
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('admin-wrap').style.display = 'block';
-    sessionStorage.setItem('rrts_tst_admin', '1');
-    loadReviews();
-  } else {
-    document.getElementById('lock-err').style.display = 'block';
+window.doLogin = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Enter email and password.'; errEl.style.display = 'block'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    errEl.textContent = 'Sign-in failed — check your email/password (same login as the CRM).';
+    errEl.style.display = 'block';
   }
 };
-document.getElementById('passcode-input').addEventListener('keydown', function(e){
-  if (e.key === 'Enter') window.checkPasscode();
+window.doSignOut = function(){ signOut(auth); };
+
+document.getElementById('login-pass').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') window.doLogin();
 });
-if (sessionStorage.getItem('rrts_tst_admin') === '1'){
-  document.getElementById('lock-screen').style.display = 'none';
-  document.getElementById('admin-wrap').style.display = 'block';
-  loadReviews();
-}
+
+onAuthStateChanged(auth, function(user){
+  if (user){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-wrap').style.display = 'block';
+    document.getElementById('who-line').textContent = 'Signed in as ' + user.email;
+    loadReviews();
+  } else {
+    document.getElementById('login-screen').style.display = 'block';
+    document.getElementById('admin-wrap').style.display = 'none';
+  }
+});
 
 let allReviews = [];
 let currentFilter = 'pending';
@@ -125,25 +140,19 @@ async function loadReviews(){
     snap.forEach(d => allReviews.push({ id: d.id, ...d.data() }));
     render();
   } catch(e) {
-    list.innerHTML = '<div class="empty">Could not load reviews: ' + esc(e.message) + '<br><br>If this is the first time, the \'testimonials\' collection may need a Firestore security rule added in the Firebase console (see setup note).</div>';
+    list.innerHTML = '<div class="empty">Could not load reviews: ' + esc(e.message) + '<br><br>Make sure your account has a role (Admin/Sales/Accounts) in the CRM\'s users collection, and that Firestore rules for the \'testimonials\' collection have been published.</div>';
   }
-}
-
-function statusOf(r){
-  if (r.approved === true) return 'approved';
-  if (r.approved === false && r.rejectedAt) return 'rejected';
-  return 'pending';
 }
 
 function render(){
   const list = document.getElementById('rev-list');
-  const filtered = currentFilter === 'all' ? allReviews : allReviews.filter(r => statusOf(r) === currentFilter);
+  const filtered = currentFilter === 'all' ? allReviews : allReviews.filter(r => (r.status || 'pending') === currentFilter);
   if (filtered.length === 0){
     list.innerHTML = '<div class="empty">No reviews here yet.</div>';
     return;
   }
   list.innerHTML = filtered.map(r => {
-    const st = statusOf(r);
+    const st = r.status || 'pending';
     const stars = '★'.repeat(Math.round(r.rating||5)) + '☆'.repeat(5 - Math.round(r.rating||5));
     return `<div class="rev-card ${st}">
       <div class="rev-top">
@@ -162,13 +171,13 @@ function render(){
 }
 
 window.approveReview = async function(id){
-  await updateDoc(doc(db, 'testimonials', id), { approved: true, rejectedAt: null });
-  const r = allReviews.find(x => x.id === id); if (r){ r.approved = true; r.rejectedAt = null; }
+  await updateDoc(doc(db, 'testimonials', id), { status: 'approved' });
+  const r = allReviews.find(x => x.id === id); if (r) r.status = 'approved';
   render();
 };
 window.rejectReview = async function(id){
-  await updateDoc(doc(db, 'testimonials', id), { approved: false, rejectedAt: new Date() });
-  const r = allReviews.find(x => x.id === id); if (r){ r.approved = false; r.rejectedAt = new Date(); }
+  await updateDoc(doc(db, 'testimonials', id), { status: 'rejected' });
+  const r = allReviews.find(x => x.id === id); if (r) r.status = 'rejected';
   render();
 };
 window.deleteReview = async function(id){

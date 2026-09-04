@@ -118,7 +118,12 @@
 </div>
 
 <section>
-  <div class="section-center"><div class="tag">Testimonials</div><h2 class="section-title">Trusted By <span>500+ Clients</span></h2><p class="section-sub" style="margin:0 auto">Have you worked with us? <a href="testimonial-submit.html" style="color:var(--blue);font-weight:700">Share your experience →</a></p></div>
+  <div class="section-center"><div class="tag">Testimonials</div><h2 class="section-title">Trusted By <span>500+ Clients</span></h2></div>
+  <div style="max-width:520px;margin:0 auto 40px;background:linear-gradient(135deg,#16264f,#2b4a82);border-radius:16px;padding:24px 26px;text-align:center;box-shadow:0 10px 30px rgba(10,22,40,.15)">
+    <p style="color:#fff;font-size:15px;font-weight:700;margin-bottom:4px">Kaam ho gaya? Apna experience share karein 🙌</p>
+    <p style="color:rgba(255,255,255,.6);font-size:12.5px;margin-bottom:16px">Sirf 60 second lagenge — koi login nahi chahiye</p>
+    <a href="review.html" class="btn btn-white btn-lg">⭐ Review Dein</a>
+  </div>
   <div class="grid-auto" id="tst-grid">
     <div class="tst-loading">Loading reviews…</div>
   </div>
@@ -219,7 +224,7 @@ async function loadReviews(){
   const grid = document.getElementById('tst-grid');
   let reviews = [];
   try {
-    const q = query(collection(db,'testimonials'), where('approved','==',true), orderBy('createdAt','desc'), limit(24));
+    const q = query(collection(db,'testimonials'), where('status','==','approved'), orderBy('createdAt','desc'), limit(24));
     const snap = await getDocs(q);
     snap.forEach(doc => reviews.push(doc.data()));
   } catch(e) {
