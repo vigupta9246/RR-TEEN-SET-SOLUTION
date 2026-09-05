@@ -1611,6 +1611,18 @@ html.attendance-boot #attendance-screen{display:block!important}
         </div>
 
         <div class="form-card">
+          <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> STEEL RATE (Website Widget)</div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Shown on the homepage and cost-calculator pages so visitors see today's rate. Update this whenever you check the market — the website also shows a "last updated" time, and a warning if it's over 7 days old.</p>
+          <div class="form-grid" style="max-width:320px">
+            <div class="form-group"><label class="form-label" for="steel-rate-input">Rate (₹ per kg)</label><input type="number" id="steel-rate-input" class="form-input" min="0" step="0.5"></div>
+          </div>
+          <p id="steel-rate-lastupdated" style="font-size:12px;color:var(--muted);margin:0 0 14px"></p>
+          <div class="btn-row">
+            <button class="btn btn-save" onclick="saveSteelRate()"><svg viewBox="0 0 24 24" class="ic"><path d="M4 4h13l3 3v13H4Z"/><rect x="7" y="4" width="8" height="5"/><rect x="7" y="14" width="10" height="6"/></svg> Update Rate</button>
+          </div>
+        </div>
+
+        <div class="form-card">
           <div class="form-section-title"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD TEAM MEMBER</div>
           <div class="form-grid" style="margin-bottom:16px">
             <div class="form-group"><label class="form-label" for="tm-name">Full Name *</label><input type="text" id="tm-name" class="form-input"></div>
@@ -2883,11 +2895,32 @@ window.showEmployeeProfile = async (uid, isSelf=false) => {
 window.loadTeam = async () => {
   document.getElementById('approval-threshold-input').value = approvalThresholdPct;
   try {
+    const snap = await getDoc(doc(db, 'settings', 'steelRate'));
+    const lu = document.getElementById('steel-rate-lastupdated');
+    if (snap.exists() && typeof snap.data().ratePerKg === 'number') {
+      document.getElementById('steel-rate-input').value = snap.data().ratePerKg;
+      const d = snap.data().updatedAt?.toDate ? snap.data().updatedAt.toDate() : null;
+      lu.textContent = d ? `Last updated: ${d.toLocaleDateString('en-IN')} ${d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})} by ${snap.data().updatedBy||'—'}` : '';
+    } else {
+      lu.textContent = 'Not set yet — the website widget stays hidden until you save a rate.';
+    }
+  } catch(e) { reportError(e); }
+  try {
     const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt','desc')));
     allTeam = [];
     snap.forEach(d => allTeam.push({ id: d.id, ...d.data() }));
     renderTeam();
   } catch(e) { reportError(e); showLoadError('team-tbody', 4, e); }
+};
+
+window.saveSteelRate = async () => {
+  const val = parseFloat(document.getElementById('steel-rate-input').value);
+  if (isNaN(val) || val <= 0) { toast('Enter a valid rate per kg.', 'warning'); return; }
+  try {
+    await setDoc(doc(db,'settings','steelRate'), { ratePerKg: val, updatedAt: serverTimestamp(), updatedBy: auth.currentUser?.email || 'unknown' }, { merge: true });
+    toast('Steel rate updated — live on the website now!', 'success');
+    loadTeam();
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
 window.saveApprovalThreshold = async () => {

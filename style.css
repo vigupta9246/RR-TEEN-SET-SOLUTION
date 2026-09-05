@@ -184,6 +184,15 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .btn-outline-white:hover { border-color:#fff; background:rgba(255,255,255,.1); color:#fff; transform:translateY(-2px); }
 .btn-outline { background:transparent; color:var(--blue); border:2px solid var(--blue); }
 .btn-outline:hover { background:var(--blue); color:#fff; transform:translateY(-2px); }
+
+#steel-rate-widget { display:none; align-items:center; gap:14px; background:linear-gradient(135deg,#1c2333,#2b3450); border-radius:14px; padding:16px 20px; max-width:340px; box-shadow:0 8px 24px rgba(10,22,40,.18); }
+#steel-rate-widget.loaded { display:flex; }
+.steel-rate-icon { font-size:28px; flex-shrink:0 }
+.steel-rate-label { font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,.55); font-weight:700 }
+.steel-rate-value { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:.5px; line-height:1.2 }
+.steel-rate-value span { font-size:13px; color:rgba(255,255,255,.6); font-family:var(--font-b); margin-left:3px }
+.steel-rate-updated { font-size:10.5px; color:rgba(255,255,255,.4); margin-top:2px }
+.steel-rate-stale { font-size:11px; color:#ffcf6b; margin-top:6px; max-width:220px; line-height:1.4 }
 .btn-lg { padding:15px 34px; font-size:15px; }
 .btn-full { width:100%; }
 

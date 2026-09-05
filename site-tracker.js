@@ -6,7 +6,7 @@
    delayed or blocked if a write fails (offline, rules not deployed yet).
 ════════════════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
+import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -58,3 +58,38 @@ logEvent('pageViews', {
   pageTitle: document.title || '',
   referrer: document.referrer || ''
 });
+
+// ── Steel Rate widget (Admin sets this from the CRM's Team tab) ─────
+// Only fires a Firestore read on pages that actually have the widget
+// element — most pages don't, so this stays a no-op for them. No login
+// needed (see settings/{id} rule's 'steelRate' exception).
+const rateEl = document.getElementById('steel-rate-widget');
+if (rateEl) {
+  getDoc(doc(db, 'settings', 'steelRate')).then(snap => {
+    if (!snap.exists() || typeof snap.data().ratePerKg !== 'number') {
+      rateEl.style.display = 'none';
+      return;
+    }
+    const { ratePerKg, updatedAt } = snap.data();
+    const updatedDate = updatedAt?.toDate ? updatedAt.toDate() : null;
+    const daysOld = updatedDate ? Math.floor((Date.now() - updatedDate.getTime()) / 86400000) : null;
+    const dateStr = updatedDate
+      ? updatedDate.toLocaleDateString('en-IN', { day:'numeric', month:'short' }) + ', ' + updatedDate.toLocaleTimeString('en-IN', { hour:'numeric', minute:'2-digit' })
+      : 'recently';
+    const staleNote = (daysOld !== null && daysOld >= 7)
+      ? `<div class="steel-rate-stale">⚠️ Rate updated ${daysOld} days ago — call for today's exact price</div>`
+      : '';
+    rateEl.innerHTML = `
+      <div class="steel-rate-icon">🔩</div>
+      <div>
+        <div class="steel-rate-label">Aaj Ka Steel Rate</div>
+        <div class="steel-rate-value">₹${ratePerKg}<span>/kg</span></div>
+        <div class="steel-rate-updated">Last updated: ${dateStr}</div>
+        ${staleNote}
+      </div>`;
+    rateEl.classList.add('loaded');
+  }).catch(err => {
+    console.warn('[site-tracker] Could not load steel rate:', err.message);
+    rateEl.style.display = 'none';
+  });
+}
