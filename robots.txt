@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /quotation-system.html
+Disallow: /testimonials-admin.html
 
 Sitemap: https://rrteensetsolution.com/sitemap.xml
