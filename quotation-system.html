@@ -794,6 +794,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
       <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
       <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
+      <button class="nav-btn" data-section="testimonials" onclick="showSection('testimonials')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3.5l2.6 5.4 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.9Z"/></svg></span><span>Testimonials</span> <span id="testimonials-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
@@ -1220,6 +1221,45 @@ html.attendance-boot #attendance-screen{display:block!important}
           </div>
           <div id="tickets-pagination" class="pagination-wrap"></div>
           <div id="tickets-loadmore"></div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section id="testimonials" class="section">
+        <div class="page-header">
+          <div class="page-title">Testimonials</div>
+          <div class="page-sub">Customer reviews submitted via <a href="review.html" target="_blank" rel="noopener noreferrer" style="color:var(--orange)">review.html</a> — approve before they show on the public reviews page</div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="testimonial-search-input" class="search-input" placeholder="Search by name, city, review text..." oninput="handleTestimonialsSearchDebounced(this.value)">
+          </div>
+          <select id="testimonial-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:150px" onchange="renderTestimonials(document.getElementById('testimonial-search-input').value)">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button class="btn-export" onclick="exportTestimonialsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">PENDING</div><div class="stat-value orange" id="tst-stat-pending">—</div></div>
+          <div class="stat-card"><div class="stat-label">APPROVED</div><div class="stat-value green" id="tst-stat-approved">—</div></div>
+          <div class="stat-card"><div class="stat-label">REJECTED</div><div class="stat-value" id="tst-stat-rejected">—</div></div>
+          <div class="stat-card"><div class="stat-label">AVG RATING (APPROVED)</div><div class="stat-value" id="tst-stat-avgrating">—</div></div>
+        </div>
+
+        <div class="table-card">
+          <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>City</th><th>Project</th><th>Rating</th><th>Review</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+            <tbody id="testimonials-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:80%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td></tr></tbody>
+          </table>
+          </div>
+          <div id="testimonials-pagination" class="pagination-wrap"></div>
+          <div id="testimonials-loadmore"></div>
         </div>
       </section>
 
@@ -2284,12 +2324,13 @@ window.exportInvoicesCSV = async () => {
 window.downloadFullBackup = async () => {
   toast('Preparing backup — this can take a moment...', 'info');
   try {
-    const [quotations, leads, invoices, customers, tickets, paymentsSnap, usersSnap, activitySnap] = await Promise.all([
+    const [quotations, leads, invoices, customers, tickets, testimonials, paymentsSnap, usersSnap, activitySnap] = await Promise.all([
       fetchCached('quotations', 'quotations'),
       fetchCached('leads', 'leads'),
       fetchCached('invoices', 'invoices'),
       fetchCached('customers', 'customers'),
       fetchCached('tickets', 'tickets'),
+      fetchCached('testimonials', 'testimonials'),
       getDocs(collection(db, 'payments')),
       getDocs(collection(db, 'users')),
       getDocs(collection(db, 'activityLog'))
@@ -2300,13 +2341,13 @@ window.downloadFullBackup = async () => {
       exportedAt: new Date().toISOString(),
       exportedBy: auth.currentUser?.email || 'unknown',
       company: 'R.R Teen Set Solution',
-      quotations, leads, invoices, customers, tickets,
+      quotations, leads, invoices, customers, tickets, testimonials,
       payments: toList(paymentsSnap),
       team: toList(usersSnap),
       activityLog: toList(activitySnap)
     };
 
-    const counts = Object.fromEntries(['quotations','leads','invoices','customers','tickets','payments','team','activityLog'].map(k => [k, backup[k].length]));
+    const counts = Object.fromEntries(['quotations','leads','invoices','customers','tickets','testimonials','payments','team','activityLog'].map(k => [k, backup[k].length]));
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2345,6 +2386,7 @@ async function loadApprovalConfig() {
 }
 let allTeam = [];
 let allTickets = [];
+let allTestimonials = [];
 let allDeletedItems = [];
 let allLabour = [];
 let editingLabourId = null;
@@ -2386,8 +2428,8 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','team','deleted-items','activity-log','employee-profile'],
-  Sales:    ['dashboard','create','history','leads','customers','tickets','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','team','deleted-items','activity-log','employee-profile'],
+  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
   // read access to (see ROLE_READ_ACCESS below). Accounts already gets
@@ -2395,7 +2437,7 @@ const ROLE_PERMISSIONS = {
   // 'labour' IS included for Accounts — wages are a financial record, same
   // reasoning as why Accounts owns Invoices & Payments. Excluded for Sales,
   // who has no reason to see wage data.
-  Accounts: ['dashboard','invoice-create','invoices','labour','customers','tickets','employee-profile']
+  Accounts: ['dashboard','invoice-create','invoices','labour','customers','tickets','testimonials','employee-profile']
 };
 const ADMIN_EMAIL = 'admin@rrteenset.com'; // bootstrap: this email always becomes Admin on first login
 const BRANCH = 'Delhi'; // single branch today — tagged on every new record so a 2nd branch later needs only a picker UI, not a data migration
@@ -2444,6 +2486,7 @@ const _cache = {
   invoices:{data:null,ts:0,complete:false,lastDoc:null},
   customers:{data:null,ts:0,complete:false,lastDoc:null},
   tickets:{data:null,ts:0,complete:false,lastDoc:null},
+  testimonials:{data:null,ts:0,complete:false,lastDoc:null},
   labour:{data:null,ts:0,complete:false,lastDoc:null}
 };
 const CACHE_TTL = 45000; // 45s
@@ -2600,6 +2643,7 @@ window._gotoPage = (key, page) => {
   if (key === 'invoices')  renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
   if (key === 'deleted')   renderDeletedItems(document.getElementById('deleted-search-input')?.value || '', true);
   if (key === 'activity')  renderActivityLog(document.getElementById('activity-search-input')?.value || '', true);
+  if (key === 'testimonials') renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
   window.scrollTo({top: document.querySelector('.section.active .table-card')?.offsetTop - 80 || 0, behavior:'smooth'});
 };
 
@@ -2613,6 +2657,7 @@ onAuthStateChanged(auth, async u => {
     await loadCurrentUserRole(u);
     applyRolePermissions();
     if (ROLE_PERMISSIONS[currentUserRole]?.includes('tickets')) updateTicketBadges();
+    if (ROLE_PERMISSIONS[currentUserRole]?.includes('testimonials')) updateTestimonialBadge();
     if (window.Sentry) {
       Sentry.setUser({ email: u.email });
       Sentry.setTag('role', currentUserRole || 'unknown');
@@ -4748,7 +4793,7 @@ function renderSecurityCard() {
 // ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
-  leads:'Leads', customers:'Customers', tickets:'Support Tickets', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
   labour:'Labour & Wages',
   team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
@@ -4787,6 +4832,7 @@ window.showSection = id => {
   if (id === 'leads')     loadLeads();
   if (id === 'customers') loadCustomers();
   if (id === 'tickets')   loadTickets();
+  if (id === 'testimonials') loadTestimonials();
   if (id === 'labour')    loadLabour();
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
@@ -5646,6 +5692,136 @@ window.sendTicketReply = async () => {
     updateTicketBadges();
     toast('Reply sent!', 'success');
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+// ── TESTIMONIALS (public reviews, submitted via review.html — no login) ──
+// Same shape as Support Tickets: public write lands as status:'pending',
+// staff (all 3 roles, matching Firestore's isStaff() rule) approve/reject/
+// delete from here. No reply thread needed (unlike tickets), so this is a
+// simpler flat-table view with inline action buttons instead of a modal.
+window.loadTestimonials = async () => {
+  try {
+    const { list } = await fetchFirstPage('testimonials', 'testimonials');
+    allTestimonials = list;
+    renderTestimonials('');
+    renderLoadMoreButton('testimonials-loadmore', 'testimonials', 'testimonials', () => {
+      allTestimonials = _cache.testimonials.data;
+      renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
+    });
+    updateTestimonialBadge();
+  } catch(e) { reportError(e); showLoadError('testimonials-tbody', 8, e); }
+};
+
+window.handleTestimonialsSearch = async (value) => {
+  if (value && !_cache.testimonials.complete) {
+    try { allTestimonials = await fetchCached('testimonials', 'testimonials'); }
+    catch(e) { reportError(e); toast('Failed to load full data for search: ' + e.message, 'error'); }
+  }
+  renderTestimonials(value);
+};
+window.handleTestimonialsSearchDebounced = debounce(window.handleTestimonialsSearch);
+
+// Pending-count badge in the sidebar — same cheap count() aggregation
+// approach as updateTicketBadges, so this works even before the tab has
+// ever been opened this session.
+async function updateTestimonialBadge() {
+  const badge = document.getElementById('testimonials-nav-badge');
+  if (!badge) return;
+  try {
+    const snap = await getCountFromServer(query(collection(db,'testimonials'), where('status','==','pending')));
+    const n = snap.data().count;
+    badge.textContent = n; badge.style.display = n > 0 ? '' : 'none';
+  } catch(e) { /* non-fatal — badge just stays hidden if this fails */ }
+}
+
+const TST_STATUS_BADGE = { pending:'badge-open', approved:'badge-resolved', rejected:'badge-closed' };
+
+window.renderTestimonials = (search='', keepPage=false) => {
+  const tbody = document.getElementById('testimonials-tbody');
+  const statusFilter = document.getElementById('testimonial-filter-status')?.value;
+  let list = allTestimonials;
+  if (search) { const s=search.toLowerCase(); list=list.filter(r=>r.name?.toLowerCase().includes(s)||r.city?.toLowerCase().includes(s)||r.text?.toLowerCase().includes(s)); }
+  if (statusFilter) list = list.filter(r => (r.status||'pending') === statusFilter);
+  const { pageItems, page, totalPages, total } = paginateList(list, 'testimonials', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="8" style="text-align:center;padding:32px;color:#64748b">No reviews found</td></tr>`
+    : pageItems.map(r => {
+        const st = r.status || 'pending';
+        const stars = '★'.repeat(Math.round(r.rating||5)) + '☆'.repeat(5 - Math.round(r.rating||5));
+        const submitted = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('en-IN') : '—';
+        const shortText = (r.text||'').length > 90 ? esc(r.text).slice(0,90) + '…' : esc(r.text||'');
+        return `<tr>
+        <td><strong>${esc(r.name)}</strong>${r.phone ? '<br><small>'+esc(r.phone)+'</small>' : ''}</td>
+        <td>${esc(r.city||'—')}</td>
+        <td>${esc(r.projectType||'—')}</td>
+        <td style="color:#f5b301;white-space:nowrap">${stars}</td>
+        <td style="max-width:260px" title="${esc(r.text)}">${shortText}</td>
+        <td><span class="${TST_STATUS_BADGE[st]||'badge-open'}">${st.charAt(0).toUpperCase()+st.slice(1)}</span></td>
+        <td>${submitted}</td>
+        <td class="action-btns">
+          ${st !== 'approved' ? `<button onclick="approveTestimonial('${r.id}')" class="btn-search" style="padding:5px 10px;font-size:12px;color:var(--green)">✓ Approve</button>` : ''}
+          ${st !== 'rejected' ? `<button onclick="rejectTestimonial('${r.id}')" class="btn-search" style="padding:5px 10px;font-size:12px;color:var(--red)">✕ Reject</button>` : ''}
+          <button onclick="deleteTestimonialRecord('${r.id}')" class="btn-search" style="padding:5px 10px;font-size:12px">🗑</button>
+        </td>
+        </tr>`;
+      }).join('');
+  renderPaginationControls('testimonials-pagination', 'testimonials', page, totalPages, total);
+  const approvedList = allTestimonials.filter(r => (r.status||'pending') === 'approved');
+  document.getElementById('tst-stat-pending').textContent  = allTestimonials.filter(r=>(r.status||'pending')==='pending').length;
+  document.getElementById('tst-stat-approved').textContent = approvedList.length;
+  document.getElementById('tst-stat-rejected').textContent = allTestimonials.filter(r=>r.status==='rejected').length;
+  document.getElementById('tst-stat-avgrating').textContent = approvedList.length
+    ? (approvedList.reduce((sum,r)=>sum+(r.rating||0),0) / approvedList.length).toFixed(1) + ' ★'
+    : '—';
+};
+
+window.approveTestimonial = async (id) => {
+  try {
+    await updateDoc(doc(db,'testimonials',id), { status: 'approved' });
+    const r = allTestimonials.find(x=>x.id===id); if (r) r.status = 'approved';
+    invalidateCache('testimonials');
+    updateTestimonialBadge();
+    renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
+    toast('Review approved — now live on the reviews page!', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.rejectTestimonial = async (id) => {
+  try {
+    await updateDoc(doc(db,'testimonials',id), { status: 'rejected' });
+    const r = allTestimonials.find(x=>x.id===id); if (r) r.status = 'rejected';
+    invalidateCache('testimonials');
+    updateTestimonialBadge();
+    renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
+    toast('Review rejected.', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.deleteTestimonialRecord = async (id) => {
+  const ok = await confirmDialog('This will permanently delete this review. This cannot be undone.', { title: 'Delete Review', danger: true, confirmText: 'Delete' });
+  if (!ok) return;
+  try {
+    await deleteDoc(doc(db,'testimonials',id));
+    allTestimonials = allTestimonials.filter(x=>x.id!==id);
+    invalidateCache('testimonials');
+    updateTestimonialBadge();
+    renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
+    toast('Review deleted.', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.exportTestimonialsCSV = async () => {
+  let rows;
+  try { rows = await fetchCached('testimonials', 'testimonials'); }
+  catch(e) { reportError(e); toast('Failed to load data for export: ' + e.message, 'error'); return; }
+  if (!rows.length) { toast('There is no review to export.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['City','city'], ['Phone','phone'], ['Project Type','projectType'],
+    ['Rating','rating'], ['Review','text'], ['Status','status'],
+    ['Submitted', r => fbDate(r.createdAt)]
+  ]);
+  downloadCSV(`testimonials_${csvDate()}.csv`, csv);
+  toast('Testimonials CSV downloaded!', 'success');
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
