@@ -2643,6 +2643,7 @@ window._gotoPage = (key, page) => {
   if (key === 'invoices')  renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
   if (key === 'deleted')   renderDeletedItems(document.getElementById('deleted-search-input')?.value || '', true);
   if (key === 'activity')  renderActivityLog(document.getElementById('activity-search-input')?.value || '', true);
+  if (key === 'tickets')   renderTickets(document.getElementById('ticket-search-input')?.value || '', true);
   if (key === 'testimonials') renderTestimonials(document.getElementById('testimonial-search-input')?.value || '', true);
   window.scrollTo({top: document.querySelector('.section.active .table-card')?.offsetTop - 80 || 0, behavior:'smooth'});
 };
