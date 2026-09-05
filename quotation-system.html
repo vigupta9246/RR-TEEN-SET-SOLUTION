@@ -1254,8 +1254,8 @@ html.attendance-boot #attendance-screen{display:block!important}
         <div class="table-card">
           <div style="overflow-x:auto">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>City</th><th>Project</th><th>Rating</th><th>Review</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
-            <tbody id="testimonials-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:80%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td></tr></tbody>
+            <thead><tr><th>Name</th><th>City</th><th>Project</th><th>Rating</th><th>Review</th><th>Photo</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+            <tbody id="testimonials-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:80%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td></td></tr></tbody>
           </table>
           </div>
           <div id="testimonials-pagination" class="pagination-wrap"></div>
@@ -5745,18 +5745,22 @@ window.renderTestimonials = (search='', keepPage=false) => {
   if (statusFilter) list = list.filter(r => (r.status||'pending') === statusFilter);
   const { pageItems, page, totalPages, total } = paginateList(list, 'testimonials', keepPage);
   tbody.innerHTML = pageItems.length === 0
-    ? `<tr><td colspan="8" style="text-align:center;padding:32px;color:#64748b">No reviews found</td></tr>`
+    ? `<tr><td colspan="9" style="text-align:center;padding:32px;color:#64748b">No reviews found</td></tr>`
     : pageItems.map(r => {
         const st = r.status || 'pending';
         const stars = '★'.repeat(Math.round(r.rating||5)) + '☆'.repeat(5 - Math.round(r.rating||5));
         const submitted = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('en-IN') : '—';
         const shortText = (r.text||'').length > 90 ? esc(r.text).slice(0,90) + '…' : esc(r.text||'');
+        const photoCell = r.photoUrl
+          ? `<a href="${esc(r.photoUrl)}" target="_blank" rel="noopener noreferrer"><img src="${esc(r.photoUrl)}" style="width:44px;height:44px;object-fit:cover;border-radius:6px" alt="Review photo"></a>`
+          : '—';
         return `<tr>
         <td><strong>${esc(r.name)}</strong>${r.phone ? '<br><small>'+esc(r.phone)+'</small>' : ''}</td>
         <td>${esc(r.city||'—')}</td>
         <td>${esc(r.projectType||'—')}</td>
         <td style="color:#f5b301;white-space:nowrap">${stars}</td>
         <td style="max-width:260px" title="${esc(r.text)}">${shortText}</td>
+        <td>${photoCell}</td>
         <td><span class="${TST_STATUS_BADGE[st]||'badge-open'}">${st.charAt(0).toUpperCase()+st.slice(1)}</span></td>
         <td>${submitted}</td>
         <td class="action-btns">
@@ -5818,7 +5822,7 @@ window.exportTestimonialsCSV = async () => {
   if (!rows.length) { toast('There is no review to export.', 'warning'); return; }
   const csv = toCSV(rows, [
     ['Name','name'], ['City','city'], ['Phone','phone'], ['Project Type','projectType'],
-    ['Rating','rating'], ['Review','text'], ['Status','status'],
+    ['Rating','rating'], ['Review','text'], ['Photo URL','photoUrl'], ['Status','status'],
     ['Submitted', r => fbDate(r.createdAt)]
   ]);
   downloadCSV(`testimonials_${csvDate()}.csv`, csv);

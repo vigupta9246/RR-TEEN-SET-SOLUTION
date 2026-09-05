@@ -147,6 +147,16 @@
         </select>
       </div>
       <div class="fgroup"><label>Your Review *</label><textarea id="r-text" rows="5" placeholder="Kaam kaisa raha, timeline, quality, team ka behaviour — jo bhi share karna chahen..." required></textarea></div>
+      <div class="fgroup">
+        <label>Add a Photo (optional)</label>
+        <div id="r-photo-drop" style="border:1.5px dashed var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#f4f6fa" onclick="document.getElementById('r-photo-input').click()">
+          <div id="r-photo-placeholder" style="font-size:13px;color:var(--muted)">📷 Tap to add a photo of the completed shed</div>
+          <img id="r-photo-preview" class="hidden" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:6px">
+          <div id="r-photo-uploading" class="hidden" style="font-size:12.5px;color:var(--blue);margin-top:6px">Uploading…</div>
+        </div>
+        <input type="file" id="r-photo-input" accept="image/*" class="hidden" onchange="handleReviewPhotoSelect(this.files)">
+        <button type="button" id="r-photo-remove" class="hidden" onclick="removeReviewPhoto()" style="background:none;border:none;color:#c0392b;font-size:12px;font-weight:700;margin-top:6px;cursor:pointer;padding:0">✕ Remove photo</button>
+      </div>
       <div id="rvw-error" class="hidden" style="color:#c0392b;font-size:13px;margin-bottom:14px"></div>
       <button type="button" class="submit-btn" id="rvw-submit-btn" onclick="submitReview()">⭐ Submit Review</button>
       <div class="rvw-trust-row">
@@ -207,6 +217,75 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Reuses the same unsigned Cloudinary preset the CRM uses for Work
+// Progress Photos — already public/unsigned, safe to reuse for another
+// upload flow. No server secret involved either way.
+const CLOUDINARY_CLOUD_NAME = 'k676kjvm';
+const CLOUDINARY_UPLOAD_PRESET = 'work-progress-photos';
+let uploadedPhotoUrl = null;
+
+function compressImageFile(file, maxDim = 1280, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else { width = Math.round(width * maxDim / height); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        URL.revokeObjectURL(url);
+        blob ? resolve(blob) : reject(new Error('Image compression failed'));
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read the selected image')); };
+    img.src = url;
+  });
+}
+
+async function uploadToCloudinary(blob) {
+  const formData = new FormData();
+  formData.append('file', blob);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+  if (!res.ok) throw new Error('Photo upload failed (' + res.status + ')');
+  const json = await res.json();
+  return json.secure_url;
+}
+
+window.handleReviewPhotoSelect = async (fileList) => {
+  const file = (fileList || [])[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  document.getElementById('r-photo-placeholder').classList.add('hidden');
+  document.getElementById('r-photo-uploading').classList.remove('hidden');
+  try {
+    const compressed = await compressImageFile(file);
+    const url = await uploadToCloudinary(compressed);
+    uploadedPhotoUrl = url;
+    const preview = document.getElementById('r-photo-preview');
+    preview.src = url;
+    preview.classList.remove('hidden');
+    document.getElementById('r-photo-remove').classList.remove('hidden');
+  } catch(e) {
+    showErr('Photo upload failed: ' + e.message + ' — you can still submit your review without it.');
+    document.getElementById('r-photo-placeholder').classList.remove('hidden');
+  } finally {
+    document.getElementById('r-photo-uploading').classList.add('hidden');
+  }
+};
+
+window.removeReviewPhoto = () => {
+  uploadedPhotoUrl = null;
+  document.getElementById('r-photo-input').value = '';
+  document.getElementById('r-photo-preview').classList.add('hidden');
+  document.getElementById('r-photo-placeholder').classList.remove('hidden');
+  document.getElementById('r-photo-remove').classList.add('hidden');
+};
+
 let selectedRating = 0;
 const starEls = document.querySelectorAll('#rvw-stars span');
 const starLabels = { 1: 'Poor 😕', 2: 'Fair 🙂', 3: 'Good 👍', 4: 'Very Good 😊', 5: 'Excellent! 🤩' };
@@ -250,7 +329,7 @@ window.submitReview = async function(){
     const id = genReviewId();
     await setDoc(doc(db, 'testimonials', id), {
       reviewId: id, name, city, phone: phone || null, projectType: type || null,
-      rating: selectedRating, text,
+      rating: selectedRating, text, photoUrl: uploadedPhotoUrl || null,
       status: 'pending', source: 'website_form',
       createdAt: serverTimestamp()
     });
