@@ -173,7 +173,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getFirestore, collection, query, where, orderBy, limit, getDocs }
+import { getFirestore, collection, query, where, limit, getDocs }
   from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -224,9 +224,15 @@ async function loadReviews(){
   const grid = document.getElementById('tst-grid');
   let reviews = [];
   try {
-    const q = query(collection(db,'testimonials'), where('status','==','approved'), orderBy('createdAt','desc'), limit(24));
+    // Single-field equality filter only — no composite index needed.
+    // (status + orderBy(createdAt) together would require one, which
+    // isn't created automatically, so that combination was silently
+    // failing and always falling back to the hardcoded reviews below.)
+    const q = query(collection(db,'testimonials'), where('status','==','approved'), limit(50));
     const snap = await getDocs(q);
     snap.forEach(doc => reviews.push(doc.data()));
+    reviews.sort((a,b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+    reviews = reviews.slice(0, 24);
   } catch(e) {
     // Collection may not exist yet, or rules aren't set — fall back silently.
     console.warn('Testimonials fetch failed, showing fallback reviews:', e.message);
