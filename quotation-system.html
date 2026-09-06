@@ -2900,7 +2900,13 @@ window.loadTeam = async () => {
     if (snap.exists() && typeof snap.data().ratePerKg === 'number') {
       document.getElementById('steel-rate-input').value = snap.data().ratePerKg;
       const d = snap.data().updatedAt?.toDate ? snap.data().updatedAt.toDate() : null;
-      lu.textContent = d ? `Last updated: ${d.toLocaleDateString('en-IN')} ${d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})} by ${snap.data().updatedBy||'—'}` : '';
+      const prev = snap.data().previousRatePerKg;
+      let trendTxt = '';
+      if (typeof prev === 'number') {
+        const diff = snap.data().ratePerKg - prev;
+        trendTxt = diff > 0 ? ` (▲ up ₹${diff} from ₹${prev})` : diff < 0 ? ` (▼ down ₹${Math.abs(diff)} from ₹${prev})` : ' (no change)';
+      }
+      lu.textContent = d ? `Last updated: ${d.toLocaleDateString('en-IN')} ${d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})} by ${snap.data().updatedBy||'—'}${trendTxt}` : '';
     } else {
       lu.textContent = 'Not set yet — the website widget stays hidden until you save a rate.';
     }
@@ -2917,7 +2923,16 @@ window.saveSteelRate = async () => {
   const val = parseFloat(document.getElementById('steel-rate-input').value);
   if (isNaN(val) || val <= 0) { toast('Enter a valid rate per kg.', 'warning'); return; }
   try {
-    await setDoc(doc(db,'settings','steelRate'), { ratePerKg: val, updatedAt: serverTimestamp(), updatedBy: auth.currentUser?.email || 'unknown' }, { merge: true });
+    // Carry the current rate forward as "previous" so the website widget
+    // can show a trend arrow (up/down since last update).
+    const existing = await getDoc(doc(db,'settings','steelRate'));
+    const prevRate = existing.exists() ? existing.data().ratePerKg : null;
+    await setDoc(doc(db,'settings','steelRate'), {
+      ratePerKg: val,
+      previousRatePerKg: (typeof prevRate === 'number' && prevRate !== val) ? prevRate : (existing.exists() ? existing.data().previousRatePerKg ?? null : null),
+      updatedAt: serverTimestamp(),
+      updatedBy: auth.currentUser?.email || 'unknown'
+    }, { merge: true });
     toast('Steel rate updated — live on the website now!', 'success');
     loadTeam();
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }

@@ -65,12 +65,27 @@ logEvent('pageViews', {
 // needed (see settings/{id} rule's 'steelRate' exception).
 const rateEl = document.getElementById('steel-rate-widget');
 if (rateEl) {
+  const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateRateCount(el, target, duration = 1200) {
+    if (reduceMotion) { el.textContent = '₹' + target; return; }
+    const start = performance.now();
+    function step(ts) {
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = '₹' + Math.round(target * eased);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = '₹' + target;
+    }
+    requestAnimationFrame(step);
+  }
+
   getDoc(doc(db, 'settings', 'steelRate')).then(snap => {
     if (!snap.exists() || typeof snap.data().ratePerKg !== 'number') {
       rateEl.style.display = 'none';
       return;
     }
-    const { ratePerKg, updatedAt } = snap.data();
+    const { ratePerKg, previousRatePerKg, updatedAt } = snap.data();
     const updatedDate = updatedAt?.toDate ? updatedAt.toDate() : null;
     const daysOld = updatedDate ? Math.floor((Date.now() - updatedDate.getTime()) / 86400000) : null;
     const dateStr = updatedDate
@@ -79,15 +94,36 @@ if (rateEl) {
     const staleNote = (daysOld !== null && daysOld >= 7)
       ? `<div class="steel-rate-stale">⚠️ Rate updated ${daysOld} days ago — call for today's exact price</div>`
       : '';
-    rateEl.innerHTML = `
-      <div class="steel-rate-icon">🔩</div>
-      <div>
-        <div class="steel-rate-label">Aaj Ka Steel Rate</div>
-        <div class="steel-rate-value">₹${ratePerKg}<span>/kg</span></div>
-        <div class="steel-rate-updated">Last updated: ${dateStr}</div>
-        ${staleNote}
+
+    let trendHtml = '';
+    if (typeof previousRatePerKg === 'number' && previousRatePerKg !== ratePerKg) {
+      const diff = ratePerKg - previousRatePerKg;
+      const up = diff > 0;
+      trendHtml = `<div class="steel-rate-trend ${up ? 'up' : 'down'}">
+        <svg viewBox="0 0 24 24" class="trend-arrow"><path d="${up ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'}"/></svg>
+        ₹${Math.abs(diff)} ${up ? 'up' : 'down'} from last update
       </div>`;
+    }
+
+    rateEl.innerHTML = `
+      <div class="steel-rate-top">
+        <div class="steel-rate-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="10" width="18" height="4" rx="1"/>
+            <path d="M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/>
+            <path d="M7 14v3M12 14v3M17 14v3"/>
+          </svg>
+        </div>
+        <div class="steel-rate-live"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <div class="steel-rate-label">Aaj Ka Steel Rate</div>
+      <div class="steel-rate-value"><span id="steel-rate-num">₹0</span><span class="steel-rate-unit">/kg</span></div>
+      ${trendHtml}
+      <div class="steel-rate-updated">Last updated: ${dateStr}</div>
+      ${staleNote}
+    `;
     rateEl.classList.add('loaded');
+    animateRateCount(document.getElementById('steel-rate-num'), ratePerKg);
   }).catch(err => {
     console.warn('[site-tracker] Could not load steel rate:', err.message);
     rateEl.style.display = 'none';
