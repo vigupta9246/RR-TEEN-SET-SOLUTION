@@ -106,23 +106,15 @@ if (rateEl) {
     }
 
     rateEl.innerHTML = `
-      <div class="steel-rate-top">
-        <div class="steel-rate-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="10" width="18" height="4" rx="1"/>
-            <path d="M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/>
-            <path d="M7 14v3M12 14v3M17 14v3"/>
-          </svg>
-        </div>
-        <div class="steel-rate-live"><span class="live-dot"></span>LIVE</div>
-      </div>
-      <div class="steel-rate-label">Aaj Ka Steel Rate</div>
+      <div class="steel-rate-toprow"><span class="steel-rate-live"><span class="live-dot"></span>LIVE</span></div>
       <div class="steel-rate-value"><span id="steel-rate-num">₹0</span><span class="steel-rate-unit">/kg</span></div>
+      <div class="steel-rate-label">Aaj Ka Steel Rate</div>
       ${trendHtml}
-      <div class="steel-rate-updated">Last updated: ${dateStr}</div>
+      <div class="steel-rate-updated">Updated ${dateStr}</div>
       ${staleNote}
     `;
     rateEl.classList.add('loaded');
+    if (rateEl.parentElement) rateEl.parentElement.classList.add('has-steel-rate');
     animateRateCount(document.getElementById('steel-rate-num'), ratePerKg);
   }).catch(err => {
     console.warn('[site-tracker] Could not load steel rate:', err.message);

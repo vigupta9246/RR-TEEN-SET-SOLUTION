@@ -185,42 +185,53 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .btn-outline { background:transparent; color:var(--blue); border:2px solid var(--blue); }
 .btn-outline:hover { background:var(--blue); color:#fff; transform:translateY(-2px); }
 
-#steel-rate-widget {
-  display:none; flex-direction:column; gap:10px;
-  background:linear-gradient(150deg,#0f1626,#1c2748 55%,#25315a);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:18px; padding:22px 24px; max-width:300px; width:100%;
-  box-shadow:0 14px 36px rgba(10,22,40,.28);
-  position:relative; overflow:hidden;
-  transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s cubic-bezier(.25,.8,.25,1);
-}
-#steel-rate-widget::before {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:radial-gradient(circle at 85% -10%, rgba(92,169,255,.18), transparent 55%);
-}
+/* Steel Rate — lives INSIDE the stats-bar as a 5th item (not a
+   standalone floating card), so it matches the surrounding dark strip
+   instead of sitting alone in white space. */
+#steel-rate-widget { display:none; flex-direction:column; align-items:center; gap:2px; }
 #steel-rate-widget.loaded { display:flex; animation:steelRateEnter .6s cubic-bezier(.25,.8,.25,1) both; }
-#steel-rate-widget:hover { transform:translateY(-5px) scale(1.015); box-shadow:0 20px 48px rgba(10,22,40,.36); }
-@keyframes steelRateEnter { from{opacity:0;transform:translateY(14px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes steelRateEnter { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-.steel-rate-top { display:flex; align-items:center; justify-content:space-between; position:relative }
-.steel-rate-icon { width:34px; height:34px; border-radius:9px; background:rgba(92,169,255,.14); color:#7cb8ff; display:flex; align-items:center; justify-content:center; flex-shrink:0 }
-.steel-rate-icon svg { width:19px; height:19px }
-.steel-rate-live { display:flex; align-items:center; gap:5px; font-size:10px; font-weight:800; letter-spacing:1px; color:#6ee7a0 }
-.live-dot { width:6px; height:6px; border-radius:50%; background:#6ee7a0; box-shadow:0 0 0 rgba(110,231,160,.6); animation:liveDotPulse 1.8s ease-out infinite }
-@keyframes liveDotPulse { 0%{box-shadow:0 0 0 0 rgba(110,231,160,.55)} 70%{box-shadow:0 0 0 7px rgba(110,231,160,0)} 100%{box-shadow:0 0 0 0 rgba(110,231,160,0)} }
+.steel-rate-toprow { display:flex; align-items:center; gap:6px; margin-bottom:2px }
+.steel-rate-live { display:flex; align-items:center; gap:4px; font-size:9px; font-weight:800; letter-spacing:1px; color:#8fe6ac }
+.live-dot { width:5px; height:5px; border-radius:50%; background:#8fe6ac; animation:liveDotPulse 1.8s ease-out infinite }
+@keyframes liveDotPulse { 0%{box-shadow:0 0 0 0 rgba(143,230,172,.55)} 70%{box-shadow:0 0 0 6px rgba(143,230,172,0)} 100%{box-shadow:0 0 0 0 rgba(143,230,172,0)} }
 
-.steel-rate-label { font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:rgba(255,255,255,.5); font-weight:700; position:relative }
-.steel-rate-value { font-family:'Bebas Neue',sans-serif; font-size:40px; color:#fff; letter-spacing:.5px; line-height:1; position:relative }
-.steel-rate-unit { font-size:15px; color:rgba(255,255,255,.55); font-family:var(--font-b); font-weight:600; margin-left:4px }
+.steel-rate-value { font-family:var(--font-h); font-size:36px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.steel-rate-unit { font-size:13px; -webkit-text-fill-color:rgba(239,226,186,.7); margin-left:3px }
+.steel-rate-label { font-size:11px; color:rgba(239,226,186,.65); text-transform:uppercase; letter-spacing:1.5px; margin-top:5px }
 
-.steel-rate-trend { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; width:fit-content; position:relative }
-.steel-rate-trend.up { color:#ff8a7a; background:rgba(255,138,122,.12) }
-.steel-rate-trend.down { color:#6ee7a0; background:rgba(110,231,160,.12) }
-.trend-arrow { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round }
+.steel-rate-trend { display:inline-flex; align-items:center; gap:3px; font-size:10.5px; font-weight:700; margin-top:4px }
+.steel-rate-trend.up { color:#ff9a8d }
+.steel-rate-trend.down { color:#8fe6ac }
+.trend-arrow { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round }
 
-.steel-rate-updated { font-size:11px; color:rgba(255,255,255,.4); position:relative }
-.steel-rate-stale { font-size:11.5px; color:#ffcf6b; line-height:1.5; position:relative; background:rgba(255,207,107,.1); border-radius:8px; padding:8px 10px }
+.steel-rate-updated { font-size:9.5px; color:rgba(239,226,186,.45); margin-top:3px }
+.steel-rate-stale { font-size:10px; color:#ffcf6b; margin-top:4px; max-width:150px; line-height:1.4 }
 @media (prefers-reduced-motion: reduce) { #steel-rate-widget.loaded{animation:none} .live-dot{animation:none} }
+@media (max-width:900px) {
+  .stats-bar.has-steel-rate { grid-template-columns:repeat(2,1fr); }
+  .stats-bar.has-steel-rate .stat-item:nth-child(5) { grid-column:1/-1; border-top:1px solid rgba(197,203,227,.18); border-right:none; padding-top:20px; margin-top:4px; }
+}
+
+/* Standalone banner variant — used on pages OUTSIDE the stats-bar
+   (calculator, cost-guide pages). Slim horizontal strip, not a big
+   floating card, so it sits naturally inline with page content. */
+.steel-rate-banner { display:flex; justify-content:center; margin:20px 0; }
+.steel-rate-banner #steel-rate-widget {
+  flex-direction:row; align-items:center; gap:16px;
+  background:linear-gradient(135deg,#16264f,#2d4a8a); border-radius:12px;
+  padding:14px 22px; max-width:100%; box-shadow:0 4px 16px rgba(10,22,40,.15);
+}
+.steel-rate-banner .steel-rate-toprow { margin-bottom:0; }
+.steel-rate-banner .steel-rate-value { font-size:26px; }
+.steel-rate-banner .steel-rate-label { margin-top:0; }
+.steel-rate-banner .steel-rate-trend { margin-top:0; }
+.steel-rate-banner .steel-rate-updated { margin-top:0; }
+.steel-rate-banner .steel-rate-stale { margin-top:0; max-width:none; }
+@media (max-width:560px) {
+  .steel-rate-banner #steel-rate-widget { flex-direction:column; text-align:center; gap:4px; }
+}
 .btn-lg { padding:15px 34px; font-size:15px; }
 .btn-full { width:100%; }
 
@@ -242,6 +253,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
    STATS BAR
 ═══════════════════════════════════════════════════════ */
 .stats-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; border-bottom:2px solid rgba(215,153,34,.4); }
+.stats-bar.has-steel-rate { grid-template-columns:repeat(4,1fr) minmax(150px,1.3fr); }
 .stat-item { border-right:1px solid rgba(197,203,227,.18); padding:16px; }
 .stat-item:last-child { border-right:none; }
 .stat-num  { font-family:var(--font-h); font-size:44px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
