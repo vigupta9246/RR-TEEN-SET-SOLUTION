@@ -291,7 +291,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .cform { background:rgba(255,255,255,.06); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:34px; }
 .fgroup { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
 .fgroup label { font-size:11px; font-weight:700; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:1px; }
-.fgroup input, .fgroup textarea, .fgroup select { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:var(--radius-sm); padding:13px 14px; min-height:46px; color:#fff; font-size:14px; font-family:var(--font-b); outline:none; transition:border var(--t); width:100%; }
+.fgroup input, .fgroup textarea, .fgroup select { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:var(--radius-sm); padding:13px 14px; min-height:46px; color:#fff; font-size:16px; font-family:var(--font-b); outline:none; transition:border var(--t); width:100%; }
 .fgroup input::placeholder, .fgroup textarea::placeholder { color:rgba(255,255,255,.3); }
 .fgroup input:focus, .fgroup textarea:focus, .fgroup select:focus { border-color:var(--sky); }
 .fgroup select option { background:var(--navy); }
