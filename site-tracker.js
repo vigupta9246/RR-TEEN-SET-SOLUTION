@@ -116,6 +116,20 @@ if (rateEl) {
     rateEl.classList.add('loaded');
     if (rateEl.parentElement) rateEl.parentElement.classList.add('has-steel-rate');
     animateRateCount(document.getElementById('steel-rate-num'), ratePerKg);
+
+    // Static reference example for pages with no interactive calculator
+    // (shed-cost-calculator.html wires its own live-linked version into
+    // #steel-rate-calc-link instead — this only fills the element if that
+    // page-specific script hasn't already claimed it).
+    // NOTE: 150/220 mirrors shed-cost-calculator.html's R.tin.low/high —
+    // keep these in sync if that range ever changes.
+    const staticEx = document.getElementById('steel-rate-static-example');
+    if (staticEx && !staticEx.textContent) {
+      const midRate = Math.round((150 + 220) / 2);
+      const area = 600; // 20 x 30 ft — the most commonly asked size
+      const cost = midRate * area;
+      staticEx.innerHTML = `Example: 20×30 ft Tin Shed ≈ ₹${cost.toLocaleString('en-IN')} <a href="shed-cost-calculator.html">Calculate your size →</a>`;
+    }
   }).catch(err => {
     console.warn('[site-tracker] Could not load steel rate:', err.message);
     rateEl.style.display = 'none';
