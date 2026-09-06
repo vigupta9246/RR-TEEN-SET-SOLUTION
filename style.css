@@ -185,67 +185,6 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .btn-outline { background:transparent; color:var(--blue); border:2px solid var(--blue); }
 .btn-outline:hover { background:var(--blue); color:#fff; transform:translateY(-2px); }
 
-/* Steel Rate — lives INSIDE the stats-bar as a 5th item (not a
-   standalone floating card), so it matches the surrounding dark strip
-   instead of sitting alone in white space. */
-#steel-rate-widget { display:none; flex-direction:column; align-items:center; gap:2px; }
-#steel-rate-widget.loaded { display:flex; animation:steelRateEnter .6s cubic-bezier(.25,.8,.25,1) both; }
-@keyframes steelRateEnter { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-.steel-rate-toprow { display:flex; align-items:center; gap:6px; margin-bottom:2px }
-.steel-rate-live { display:flex; align-items:center; gap:4px; font-size:9px; font-weight:800; letter-spacing:1px; color:#8fe6ac }
-.live-dot { width:5px; height:5px; border-radius:50%; background:#8fe6ac; animation:liveDotPulse 1.8s ease-out infinite }
-@keyframes liveDotPulse { 0%{box-shadow:0 0 0 0 rgba(143,230,172,.55)} 70%{box-shadow:0 0 0 6px rgba(143,230,172,0)} 100%{box-shadow:0 0 0 0 rgba(143,230,172,0)} }
-
-.steel-rate-value { font-family:var(--font-h); font-size:36px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-.steel-rate-unit { font-size:13px; -webkit-text-fill-color:rgba(239,226,186,.7); margin-left:3px }
-.steel-rate-label { font-size:11px; color:rgba(239,226,186,.65); text-transform:uppercase; letter-spacing:1.5px; margin-top:5px }
-
-.steel-rate-trend { display:inline-flex; align-items:center; gap:3px; font-size:10.5px; font-weight:700; margin-top:4px }
-.steel-rate-trend.up { color:#ff9a8d }
-.steel-rate-trend.down { color:#8fe6ac }
-.trend-arrow { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round }
-
-.steel-rate-updated { font-size:9.5px; color:rgba(239,226,186,.45); margin-top:3px }
-.steel-rate-stale { font-size:10px; color:#ffcf6b; margin-top:4px; max-width:150px; line-height:1.4 }
-@media (prefers-reduced-motion: reduce) { #steel-rate-widget.loaded{animation:none} .live-dot{animation:none} }
-@media (max-width:900px) {
-  .stats-bar.has-steel-rate { grid-template-columns:repeat(2,1fr); }
-  .stats-bar.has-steel-rate .stat-item:nth-child(5) { grid-column:1/-1; border-top:1px solid rgba(197,203,227,.18); border-right:none; padding-top:20px; margin-top:4px; }
-}
-
-/* Standalone banner variant — used on pages OUTSIDE the stats-bar
-   (calculator, cost-guide pages). Slim horizontal strip, not a big
-   floating card, so it sits naturally inline with page content. */
-.steel-rate-banner { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:0; margin:20px 0; }
-.steel-rate-calc-link {
-  background:rgba(46,125,50,.08); color:#1b5e20; font-size:13px; font-weight:700;
-  padding:14px 20px 14px 30px; border-radius:0 12px 12px 0; margin-left:-14px;
-  border:1.5px dashed rgba(46,125,50,.3); border-left:none; min-height:60px;
-  display:flex; align-items:center; position:relative;
-}
-.steel-rate-calc-link:empty { display:none; }
-.steel-rate-calc-link a { color:#1b5e20; text-decoration:underline; margin-left:6px; white-space:nowrap; }
-.steel-rate-calc-link::before { content:'→'; position:absolute; left:-4px; top:50%; transform:translateY(-50%); font-size:16px; color:rgba(46,125,50,.5); }
-@media (max-width:640px) {
-  .steel-rate-banner { flex-direction:column; }
-  .steel-rate-calc-link { border-radius:12px; margin-left:0; border-left:1.5px dashed rgba(46,125,50,.3); border-top:none; width:100%; box-sizing:border-box; justify-content:center; text-align:center; padding:12px 16px; }
-  .steel-rate-calc-link::before { content:'↓'; left:50%; top:-4px; transform:translate(-50%,-50%); }
-}
-.steel-rate-banner #steel-rate-widget {
-  flex-direction:row; align-items:center; gap:16px;
-  background:linear-gradient(135deg,#16264f,#2d4a8a); border-radius:12px;
-  padding:14px 22px; max-width:100%; box-shadow:0 4px 16px rgba(10,22,40,.15);
-}
-.steel-rate-banner .steel-rate-toprow { margin-bottom:0; }
-.steel-rate-banner .steel-rate-value { font-size:26px; }
-.steel-rate-banner .steel-rate-label { margin-top:0; }
-.steel-rate-banner .steel-rate-trend { margin-top:0; }
-.steel-rate-banner .steel-rate-updated { margin-top:0; }
-.steel-rate-banner .steel-rate-stale { margin-top:0; max-width:none; }
-@media (max-width:560px) {
-  .steel-rate-banner #steel-rate-widget { flex-direction:column; text-align:center; gap:4px; }
-}
 .btn-lg { padding:15px 34px; font-size:15px; }
 .btn-full { width:100%; }
 
@@ -267,7 +206,6 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
    STATS BAR
 ═══════════════════════════════════════════════════════ */
 .stats-bar { background:linear-gradient(135deg,#16264f,#2d4a8a); padding:36px 5%; display:grid; grid-template-columns:repeat(4,1fr); text-align:center; border-bottom:2px solid rgba(215,153,34,.4); }
-.stats-bar.has-steel-rate { grid-template-columns:repeat(4,1fr) minmax(150px,1.3fr); }
 .stat-item { border-right:1px solid rgba(197,203,227,.18); padding:16px; }
 .stat-item:last-child { border-right:none; }
 .stat-num  { font-family:var(--font-h); font-size:44px; line-height:1; background:linear-gradient(135deg,var(--accent-2),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
