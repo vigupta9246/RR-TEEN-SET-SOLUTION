@@ -185,6 +185,23 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .btn-outline { background:transparent; color:var(--blue); border:2px solid var(--blue); }
 .btn-outline:hover { background:var(--blue); color:#fff; transform:translateY(-2px); }
 
+/* Trust Avatar Stack — overlapping initial-circles, used in the homepage
+   hero. Uses reviewer initials (not stock photos) since we don't have
+   real customer headshots to show honestly. */
+.hero-avatar-stack { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.hero-avatars { display:flex; }
+.hero-avatar {
+  width:36px; height:36px; border-radius:50%; border:2px solid rgba(10,22,40,.85);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-b); font-size:12px; font-weight:800; color:#fff;
+  margin-left:-10px; box-shadow:0 2px 8px rgba(0,0,0,.25);
+  transition:transform .25s cubic-bezier(.25,.8,.25,1);
+}
+.hero-avatar:first-child { margin-left:0; }
+.hero-avatar:hover { transform:translateY(-4px) scale(1.08); z-index:2; }
+.hero-avatar-text { font-family:'Inter',sans-serif; font-size:13px; color:rgba(255,255,255,.65); font-weight:500; }
+@media (max-width:480px) { .hero-avatar-text { font-size:12px; } .hero-avatar { width:32px; height:32px; font-size:11px; } }
+
 .btn-lg { padding:15px 34px; font-size:15px; }
 .btn-full { width:100%; }
 
