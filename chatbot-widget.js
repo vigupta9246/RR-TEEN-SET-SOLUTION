@@ -79,6 +79,29 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
     document.getElementById('chatbot-typing').style.display = 'none';
   }
 
+  function positionFab() {
+    const fab = document.getElementById('chatbot-fab');
+    const panel = document.getElementById('chatbot-panel');
+    if (!fab) return;
+
+    // Different pages use different floating-button systems: most use a
+    // single .wa-float button, but some (homepage, calculator) use a
+    // custom .fab-wrap with a stacked Call + WhatsApp pair. Detecting
+    // the actual element at runtime (instead of guessing a fixed pixel
+    // value) means this keeps working correctly regardless of which
+    // system a given page uses, or if either one's size/position ever
+    // changes.
+    const existing = document.querySelector('.fab-wrap') || document.querySelector('.wa-float');
+    let bottomPx = 90; // sensible fallback if neither is found
+    if (existing) {
+      const rect = existing.getBoundingClientRect();
+      const gap = 14;
+      bottomPx = Math.round(window.innerHeight - rect.top + gap);
+    }
+    fab.style.bottom = bottomPx + 'px';
+    if (panel) panel.style.bottom = (bottomPx + 68) + 'px';
+  }
+
   function addMessage(role, text) {
     const messagesEl = document.getElementById('chatbot-messages');
     const bubble = el(`<div class="chatbot-msg chatbot-msg-${role === 'user' ? 'user' : 'bot'}">${esc(text)}</div>`);
@@ -139,6 +162,12 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
       return; // don't show a broken widget in production
     }
     buildUI();
+    positionFab();
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(positionFab, 150);
+    });
     document.getElementById('chatbot-fab').addEventListener('click', toggleChat);
     document.getElementById('chatbot-close-btn').addEventListener('click', toggleChat);
     document.getElementById('chatbot-send-btn').addEventListener('click', () => {
