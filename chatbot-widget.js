@@ -50,7 +50,7 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
       <div id="chatbot-panel">
         <div id="chatbot-header">
           <div id="chatbot-header-title">
-            <div id="chatbot-avatar">🏗️</div>
+            <div id="chatbot-avatar"><img src="images/rr-logo-original.png" alt="R.R Teen Set Solution"></div>
             <div>
               <div id="chatbot-name">R.R Teen Set Assistant</div>
               <div id="chatbot-status"><span class="chatbot-dot"></span>AI Assistant · Online</div>
