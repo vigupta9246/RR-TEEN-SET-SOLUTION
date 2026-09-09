@@ -99,7 +99,20 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
       bottomPx = Math.round(window.innerHeight - rect.top + gap);
     }
     fab.style.bottom = bottomPx + 'px';
-    if (panel) panel.style.bottom = (bottomPx + 68) + 'px';
+    if (panel) {
+      const panelBottom = bottomPx + 68;
+      panel.style.bottom = panelBottom + 'px';
+      // The panel's max-height was previously a static CSS value that
+      // assumed a fixed bottom offset. Since bottomPx now varies by page
+      // (fab-wrap pages push it higher than wa-float pages), a static
+      // max-height could let the panel's top edge go above the viewport
+      // on shorter windows. Compute it fresh here so the panel always
+      // fits between its (dynamic) bottom position and a safe 16px gap
+      // from the top of the viewport, however tall that gap actually is.
+      const safeTopMargin = 16;
+      const available = window.innerHeight - panelBottom - safeTopMargin;
+      panel.style.maxHeight = Math.max(280, available) + 'px';
+    }
   }
 
   function addMessage(role, text) {
