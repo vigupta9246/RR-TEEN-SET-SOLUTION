@@ -19,6 +19,13 @@
       .share-btn.x{background:#000}
       .share-btn.copy{background:#4056a1}
       .share-btn.copy.copied{background:#2e7d32}
+      #article-toc{background:#f8f8fb;border:1.5px solid #e8e8ec;border-radius:12px;padding:16px 20px;margin-bottom:28px}
+      #article-toc summary{font-weight:800;font-size:14px;color:#16264f;cursor:pointer;list-style:none;outline:none}
+      #article-toc summary::-webkit-details-marker{display:none}
+      #article-toc ul{margin:14px 0 2px;padding-left:20px}
+      #article-toc li{margin-bottom:8px;font-size:13.5px}
+      #article-toc a{color:#4056a1;text-decoration:none}
+      #article-toc a:hover{text-decoration:underline}
     `;
     var style = document.createElement('style');
     style.id = 'blog-enh-styles';
@@ -74,10 +81,52 @@
     });
   }
 
+  function slugify(text) {
+    return text.toLowerCase().trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 60);
+  }
+
+  function addTOC() {
+    var body = document.querySelector('.blog-body');
+    if (!body || document.getElementById('article-toc')) return;
+    var headings = Array.prototype.slice.call(body.querySelectorAll('h2'));
+    if (headings.length < 3) return; // not worth a TOC for short articles
+
+    var usedIds = {};
+    var items = headings.map(function (h) {
+      var text = h.textContent.trim();
+      var base = slugify(text) || 'section';
+      var id = base;
+      var n = 1;
+      while (usedIds[id]) { id = base + '-' + (++n); }
+      usedIds[id] = true;
+      if (!h.id) h.id = id;
+      return { id: h.id, text: text };
+    });
+
+    var toc = document.createElement('details');
+    toc.id = 'article-toc';
+    toc.open = true;
+    var listHtml = items.map(function (it) {
+      return '<li><a href="#' + it.id + '">' + it.text + '</a></li>';
+    }).join('');
+    toc.innerHTML = '<summary>📋 Table of Contents</summary><ul>' + listHtml + '</ul>';
+
+    var shareRow = document.querySelector('.share-row');
+    if (shareRow) {
+      shareRow.insertAdjacentElement('afterend', toc);
+    } else {
+      body.insertBefore(toc, body.firstChild);
+    }
+  }
+
   function init() {
     injectStyles();
     addProgressBar();
     addShareRow();
+    addTOC();
   }
 
   if (document.readyState === 'loading') {

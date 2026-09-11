@@ -538,3 +538,19 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
   nav, .fab-wrap, .hamburger, #mob-menu { display:none!important; }
   section { padding:20px 0; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   SKIP-TO-CONTENT LINK (accessibility)
+═══════════════════════════════════════════════════════ */
+#skip-link { position:absolute; top:-45px; left:6px; background:#16264f; color:#fff; padding:10px 18px; border-radius:6px; z-index:100000; text-decoration:none; font-weight:700; font-size:14px; transition:top .2s; }
+#skip-link:focus { top:6px; }
+
+/* ═══════════════════════════════════════════════════════
+   BACK-TO-TOP BUTTON (bottom-left, avoids the chat/call/
+   WhatsApp stack which lives bottom-right)
+═══════════════════════════════════════════════════════ */
+#back-to-top { position:fixed; bottom:24px; left:22px; width:44px; height:44px; border-radius:50%; background:var(--navy,#16264f); color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(10,22,40,.3); z-index:9500; opacity:0; visibility:hidden; transform:translateY(10px); transition:opacity .25s, transform .25s, visibility .25s; }
+#back-to-top.show { opacity:1; visibility:visible; transform:translateY(0); }
+#back-to-top:hover { background:var(--accent,#f13c20); }
+#back-to-top svg { width:20px; height:20px; }
+@media(max-width:768px) { #back-to-top { bottom:16px; left:14px; width:40px; height:40px; } }

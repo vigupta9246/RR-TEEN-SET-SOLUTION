@@ -471,3 +471,58 @@ function scrollVideoSlider(sliderId, direction){
 
 
 
+
+/* ════════════════════════════════════════════════════════════
+   SKIP-TO-CONTENT LINK — accessibility (WCAG)
+════════════════════════════════════════════════════════════ */
+(function () {
+  function addSkipLink() {
+    if (document.getElementById('skip-link')) return;
+    var target = document.querySelector('.page-hero, .blog-hero, section, main, #home');
+    if (!target) {
+      // Universal fallback: whatever comes right after <nav> (skip mob-menu if present)
+      var nav = document.querySelector('nav');
+      var el = nav ? nav.nextElementSibling : null;
+      while (el && el.id === 'mob-menu') el = el.nextElementSibling;
+      target = el;
+    }
+    if (!target) return;
+    if (!target.id) target.id = 'main-content-auto';
+    var link = document.createElement('a');
+    link.id = 'skip-link';
+    link.href = '#' + target.id;
+    link.textContent = 'Skip to main content';
+    document.body.prepend(link);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addSkipLink);
+  } else {
+    addSkipLink();
+  }
+})();
+
+/* ════════════════════════════════════════════════════════════
+   BACK-TO-TOP BUTTON — site-wide
+════════════════════════════════════════════════════════════ */
+(function () {
+  function addBackToTop() {
+    if (document.getElementById('back-to-top')) return;
+    var btn = document.createElement('button');
+    btn.id = 'back-to-top';
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.title = 'Back to top';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>';
+    document.body.appendChild(btn);
+    window.addEventListener('scroll', function () {
+      btn.classList.toggle('show', window.scrollY > 500);
+    }, { passive: true });
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addBackToTop);
+  } else {
+    addBackToTop();
+  }
+})();
