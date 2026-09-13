@@ -795,6 +795,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
       <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <button class="nav-btn" data-section="testimonials" onclick="showSection('testimonials')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3.5l2.6 5.4 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.9Z"/></svg></span><span>Testimonials</span> <span id="testimonials-nav-badge" class="nav-badge" style="display:none">0</span></button>
+      <button class="nav-btn" data-section="careers" onclick="showSection('careers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg></span><span>Careers</span> <span id="careers-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
@@ -1260,6 +1261,43 @@ html.attendance-boot #attendance-screen{display:block!important}
           </div>
           <div id="testimonials-pagination" class="pagination-wrap"></div>
           <div id="testimonials-loadmore"></div>
+        </div>
+      </section>
+
+      <!-- CAREERS / JOB APPLICANTS -->
+      <section id="careers" class="section">
+        <div class="page-header">
+          <div class="page-title">Careers</div>
+          <div class="page-sub">Job applications submitted via <a href="careers.html" target="_blank" rel="noopener noreferrer" style="color:var(--orange)">careers.html</a> — call them back and update status as you go through hiring</div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="applicant-search-input" class="search-input" placeholder="Search by name, phone, role, city..." oninput="handleApplicantsSearchDebounced(this.value)">
+          </div>
+          <select id="applicant-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderJobApplicants(document.getElementById('applicant-search-input').value)">
+            <option value="">All Status</option>
+            <option>New</option><option>Contacted</option><option>Interview Scheduled</option><option>Hired</option><option>Rejected</option>
+          </select>
+          <button class="btn-export" onclick="exportJobApplicantsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">NEW</div><div class="stat-value orange" id="car-stat-new">—</div></div>
+          <div class="stat-card"><div class="stat-label">CONTACTED</div><div class="stat-value" id="car-stat-contacted">—</div></div>
+          <div class="stat-card"><div class="stat-label">HIRED</div><div class="stat-value green" id="car-stat-hired">—</div></div>
+          <div class="stat-card"><div class="stat-label">TOTAL APPLICATIONS</div><div class="stat-value" id="car-stat-total">—</div></div>
+        </div>
+
+        <div class="table-card">
+          <div style="overflow-x:auto">
+          <table class="data-table mobile-cards">
+            <thead><tr><th>Name / Phone</th><th>Role Applied</th><th>Experience</th><th>City / Area</th><th>Note</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="careers-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:40%"></span></td><td><span class="skel skel-line" style="width:60%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td><td></td></tr></tbody>
+          </table>
+          </div>
+          <div id="careers-pagination" class="pagination-wrap"></div>
+          <div id="careers-loadmore"></div>
         </div>
       </section>
 
@@ -2387,6 +2425,7 @@ async function loadApprovalConfig() {
 let allTeam = [];
 let allTickets = [];
 let allTestimonials = [];
+let allJobApplicants = [];
 let allDeletedItems = [];
 let allLabour = [];
 let editingLabourId = null;
@@ -2428,8 +2467,8 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','team','deleted-items','activity-log','employee-profile'],
-  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','careers','team','deleted-items','activity-log','employee-profile'],
+  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','careers','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
   // read access to (see ROLE_READ_ACCESS below). Accounts already gets
@@ -2487,7 +2526,8 @@ const _cache = {
   customers:{data:null,ts:0,complete:false,lastDoc:null},
   tickets:{data:null,ts:0,complete:false,lastDoc:null},
   testimonials:{data:null,ts:0,complete:false,lastDoc:null},
-  labour:{data:null,ts:0,complete:false,lastDoc:null}
+  labour:{data:null,ts:0,complete:false,lastDoc:null},
+  jobApplications:{data:null,ts:0,complete:false,lastDoc:null}
 };
 const CACHE_TTL = 45000; // 45s
 
@@ -2659,6 +2699,7 @@ onAuthStateChanged(auth, async u => {
     applyRolePermissions();
     if (ROLE_PERMISSIONS[currentUserRole]?.includes('tickets')) updateTicketBadges();
     if (ROLE_PERMISSIONS[currentUserRole]?.includes('testimonials')) updateTestimonialBadge();
+    if (ROLE_PERMISSIONS[currentUserRole]?.includes('careers')) updateApplicantsBadge();
     if (window.Sentry) {
       Sentry.setUser({ email: u.email });
       Sentry.setTag('role', currentUserRole || 'unknown');
@@ -4794,7 +4835,7 @@ function renderSecurityCard() {
 // ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
-  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', careers:'Careers', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
   labour:'Labour & Wages',
   team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
@@ -4834,6 +4875,7 @@ window.showSection = id => {
   if (id === 'customers') loadCustomers();
   if (id === 'tickets')   loadTickets();
   if (id === 'testimonials') loadTestimonials();
+  if (id === 'careers')   loadJobApplicants();
   if (id === 'labour')    loadLabour();
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
@@ -5827,6 +5869,127 @@ window.exportTestimonialsCSV = async () => {
   ]);
   downloadCSV(`testimonials_${csvDate()}.csv`, csv);
   toast('Testimonials CSV downloaded!', 'success');
+};
+
+// ── CAREERS / JOB APPLICANTS (public write via careers.html, no login) ──
+// Same shape as Testimonials/Leads: a public form writes a doc with
+// status:'New', staff track it through the hiring pipeline from here.
+// Kept in its OWN collection ("jobApplications"), never mixed with
+// "leads" (sales enquiries).
+window.loadJobApplicants = async () => {
+  try {
+    const { list } = await fetchFirstPage('jobApplications', 'jobApplications');
+    allJobApplicants = list;
+    renderJobApplicants('');
+    renderLoadMoreButton('careers-loadmore', 'jobApplications', 'jobApplications', () => {
+      allJobApplicants = _cache.jobApplications.data;
+      renderJobApplicants(document.getElementById('applicant-search-input')?.value || '', true);
+    });
+    updateApplicantsBadge();
+  } catch(e) { reportError(e); showLoadError('careers-tbody', 8, e); }
+};
+
+window.handleApplicantsSearch = async (value) => {
+  const statusFilterActive = document.getElementById('applicant-filter-status')?.value;
+  if ((value || statusFilterActive) && !_cache.jobApplications.complete) {
+    try { allJobApplicants = await fetchCached('jobApplications', 'jobApplications'); }
+    catch(e) { reportError(e); toast('Failed to load full data for search: ' + e.message, 'error'); }
+  }
+  renderJobApplicants(value);
+};
+window.handleApplicantsSearchDebounced = debounce(window.handleApplicantsSearch);
+
+// "New" count badge in the sidebar — cheap count() aggregation, same
+// approach as updateTicketBadges/updateTestimonialBadge, so it works
+// even before this tab has ever been opened this session.
+async function updateApplicantsBadge() {
+  const badge = document.getElementById('careers-nav-badge');
+  if (!badge) return;
+  try {
+    const snap = await getCountFromServer(query(collection(db,'jobApplications'), where('status','==','New')));
+    const n = snap.data().count;
+    badge.textContent = n; badge.style.display = n > 0 ? '' : 'none';
+  } catch(e) { /* non-fatal — badge just stays hidden if this fails */ }
+}
+
+const CAR_STATUS_BADGE = { 'New':'badge-open', 'Contacted':'badge-inprogress', 'Interview Scheduled':'badge-inprogress', 'Hired':'badge-resolved', 'Rejected':'badge-closed' };
+
+window.renderJobApplicants = (search='', keepPage=false) => {
+  const tbody = document.getElementById('careers-tbody');
+  const statusFilter = document.getElementById('applicant-filter-status')?.value;
+  let list = allJobApplicants;
+  if (search) { const s=search.toLowerCase(); list=list.filter(a=>a.name?.toLowerCase().includes(s)||a.phone?.includes(s)||a.role?.toLowerCase().includes(s)||a.city?.toLowerCase().includes(s)); }
+  if (statusFilter) list = list.filter(a => (a.status||'New') === statusFilter);
+  const { pageItems, page, totalPages, total } = paginateList(list, 'jobApplications', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="8" style="text-align:center;padding:32px;color:#64748b">No job applications found</td></tr>`
+    : pageItems.map(a => {
+        const st = a.status || 'New';
+        const applied = a.createdAt?.toDate ? a.createdAt.toDate().toLocaleDateString('en-IN') : '—';
+        const callLink = a.phone ? `<a href="tel:${esc(a.phone)}" class="btn-icon" title="Call" aria-label="Call">${ICONS.phone}</a>` : '';
+        const waFollow = a.phone ? `<a href="${waLink(a.phone, `Hello ${a.name}, this is R.R Teen Set Solution regarding your job application for ${a.role||'the role'}. Please let us know a good time to talk. Thank you!`)}" target="_blank" rel="noopener noreferrer" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
+        return `<tr>
+        <td data-label="Name / Phone"><strong>${esc(a.name)}</strong><br><small>${esc(a.phone||'—')}</small></td>
+        <td data-label="Role Applied">${esc(a.role||'—')}</td>
+        <td data-label="Experience">${esc(a.experience||'—')}</td>
+        <td data-label="City / Area">${esc(a.city||'—')}</td>
+        <td data-label="Note" style="max-width:220px" title="${esc(a.message||'')}">${(a.message||'—').length>60?esc(a.message).slice(0,60)+'…':esc(a.message||'—')}</td>
+        <td data-label="Applied">${applied}</td>
+        <td data-label="Status">
+          <select onchange="updateApplicantStatus('${a.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
+            ${['New','Contacted','Interview Scheduled','Hired','Rejected'].map(s=>`<option ${st===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td data-label="Actions" class="action-btns">
+          ${callLink}${waFollow}
+          <button onclick="deleteJobApplicant('${a.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
+        </td></tr>`;
+      }).join('');
+  renderPaginationControls('careers-pagination', 'jobApplications', page, totalPages, total);
+  document.getElementById('car-stat-new').textContent = allJobApplicants.filter(a=>(a.status||'New')==='New').length;
+  document.getElementById('car-stat-contacted').textContent = allJobApplicants.filter(a=>a.status==='Contacted').length;
+  document.getElementById('car-stat-hired').textContent = allJobApplicants.filter(a=>a.status==='Hired').length;
+  document.getElementById('car-stat-total').textContent = allJobApplicants.length;
+};
+
+window.updateApplicantStatus = async (id, status) => {
+  try {
+    await updateDoc(doc(db,'jobApplications',id), { status, updatedAt: serverTimestamp() });
+    const a = allJobApplicants.find(x=>x.id===id); if (a) a.status = status;
+    invalidateCache('jobApplications');
+    updateApplicantsBadge();
+    renderJobApplicants(document.getElementById('applicant-search-input')?.value || '', true);
+  } catch(e) {
+    reportError(e); toast('Error: ' + e.message, 'error');
+    renderJobApplicants(document.getElementById('applicant-search-input')?.value || ''); // revert dropdown to the real saved status
+  }
+};
+
+window.deleteJobApplicant = async (id) => {
+  const ok = await confirmDialog('This will permanently delete this job application. This cannot be undone.', { title: 'Delete Application', danger: true, confirmText: 'Delete' });
+  if (!ok) return;
+  try {
+    await deleteDoc(doc(db,'jobApplications',id));
+    allJobApplicants = allJobApplicants.filter(x=>x.id!==id);
+    invalidateCache('jobApplications');
+    updateApplicantsBadge();
+    renderJobApplicants(document.getElementById('applicant-search-input')?.value || '', true);
+    toast('Application deleted.', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.exportJobApplicantsCSV = async () => {
+  let rows;
+  try { rows = await fetchCached('jobApplications', 'jobApplications'); }
+  catch(e) { reportError(e); toast('Failed to load data for export: ' + e.message, 'error'); return; }
+  if (!rows.length) { toast('There is no application to export.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['Phone','phone'], ['Role Applied','role'], ['Experience','experience'],
+    ['City / Area','city'], ['Note','message'], ['Status','status'],
+    ['Applied', r => fbDate(r.createdAt)]
+  ]);
+  downloadCSV(`job_applications_${csvDate()}.csv`, csv);
+  toast('Job applications CSV downloaded!', 'success');
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
