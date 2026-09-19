@@ -558,8 +558,15 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 /* ═══════════════════════════════════════════════════════
    NEWSLETTER SIGNUP BAR (top of footer, site-wide)
 ═══════════════════════════════════════════════════════ */
-#newsletter-bar { background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.1); padding:26px 5%; }
-.nl-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+/* Injected by newsletter.js as the FIRST child of <footer>, which already
+   has padding:52px 5% 24px — so this element must NOT add another 5% of
+   its own (that was stacking into a squeezed, inset panel on desktop) and
+   must carry its own bottom margin, or the footer grid sits flush against
+   it. Styled as a rounded card aligned to the same 1200px rhythm as
+   .footer-grid, instead of a full-bleed strip it can never actually reach
+   the edges to be. */
+#newsletter-bar { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:24px 28px; max-width:1200px; margin:0 auto 40px; }
+.nl-inner { max-width:100%; margin:0 auto; display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
 .nl-text { flex:1; min-width:220px; }
 .nl-text strong { display:block; color:#fff; font-size:16px; margin-bottom:2px; }
 .nl-text span { color:rgba(255,255,255,.6); font-size:13px; }
@@ -573,4 +580,4 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 #nl-msg { width:100%; margin:8px 0 0; font-size:12.5px; }
 #nl-msg.ok { color:#6fcf7f; }
 #nl-msg.err { color:#ff8a80; }
-@media(max-width:600px) { .nl-inner { flex-direction:column; align-items:stretch; } #nl-form { flex-direction:column; } #nl-email { min-width:0; } }
+@media(max-width:600px) { #newsletter-bar { padding:20px 18px; margin-bottom:32px; } .nl-inner { flex-direction:column; align-items:stretch; } #nl-form { flex-direction:column; } #nl-email { min-width:0; } }
