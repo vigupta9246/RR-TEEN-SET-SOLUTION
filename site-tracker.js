@@ -4,10 +4,24 @@
    fire-and-forget: nothing on this page ever waits on it, and nothing
    the visitor is doing (calling, opening WhatsApp, browsing) is ever
    delayed or blocked if a write fails (offline, rules not deployed yet).
+
+   Uses the Firestore LITE SDK deliberately, not the full one: the full
+   SDK opens a persistent WebChannel (long-polling) connection to
+   Firestore the moment getFirestore() runs, even for a single one-off
+   write, and that connection stays open in the background for the
+   rest of the page's life. This page never reads with a live listener
+   (no onSnapshot anywhere here), so that channel bought nothing — it
+   just meant the network was never fully idle, which is exactly the
+   condition Lighthouse/PageSpeed needs to close out an LCP trace.
+   Found via a PageSpeed run on the homepage showing LCP/TBT as
+   "Error! NO_LCP" — the trace was aborting before it could record a
+   Largest Contentful Paint, on a page that visibly painted fine. The
+   lite SDK does plain HTTPS REST calls instead (addDoc = one POST),
+   so there's nothing left running once the write resolves.
 ════════════════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",

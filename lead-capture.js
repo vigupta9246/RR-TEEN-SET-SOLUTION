@@ -10,10 +10,19 @@
    rule this write will fail silently (permission-denied) and the
    form will still work normally via WhatsApp — it just won't
    reach the CRM until the rule is deployed.
+
+   Uses the Firestore LITE SDK: this file runs on every page with a
+   lead form (including the homepage) and initializes Firestore
+   unconditionally on load, not lazily on submit — with the full SDK
+   that meant a persistent WebChannel connection opened on every
+   pageview whether or not the visitor ever filled the form, which
+   kept the network from going idle and broke Lighthouse's LCP trace
+   (see site-tracker.js for the full explanation). No onSnapshot is
+   used here, so the lite SDK's plain-REST addDoc is a drop-in swap.
 ════════════════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",

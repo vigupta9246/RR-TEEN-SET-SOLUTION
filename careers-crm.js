@@ -16,10 +16,16 @@
    rule this write fails silently (permission-denied) and the
    careers form still works normally via WhatsApp; it just won't
    reach the CRM until the rule is deployed.
+
+   Uses the Firestore LITE SDK — same reasoning as lead-capture.js
+   and site-tracker.js: no onSnapshot is used here, so there's no
+   reason to pay for the full SDK's persistent WebChannel connection
+   (it opens on load, not on submit) when a plain REST addDoc does
+   the exact same job without keeping the network non-idle.
 ════════════════════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0vwKNfJ4cb9WvGrir8U5oGyWdwNk3TvQ",

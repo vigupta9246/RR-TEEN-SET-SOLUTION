@@ -58,7 +58,7 @@
       try {
         const [{ initializeApp, getApps }, { getFirestore, doc, setDoc, serverTimestamp }] = await Promise.all([
           import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-          import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+          import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js")
         ]);
         const existing = getApps();
         const app = existing.length ? existing[0] : initializeApp(firebaseConfig);
