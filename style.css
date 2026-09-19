@@ -191,12 +191,30 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 /* ═══════════════════════════════════════════════════════
    PAGE HERO (inner pages)
 ═══════════════════════════════════════════════════════ */
-.page-hero { min-height:300px; background:linear-gradient(135deg,var(--navy),var(--steel),var(--navy)); background-size:200% 200%; animation:heroGradientShift 14s ease infinite; display:flex; align-items:center; padding:calc(var(--nav-h) + 44px) 5% 55px; position:relative; overflow:hidden; }
-@keyframes heroGradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-@media (prefers-reduced-motion: reduce) { .page-hero { animation:none; } }
-.page-hero::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(92,113,176,.025) 40px,rgba(92,113,176,.025) 80px); }
-.page-hero h1 { font-size:clamp(38px,6vw,68px); color:#fff; letter-spacing:2px; margin-bottom:12px; position:relative; }
-.page-hero p  { font-size:16px; color:rgba(255,255,255,.65); max-width:560px; line-height:1.75; position:relative; }
+/* The shifting-gradient background used to animate background-position directly
+   on .page-hero, which forces a full repaint on the main thread every single
+   animation frame, forever (Lighthouse flags this as "non-composited
+   animation" - it's exactly the kind of continuous main-thread work that
+   was preventing PageSpeed from ever seeing the page go idle and closing
+   out its LCP trace, showing NO_LCP even on otherwise-fast pages).
+   Fixed by moving the gradient onto an oversized ::after layer that's
+   animated with `transform: translate()` instead - the compositor can run
+   that entirely on the GPU with zero main-thread repaint work, giving the
+   same visual motion at a fraction of the cost. */
+.page-hero { min-height:300px; background:linear-gradient(135deg,var(--navy),var(--steel),var(--navy)); display:flex; align-items:center; padding:calc(var(--nav-h) + 44px) 5% 55px; position:relative; overflow:hidden; }
+.page-hero::after { content:''; position:absolute; inset:-20%; background:linear-gradient(135deg,var(--navy),var(--steel),var(--navy)); background-size:200% 200%; will-change:transform; animation:heroGradientShift 14s ease infinite; z-index:0; }
+@keyframes heroGradientShift { 0%{transform:translate(0,0)} 50%{transform:translate(-8%,-6%)} 100%{transform:translate(0,0)} }
+@media (prefers-reduced-motion: reduce) { .page-hero::after { animation:none; } }
+.page-hero::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(92,113,176,.025) 40px,rgba(92,113,176,.025) 80px); z-index:1; }
+/* The breadcrumb/h1/p wrapper is a plain unpositioned <div> on every page
+   (one page - projects.html - already patched this inline with the same
+   z-index, which is what gave the game away). Non-positioned content
+   paints BEHIND any positioned sibling with a set z-index per CSS's
+   stacking order, so without this it would end up hidden under the new
+   opaque ::after gradient layer above. */
+.page-hero > div { position:relative; z-index:2; }
+.page-hero h1 { font-size:clamp(38px,6vw,68px); color:#fff; letter-spacing:2px; margin-bottom:12px; position:relative; z-index:2; }
+.page-hero p  { font-size:16px; color:rgba(255,255,255,.65); max-width:560px; line-height:1.75; position:relative; z-index:2; }
 .breadcrumb { display:flex; align-items:center; gap:7px; margin-bottom:14px; font-size:12px; color:rgba(255,255,255,.45); position:relative; }
 .breadcrumb a { color:var(--sky); }
 .breadcrumb a:hover { color:#fff; }
