@@ -796,6 +796,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <button class="nav-btn" data-section="testimonials" onclick="showSection('testimonials')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3.5l2.6 5.4 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.9Z"/></svg></span><span>Testimonials</span> <span id="testimonials-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <button class="nav-btn" data-section="careers" onclick="showSection('careers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8.5" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg></span><span>Careers</span> <span id="careers-nav-badge" class="nav-badge" style="display:none">0</span></button>
+      <button class="nav-btn" data-section="newsletter" onclick="showSection('newsletter')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></span><span>Newsletter</span></button>
       <div class="nav-section">BILLING</div>
       <button class="nav-btn" data-section="invoice-create" onclick="resetInvoiceForm(); showSection('invoice-create')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h12v17l-2-1.3L14 20l-2-1.3L10 20l-2-1.3L6 20Z"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="8.5" y1="11" x2="15.5" y2="11"/><line x1="8.5" y1="14.5" x2="13" y2="14.5"/></svg></span><span>New Invoice</span></button>
       <button class="nav-btn" data-section="invoices" onclick="showSection('invoices')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 9h18"/><rect x="15" y="12" width="4" height="3" rx=".5"/></svg></span><span>Invoices &amp; Payments</span></button>
@@ -1298,6 +1299,36 @@ html.attendance-boot #attendance-screen{display:block!important}
           </div>
           <div id="careers-pagination" class="pagination-wrap"></div>
           <div id="careers-loadmore"></div>
+        </div>
+      </section>
+
+      <!-- NEWSLETTER SIGNUPS -->
+      <section id="newsletter" class="section">
+        <div class="page-header">
+          <div class="page-title">Newsletter</div>
+          <div class="page-sub">Email subscribers from the "Stay Updated" bar on every website page — export this list when you're ready to send a bulk email</div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="newsletter-search-input" class="search-input" placeholder="Search by email..." oninput="handleNewsletterSearchDebounced(this.value)">
+          </div>
+          <button class="btn-export" onclick="exportNewsletterCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">TOTAL SUBSCRIBERS</div><div class="stat-value orange" id="nl-stat-total">—</div></div>
+        </div>
+
+        <div class="table-card">
+          <div style="overflow-x:auto">
+          <table class="data-table mobile-cards">
+            <thead><tr><th>Email</th><th>Source Page</th><th>Subscribed</th><th>Actions</th></tr></thead>
+            <tbody id="newsletter-tbody"><tr><td><span class="skel skel-line" style="width:70%"></span></td><td><span class="skel skel-line" style="width:50%"></span></td><td><span class="skel skel-line" style="width:30%"></span></td><td></td></tr></tbody>
+          </table>
+          </div>
+          <div id="newsletter-pagination" class="pagination-wrap"></div>
+          <div id="newsletter-loadmore"></div>
         </div>
       </section>
 
@@ -2426,6 +2457,7 @@ let allTeam = [];
 let allTickets = [];
 let allTestimonials = [];
 let allJobApplicants = [];
+let allNewsletterSignups = [];
 let allDeletedItems = [];
 let allLabour = [];
 let editingLabourId = null;
@@ -2467,8 +2499,8 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','careers','team','deleted-items','activity-log','employee-profile'],
-  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','careers','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','careers','newsletter','team','deleted-items','activity-log','employee-profile'],
+  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','careers','newsletter','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
   // read access to (see ROLE_READ_ACCESS below). Accounts already gets
@@ -2527,7 +2559,8 @@ const _cache = {
   tickets:{data:null,ts:0,complete:false,lastDoc:null},
   testimonials:{data:null,ts:0,complete:false,lastDoc:null},
   labour:{data:null,ts:0,complete:false,lastDoc:null},
-  jobApplications:{data:null,ts:0,complete:false,lastDoc:null}
+  jobApplications:{data:null,ts:0,complete:false,lastDoc:null},
+  newsletter_signups:{data:null,ts:0,complete:false,lastDoc:null}
 };
 const CACHE_TTL = 45000; // 45s
 
@@ -2585,7 +2618,7 @@ async function getTotalCount(key, colName) {
   } catch(e) { return null; }
 }
 
-async function renderLoadMoreButton(containerId, key, colName, onLoaded) {
+async function renderLoadMoreButton(containerId, key, colName, onLoaded, orderField='createdAt') {
   const el = document.getElementById(containerId);
   if (!el) return;
   const c = _cache[key];
@@ -2602,9 +2635,9 @@ async function renderLoadMoreButton(containerId, key, colName, onLoaded) {
     </div>`;
   document.getElementById(`${containerId}-btn`).onclick = async (ev) => {
     ev.target.disabled = true; ev.target.textContent = 'Loading...';
-    try { await fetchNextPage(key, colName); onLoaded(); }
+    try { await fetchNextPage(key, colName, orderField); onLoaded(); }
     catch(err) { reportError(err); toast('Error while loading: ' + err.message, 'error'); }
-    finally { renderLoadMoreButton(containerId, key, colName, onLoaded); }
+    finally { renderLoadMoreButton(containerId, key, colName, onLoaded, orderField); }
   };
 }
 
@@ -4835,7 +4868,7 @@ function renderSecurityCard() {
 // ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
-  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', careers:'Careers', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', careers:'Careers', newsletter:'Newsletter', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
   labour:'Labour & Wages',
   team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
@@ -4876,6 +4909,7 @@ window.showSection = id => {
   if (id === 'tickets')   loadTickets();
   if (id === 'testimonials') loadTestimonials();
   if (id === 'careers')   loadJobApplicants();
+  if (id === 'newsletter') loadNewsletterSignups();
   if (id === 'labour')    loadLabour();
   if (id === 'team')      loadTeam();
   if (id === 'deleted-items') loadDeletedItems();
@@ -5990,6 +6024,81 @@ window.exportJobApplicantsCSV = async () => {
   ]);
   downloadCSV(`job_applications_${csvDate()}.csv`, csv);
   toast('Job applications CSV downloaded!', 'success');
+};
+
+// ── NEWSLETTER SIGNUPS (public write via newsletter.js, no login) ──
+// Same shape as Leads/Testimonials/Careers: a public form writes with no
+// auth, staff track/export it from here. No per-item status field (unlike
+// Careers/Testimonials/Tickets) — a subscriber is just a subscriber, so
+// there's no badge and no status dropdown, only search + export + remove.
+// IMPORTANT: this collection orders by `created_at` (snake_case, set by
+// newsletter.js), not the `createdAt` every other collection here uses —
+// every fetch/cache/pagination call below passes that explicitly.
+window.loadNewsletterSignups = async () => {
+  try {
+    const { list } = await fetchFirstPage('newsletter_signups', 'newsletter_signups', 'created_at');
+    allNewsletterSignups = list;
+    renderNewsletterSignups('');
+    renderLoadMoreButton('newsletter-loadmore', 'newsletter_signups', 'newsletter_signups', () => {
+      allNewsletterSignups = _cache.newsletter_signups.data;
+      renderNewsletterSignups(document.getElementById('newsletter-search-input')?.value || '', true);
+    }, 'created_at');
+  } catch(e) { reportError(e); showLoadError('newsletter-tbody', 4, e); }
+};
+
+window.handleNewsletterSearch = async (value) => {
+  if (value && !_cache.newsletter_signups.complete) {
+    try { allNewsletterSignups = await fetchCached('newsletter_signups', 'newsletter_signups', 'created_at'); }
+    catch(e) { reportError(e); toast('Failed to load full data for search: ' + e.message, 'error'); }
+  }
+  renderNewsletterSignups(value);
+};
+window.handleNewsletterSearchDebounced = debounce(window.handleNewsletterSearch);
+
+window.renderNewsletterSignups = (search='', keepPage=false) => {
+  const tbody = document.getElementById('newsletter-tbody');
+  let list = allNewsletterSignups;
+  if (search) { const s=search.toLowerCase(); list = list.filter(n => n.email?.toLowerCase().includes(s)); }
+  const { pageItems, page, totalPages, total } = paginateList(list, 'newsletter_signups', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;padding:32px;color:#64748b">No subscribers found</td></tr>`
+    : pageItems.map(n => {
+        const subscribed = n.created_at?.toDate ? n.created_at.toDate().toLocaleDateString('en-IN') : '—';
+        return `<tr>
+        <td data-label="Email"><strong>${esc(n.email)}</strong></td>
+        <td data-label="Source Page">${esc(n.source_page||'—')}</td>
+        <td data-label="Subscribed">${subscribed}</td>
+        <td data-label="Actions" class="action-btns">
+          <button onclick="deleteNewsletterSignup('${n.id}')" class="btn-icon btn-danger" title="Remove Subscriber" aria-label="Remove Subscriber">${ICONS.trash}</button>
+        </td></tr>`;
+      }).join('');
+  renderPaginationControls('newsletter-pagination', 'newsletter_signups', page, totalPages, total);
+  document.getElementById('nl-stat-total').textContent = allNewsletterSignups.length;
+};
+
+window.deleteNewsletterSignup = async (id) => {
+  const ok = await confirmDialog('This will permanently remove this subscriber. This cannot be undone.', { title: 'Remove Subscriber', danger: true, confirmText: 'Remove' });
+  if (!ok) return;
+  try {
+    await deleteDoc(doc(db,'newsletter_signups',id));
+    allNewsletterSignups = allNewsletterSignups.filter(x=>x.id!==id);
+    invalidateCache('newsletter_signups');
+    renderNewsletterSignups(document.getElementById('newsletter-search-input')?.value || '', true);
+    toast('Subscriber removed.', 'success');
+  } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
+};
+
+window.exportNewsletterCSV = async () => {
+  let rows;
+  try { rows = await fetchCached('newsletter_signups', 'newsletter_signups', 'created_at'); }
+  catch(e) { reportError(e); toast('Failed to load data for export: ' + e.message, 'error'); return; }
+  if (!rows.length) { toast('There are no subscribers to export.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Email','email'], ['Source Page','source_page'],
+    ['Subscribed', r => fbDate(r.created_at)]
+  ]);
+  downloadCSV(`newsletter_subscribers_${csvDate()}.csv`, csv);
+  toast('Subscriber list CSV downloaded!', 'success');
 };
 
 // ── LOAD & RENDER ───────────────────────────────────────────────
