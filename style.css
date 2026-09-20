@@ -142,9 +142,14 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .dropdown a:hover { color:var(--accent); background:rgba(10,22,40,.04); padding-left:24px; }
 .nav-cta { background:linear-gradient(135deg,var(--accent-2),var(--accent)); color:#fff; padding:9px 20px; border-radius:6px; font-weight:700; font-size:13px; letter-spacing:.3px; transition:all var(--t); white-space:nowrap; }
 .nav-cta:hover { transform:translateY(-1px); color:#fff; box-shadow:0 10px 24px rgba(241,60,32,.35); }
-.theme-toggle { width:36px; height:36px; border-radius:50%; background:rgba(10,22,40,.06); border:1px solid rgba(10,22,40,.12); cursor:pointer; display:flex; align-items:center; justify-content:center; color:rgba(10,22,40,.7); font-size:16px; transition:all var(--t); flex-shrink:0; }
+/* 44px, not 36px - under the touch-target guideline. */
+.theme-toggle { width:44px; height:44px; border-radius:50%; background:rgba(10,22,40,.06); border:1px solid rgba(10,22,40,.12); cursor:pointer; display:flex; align-items:center; justify-content:center; color:rgba(10,22,40,.7); font-size:16px; transition:all var(--t); flex-shrink:0; }
 .theme-toggle:hover { background:rgba(10,22,40,.12); color:#0a1628; }
-.hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:8px; border-radius:6px; transition:background .2s; }
+/* min-width/min-height:44px, not padding math off the 24px icon - was
+   ~40x34px, under the 44px touch-target guideline, for the button that
+   opens the entire mobile nav. justify/align-items center keeps the
+   icon centered in the larger tap area. */
+.hamburger { display:none; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; background:none; border:none; padding:8px; min-width:44px; min-height:44px; border-radius:6px; transition:background .2s; }
 .hamburger:active { background:rgba(10,22,40,.06); }
 .hamburger span { display:block; width:24px; height:2.5px; background:#0a1628; border-radius:2px; transition:all var(--t); }
 .hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
@@ -286,11 +291,17 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .pg-prev { left:14px; }
 .pg-next { right:14px; }
 .pg-dots { position:absolute; bottom:14px; right:18px; display:flex; gap:6px; z-index:5; }
-.pg-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); cursor:pointer; transition:all .2s; }
+/* Visual dot stays tiny (8px) on purpose - the tap target doesn't have
+   to be. ::before extends the actual clickable area to ~28px without
+   changing anything anyone sees. */
+.pg-dot { position:relative; width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); cursor:pointer; transition:all .2s; }
+.pg-dot::before { content:''; position:absolute; inset:-10px; }
 .pg-dot.active { background:var(--accent); width:22px; border-radius:4px; }
 @media (max-width:768px) {
   .pgallery-slider { aspect-ratio:4/3; border-radius:12px; }
-  .pg-arrow { width:32px; height:32px; font-size:12px; }
+  /* Was 32px - under the 44px minimum touch-target guideline, and
+     mobile is exactly where a smaller tap target hurts most. */
+  .pg-arrow { width:44px; height:44px; font-size:14px; }
   .pg-overlay { padding:14px 16px; }
   .pg-overlay span { font-size:12px; }
 }
@@ -573,7 +584,10 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 #back-to-top.show { opacity:1; visibility:visible; transform:translateY(0); }
 #back-to-top:hover { background:var(--accent,#f13c20); }
 #back-to-top svg { width:20px; height:20px; }
-@media(max-width:768px) { #back-to-top { bottom:16px; left:14px; width:40px; height:40px; } }
+/* Position moves in on small screens, but the tap target itself stays
+   at 44px (the desktop size already was 44px) rather than shrinking to
+   40px - mobile is exactly where it shouldn't get smaller. */
+@media(max-width:768px) { #back-to-top { bottom:16px; left:14px; } }
 
 /* ═══════════════════════════════════════════════════════
    NEWSLETTER SIGNUP BAR (top of footer, site-wide)

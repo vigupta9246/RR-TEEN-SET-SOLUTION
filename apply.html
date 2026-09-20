@@ -37,7 +37,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20260920">
+<link rel="stylesheet" href="style.css?v=20260922">
 <meta name="geo.region" content="IN-DL">
 <meta name="geo.placename" content="Najafgarh, Delhi">
 
@@ -109,8 +109,8 @@
     <div class="cform">
       <form id="careers-form" onsubmit="handleCareersApply(event)" novalidate>
         <div class="frow">
-          <div class="fgroup"><label>Your Name *</label><input type="text" name="name" id="j-name" placeholder="Ramesh Kumar" required></div>
-          <div class="fgroup"><label>Phone / WhatsApp *</label><input type="tel" name="phone" id="j-phone" placeholder="+91 98765 43210" required></div>
+          <div class="fgroup"><label>Your Name *</label><input type="text" name="name" autocomplete="name" id="j-name" placeholder="Ramesh Kumar" required></div>
+          <div class="fgroup"><label>Phone / WhatsApp *</label><input type="tel" name="phone" autocomplete="tel" id="j-phone" placeholder="+91 98765 43210" required></div>
         </div>
         <div class="fgroup"><label>Role Applying For *</label>
           <select name="role" id="j-role" required>
@@ -124,7 +124,7 @@
         </div>
         <div class="frow">
           <div class="fgroup"><label>Experience</label><input type="text" name="experience" id="j-exp" placeholder="e.g. 3 years / Fresher"></div>
-          <div class="fgroup"><label>Your City / Area</label><input type="text" name="city" id="j-city" placeholder="Najafgarh, Dwarka, Noida..."></div>
+          <div class="fgroup"><label>Your City / Area</label><input type="text" name="city" autocomplete="address-level2" id="j-city" placeholder="Najafgarh, Dwarka, Noida..."></div>
         </div>
         <div class="fgroup"><label>Anything Else?</label><textarea name="message" id="j-message" placeholder="ITI certificate, availability, previous work..."></textarea></div>
         <button type="submit" class="submit-btn">📲 Send Application on WhatsApp →</button>
