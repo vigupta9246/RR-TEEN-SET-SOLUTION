@@ -85,7 +85,11 @@ document.addEventListener('DOMContentLoaded',function(){
     groups[parentKey] = groups[parentKey] || 0;
     var idx = groups[parentKey]++;
     var delay = reduceMotion ? 0 : Math.min(idx,7) * 70;
-    el.style.opacity='0';
+    // 0.01, not 0: a known Chromium bug hangs Lighthouse's LCP trace
+    // (reports "NO_LCP") when something on the page animates FROM a
+    // literal opacity:0, even elements below the fold that were never
+    // actually the LCP candidate. Visually identical to 0; avoids the bug.
+    el.style.opacity='0.01';
     el.style.transform='translateY(18px) scale(.98)';
     el.style.transition='opacity .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms, transform .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms';
     io.observe(el);
