@@ -80,15 +80,20 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   },{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
   var groups={};
+  var vh = window.innerHeight || document.documentElement.clientHeight;
   document.querySelectorAll('.scard,.wcard,.tcard,.pstep,.gallery-item').forEach(function(el){
+    // Already visible in the initial viewport (common on a short mobile
+    // screen right under the hero) - never hide it at all. It's already
+    // shown, there's no scroll happening yet to "reveal" it from, and
+    // hiding-then-revealing something that was already on screen is both
+    // pointless and, if that element is the page's LCP candidate, enough
+    // to make Chrome's LCP tracking report "NO_LCP" (a known Chromium bug:
+    // animating the eventual LCP element from opacity:0 breaks the trace).
+    if (el.getBoundingClientRect().top < vh) return;
     var parentKey = el.parentElement ? (el.parentElement.className||'g') : 'g';
     groups[parentKey] = groups[parentKey] || 0;
     var idx = groups[parentKey]++;
     var delay = reduceMotion ? 0 : Math.min(idx,7) * 70;
-    // 0.01, not 0: a known Chromium bug hangs Lighthouse's LCP trace
-    // (reports "NO_LCP") when something on the page animates FROM a
-    // literal opacity:0, even elements below the fold that were never
-    // actually the LCP candidate. Visually identical to 0; avoids the bug.
     el.style.opacity='0.01';
     el.style.transform='translateY(18px) scale(.98)';
     el.style.transition='opacity .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms, transform .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms';
