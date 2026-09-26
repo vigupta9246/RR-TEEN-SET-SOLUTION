@@ -6645,35 +6645,93 @@ window.shareEmail = async id => {
 // the link is only exploitable by someone who has the exact link. Because
 // it reads the SAME live document, status/payments shown to the customer
 // are always current — nothing to keep in sync.
+//
+// ensurePortalLink() is the shared core (token + short code, reused if
+// already minted) — generatePortalLink() (manual "Share" button) and the
+// auto-prompt hooks on invoice-create / work-status-save (below) all call
+// this same function, so every caller reuses one portalCode per record
+// instead of racing to mint separate ones.
+async function ensurePortalLink(type, id) {
+  const isInvoice = type === 'invoice';
+  const record = isInvoice ? allInvoices.find(x=>x.id===id) : allQuotations.find(x=>x.id===id);
+  if (!record) return null;
+  let token = record.portalToken;
+  if (!token) {
+    token = crypto.randomUUID();
+    await updateDoc(doc(db, isInvoice ? 'invoices' : 'quotations', id), { portalToken: token });
+    record.portalToken = token; // keep in-memory cache in sync so re-clicking reuses it
+    invalidateCache(isInvoice ? 'invoices' : 'quotations');
+  }
+  // Short link: a small portalLinks/{code} pointer doc (code = ~62-bit
+  // crypto-random, same bearer-token pattern as tickets/{ticketId}) holds
+  // {type,id,token} so the URL itself only needs the short code — instead
+  // of a ~90-character id+token query string. Reuse the code if this
+  // record was already shared before, so re-sharing doesn't mint a new
+  // link every time.
+  let code = record.portalCode;
+  if (!code) {
+    code = genPortalCode();
+    await setDoc(doc(db, 'portalLinks', code), {
+      type: isInvoice ? 'invoice' : 'quotation', id, token, createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, isInvoice ? 'invoices' : 'quotations', id), { portalCode: code });
+    record.portalCode = code;
+  }
+  return { record, url: `${location.origin}${location.pathname}?p=${code}` };
+}
+
+// Shared one-click "send this on WhatsApp?" prompt used by the manual
+// Share button and the auto-prompt hooks below. confirmMsg is a short
+// summary shown in the dialog; waText is the full formatted message that
+// actually gets sent. wa.me links cannot be sent silently — WhatsApp
+// always requires a human tap on Send in the opened chat — so this is a
+// one-click confirm, not a fully automatic send.
+async function promptSendWhatsApp(phoneRaw, waText, confirmMsg, { title, confirmText = 'Open WhatsApp', cancelText = 'Not Now' } = {}) {
+  let phone = (phoneRaw || '').replace(/\D/g, '');
+  if (!phone) return false;
+  if (phone.length === 10) phone = '91' + phone;
+  const send = await confirmDialog(confirmMsg, { title, confirmText, cancelText });
+  if (send) window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waText)}`, '_blank');
+  return send;
+}
+
+const WORK_STAGE_LABELS = ['Order Confirmed', 'Material Procurement', 'Fabrication In Progress', 'Ready For Delivery', 'Delivered / Erection In Progress', 'Completed'];
+
+// Auto-prompt fired right after a NEW invoice is created (saveInvoice) —
+// the "order confirmed" moment. Mints the portal link immediately instead
+// of waiting for staff to find the separate Share button later.
+async function notifyOrderConfirmed(invoiceId) {
+  try {
+    const link = await ensurePortalLink('invoice', invoiceId);
+    if (!link) return;
+    const { record, url } = link;
+    const msg = `🏗️ *R.R Teen Set Solution*\n\nHello ${record.cname}, aapka order *${record.invId}* confirm ho gaya hai!\n\nAap apne order ka live status, photos aur invoice kabhi bhi yahan dekh sakte hain:\n${url}\n\n📞 Call/WhatsApp: +91 85272 58462`;
+    await promptSendWhatsApp(record.cphone, msg, `Send the portal link to ${record.cname} on WhatsApp now?`, { title: 'Order Confirmed' });
+  } catch (e) { reportError(e); }
+}
+
+// Auto-prompt fired right after Work Progress is saved (saveWorkStatus).
+async function notifyStageChange(invoiceId, workStage, workNote) {
+  try {
+    const link = await ensurePortalLink('invoice', invoiceId);
+    if (!link) return;
+    const { record, url } = link;
+    const stageLabel = WORK_STAGE_LABELS[workStage] || WORK_STAGE_LABELS[0];
+    const noteLine = workNote ? `\n${workNote}\n` : '\n';
+    const msg = `🏗️ *R.R Teen Set Solution*\n\nHello ${record.cname}, update on your order *${record.invId}*:\n\n📍 Current Stage: *${stageLabel}*${noteLine}\nLive status & photos:\n${url}\n\n📞 Call/WhatsApp: +91 85272 58462`;
+    await promptSendWhatsApp(record.cphone, msg, `Send this "${stageLabel}" update to ${record.cname} on WhatsApp now?`, { title: 'Progress Update' });
+  } catch (e) { reportError(e); }
+}
+
 window.generatePortalLink = async (type, id) => {
   const isInvoice = type === 'invoice';
   const record = isInvoice ? allInvoices.find(x=>x.id===id) : allQuotations.find(x=>x.id===id);
   if (!record) return;
   if (!isInvoice && record.isDraft) { toast('Finalize this quotation before sharing a customer link.', 'warning'); return; }
   try {
-    let token = record.portalToken;
-    if (!token) {
-      token = crypto.randomUUID();
-      await updateDoc(doc(db, isInvoice ? 'invoices' : 'quotations', id), { portalToken: token });
-      record.portalToken = token; // keep in-memory cache in sync so re-clicking reuses it
-      invalidateCache(isInvoice ? 'invoices' : 'quotations');
-    }
-    // Short link: a small portalLinks/{code} pointer doc (code = ~62-bit
-    // crypto-random, same bearer-token pattern as tickets/{ticketId}) holds
-    // {type,id,token} so the URL itself only needs the short code — instead
-    // of a ~90-character id+token query string. Reuse the code if this
-    // record was already shared before, so re-sharing doesn't mint a new
-    // link every time.
-    let code = record.portalCode;
-    if (!code) {
-      code = genPortalCode();
-      await setDoc(doc(db, 'portalLinks', code), {
-        type: isInvoice ? 'invoice' : 'quotation', id, token, createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, isInvoice ? 'invoices' : 'quotations', id), { portalCode: code });
-      record.portalCode = code;
-    }
-    const url = `${location.origin}${location.pathname}?p=${code}`;
+    const link = await ensurePortalLink(type, id);
+    if (!link) return;
+    const { url } = link;
     let copied = false;
     try { await navigator.clipboard.writeText(url); copied = true; } catch(e) {}
     const send = await confirmDialog(
@@ -7010,6 +7068,7 @@ window.saveInvoice = async () => {
   };
   const btn = document.getElementById('inv-save-btn');
   setBtnLoading(btn, true, 'Saving...');
+  let newInvoiceId = null;
   try {
     if (editingInvoiceId) {
       data.invId = g('i-invid'); // editing never renumbers — GST invoice numbers must stay fixed once issued
@@ -7017,7 +7076,14 @@ window.saveInvoice = async () => {
       editingInvoiceId = null;
     } else {
       data.invId = await getNextInvoiceNumber(); // assigned atomically, exactly once, right before save
-      await addDoc(collection(db,'invoices'), { ...data, amountPaid: 0, status: 'unpaid', createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() });
+      const newInvoiceData = { ...data, amountPaid: 0, status: 'unpaid', createdBy: auth.currentUser?.email || null, branch: BRANCH, createdAt: serverTimestamp() };
+      const ref = await addDoc(collection(db,'invoices'), newInvoiceData);
+      newInvoiceId = ref.id;
+      // Seed the in-memory cache with this record right away (rather than
+      // re-fetching from Firestore) so the "order confirmed" WhatsApp
+      // prompt below — via ensurePortalLink's allInvoices lookup — can find
+      // it immediately, with no dependency on cache-refresh timing.
+      allInvoices.unshift({ id: newInvoiceId, ...newInvoiceData });
       // NOTE: silently no-ops for the Accounts role today — the customers
       // collection's write rule is Admin/Sales only, so an Accounts-created
       // invoice won't bump the customer's totalInvoices count unless that
@@ -7032,6 +7098,8 @@ window.saveInvoice = async () => {
       id: data.invId
     });
     resetInvoiceForm(); showSection('invoices');
+    // "Order confirmed" moment — only for a brand-new invoice, not an edit.
+    if (newInvoiceId) await notifyOrderConfirmed(newInvoiceId);
   } catch(e) {
     setBtnLoading(btn, false);
     reportError(e); toast('Error: ' + e.message, 'error');
@@ -7274,11 +7342,13 @@ window.saveWorkStatus = async () => {
   const workStage = parseInt(document.getElementById('ws-stage').value, 10) || 0;
   const workNote = document.getElementById('ws-note').value.trim();
   try {
-    await updateDoc(doc(db,'invoices',activeWorkStatusInvoiceId), { workStage, workNote, updatedAt: serverTimestamp() });
+    const invId = activeWorkStatusInvoiceId;
+    await updateDoc(doc(db,'invoices',invId), { workStage, workNote, updatedAt: serverTimestamp() });
     toast('Work progress updated!', 'success');
     invalidateCache('invoices');
     closeWorkStatusModal();
     loadInvoices();
+    await notifyStageChange(invId, workStage, workNote);
   } catch(e) { reportError(e); toast('Error: ' + e.message, 'error'); }
 };
 
