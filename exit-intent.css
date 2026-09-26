@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════
+   Exit-Intent Popup — styles for exit-intent.js
+═══════════════════════════════════════════════════════════ */
+#exit-intent-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 22, 40, .58);
+  z-index: 99400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+#exit-intent-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+#exit-intent-card {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  max-width: 380px;
+  width: 100%;
+  padding: 32px 26px 26px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(10, 22, 40, .35);
+  transform: scale(.92) translateY(10px);
+  transition: transform .28s cubic-bezier(.25, .8, .25, 1);
+  font-family: inherit;
+}
+#exit-intent-overlay.open #exit-intent-card {
+  transform: scale(1) translateY(0);
+}
+#exit-intent-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+}
+#exit-intent-close:hover { color: #0a1628; }
+#exit-intent-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+#exit-intent-card h3 {
+  font-size: 21px;
+  color: var(--navy, #16264f);
+  margin: 0 0 10px;
+  letter-spacing: .2px;
+}
+#exit-intent-card p {
+  font-size: 14px;
+  color: var(--text-muted, #64748b);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+#exit-intent-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  background: #25D366;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(37, 211, 102, .35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+#exit-intent-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(37, 211, 102, .45);
+}
+#exit-intent-dismiss {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted, #64748b);
+  font-size: 12.5px;
+  margin-top: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+#exit-intent-dismiss:hover { color: var(--navy, #16264f); }
+
+@media (max-width: 420px) {
+  #exit-intent-card { padding: 28px 20px 22px; }
+  #exit-intent-card h3 { font-size: 19px; }
+}
