@@ -107,6 +107,14 @@
 .proj-item.proj-hidden { display: none !important; }
 .proj-filter-empty { text-align: center; color: var(--text-muted, #64748b); font-size: 14px; margin: -8px 0 28px; }
 
+/* Video grid */
+.proj-video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px 16px; }
+.proj-video-card .video-facade { position: relative; aspect-ratio: 9/16; border-radius: 14px; overflow: hidden; cursor: pointer; background: #000; box-shadow: 0 6px 18px rgba(10,22,40,.15); }
+.proj-video-card .video-facade img { width: 100%; height: 100%; object-fit: cover; }
+.proj-video-card .video-play-badge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.2); }
+.proj-video-card .video-play-badge div { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+.proj-video-card p { text-align: center; margin-top: 10px; font-size: 12.5px; color: var(--text-muted, #64748b); }
+
 /* Gallery grid */
 .proj-gallery {
   display: grid;
@@ -328,8 +336,62 @@
     <button type="button" class="proj-filter-chip" data-filter="warehouse">Warehouse</button>
     <button type="button" class="proj-filter-chip" data-filter="rooftop">Rooftop &amp; Residential</button>
     <button type="button" class="proj-filter-chip" data-filter="agricultural">Agricultural</button>
+    <button type="button" class="proj-filter-chip" data-filter="videos">🎥 Videos</button>
   </div>
   <p class="proj-filter-empty" id="proj-filter-empty" style="display:none">Is category mein filhaal koi photo nahi hai — jaldi update karenge.</p>
+
+  <!-- Video grid — real site work videos, shown when "Videos" filter is picked -->
+  <div class="proj-video-grid" id="proj-videos" style="display:none">
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="Oy3UQuf9Kwg" data-video-title="Tin Shed Roof Installation Process" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/Oy3UQuf9Kwg/hqdefault.jpg" alt="Tin shed roof installation with blue profile sheets - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Roof Installation — Blue Profile Sheets</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="D845rL-C5IE" data-video-title="Tin Shed Repair - Roof Sheet Replacement" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/D845rL-C5IE/hqdefault.jpg" alt="Old tin shed roof repair and sheet replacement - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Old Shed Repair — Roof Sheet Replacement</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="Qph-w-vikR4" data-video-title="Wind Turbine Roof Ventilator Installation" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/Qph-w-vikR4/hqdefault.jpg" alt="Wind turbine roof ventilator installation on factory shed - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Wind Turbine Roof Ventilator Fitting</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="uSHGDI_48TE" data-video-title="Industrial Shed Construction Work" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/uSHGDI_48TE/hqdefault.jpg" alt="Industrial shed construction and warehouse interior setup - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Industrial Shed &amp; Warehouse Interior Work</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="krRysUFi9hI" data-video-title="Wall Cladding Sheet Installation on Steel Frame Structure" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/krRysUFi9hI/hqdefault.jpg" alt="Wall cladding sheet installation on steel frame structure - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Wall Cladding on Steel Frame Structure</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="8AqxX3_B_Bc" data-video-title="Roofing Sheet Screw Fitting - Leak-Proof Self-Drilling Screws" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/8AqxX3_B_Bc/hqdefault.jpg" alt="Roofing sheet screw fitting with leak-proof self-drilling screws - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>Leak-Proof Self-Drilling Screw Fitting</p>
+    </div>
+    <div class="proj-video-card">
+      <div class="video-facade" data-video-id="zMkjC-DxVB4" data-video-title="Old Tin Sheet Replacement - New White Profile Roofing Sheet Fitting" onclick="loadYTVideo(this)">
+        <img src="https://i.ytimg.com/vi/zMkjC-DxVB4/hqdefault.jpg" alt="Old tin sheet replaced with new white profile roofing sheet - video thumbnail" loading="lazy">
+        <div class="video-play-badge"><div><svg width="20" height="20" viewBox="0 0 24 24" fill="#16264f"><path d="M8 5v14l11-7z"/></svg></div></div>
+      </div>
+      <p>New White Profile Sheet Fitting</p>
+    </div>
+  </div>
 
   <!-- Gallery — mosaic layout -->
   <div class="proj-gallery" id="proj-gallery">
@@ -715,6 +777,8 @@
     var filterBar = document.getElementById('proj-filters');
     var items = Array.prototype.slice.call(document.querySelectorAll('#proj-gallery .proj-item'));
     var emptyMsg = document.getElementById('proj-filter-empty');
+    var photoGrid = document.getElementById('proj-gallery');
+    var videoGrid = document.getElementById('proj-videos');
     if (filterBar && items.length) {
       filterBar.addEventListener('click', function (e) {
         var chip = e.target.closest('.proj-filter-chip');
@@ -722,6 +786,16 @@
         filterBar.querySelectorAll('.proj-filter-chip').forEach(function (c) { c.classList.remove('active'); });
         chip.classList.add('active');
         var filter = chip.getAttribute('data-filter');
+
+        if (filter === 'videos') {
+          if (photoGrid) photoGrid.style.display = 'none';
+          if (videoGrid) videoGrid.style.display = 'grid';
+          if (emptyMsg) emptyMsg.style.display = 'none';
+          return;
+        }
+        if (photoGrid) photoGrid.style.display = 'grid';
+        if (videoGrid) videoGrid.style.display = 'none';
+
         var visibleCount = 0;
         items.forEach(function (item) {
           var cats = (item.getAttribute('data-cat') || '').split(' ');
