@@ -454,6 +454,10 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 #chatbot-typing span:nth-child(3) { animation-delay:.3s; }
 @keyframes chatbotTyping { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
 
+#chatbot-quick-replies { display:flex; gap:7px; padding:10px 12px 0; overflow-x:auto; flex-shrink:0; scrollbar-width:none; }
+#chatbot-quick-replies::-webkit-scrollbar { display:none; }
+.chatbot-qr-chip { flex:0 0 auto; background:#eef2f8; color:var(--navy,#16264f); border:1px solid rgba(10,22,40,.08); border-radius:999px; padding:7px 13px; font-size:12.5px; font-weight:600; white-space:nowrap; cursor:pointer; transition:background .15s, transform .15s; }
+.chatbot-qr-chip:hover { background:#e2e8f5; transform:translateY(-1px); }
 #chatbot-input-row { display:flex; gap:8px; padding:12px; border-top:1px solid rgba(10,22,40,.07); background:#fff; flex-shrink:0; }
 #chatbot-input { flex:1; border:1.5px solid var(--border); border-radius:22px; padding:10px 16px; font-size:16px; outline:none; transition:border-color .2s, box-shadow .2s; }
 #chatbot-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(21,101,192,.1); }

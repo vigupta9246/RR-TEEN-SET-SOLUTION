@@ -21,6 +21,17 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
   let isOpen = false;
   let isSending = false;
 
+  // Quick-reply chips — one tap for the most common questions, so
+  // visitors don't have to type. `text` is what actually gets sent to
+  // the AI (same as typing it manually); `href` (if present) instead
+  // navigates the page, for the one chip that jumps to the calculator.
+  const QUICK_REPLIES = [
+    { label: '💰 Price batao', text: 'Aapke shed/structure ka price kya rehta hai, approx?' },
+    { label: '📍 Location batao', text: 'Aap kis area mein service dete hain?' },
+    { label: '🧮 Calculator kholo', href: 'shed-cost-calculator.html' },
+    { label: '📞 Callback chahiye', text: 'Mujhe callback chahiye, koi mujhe call kar de please.' }
+  ];
+
   function el(html) {
     const t = document.createElement('template');
     t.innerHTML = html.trim();
@@ -60,6 +71,7 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
         </div>
         <div id="chatbot-messages"></div>
         <div id="chatbot-typing"><span></span><span></span><span></span></div>
+        <div id="chatbot-quick-replies"></div>
         <div id="chatbot-input-row">
           <input type="text" id="chatbot-input" placeholder="Apna sawal likhein..." maxlength="500">
           <button id="chatbot-send-btn" aria-label="Send">
@@ -122,6 +134,19 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  function renderQuickReplies() {
+    const wrap = document.getElementById('chatbot-quick-replies');
+    if (!wrap || wrap.childElementCount) return; // render once
+    QUICK_REPLIES.forEach(qr => {
+      const chip = el(`<button type="button" class="chatbot-qr-chip">${esc(qr.label)}</button>`);
+      chip.addEventListener('click', () => {
+        if (qr.href) { window.location.href = qr.href; return; }
+        sendMessage(qr.text);
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
   function setTyping(show) {
     document.getElementById('chatbot-typing').style.display = show ? 'flex' : 'none';
     if (show) {
@@ -165,6 +190,7 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
     document.getElementById('chatbot-ai-badge').style.display = isOpen ? 'none' : '';
     if (isOpen && history.length === 0) {
       addMessage('model', WELCOME_MSG);
+      renderQuickReplies();
     }
     if (isOpen) document.getElementById('chatbot-input').focus();
   }

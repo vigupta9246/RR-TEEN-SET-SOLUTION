@@ -361,6 +361,20 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .result-price{font-family:'Bebas Neue',sans-serif;font-size:48px;color:#ff8c00;letter-spacing:1px;margin:0 0 6px;line-height:1;text-shadow:0 0 24px rgba(255,140,0,.25)}
 .result-sub{font-size:12px;color:rgba(255,255,255,.5);margin:0}
 .result-breakdown{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.cost-chart{margin-top:16px}
+.cc-title{font-size:12px;color:var(--text-muted,#64748b);margin:0 0 8px;font-weight:600}
+.cc-bar{display:flex;width:100%;height:10px;border-radius:6px;overflow:hidden;background:#eef1f6}
+.cc-seg{height:100%;transition:width .4s cubic-bezier(.25,.8,.25,1)}
+.cc-seg-mat{background:#ff6f00}
+.cc-seg-lab{background:#4056a1}
+.cc-seg-add{background:#25D366}
+.cc-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:9px}
+.cc-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted,#64748b)}
+.cc-item b{color:var(--text,#0a1628);font-weight:700}
+.cc-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cc-dot-mat{background:#ff6f00}
+.cc-dot-lab{background:#4056a1}
+.cc-dot-add{background:#25D366}
 .rb-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px}
 .rb-lbl{font-size:10px;color:rgba(255,255,255,.5);margin:0 0 4px;text-transform:uppercase;letter-spacing:.5px}
 .rb-val{font-size:15px;font-weight:700;color:#ffffff;margin:0}
@@ -945,6 +959,22 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
         <div class="rb-card"><p class="rb-lbl">Material cost</p><p class="rb-val" id="rb-mat">₹2.8L–3.5L</p></div>
         <div class="rb-card"><p class="rb-lbl">Labour + misc</p><p class="rb-val" id="rb-lab">₹0.8L–0.9L</p></div>
       </div>
+
+      <!-- COST BREAKDOWN CHART -->
+      <div class="cost-chart" id="cost-chart">
+        <p class="cc-title">Cost kahan jaata hai</p>
+        <div class="cc-bar">
+          <div class="cc-seg cc-seg-mat" id="cc-seg-mat" style="width:70%"></div>
+          <div class="cc-seg cc-seg-lab" id="cc-seg-lab" style="width:22%"></div>
+          <div class="cc-seg cc-seg-add" id="cc-seg-add" style="width:8%"></div>
+        </div>
+        <div class="cc-legend">
+          <span class="cc-item"><i class="cc-dot cc-dot-mat"></i>Material <b id="cc-pct-mat">70%</b></span>
+          <span class="cc-item"><i class="cc-dot cc-dot-lab"></i>Labour <b id="cc-pct-lab">22%</b></span>
+          <span class="cc-item" id="cc-item-add"><i class="cc-dot cc-dot-add"></i>Add-ons <b id="cc-pct-add">8%</b></span>
+        </div>
+      </div>
+
       <div class="gst-row">
         <span class="gst-toggle-lbl" id="gst-toggle-lbl" onclick="toggleGST()"><span class="gst-switch"></span> GST @18% included</span>
         <span class="gst-amount" id="gst-amount">+₹0</span>
@@ -975,6 +1005,9 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
   <!-- PDF DOWNLOAD CTA -->
   <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
+
+  <!-- EMAIL QUOTE — save for later -->
+  <button class="xbtn xbtn-pdf" id="email-quote-btn" onclick="emailQuote()" style="margin-top:8px;background:#fff;border:1.5px solid #4056a1;color:#4056a1"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Email Karke Save Kar Lein</span></button>
 
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
@@ -1852,6 +1885,25 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     document.getElementById('rb-mat').textContent=fmt(mLo)+'–'+fmt(mHi);
     document.getElementById('rb-lab').textContent=fmt(lLo)+'–'+fmt(lHi);
     document.getElementById('gst-amount').textContent='+'+fmt(gstLo)+'–'+fmt(gstHi);
+
+    /* Cost breakdown chart — material vs pure labour vs add-ons, as % of pre-GST total */
+    (function(){
+      var matAvg=(mLo+mHi)/2;
+      var pureLabAvg=((lLo-addons)+(lHi-addons))/2;
+      var addAvg=addons;
+      var totalAvg=matAvg+pureLabAvg+addAvg;
+      if(totalAvg<=0)return;
+      var matPct=Math.round(matAvg/totalAvg*100);
+      var addPct=addAvg>0?Math.round(addAvg/totalAvg*100):0;
+      var labPct=100-matPct-addPct;
+      document.getElementById('cc-seg-mat').style.width=matPct+'%';
+      document.getElementById('cc-seg-lab').style.width=labPct+'%';
+      document.getElementById('cc-seg-add').style.width=addPct+'%';
+      document.getElementById('cc-pct-mat').textContent=matPct+'%';
+      document.getElementById('cc-pct-lab').textContent=labPct+'%';
+      document.getElementById('cc-pct-add').textContent=addPct+'%';
+      document.getElementById('cc-item-add').style.display=addAvg>0?'':'none';
+    })();
     updateValueTier(rate,r);
     lastFinalLo=finalLo;lastFinalHi=finalHi;
     updateEMI();
@@ -1871,8 +1923,17 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     var gstLine=gstIncluded?' (GST incl.)':' (GST extra)';
     var msg='Hello R.R Teen Set Solution!\n\nMujhe '+r.label+' chahiye.\n📐 Size: '+len+' × '+wid+' feet\n📊 Height: '+ht+' feet'+addonLine+'\n💰 Estimated Budget: '+fmt(finalLo)+' – '+fmt(finalHi)+gstLine+'\n\nPlease free site visit aur detailed quote arrange karein.\nThank you!';
     document.getElementById('cta-wa-btn').href='https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(msg);
+    window.lastQuoteMsg=msg;
 
     saveState();
+  };
+
+  /* ── EMAIL QUOTE — opens visitor's own mail app with the quote pre-filled,
+     so they can send it to themselves or forward it, no backend needed ── */
+  window.emailQuote=function(){
+    var subject='Mera Shed Cost Estimate — R.R Teen Set Solution';
+    var body=(window.lastQuoteMsg||'Estimate dekhne ke liye calculator use karein: '+location.href)+'\n\n'+location.href;
+    window.location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   };
 
   /* ── LEAD FORM SUBMIT ── */
