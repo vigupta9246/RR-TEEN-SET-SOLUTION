@@ -168,7 +168,7 @@
         <label>Add a Photo (optional)</label>
         <div id="r-photo-drop" style="border:1.5px dashed var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#f4f6fa" onclick="document.getElementById('r-photo-input').click()">
           <div id="r-photo-placeholder" style="font-size:13px;color:var(--muted)">📷 Tap to add a photo of the completed shed</div>
-          <img id="r-photo-preview" class="hidden" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:6px">
+          <img id="r-photo-preview" class="hidden" alt="Preview of your uploaded photo" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:6px">
           <div id="r-photo-uploading" class="hidden" style="font-size:12.5px;color:var(--blue);margin-top:6px">Uploading…</div>
         </div>
         <input type="file" id="r-photo-input" accept="image/*" class="hidden" onchange="handleReviewPhotoSelect(this.files)">
