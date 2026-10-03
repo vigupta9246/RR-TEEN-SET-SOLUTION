@@ -586,6 +586,20 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 @keyframes xspin360r{to{transform:scaleX(-1) rotate(-360deg)}}
 .pv-hint{font-size:10px;color:rgba(10,22,40,.4);display:flex;align-items:center;gap:4px;letter-spacing:.2px;user-select:none;transition:opacity .4s ease}
 
+/* 3D canvas ? keeps the old SVG's 340:185 frame so the surrounding card
+   layout (already tuned/tested) doesn't need to change */
+#pshed{width:100%;aspect-ratio:340/185;display:block;border-radius:10px;touch-action:none;cursor:grab}
+#pshed:active{cursor:grabbing}
+.preview-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#f7f3e8,#efe2ba);border-radius:10px;transition:opacity .3s ease;pointer-events:none}
+.preview-loading.is-hidden{opacity:0}
+.preview-spinner{width:26px;height:26px;border:3px solid rgba(255,111,0,.2);border-top-color:#ff6f00;border-radius:50%;animation:xspin .8s linear infinite}
+@keyframes xspin{to{transform:rotate(360deg)}}
+/* Camera view presets ? small, secondary row under the main rotate controls */
+.preview-view-presets{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.pv-preset-btn{background:#ffffff;border:1.5px solid rgba(10,22,40,.1);color:rgba(10,22,40,.55);font-size:10.5px;font-weight:700;letter-spacing:.2px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
+.pv-preset-btn:hover{border-color:rgba(255,111,0,.4);color:#ff6f00}
+.pv-preset-btn.is-active{background:#ff6f00;border-color:#ff6f00;color:#fff}
+
 /* Confetti */
 .confetti-piece{position:fixed;top:-10px;width:8px;height:8px;pointer-events:none;z-index:200;border-radius:1px;animation:xconfetti linear forwards}
 @keyframes xconfetti{to{transform:translateY(105vh) rotate(540deg);opacity:.4}}
@@ -833,45 +847,8 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     <div class="preview-addon-chips" id="preview-addon-chips"></div>
     <div class="preview-tilt-stage" id="preview-tilt-stage">
       <div class="preview-tilt-inner" id="preview-tilt-inner">
-        <svg id="pshed" viewBox="0 0 340 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-          <defs>
-            <radialGradient id="pshedBgGrad" cx="50%" cy="34%" r="80%">
-              <stop offset="0%" stop-color="#fdf9f0"/>
-              <stop offset="45%" stop-color="#eef1f6"/>
-              <stop offset="100%" stop-color="#c7d0e0"/>
-            </radialGradient>
-            <linearGradient id="pshedFloorGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#c7d0e0" stop-opacity="0"/>
-              <stop offset="100%" stop-color="#8a97b5" stop-opacity="0.55"/>
-            </linearGradient>
-            <pattern id="pshedGrid" width="22" height="22" patternUnits="userSpaceOnUse">
-              <path d="M22 0H0V22" fill="none" stroke="rgba(10,22,40,0.05)" stroke-width="1"/>
-            </pattern>
-            <linearGradient id="pshedEaveGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop id="pshedEaveGradTop" offset="0%" stop-color="#1976D2"/>
-              <stop id="pshedEaveGradBot" offset="100%" stop-color="#0D47A1"/>
-            </linearGradient>
-            <linearGradient id="pshedEndGrad" x1="0" y1="0" x2="1" y2="0.3">
-              <stop id="pshedEndGradTop" offset="0%" stop-color="#0D47A1"/>
-              <stop id="pshedEndGradBot" offset="100%" stop-color="#082f6e"/>
-            </linearGradient>
-            <linearGradient id="pshedRoofGrad" x1="0" y1="0" x2="0.5" y2="1">
-              <stop id="pshedRoofGradTop" offset="0%" stop-color="#607D8B"/>
-              <stop id="pshedRoofGradBot" offset="100%" stop-color="#37474F"/>
-            </linearGradient>
-            <filter id="pshedDropShadow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#0a1628" flood-opacity="0.32"/>
-            </filter>
-          </defs>
-          <rect width="340" height="185" fill="url(#pshedBgGrad)"/>
-          <rect width="340" height="185" fill="url(#pshedGrid)"/>
-          <rect y="118" width="340" height="67" fill="url(#pshedFloorGrad)"/>
-          <ellipse cx="170" cy="172" rx="138" ry="11" fill="rgba(10,22,40,0.15)" id="pshed-shadow"/>
-          <g id="pshed-g" filter="url(#pshedDropShadow)"></g>
-          <text id="plbl-len" font-size="9" fill="#ff6f00" font-family="sans-serif" text-anchor="middle"></text>
-          <text id="plbl-ht" font-size="9" fill="rgba(10,22,40,0.45)" font-family="sans-serif" text-anchor="middle"></text>
-          <line id="pdim-line" stroke="#ff6f00" stroke-width="0.5" opacity="0.45" stroke-dasharray="3,2"/>
-        </svg>
+        <canvas id="pshed" aria-label="3D preview of your shed, updates live as you set dimensions"></canvas>
+        <div class="preview-loading" id="preview-loading"><span class="preview-spinner"></span></div>
       </div>
     </div>
     <div class="preview-controls">
@@ -879,6 +856,12 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
       <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
       <span class="pv-hint"><svg class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
       <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+    </div>
+    <div class="preview-view-presets" id="preview-view-presets">
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('front')">Front</button>
+      <button type="button" class="pv-preset-btn is-active" onclick="setCameraPreset('iso')">3/4</button>
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('side')">Side</button>
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('top')">Top</button>
     </div>
   </div>
 
@@ -1258,6 +1241,34 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
   var dispLen=50,dispWid=40,dispHt=14; /* smoothly-animated display values */
   var animRAF=null;
 
+  /* ── 3D ENGINE BOOTSTRAP ──────────────────────────────────────────
+     Loads three.js (self-hosted in /vendor, same pattern as fusejs/
+     glightbox) as an ES module via a dynamic import from inside this
+     classic script — keeps the whole calculator in one script/one
+     scope instead of splitting state across a module + classic script.
+     renderShed() below is called from many places (slider oninput,
+     addon toggles, the page-load init at the bottom of this file) —
+     some of those can fire before this import resolves, so renderShed
+     just remembers the last requested dimensions and threeInit()
+     flushes that pending render once the engine is actually ready. */
+  var THREE=null, threeReady=false, pendingRenderArgs=null;
+  var shedEngine=null; /* set once threeReady — { scene,camera,renderer,... } */
+  async function threeInit(){
+    try{
+      THREE=await import('./vendor/three/three.module.min.js');
+    }catch(e){
+      var loading=document.getElementById('preview-loading');
+      if(loading)loading.innerHTML='<span style="font-size:11px;color:rgba(10,22,40,.5);padding:0 20px;text-align:center">3D preview couldn\'t load ? the calculator below still works fine.</span>';
+      return;
+    }
+    shedEngine=buildShedEngine(THREE);
+    threeReady=true;
+    var loadingEl=document.getElementById('preview-loading');
+    if(loadingEl)loadingEl.classList.add('is-hidden');
+    if(pendingRenderArgs){renderShed(pendingRenderArgs[0],pendingRenderArgs[1],pendingRenderArgs[2]);pendingRenderArgs=null;}
+  }
+  threeInit();
+
   /* ── GEOLOCATION AUTO-DETECT ── */
   var NCR_ZONES=[
     {value:'1',    name:'Delhi / Najafgarh',       lat:28.6139, lon:77.2090},
@@ -1552,96 +1563,6 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     calcSelect('tin');
   };
 
-  /* ── ROTATION STATE (continuous, radians) ── */
-  var theta=-0.5;      /* current rotation angle */
-  var thetaTarget=-0.5;
-  var thetaRAF=null;
-  var autoRotateOn=true;
-  var manualDragActive=false;
-  var lastInteraction=0;
-
-  function animateTheta(){
-    if(thetaRAF)cancelAnimationFrame(thetaRAF);
-    function step(){
-      var diff=thetaTarget-theta;
-      theta+=diff*0.18;
-      renderShed(dispLen,dispWid,dispHt);
-      if(Math.abs(diff)>0.002){thetaRAF=requestAnimationFrame(step);}
-      else{theta=thetaTarget;renderShed(dispLen,dispWid,dispHt);thetaRAF=null;}
-    }
-    thetaRAF=requestAnimationFrame(step);
-  }
-
-  /* ── ROTATE BUTTONS — nudge by a fixed step, smoothly ── */
-  window.rotateView=function(dir){
-    lastInteraction=Date.now();
-    haptic(8);
-    thetaTarget+=dir*(Math.PI/4);
-    animateTheta();
-    var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
-    if(btnEl){btnEl.classList.add('is-spinning');setTimeout(function(){btnEl.classList.remove('is-spinning');},400);}
-  };
-
-  /* ── AUTO-ROTATE — idle showcase spin, pauses on any manual interaction and
-     resumes a couple seconds after the visitor lets go. Runs as one continuous
-     RAF loop so it never fights with the drag/button rotation animations. ── */
-  function startAutoRotateLoop(){
-    function step(){
-      var idleLongEnough=(Date.now()-lastInteraction)>2200;
-      if(autoRotateOn&&!manualDragActive&&idleLongEnough&&!thetaRAF){
-        theta+=0.0028;
-        thetaTarget=theta;
-        renderShed(dispLen,dispWid,dispHt);
-      }
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  window.toggleAutoRotate=function(){
-    autoRotateOn=!autoRotateOn;
-    lastInteraction=autoRotateOn?0:Date.now(); /* resume immediately on next frame if turned back on */
-    var icon=document.getElementById('pv-auto-icon');
-    if(icon)icon.setAttribute('href',autoRotateOn?'#i-pause':'#i-play');
-    var btn=document.getElementById('pv-auto-toggle');
-    if(btn)btn.setAttribute('aria-label',autoRotateOn?'Pause auto-rotate':'Resume auto-rotate');
-  };
-
-  /* ── DRAG-TO-ROTATE — full continuous 360° ── */
-  function initDragRotate(){
-    var stage=document.getElementById('preview-tilt-stage');
-    if(!stage)return;
-    var dragging=false,lastX=0,pendingDx=0,frameQueued=false,hint=document.querySelector('.pv-hint');
-    function onDown(x){dragging=true;manualDragActive=true;lastInteraction=Date.now();lastX=x;pendingDx=0;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
-    function flush(){
-      frameQueued=false;
-      if(pendingDx===0)return;
-      theta+=pendingDx*0.012;thetaTarget=theta;pendingDx=0;
-      renderShed(dispLen,dispWid,dispHt);
-    }
-    function onMove(x){
-      if(!dragging)return;
-      lastInteraction=Date.now();
-      pendingDx+=x-lastX;lastX=x;
-      if(!frameQueued){frameQueued=true;requestAnimationFrame(flush);}
-    }
-    function onUp(){dragging=false;manualDragActive=false;lastInteraction=Date.now();stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
-    stage.style.cursor='grab';
-    stage.addEventListener('mousedown',function(e){onDown(e.clientX);e.preventDefault();});
-    window.addEventListener('mousemove',function(e){if(dragging)onMove(e.clientX);});
-    window.addEventListener('mouseup',onUp);
-    stage.addEventListener('touchstart',function(e){if(e.touches&&e.touches[0])onDown(e.touches[0].clientX);},{passive:true});
-    stage.addEventListener('touchmove',function(e){if(e.touches&&e.touches[0]){onMove(e.touches[0].clientX);e.preventDefault();}},{passive:false});
-    stage.addEventListener('touchend',onUp);
-  }
-
-  /* ── SVG HELPERS ── */
-  function svgEl(tag,attrs){
-    var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
-    Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
-    return e;
-  }
-  function pt(a){return a[0].toFixed(1)+','+a[1].toFixed(1);}
-
   /* ── ANIMATE DIMENSION CHANGES SMOOTHLY ── */
   function animateTo(targetLen,targetWid,targetHt){
     if(animRAF)cancelAnimationFrame(animRAF);
@@ -1672,174 +1593,530 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     animateTo(len,wid,ht);
   };
 
-  /* ── TRUE 3D ISOMETRIC RENDER — full 360° rotation with face culling ── */
-  function renderShed(lenRaw,widRaw,htRaw){
-    var r=R[curType];
-    var L=lenRaw,D=widRaw,H0=htRaw;
-    var hl=L/2,hd=D/2;
-    var rHft=Math.min(H0*0.35,15);
+  /* ── 3D ENGINE ──────────────────────────────────────────────────
+     Real WebGL construction (steel columns, pitched roof with rafters
+     + purlins, corrugated sheet materials, doors/windows tied to the
+     existing add-on toggles) via three.js, replacing the old flat
+     isometric-SVG box. Everything below is built ONCE in
+     buildShedEngine(); every renderShed() call after that only
+     repositions/rescales the existing objects (an "object pool") and
+     re-renders one frame — no geometry is created or destroyed during
+     animation/drag/auto-rotate, which is what keeps this smooth on
+     low-end mobile GPUs. Unit = 1 foot, matching the sliders exactly. */
+  var MAX_COLS=14, MAX_BAYS=14, PURLIN_ROWS=3;
 
-    /* Scale to fit viewBox at ANY rotation angle (closed-form worst-case bound) */
-    var M=Math.sqrt(2*(hl*hl+hd*hd));
-    var wSpan=1.732*M, hSpan=M+(H0+rHft)*0.86;
-    var sc=Math.min(290/wSpan,116/hSpan,5.2);
-
-    var cx=170,baseY=168-0.5*M*sc;
-    function project(xl,yl,zl){
-      var xc=xl-hl,zc=zl-hd;
-      var xr=xc*Math.cos(theta)-zc*Math.sin(theta);
-      var zr=xc*Math.sin(theta)+zc*Math.cos(theta);
-      var X=xr*sc,Y=yl*sc,Z=zr*sc;
-      return [cx+(X-Z)*0.866, baseY-((X+Z)*0.5)-Y*0.86];
+  /* Small canvas-generated corrugated-sheet texture ── cheap (done
+     once per shed type at init, never regenerated in the render loop)
+     and avoids shipping image assets just for this. */
+  function makeCorrugatedTexture(THREE,baseHex){
+    var c=document.createElement('canvas');c.width=64;c.height=64;
+    var ctx=c.getContext('2d');
+    var base=new THREE.Color(baseHex);
+    for(var x=0;x<64;x++){
+      var wave=Math.sin(x/64*Math.PI*2*4)*0.14; /* 4 ribs across the tile */
+      var shade=base.clone().offsetHSL(0,0,wave);
+      ctx.fillStyle='#'+shade.getHexString();
+      ctx.fillRect(x,0,1,64);
     }
-
-    var G1=project(0,0,0),G2=project(L,0,0),G3=project(L,0,D),G4=project(0,0,D);
-    var T1=project(0,H0,0),T2=project(L,H0,0),T3=project(L,H0,D),T4=project(0,H0,D);
-    var R1=project(0,H0+rHft,D/2),R2=project(L,H0+rHft,D/2);
-
-    /* Visibility — pick the 2 most camera-facing faces among 4 candidates */
-    var dEndA=-(Math.cos(theta)+Math.sin(theta));
-    var dEndB=(Math.cos(theta)+Math.sin(theta));
-    var dEaveF=Math.sin(theta)-Math.cos(theta);
-    var dEaveB=Math.cos(theta)-Math.sin(theta);
-    var endVisible=dEndA>dEndB?'A':'B';
-    var eaveVisible=dEaveF>dEaveB?'F':'B';
-
-    /* Sync material gradients to the current shed type — gives solid, shaded product look */
-    var gt=document.getElementById('pshedEaveGradTop'),gb=document.getElementById('pshedEaveGradBot');
-    if(gt&&gb){gt.setAttribute('stop-color',r.wc);gb.setAttribute('stop-color',r.wd);}
-    var et=document.getElementById('pshedEndGradTop'),eb=document.getElementById('pshedEndGradBot');
-    if(et&&eb){et.setAttribute('stop-color',r.wd);eb.setAttribute('stop-color',r.ws);}
-
-    var g=document.getElementById('pshed-g');
-    g.innerHTML='';
-
-    /* Ground — tinted light concrete grey when the PCC Flooring add-on is selected, otherwise bare earth */
-    var floorTint=(selectedAddons&&selectedAddons.flooring)?'#c9ccd1':'#101a0e';
-    var floorOpacity=(selectedAddons&&selectedAddons.flooring)?'0.9':'0.85';
-    g.appendChild(svgEl('polygon',{points:pt(G1)+' '+pt(G2)+' '+pt(G3)+' '+pt(G4),fill:floorTint,opacity:floorOpacity}));
-
-    /* Determine wall corner sets for the two visible faces */
-    var eave=eaveVisible==='F'?{a:G1,b:G2,ta:T1,tb:T2}:{a:G4,b:G3,ta:T4,tb:T3};
-    var end=endVisible==='A'?{a:G1,b:G4,ta:T1,tb:T4,ridge:R1}:{a:G2,b:G3,ta:T2,tb:T3,ridge:R2};
-    var eaveRidge=[R1,R2]; /* R1 always matches ta (Xl=0), R2 always matches tb (Xl=L) — no swap needed */
-
-    /* End wall (gable end) — drawn first so eave wall's corner overlaps cleanly on top */
-    g.appendChild(svgEl('polygon',{points:pt(end.a)+' '+pt(end.b)+' '+pt(end.tb)+' '+pt(end.ta),fill:'url(#pshedEndGrad)'}));
-    g.appendChild(svgEl('polygon',{points:pt(end.ta)+' '+pt(end.tb)+' '+pt(end.ridge),fill:'url(#pshedEndGrad)'}));
-
-    /* Eave wall (long wall, main face) */
-    g.appendChild(svgEl('polygon',{points:pt(eave.a)+' '+pt(eave.b)+' '+pt(eave.tb)+' '+pt(eave.ta),fill:'url(#pshedEaveGrad)'}));
-
-    /* Corrugated stripes on the main eave wall */
-    var steps=Math.max(4,Math.round(L/9));
-    for(var i=1;i<steps;i++){
-      var t=i/steps;
-      var bx=eave.a[0]+(eave.b[0]-eave.a[0])*t, by=eave.a[1]+(eave.b[1]-eave.a[1])*t;
-      var tx=eave.ta[0]+(eave.tb[0]-eave.ta[0])*t, ty=eave.ta[1]+(eave.tb[1]-eave.ta[1])*t;
-      g.appendChild(svgEl('line',{x1:bx.toFixed(1),y1:by.toFixed(1),x2:tx.toFixed(1),y2:ty.toFixed(1),stroke:'rgba(0,0,0,0.13)','stroke-width':'0.7'}));
-    }
-    /* Stripes on the end wall too */
-    var steps2=Math.max(2,Math.round(D/12));
-    for(var j=1;j<steps2;j++){
-      var t2=j/steps2;
-      var bx2=end.a[0]+(end.b[0]-end.a[0])*t2, by2=end.a[1]+(end.b[1]-end.a[1])*t2;
-      var tx2=end.ta[0]+(end.tb[0]-end.ta[0])*t2, ty2=end.ta[1]+(end.tb[1]-end.ta[1])*t2;
-      g.appendChild(svgEl('line',{x1:bx2.toFixed(1),y1:by2.toFixed(1),x2:tx2.toFixed(1),y2:ty2.toFixed(1),stroke:'rgba(0,0,0,0.16)','stroke-width':'0.6'}));
-    }
-
-    /* Door on the main eave wall, centered-ish */
-    var dW=Math.abs(eave.b[0]-eave.a[0])*0.15,dH=Math.abs(eave.ta[1]-eave.a[1])*0.52;
-    var doorMidX=eave.a[0]+(eave.b[0]-eave.a[0])*0.42, doorBotY=eave.a[1]+(eave.b[1]-eave.a[1])*0.42;
-    var dX=doorMidX-dW/2,dY=doorBotY-dH;
-    g.appendChild(svgEl('rect',{x:dX.toFixed(1),y:dY.toFixed(1),width:dW.toFixed(1),height:dH.toFixed(1),fill:'rgba(0,0,0,0.5)',rx:'1'}));
-    if(curType==='warehouse'){
-      var ribs=5;
-      for(var ri=1;ri<ribs;ri++){
-        var ry=dY+(dH/ribs)*ri;
-        g.appendChild(svgEl('line',{x1:dX.toFixed(1),y1:ry.toFixed(1),x2:(dX+dW).toFixed(1),y2:ry.toFixed(1),stroke:'rgba(255,255,255,0.14)','stroke-width':'0.6'}));
-      }
-    }else{
-      g.appendChild(svgEl('line',{x1:(dX+dW/2).toFixed(1),y1:dY.toFixed(1),x2:(dX+dW/2).toFixed(1),y2:(dY+dH).toFixed(1),stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5'}));
-    }
-
-    /* ── ADD-ON: extra windows — only drawn when the user has selected the Windows add-on ── */
-    if(selectedAddons&&selectedAddons.windows){
-      var wW=Math.abs(eave.b[0]-eave.a[0])*0.09,wH=Math.abs(eave.ta[1]-eave.a[1])*0.28;
-      [0.74,0.9].forEach(function(wt){
-        var wMidX=eave.a[0]+(eave.b[0]-eave.a[0])*wt, wMidY=eave.a[1]+(eave.b[1]-eave.a[1])*wt;
-        var wX=wMidX-wW/2, wY=wMidY-Math.abs(eave.ta[1]-eave.a[1])*0.62-wH/2;
-        g.appendChild(svgEl('rect',{x:wX.toFixed(1),y:wY.toFixed(1),width:wW.toFixed(1),height:wH.toFixed(1),fill:'rgba(179,229,252,.55)',stroke:'rgba(255,255,255,.55)','stroke-width':'.6',rx:'.5'}));
-        g.appendChild(svgEl('line',{x1:(wX+wW/2).toFixed(1),y1:wY.toFixed(1),x2:(wX+wW/2).toFixed(1),y2:(wY+wH).toFixed(1),stroke:'rgba(255,255,255,.6)','stroke-width':'.4'}));
-        g.appendChild(svgEl('line',{x1:wX.toFixed(1),y1:(wY+wH/2).toFixed(1),x2:(wX+wW).toFixed(1),y2:(wY+wH/2).toFixed(1),stroke:'rgba(255,255,255,.6)','stroke-width':'.4'}));
-      });
-    }
-
-    /* ── ADD-ON: extra door — a second, slightly smaller door near the other end of the wall ── */
-    if(selectedAddons&&selectedAddons.doors){
-      var d2W=dW*0.82,d2H=dH*0.88;
-      var d2MidX=eave.a[0]+(eave.b[0]-eave.a[0])*0.15, d2BotY=eave.a[1]+(eave.b[1]-eave.a[1])*0.15;
-      var d2X=d2MidX-d2W/2,d2Y=d2BotY-d2H;
-      g.appendChild(svgEl('rect',{x:d2X.toFixed(1),y:d2Y.toFixed(1),width:d2W.toFixed(1),height:d2H.toFixed(1),fill:'rgba(0,0,0,0.45)',rx:'1'}));
-      g.appendChild(svgEl('line',{x1:(d2X+d2W/2).toFixed(1),y1:d2Y.toFixed(1),x2:(d2X+d2W/2).toFixed(1),y2:(d2Y+d2H).toFixed(1),stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5'}));
-    }
-
-    /* Roof slope above the visible eave wall */
-    g.appendChild(svgEl('polygon',{points:pt(eave.ta)+' '+pt(eave.tb)+' '+pt(eaveRidge[1])+' '+pt(eaveRidge[0]),fill:'url(#pshedRoofGrad)'}));
-    /* Ridge line */
-    g.appendChild(svgEl('line',{x1:R1[0].toFixed(1),y1:R1[1].toFixed(1),x2:R2[0].toFixed(1),y2:R2[1].toFixed(1),stroke:'rgba(10,22,40,0.3)','stroke-width':'1'}));
-
-    /* ── ADD-ON: insulation — tints the roof gradient to a reflective silver sheet look ── */
-    var roofTop=document.getElementById('pshedRoofGradTop'),roofBot=document.getElementById('pshedRoofGradBot');
-    if(roofTop&&roofBot){
-      if(selectedAddons&&selectedAddons.insulation){roofTop.setAttribute('stop-color','#CFD8DC');roofBot.setAttribute('stop-color','#90A4AE');}
-      else{roofTop.setAttribute('stop-color','#607D8B');roofBot.setAttribute('stop-color','#37474F');}
-    }
-
-    /* Type-specific realistic details */
-    if(curType==='peb'){
-      var trussN=4;
-      for(var ti=1;ti<trussN;ti++){
-        var tt=ti/trussN;
-        var px1=eave.ta[0]+(eave.tb[0]-eave.ta[0])*tt, py1=eave.ta[1]+(eave.tb[1]-eave.ta[1])*tt;
-        var px2=eaveRidge[0][0]+(eaveRidge[1][0]-eaveRidge[0][0])*tt, py2=eaveRidge[0][1]+(eaveRidge[1][1]-eaveRidge[0][1])*tt;
-        g.appendChild(svgEl('line',{x1:px1.toFixed(1),y1:py1.toFixed(1),x2:px2.toFixed(1),y2:py2.toFixed(1),stroke:'rgba(255,255,255,0.2)','stroke-width':'0.6'}));
-      }
-    }else if(curType==='industrial'){
-      var midR=[(R1[0]+R2[0])/2,(R1[1]+R2[1])/2];
-      var vW=Math.abs(R2[0]-R1[0])*0.12,vH=14;
-      var vX=midR[0]-vW/2,vY=midR[1]-vH*0.9;
-      g.appendChild(svgEl('rect',{x:vX.toFixed(1),y:vY.toFixed(1),width:vW.toFixed(1),height:vH.toFixed(1),fill:'#263238',stroke:'rgba(255,255,255,0.15)','stroke-width':'0.5',rx:'1'}));
-      g.appendChild(svgEl('line',{x1:vX.toFixed(1),y1:(vY+vH*0.4).toFixed(1),x2:(vX+vW).toFixed(1),y2:(vY+vH*0.4).toFixed(1),stroke:'rgba(255,255,255,0.2)','stroke-width':'0.5'}));
-    }
-
-    /* Outline edges for crispness */
-    g.appendChild(svgEl('line',{x1:eave.a[0].toFixed(1),y1:eave.a[1].toFixed(1),x2:eave.b[0].toFixed(1),y2:eave.b[1].toFixed(1),stroke:'rgba(10,22,40,0.25)','stroke-width':'1'}));
-    g.appendChild(svgEl('line',{x1:end.ta[0].toFixed(1),y1:end.ta[1].toFixed(1),x2:end.ridge[0].toFixed(1),y2:end.ridge[1].toFixed(1),stroke:'rgba(10,22,40,0.2)','stroke-width':'0.8'}));
-    /* Rim-light — subtle bright edge where the main wall meets the roofline, sells the "solid material" look */
-    g.appendChild(svgEl('line',{x1:eave.ta[0].toFixed(1),y1:eave.ta[1].toFixed(1),x2:eave.tb[0].toFixed(1),y2:eave.tb[1].toFixed(1),stroke:'rgba(255,255,255,0.4)','stroke-width':'0.8'}));
-
-    /* Ground shadow scales with footprint */
-    var shadow=document.getElementById('pshed-shadow');
-    if(shadow){
-      shadow.setAttribute('rx',Math.min(150,L*sc*0.42+30).toFixed(1));
-      shadow.setAttribute('cy',(baseY+0.5*M*sc+3).toFixed(1));
-    }
-
-    /* Dimension labels — follow the visible eave wall */
-    var dimY=Math.max(eave.a[1],eave.b[1])+14;
-    var ll=document.getElementById('plbl-len');
-    ll.setAttribute('x',((eave.a[0]+eave.b[0])/2).toFixed(1));
-    ll.setAttribute('y',dimY.toFixed(1));
-    ll.textContent=Math.round(L)+' ft';
-    var dl=document.getElementById('pdim-line');
-    dl.setAttribute('x1',eave.a[0].toFixed(1));dl.setAttribute('y1',dimY.toFixed(1));
-    dl.setAttribute('x2',eave.b[0].toFixed(1));dl.setAttribute('y2',dimY.toFixed(1));
-    var lh=document.getElementById('plbl-ht');
-    lh.setAttribute('x',(end.a[0]-14).toFixed(1));
-    lh.setAttribute('y',((end.a[1]+end.ta[1])/2).toFixed(1));
-    lh.textContent=Math.round(htRaw)+' ft';
+    var tex=new THREE.CanvasTexture(c);
+    tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+    tex.colorSpace=THREE.SRGBColorSpace;
+    return tex;
   }
+  /* Point-to-point orienter ── scales/rotates a unit box so it exactly
+     spans p1→p2 (used for rafters/purlins/ridge members). Far more
+     reliable than guessing a rotation.set(angle,0,0) sign by hand, and
+     works for any slope/angle without per-case trig. */
+  function orientBetween(THREE,mesh,p1,p2,thickness){
+    var dir=new THREE.Vector3().subVectors(p2,p1);
+    var len=dir.length()||0.001;
+    var mid=new THREE.Vector3().addVectors(p1,p2).multiplyScalar(0.5);
+    mesh.position.copy(mid);
+    mesh.scale.set(thickness,len,thickness);
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());
+  }
+  /* 4-corner quad (roof slopes) ── position written directly as world
+     corners every frame (cheap attribute update, no geometry rebuild),
+     so there's no rotation math to get wrong: the mesh always exactly
+     touches the eave and ridge points we hand it. DoubleSide material
+     means winding order doesn't matter for visibility either. */
+  function makeQuad(THREE,mat){
+    var geom=new THREE.BufferGeometry();
+    geom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(12),3));
+    geom.setAttribute('uv',new THREE.BufferAttribute(new Float32Array([0,0, 3,0, 3,1, 0,1]),2));
+    geom.setIndex([0,1,2,0,2,3]);
+    var m=new THREE.Mesh(geom,mat);
+    m.frustumCulled=false;
+    return m;
+  }
+  function setQuad(p1p2p3p4mesh,a,b,c,d){
+    var pos=p1p2p3p4mesh.geometry.attributes.position;
+    pos.setXYZ(0,a.x,a.y,a.z);pos.setXYZ(1,b.x,b.y,b.z);
+    pos.setXYZ(2,c.x,c.y,c.z);pos.setXYZ(3,d.x,d.y,d.z);
+    pos.needsUpdate=true;
+    p1p2p3p4mesh.geometry.computeVertexNormals();
+    p1p2p3p4mesh.geometry.computeBoundingSphere();
+  }
+  function makeGroundShadowTexture(THREE){
+    var c=document.createElement('canvas');c.width=256;c.height=256;
+    var ctx=c.getContext('2d');
+    var g=ctx.createRadialGradient(128,128,10,128,128,128);
+    g.addColorStop(0,'rgba(10,22,40,0.38)');
+    g.addColorStop(0.7,'rgba(10,22,40,0.16)');
+    g.addColorStop(1,'rgba(10,22,40,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,256,256);
+    return new THREE.CanvasTexture(c);
+  }
+  /* Small canvas text sprite for the dimension labels (replaces the
+     old SVG <text> elements) ── regenerated only when the displayed
+     number actually changes, not every frame. */
+  function makeLabelSprite(THREE){
+    var c=document.createElement('canvas');c.width=160;c.height=48;
+    var tex=new THREE.CanvasTexture(c);
+    var mat=new THREE.SpriteMaterial({map:tex,depthTest:false,sizeAttenuation:false});
+    var spr=new THREE.Sprite(mat);
+    spr.scale.set(0.09,0.027,1);
+    spr.renderOrder=999;
+    spr._canvas=c;spr._ctx=c.getContext('2d');spr._lastText=null;
+    return spr;
+  }
+  function setLabelText(spr,text,color){
+    if(spr._lastText===text)return;
+    spr._lastText=text;
+    var ctx=spr._ctx,c=spr._canvas;
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.font='700 26px Poppins, sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(255,255,255,0.95)';
+    ctx.lineWidth=6;ctx.strokeStyle='rgba(10,22,40,0.55)';
+    ctx.strokeText(text,c.width/2,c.height/2);
+    ctx.fillStyle=color;
+    ctx.fillText(text,c.width/2,c.height/2);
+    spr.material.map.needsUpdate=true;
+  }
+
+  function buildShedEngine(THREE){
+    var canvas=document.getElementById('pshed');
+    var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
+    renderer.setClearColor(0x000000,0);
+    var isMobile=window.matchMedia('(max-width:640px)').matches;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,isMobile?2:2.5));
+
+    var scene=new THREE.Scene();
+    var camera=new THREE.PerspectiveCamera(32,340/185,1,900);
+
+    scene.add(new THREE.HemisphereLight(0xf2f6ff,0x3a3226,1.05));
+    var sun=new THREE.DirectionalLight(0xfff4e0,1.35);
+    sun.position.set(60,90,40);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff,0.18));
+
+    var unitBox=new THREE.BoxGeometry(1,1,1);
+
+    /* Materials ── palette pulled straight from R[] so the 3D model's
+       colours always match the shed-type cards above it. */
+    var wallMats={},roofMatNormal,roofMatInsulated,structMat,plinthMat,floorMatBare,floorMatPCC;
+    var typeKeys=['tin','industrial','peb','warehouse'];
+    typeKeys.forEach(function(k){
+      var r=R[k];
+      wallMats[k]=new THREE.MeshStandardMaterial({map:makeCorrugatedTexture(THREE,r.wc),color:0xffffff,metalness:0.65,roughness:0.42,side:THREE.DoubleSide});
+    });
+    roofMatNormal=new THREE.MeshStandardMaterial({map:makeCorrugatedTexture(THREE,'#546670'),metalness:0.7,roughness:0.38,side:THREE.DoubleSide});
+    roofMatInsulated=new THREE.MeshStandardMaterial({map:makeCorrugatedTexture(THREE,'#c9d3d8'),metalness:0.55,roughness:0.3,side:THREE.DoubleSide});
+    structMat=new THREE.MeshStandardMaterial({color:0x1c2430,metalness:0.75,roughness:0.5});
+    plinthMat=new THREE.MeshStandardMaterial({color:0x9aa0a6,metalness:0.05,roughness:0.9});
+    floorMatBare=new THREE.MeshStandardMaterial({color:0x14200f,roughness:1,metalness:0});
+    floorMatPCC=new THREE.MeshStandardMaterial({color:0xc9ccd1,roughness:0.85,metalness:0});
+    var doorMat=new THREE.MeshStandardMaterial({color:0x20242b,metalness:0.4,roughness:0.6,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8});
+    var doorLineMat=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.22});
+    var winMat=new THREE.MeshPhysicalMaterial({color:0x8fc7f0,metalness:0.1,roughness:0.15,transparent:true,opacity:0.55,transmission:0.35,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8});
+    var winLineMat=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.6});
+    var ventMat=new THREE.MeshStandardMaterial({color:0x2a2f38,metalness:0.6,roughness:0.5});
+
+    var shedGroup=new THREE.Group();scene.add(shedGroup);
+
+    /* Ground: big soft contact-shadow disc + a floor patch under the shed
+       footprint (tints from bare-earth to PCC grey with the Flooring add-on) */
+    var shadowTex=makeGroundShadowTexture(THREE);
+    var groundShadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));
+    groundShadow.rotation.x=-Math.PI/2;groundShadow.position.y=-0.32;
+    shedGroup.add(groundShadow);
+    var floorPad=new THREE.Mesh(unitBox,floorMatBare);
+    floorPad.position.y=-0.15;
+    shedGroup.add(floorPad);
+    var plinth=new THREE.Mesh(unitBox,plinthMat);
+    shedGroup.add(plinth);
+
+    /* Walls (4) ── the two long "eave" walls are simple rectangles; the
+       two "gable" end walls are a fixed-ratio pentagon (rectangle + roof
+       -pitch triangle) built ONCE and reused by non-uniform scaling, see
+       the comment above buildShedEngine(). */
+    function makeWallMesh(){return new THREE.Mesh(new THREE.PlaneGeometry(1,1),wallMats.tin);}
+    var wallFront=makeWallMesh(),wallBack=makeWallMesh();
+    wallBack.rotation.y=Math.PI;
+    shedGroup.add(wallFront,wallBack);
+
+    var GABLE_RATIO=1/1.35; /* eave height as a fraction of total gable height ── see note above */
+    var gableShape=new THREE.Shape();
+    gableShape.moveTo(-0.5,0);gableShape.lineTo(0.5,0);gableShape.lineTo(0.5,GABLE_RATIO);
+    gableShape.lineTo(0,1);gableShape.lineTo(-0.5,GABLE_RATIO);gableShape.closePath();
+    var gableGeom=new THREE.ExtrudeGeometry(gableShape,{depth:0.15,bevelEnabled:false});
+    gableGeom.translate(0,0,-0.075);
+    var gableLeft=new THREE.Mesh(gableGeom,wallMats.tin);
+    var gableRight=new THREE.Mesh(gableGeom,wallMats.tin);
+    gableLeft.rotation.y=Math.PI/2;gableRight.rotation.y=-Math.PI/2;
+    shedGroup.add(gableLeft,gableRight);
+
+    /* Roof (2 pitched slopes as explicit-corner quads + a ridge cap) */
+    var roofFront=makeQuad(THREE,roofMatNormal);
+    var roofBack=makeQuad(THREE,roofMatNormal);
+    var ridgeCap=new THREE.Mesh(unitBox,structMat);
+    shedGroup.add(roofFront,roofBack,ridgeCap);
+
+    /* Ridge ventilator (industrial type only, matches old design detail) */
+    var ventBody=new THREE.Mesh(unitBox,ventMat);
+    var ventLouvre=new THREE.Mesh(unitBox,new THREE.MeshStandardMaterial({color:0x475463,metalness:0.5,roughness:0.5}));
+    shedGroup.add(ventBody,ventLouvre);
+
+    /* Columns / rafters / purlins ── pooled, hidden by default, shown
+       up to however many the current length needs. */
+    function pool(n,mat){var a=[];for(var i=0;i<n;i++){var m=new THREE.Mesh(unitBox,mat);m.visible=false;shedGroup.add(m);a.push(m);}return a;}
+    var colsFront=pool(MAX_COLS,structMat), colsBack=pool(MAX_COLS,structMat);
+    var raftersL=pool(MAX_BAYS,structMat), raftersR=pool(MAX_BAYS,structMat);
+    var purlinsL=pool(PURLIN_ROWS,structMat), purlinsR=pool(PURLIN_ROWS,structMat);
+
+    /* Doors ── main + the "Extra Door" add-on, each with a couple of
+       detail lines so they don't read as flat grey rectangles. */
+    function makeDoor(){
+      var g=new THREE.Group();
+      var panel=new THREE.Mesh(new THREE.PlaneGeometry(1,1),doorMat);
+      g.add(panel);g.userData.panel=panel;
+      var lines=new THREE.Group();g.add(lines);g.userData.lines=lines;
+      for(var i=0;i<5;i++){var l=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.5,0,0),new THREE.Vector3(0.5,0,0)]),doorLineMat);l.visible=false;lines.add(l);}
+      return g;
+    }
+    var doorMain=makeDoor(), doorExtra=makeDoor();
+    shedGroup.add(doorMain,doorExtra);
+
+    /* Windows ── the "Extra Windows" add-on, 2 panes with a cross mullion */
+    function makeWindow(){
+      var g=new THREE.Group();
+      var panel=new THREE.Mesh(new THREE.PlaneGeometry(1,1),winMat);
+      g.add(panel);
+      var v=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-0.5,0.01),new THREE.Vector3(0,0.5,0.01)]),winLineMat);
+      var h=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.5,0,0.01),new THREE.Vector3(0.5,0,0.01)]),winLineMat);
+      g.add(v,h);
+      return g;
+    }
+    var windows=[makeWindow(),makeWindow()];
+    windows.forEach(function(w){shedGroup.add(w);});
+
+    /* Dimension labels ── sprites + a thin connecting line, same idea as
+       the old SVG plbl-len / plbl-ht / pdim-line but positioned in 3D. */
+    var lenLabel=makeLabelSprite(THREE), htLabel=makeLabelSprite(THREE);
+    var dimLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineDashedMaterial({color:0xff6f00,dashSize:1,gapSize:0.6,transparent:true,opacity:0.7}));
+    scene.add(lenLabel,htLabel,dimLine);
+
+    function fitCanvas(){
+      var w=canvas.clientWidth||canvas.parentElement.clientWidth||340;
+      var h=w*185/340;
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h;camera.updateProjectionMatrix();
+    }
+    fitCanvas();
+    new ResizeObserver(fitCanvas).observe(canvas.parentElement);
+
+    return {
+      scene:scene,camera:camera,renderer:renderer,shedGroup:shedGroup,
+      wallFront:wallFront,wallBack:wallBack,gableLeft:gableLeft,gableRight:gableRight,
+      wallMats:wallMats,roofFront:roofFront,roofBack:roofBack,ridgeCap:ridgeCap,
+      roofMatNormal:roofMatNormal,roofMatInsulated:roofMatInsulated,
+      groundShadow:groundShadow,floorPad:floorPad,floorMatBare:floorMatBare,floorMatPCC:floorMatPCC,plinth:plinth,
+      ventBody:ventBody,ventLouvre:ventLouvre,
+      colsFront:colsFront,colsBack:colsBack,raftersL:raftersL,raftersR:raftersR,purlinsL:purlinsL,purlinsR:purlinsR,
+      doorMain:doorMain,doorExtra:doorExtra,windows:windows,
+      lenLabel:lenLabel,htLabel:htLabel,dimLine:dimLine,
+      fitCanvas:fitCanvas
+    };
+  }
+
+  /* ── ROTATION / ZOOM STATE (continuous) ──
+     theta = azimuth around the shed (kept as the same variable name/
+     semantics the old rotate buttons + drag + auto-rotate already used).
+     elevation = camera pitch. zoom = distance multiplier. All three are
+     tweened the same way the old code tweened theta alone. */
+  var theta=-0.5, thetaTarget=-0.5, thetaRAF=null;
+  var elevation=0.46, elevationTarget=0.46;
+  var zoom=1, zoomTarget=1;
+  var autoRotateOn=true, manualDragActive=false, lastInteraction=0;
+  var activePreset='iso';
+
+  function setPresetActive(name){
+    activePreset=name;
+    document.querySelectorAll('.pv-preset-btn').forEach(function(b){
+      b.classList.toggle('is-active', b.getAttribute('onclick')==="setCameraPreset('"+name+"')");
+    });
+  }
+  window.setCameraPreset=function(name){
+    haptic(10);
+    setPresetActive(name);
+    lastInteraction=Date.now();
+    if(name==='front'){thetaTarget=0;elevationTarget=0.16;}
+    else if(name==='side'){thetaTarget=Math.PI/2;elevationTarget=0.28;}
+    else if(name==='top'){elevationTarget=1.45;}
+    else{thetaTarget=-0.5;elevationTarget=0.46;} /* 'iso' / default 3/4 view */
+    animateCamera();
+  };
+
+  function animateCamera(){
+    if(thetaRAF)cancelAnimationFrame(thetaRAF);
+    function step(){
+      var dt=thetaTarget-theta, de=elevationTarget-elevation, dz=zoomTarget-zoom;
+      theta+=dt*0.16; elevation+=de*0.16; zoom+=dz*0.16;
+      renderShed(dispLen,dispWid,dispHt);
+      if(Math.abs(dt)>0.002||Math.abs(de)>0.002||Math.abs(dz)>0.002){thetaRAF=requestAnimationFrame(step);}
+      else{theta=thetaTarget;elevation=elevationTarget;zoom=zoomTarget;renderShed(dispLen,dispWid,dispHt);thetaRAF=null;}
+    }
+    thetaRAF=requestAnimationFrame(step);
+  }
+  var animateTheta=animateCamera; /* rotateView()/auto-rotate below call this by its old name */
+
+  /* ── ROTATE BUTTONS ── nudge azimuth by a fixed step, smoothly ── */
+  window.rotateView=function(dir){
+    lastInteraction=Date.now();
+    haptic(8);
+    thetaTarget+=dir*(Math.PI/4);
+    animateTheta();
+    var btnEl=document.querySelector(dir<0?'.pv-rotate-btn:not(.pv-rotate-r)':'.pv-rotate-r');
+    if(btnEl){btnEl.classList.add('is-spinning');setTimeout(function(){btnEl.classList.remove('is-spinning');},400);}
+  };
+
+  /* ── AUTO-ROTATE ── idle showcase spin, pauses on any manual interaction
+     and resumes a couple seconds after the visitor lets go ── */
+  function startAutoRotateLoop(){
+    function step(){
+      var idleLongEnough=(Date.now()-lastInteraction)>2200;
+      if(autoRotateOn&&!manualDragActive&&idleLongEnough&&!thetaRAF){
+        theta+=0.0028;thetaTarget=theta;
+        renderShed(dispLen,dispWid,dispHt);
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  window.toggleAutoRotate=function(){
+    autoRotateOn=!autoRotateOn;
+    lastInteraction=autoRotateOn?0:Date.now();
+    var icon=document.getElementById('pv-auto-icon');
+    if(icon)icon.setAttribute('href',autoRotateOn?'#i-pause':'#i-play');
+    var btn=document.getElementById('pv-auto-toggle');
+    if(btn)btn.setAttribute('aria-label',autoRotateOn?'Pause auto-rotate':'Resume auto-rotate');
+  };
+
+  /* ── DRAG TO ROTATE (full 360°) + WHEEL / PINCH TO ZOOM ── */
+  function initDragRotate(){
+    var stage=document.getElementById('preview-tilt-stage');
+    if(!stage)return;
+    var dragging=false,lastX=0,pendingDx=0,frameQueued=false,hint=document.querySelector('.pv-hint');
+    function onDown(x){dragging=true;manualDragActive=true;lastInteraction=Date.now();lastX=x;pendingDx=0;if(thetaRAF){cancelAnimationFrame(thetaRAF);thetaRAF=null;}stage.style.cursor='grabbing';if(hint)hint.style.opacity='0';}
+    function flush(){
+      frameQueued=false;
+      if(pendingDx===0)return;
+      theta+=pendingDx*0.012;thetaTarget=theta;pendingDx=0;
+      renderShed(dispLen,dispWid,dispHt);
+    }
+    function onMove(x){
+      if(!dragging)return;
+      lastInteraction=Date.now();
+      pendingDx+=x-lastX;lastX=x;
+      if(!frameQueued){frameQueued=true;requestAnimationFrame(flush);}
+    }
+    function onUp(){dragging=false;manualDragActive=false;lastInteraction=Date.now();stage.style.cursor='grab';if(hint)setTimeout(function(){hint.style.opacity='1';},1200);}
+    stage.style.cursor='grab';
+    stage.addEventListener('mousedown',function(e){onDown(e.clientX);e.preventDefault();});
+    window.addEventListener('mousemove',function(e){if(dragging)onMove(e.clientX);});
+    window.addEventListener('mouseup',onUp);
+    stage.addEventListener('touchstart',function(e){
+      if(e.touches&&e.touches.length===1)onDown(e.touches[0].clientX);
+      else if(e.touches&&e.touches.length===2)pinchDist=touchDist(e.touches);
+    },{passive:true});
+    stage.addEventListener('touchmove',function(e){
+      if(e.touches&&e.touches.length===2){
+        var d=touchDist(e.touches);
+        if(pinchDist){zoomTarget=clampZoom(zoomTarget*(pinchDist/d));zoom=zoomTarget;renderShed(dispLen,dispWid,dispHt);}
+        pinchDist=d;lastInteraction=Date.now();
+        e.preventDefault();
+      }else if(e.touches&&e.touches[0]){onMove(e.touches[0].clientX);e.preventDefault();}
+    },{passive:false});
+    stage.addEventListener('touchend',function(e){onUp();pinchDist=null;});
+    var pinchDist=null;
+    function touchDist(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+    function clampZoom(z){return Math.max(0.55,Math.min(2.1,z));}
+    stage.addEventListener('wheel',function(e){
+      e.preventDefault();
+      lastInteraction=Date.now();
+      zoomTarget=clampZoom(zoomTarget*(1+ (e.deltaY>0?0.09:-0.09)));
+      zoom=zoomTarget;
+      renderShed(dispLen,dispWid,dispHt);
+    },{passive:false});
+  }
+
+  /* ── MAIN RENDER ── rebuilds nothing; repositions/rescales the pooled
+     objects created once in buildShedEngine() and draws one frame. ── */
+  window.renderShed=function(lenRaw,widRaw,htRaw){
+    if(!threeReady){pendingRenderArgs=[lenRaw,widRaw,htRaw];return;}
+    var e=shedEngine, T=THREE;
+    var L=Math.max(lenRaw,1),D=Math.max(widRaw,1),H=Math.max(htRaw,1);
+    var hl=L/2,hd=D/2;
+    var rHft=Math.min(H*0.35,15);
+    var totalH=H+rHft;
+
+    /* Wall materials / colour follow the selected shed type */
+    var wallMat=e.wallMats[curType]||e.wallMats.tin;
+    e.wallFront.material=wallMat;e.wallBack.material=wallMat;
+    e.gableLeft.material=wallMat;e.gableRight.material=wallMat;
+
+    e.wallFront.geometry.dispose && null; /* no-op: geometry is shared, never disposed */
+    e.wallFront.scale.set(L,H,1);e.wallFront.position.set(0,H/2,-hd);
+    e.wallBack.scale.set(L,H,1);e.wallBack.position.set(0,H/2,hd);
+    /* corrugation tiling density follows length, matching the old code's rib spacing */
+    wallMat.map.repeat.set(Math.max(4,Math.round(L/9)),1);
+
+    e.gableLeft.scale.set(D,totalH,1);e.gableLeft.position.set(-hl,0,0);
+    e.gableRight.scale.set(D,totalH,1);e.gableRight.position.set(hl,0,0);
+
+    /* Roof: 2 pitched slopes meeting at the ridge, with a small overhang
+       beyond the wall footprint on every side. Built from explicit world
+       corners (see setQuad/makeQuad above) so the slope always touches
+       the wall-top eave line and the ridge line exactly ── no rotation
+       math that can silently point the wrong way. */
+    var overhang=Math.min(1.6,L*0.02);
+    var roofThk=Math.max(0.18,L*0.0025);
+    var roofMat=(selectedAddons&&selectedAddons.insulation)?e.roofMatInsulated:e.roofMatNormal;
+    [e.roofFront,e.roofBack].forEach(function(m){m.material=roofMat;});
+    roofMat.map.repeat.set(Math.max(4,Math.round(L/9)),3);
+    var eaveF1=new T.Vector3(-hl-overhang,H,-hd-overhang), eaveF2=new T.Vector3(hl+overhang,H,-hd-overhang);
+    var eaveB1=new T.Vector3(-hl-overhang,H,hd+overhang), eaveB2=new T.Vector3(hl+overhang,H,hd+overhang);
+    var ridgeL=new T.Vector3(-hl-overhang,H+rHft,0), ridgeR=new T.Vector3(hl+overhang,H+rHft,0);
+    setQuad(e.roofFront,eaveF1,eaveF2,ridgeR,ridgeL);
+    setQuad(e.roofBack,eaveB2,eaveB1,ridgeL,ridgeR);
+    e.ridgeCap.scale.set(L+overhang*2,roofThk*1.8,roofThk*3.4);
+    e.ridgeCap.position.set(0,H+rHft,0);
+
+    /* Foundation / plinth + floor tint (PCC Flooring add-on) */
+    e.plinth.scale.set(L+0.6,0.3,D+0.6);e.plinth.position.set(0,-0.15,0);
+    e.floorPad.material=(selectedAddons&&selectedAddons.flooring)?e.floorMatPCC:e.floorMatBare;
+    e.floorPad.scale.set(L+0.6,0.02,D+0.6);e.floorPad.position.set(0,-0.31,0);
+    var shadowR=Math.max(L,D)*0.95+8;
+    e.groundShadow.scale.set(shadowR,shadowR,1);
+
+    /* Ridge ventilator ── industrial type only, matches the old design detail */
+    var showVent=curType==='industrial';
+    e.ventBody.visible=showVent;e.ventLouvre.visible=showVent;
+    if(showVent){
+      var vW=Math.min(8,L*0.1),vH=Math.max(2,H*0.14),vD=Math.min(D*0.5,10);
+      e.ventBody.scale.set(vW,vH,vD);e.ventBody.position.set(0,H+rHft+vH/2,0);
+      e.ventLouvre.scale.set(vW*0.94,vH*0.32,vD*0.94);e.ventLouvre.position.set(0,H+rHft+vH*0.42,0);
+    }
+
+    /* Columns ── one bay roughly every 16ft along the length, on both
+       long walls, ground to eave height */
+    var nBays=Math.max(2,Math.min(MAX_COLS-1,Math.round(L/16)));
+    for(var i=0;i<MAX_COLS;i++){
+      var show=i<=nBays;
+      e.colsFront[i].visible=show;e.colsBack[i].visible=show;
+      if(!show)continue;
+      var cx=-hl+(L*i/nBays);
+      var colW=Math.max(0.35,Math.min(0.6,H*0.03));
+      /* sit just proud of the wall sheet (outside face) so the posts
+         stay visible instead of being hidden behind the opaque wall */
+      e.colsFront[i].scale.set(colW,H,colW);e.colsFront[i].position.set(cx,H/2,-hd-colW*0.6);
+      e.colsBack[i].scale.set(colW,H,colW);e.colsBack[i].position.set(cx,H/2,hd+colW*0.6);
+    }
+
+    /* Rafters ── a pitched pair per bay, exactly eave-top to ridge (no
+       overhang ── the roof sheet oversails these, matching a real shed) */
+    var railW=Math.max(0.25,Math.min(0.4,H*0.02));
+    for(var j=0;j<MAX_BAYS;j++){
+      var show2=j<=nBays;
+      e.raftersL[j].visible=show2;e.raftersR[j].visible=show2;
+      if(!show2)continue;
+      var rx=-hl+(L*j/nBays);
+      orientBetween(T,e.raftersL[j],new T.Vector3(rx,H+0.08,-hd),new T.Vector3(rx,H+rHft+0.08,0),railW*1.3);
+      orientBetween(T,e.raftersR[j],new T.Vector3(rx,H+0.08,hd),new T.Vector3(rx,H+rHft+0.08,0),railW*1.3);
+    }
+
+    /* Purlins ── a few horizontal rails running the full length, resting
+       on top of each roof slope (perpendicular to the rafters), each at
+       a fixed fraction of the way up the slope from eave to ridge */
+    for(var p=0;p<PURLIN_ROWS;p++){
+      var frac=(p+1)/(PURLIN_ROWS+1);
+      var py=H+rHft*frac, pzF=-hd*(1-frac), pzB=hd*(1-frac);
+      /* poke out above the roof plane (rather than sitting flush) so
+         they stay readable as distinct lines against the roof sheet */
+      orientBetween(T,e.purlinsL[p],new T.Vector3(-hl,py+railW*1.3,pzF),new T.Vector3(hl,py+railW*1.3,pzF),railW*1.15);
+      orientBetween(T,e.purlinsR[p],new T.Vector3(-hl,py+railW*1.3,pzB),new T.Vector3(hl,py+railW*1.3,pzB),railW*1.15);
+      e.purlinsL[p].visible=true;e.purlinsR[p].visible=true;
+    }
+
+    /* Main door (front eave wall) + the "Extra Door" add-on */
+    function placeDoor(doorGrp,fracAlong,wFrac,hFrac,isMain){
+      var dW=L*wFrac,dH=H*hFrac;
+      var dx=-hl+L*fracAlong;
+      doorGrp.position.set(dx,dH/2,hd-0.35);
+      doorGrp.userData.panel.scale.set(dW,dH,1);
+      var lines=doorGrp.userData.lines.children;
+      if(curType==='warehouse'){
+        for(var k=0;k<lines.length;k++){
+          lines[k].visible=true;
+          var ly=-dH/2+(dH/(lines.length+1))*(k+1);
+          lines[k].geometry.setFromPoints([new T.Vector3(-dW/2,ly,0.01),new T.Vector3(dW/2,ly,0.01)]);
+        }
+      }else{
+        lines[0].visible=true;
+        lines[0].geometry.setFromPoints([new T.Vector3(0,-dH/2,0.01),new T.Vector3(0,dH/2,0.01)]);
+        for(var k2=1;k2<lines.length;k2++)lines[k2].visible=false;
+      }
+    }
+    placeDoor(e.doorMain,0.42,0.15,0.52,true);
+    e.doorExtra.visible=!!(selectedAddons&&selectedAddons.doors);
+    if(e.doorExtra.visible)placeDoor(e.doorExtra,0.15,0.123,0.46,false);
+
+    /* Windows ── the "Extra Windows" add-on */
+    var showWin=!!(selectedAddons&&selectedAddons.windows);
+    [0.74,0.9].forEach(function(fr,idx){
+      var w=e.windows[idx];w.visible=showWin;
+      if(!showWin)return;
+      var wW=L*0.09,wH=H*0.28;
+      var wx=-hl+L*fr, wy=H*0.62;
+      w.position.set(wx,wy,hd-0.35);
+      w.children[0].scale.set(wW,wH,1);
+      w.children[1].geometry.setFromPoints([new T.Vector3(0,-wH/2,0.01),new T.Vector3(0,wH/2,0.01)]);
+      w.children[2].geometry.setFromPoints([new T.Vector3(-wW/2,0,0.01),new T.Vector3(wW/2,0,0.01)]);
+    });
+
+    /* Camera ── auto-fit distance from a bounding sphere so any size
+       (60x30 to 200x150) frames nicely, azimuth/elevation driven by
+       theta/elevation, distance additionally scaled by zoom */
+    var boundR=Math.sqrt(hl*hl+hd*hd+totalH*totalH);
+    var dist=(boundR/Math.sin(16*Math.PI/180))*0.62*zoom;
+    var camY=Math.sin(elevation)*dist, camFlat=Math.cos(elevation)*dist;
+    e.camera.position.set(Math.sin(theta)*camFlat,camY+totalH*0.15,Math.cos(theta)*camFlat);
+    e.camera.lookAt(0,totalH*0.32,0);
+
+    /* Dimension labels: length label under the camera-facing eave edge
+       (same wall as the door), height label beside the nearer gable end */
+    var frontZ=hd+0.15;
+    setLabelText(e.lenLabel,Math.round(L)+' ft','#ff8c00');
+    e.lenLabel.position.set(0,-0.05,frontZ+0.6);
+    setLabelText(e.htLabel,Math.round(H)+' ft','rgba(255,255,255,0.9)');
+    e.htLabel.position.set(-hl-1.1,H/2,hd*0.4);
+    e.dimLine.geometry.setFromPoints([new T.Vector3(-hl,-0.05,frontZ+0.5),new T.Vector3(hl,-0.05,frontZ+0.5)]);
+    e.dimLine.computeLineDistances();
+
+    document.getElementById('pdim').textContent=Math.round(lenRaw)+' × '+Math.round(widRaw)+' ft';
+    e.renderer.render(e.scene,e.camera);
+  };
 
   /* ── FORMAT CURRENCY ── */
   function fmt(n){
