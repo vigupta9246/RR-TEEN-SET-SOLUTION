@@ -155,6 +155,37 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
     }
   }
 
+  // ── Lead capture → CRM ───────────────────────────────────────
+  // The Worker returns `lead` only after validating it (10-digit mobile that
+  // the visitor actually typed). We write it into the same Firestore "leads"
+  // collection the website forms use, so it appears in the CRM's Leads tab.
+  // lead-capture.js is loaded lazily (only when a lead exists) because most
+  // pages don't include it and we don't want Firebase loading on every pageview.
+  // Same URL as the <script type="module"> tag on form pages, so the browser
+  // reuses that module instead of loading it twice.
+  async function saveLead(lead) {
+    try {
+      if (sessionStorage.getItem('rrts_chat_lead') === lead.phone) return; // already saved this session
+    } catch (e) { /* storage blocked — continue */ }
+    try {
+      await import('/lead-capture.js?v=20260919');
+      if (typeof window.pushLeadToFirestore !== 'function') return;
+      const ok = await window.pushLeadToFirestore({
+        name: lead.name,
+        phone: lead.phone,
+        service: lead.service,
+        city: lead.city,
+        message: 'Chatbot: ' + (lead.note || 'callback requested'),
+        pageSource: 'chatbot:' + (location.pathname.replace(/^\//, '') || 'index.html')
+      });
+      if (ok) {
+        try { sessionStorage.setItem('rrts_chat_lead', lead.phone); } catch (e) {}
+      }
+    } catch (e) {
+      console.warn('[chatbot-widget] lead save failed:', e && e.message);
+    }
+  }
+
   async function sendMessage(text) {
     if (!text.trim() || isSending) return;
     isSending = true;
@@ -174,6 +205,7 @@ const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
       const reply = data.reply || data.error || "Sorry, kuch gadbad ho gayi. WhatsApp pe try karein.";
       addMessage('model', reply);
       history.push({ role: 'model', text: reply });
+      if (data.lead) saveLead(data.lead); // fire-and-forget; never blocks the chat
     } catch (err) {
       setTyping(false);
       addMessage('model', "Connection mein dikkat aa rahi hai. Please WhatsApp karein: +91 85272 58462");
