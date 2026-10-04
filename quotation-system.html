@@ -800,6 +800,7 @@ html.attendance-boot #attendance-screen{display:block!important}
       <button class="nav-btn" data-section="employee-profile" onclick="showSection('employee-profile')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></span><span>My Profile</span></button>
       <div class="nav-section">CRM</div>
       <button class="nav-btn" data-section="leads" onclick="showSection('leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M6 3h3l1.5 4.5-2 1.5a11 11 0 0 0 5.5 5.5l1.5-2L20 14v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-2Z"/></svg></span><span>Leads</span></button>
+      <button class="nav-btn" data-section="chat-leads" onclick="showSection('chat-leads')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-4 4V5Z"/><circle cx="9" cy="10.5" r=".8"/><circle cx="12" cy="10.5" r=".8"/><circle cx="15" cy="10.5" r=".8"/></svg></span><span>AI Chatbot</span></button>
       <button class="nav-btn" data-section="customers" onclick="showSection('customers')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><circle cx="9" cy="8" r="3"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15 19.5c.3-2.3 2-4 4-4"/></svg></span><span>Customers</span></button>
       <button class="nav-btn" data-section="tickets" onclick="showSection('tickets')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z"/><line x1="13" y1="7" x2="13" y2="17" stroke-dasharray="2,2"/></svg></span><span>Support Tickets</span> <span id="tickets-nav-badge" class="nav-badge" style="display:none">0</span></button>
       <button class="nav-btn" data-section="testimonials" onclick="showSection('testimonials')"><span class="nav-icon"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3.5l2.6 5.4 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.9Z"/></svg></span><span>Testimonials</span> <span id="testimonials-nav-badge" class="nav-badge" style="display:none">0</span></button>
@@ -1149,6 +1150,43 @@ html.attendance-boot #attendance-screen{display:block!important}
           </div>
             <div id="leads-pagination" class="pagination-wrap"></div>
             <div id="leads-loadmore"></div>
+        </div>
+      </section>
+
+      <!-- AI CHATBOT LEADS -->
+      <section id="chat-leads" class="section">
+        <div class="page-header">
+          <div class="page-title">AI Chatbot Leads</div>
+          <div class="page-sub">Visitors who shared their name &amp; number with the website chatbot — with what they asked, so you can call back with context</div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">TOTAL CHATBOT LEADS</div><div class="stat-value orange" id="cl-stat-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">NEW (NOT CONTACTED)</div><div class="stat-value orange" id="cl-stat-new">—</div></div>
+          <div class="stat-card"><div class="stat-label">LAST 7 DAYS</div><div class="stat-value green" id="cl-stat-week">—</div></div>
+          <div class="stat-card"><div class="stat-label">WON</div><div class="stat-value green" id="cl-stat-won">—</div></div>
+        </div>
+
+        <div class="history-controls">
+          <div class="search-box">
+            <input type="text" id="chat-lead-search-input" class="search-input" placeholder="Search by name, phone, city, requirement..." oninput="handleChatLeadsSearchDebounced(this.value)">
+          </div>
+          <select id="chat-lead-filter-status" class="form-select" style="padding:9px 12px;font-size:13px;max-width:160px" onchange="renderChatLeads(document.getElementById('chat-lead-search-input').value)">
+            <option value="">All Status</option>
+            <option>New</option><option>Contacted</option><option>Site Visit</option><option>Quoted</option><option>Won</option><option>Lost</option>
+          </select>
+          <button class="btn-export" onclick="exportChatLeadsCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg> Export CSV</button>
+        </div>
+
+        <div class="table-card">
+          <div style="overflow-x:auto">
+          <table class="data-table mobile-cards">
+            <thead><tr><th>Name</th><th>Phone / City</th><th>Service &amp; Requirement</th><th>Chat Page</th><th>Received</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="chat-leads-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">Loading…</td></tr></tbody>
+          </table>
+          </div>
+          <div id="chat-leads-pagination" class="pagination-wrap"></div>
+          <div id="chat-leads-loadmore"></div>
         </div>
       </section>
 
@@ -2507,8 +2545,8 @@ const ICONS = {
 
 // Which nav sections each role can see. Admin sees everything (incl. Team, admin-only).
 const ROLE_PERMISSIONS = {
-  Admin:    ['dashboard','create','history','analytics','leads','customers','invoice-create','invoices','labour','tickets','testimonials','careers','newsletter','team','deleted-items','activity-log','employee-profile'],
-  Sales:    ['dashboard','create','history','leads','customers','tickets','testimonials','careers','newsletter','employee-profile'],
+  Admin:    ['dashboard','create','history','analytics','leads','chat-leads','customers','invoice-create','invoices','labour','tickets','testimonials','careers','newsletter','team','deleted-items','activity-log','employee-profile'],
+  Sales:    ['dashboard','create','history','leads','chat-leads','customers','tickets','testimonials','careers','newsletter','employee-profile'],
   // NOTE: 'analytics' intentionally excluded for Accounts — that page is built
   // entirely from the quotations collection, which Accounts has no Firestore
   // read access to (see ROLE_READ_ACCESS below). Accounts already gets
@@ -2719,6 +2757,7 @@ function renderPaginationControls(containerId, key, page, totalPages, total) {
 window._gotoPage = (key, page) => {
   _pageState[key] = page;
   if (key === 'leads')     renderLeads(document.getElementById('lead-search-input')?.value || '', true);
+  if (key === 'chat-leads') renderChatLeads(document.getElementById('chat-lead-search-input')?.value || '', true);
   if (key === 'history')   renderHistory(document.getElementById('search-input')?.value || '', true);
   if (key === 'customers') renderCustomers(document.getElementById('cust-search-input')?.value || '', true);
   if (key === 'invoices')  renderInvoices(document.getElementById('inv-search-input')?.value || '', true);
@@ -4876,7 +4915,7 @@ function renderSecurityCard() {
 // ── MOBILE SIDEBAR (off-canvas drawer) ─────────────────────────
 const SECTION_TITLES = {
   dashboard:'Dashboard', create:'New Quotation', history:'History', analytics:'Analytics',
-  leads:'Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', careers:'Careers', newsletter:'Newsletter', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
+  leads:'Leads', 'chat-leads':'AI Chatbot Leads', customers:'Customers', tickets:'Support Tickets', testimonials:'Testimonials', careers:'Careers', newsletter:'Newsletter', 'invoice-create':'New Invoice', invoices:'Invoices & Payments',
   labour:'Labour & Wages',
   team:'Team', 'deleted-items':'Deleted Items', 'activity-log':'Activity Log', 'employee-profile':'My Profile'
 };
@@ -4913,6 +4952,7 @@ window.showSection = id => {
   if (id === 'invoices')  loadInvoices();
   if (id === 'invoice-create') populateQuotationDropdown();
   if (id === 'leads')     loadLeads();
+  if (id === 'chat-leads') loadChatLeads();
   if (id === 'customers') loadCustomers();
   if (id === 'tickets')   loadTickets();
   if (id === 'testimonials') loadTestimonials();
@@ -5368,6 +5408,120 @@ window.renderLeads = (search='', keepPage=false) => {
   renderPaginationControls('leads-pagination', 'leads', page, totalPages, total);
   document.getElementById('leads-select-all').checked = false;
   updateLeadsBulkBar();
+};
+
+// ── AI CHATBOT LEADS ────────────────────────────────────────────
+// Leads captured by the website chatbot (chatbot-widget.js → lead-capture.js)
+// live in the SAME `leads` collection as every other lead, marked with
+// sourcePage "chatbot:<page>" (and channel "AI Chatbot" on newer ones).
+// This tab is just a filtered view of them plus the chat context
+// (requirement note + conversation), so status changes, "Convert to
+// Quotation" and delete all reuse the existing Leads logic and stay in sync.
+const isChatLead = l => String(l.sourcePage || '').startsWith('chatbot:') || l.channel === 'AI Chatbot';
+const leadMs = l => { const d = l.createdAt?.toDate ? l.createdAt.toDate() : (l.createdAt ? new Date(l.createdAt) : null); return d && !isNaN(d) ? d.getTime() : 0; };
+const chatLeadRequirement = l => l.chatNote || String(l.notes || '').replace(/\s*[—-]\s*\(via [^)]*\)\s*$/, '').replace(/^Chatbot:\s*/, '');
+
+window.loadChatLeads = async () => {
+  try {
+    const { list } = await fetchFirstPage('leads', 'leads');
+    allLeads = list; // shared with the Leads tab so updateLeadStatus / convertLeadToQuotation work here too
+    renderChatLeads(document.getElementById('chat-lead-search-input')?.value || '');
+    renderLoadMoreButton('chat-leads-loadmore', 'leads', 'leads', () => {
+      allLeads = _cache.leads.data;
+      renderChatLeads(document.getElementById('chat-lead-search-input')?.value || '', true);
+    });
+  } catch(e) { reportError(e); showLoadError('chat-leads-tbody', 7, e); }
+};
+
+window.handleChatLeadsSearch = value => renderChatLeads(value);
+window.handleChatLeadsSearchDebounced = debounce(window.handleChatLeadsSearch);
+
+window.renderChatLeads = (search = '', keepPage = false) => {
+  const tbody = document.getElementById('chat-leads-tbody');
+  if (!tbody) return;
+  if (!_pageState['chat-leads']) _pageState['chat-leads'] = 1;
+  const all = allLeads.filter(l => !l.deleted && isChatLead(l));
+
+  const weekAgo = Date.now() - 7 * 86400000;
+  document.getElementById('cl-stat-total').textContent = all.length;
+  document.getElementById('cl-stat-new').textContent  = all.filter(l => (l.status || 'New') === 'New').length;
+  document.getElementById('cl-stat-week').textContent = all.filter(l => leadMs(l) >= weekAgo).length;
+  document.getElementById('cl-stat-won').textContent  = all.filter(l => l.status === 'Won').length;
+
+  let list = all;
+  const statusFilter = document.getElementById('chat-lead-filter-status')?.value;
+  if (search) {
+    const q = search.toLowerCase();
+    list = list.filter(l => [l.name, l.phone, l.addr, l.ptype, chatLeadRequirement(l)].some(v => String(v || '').toLowerCase().includes(q)));
+  }
+  if (statusFilter) list = list.filter(l => (l.status || 'New') === statusFilter);
+
+  const { pageItems, page, totalPages, total } = paginateList(list, 'chat-leads', keepPage);
+  tbody.innerHTML = pageItems.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px;color:#64748b">No chatbot leads yet</td></tr>`
+    : pageItems.map(l => {
+        const ms = leadMs(l);
+        const d = ms ? new Date(ms) : null;
+        const when = d ? d.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '—';
+        const isOpen = !['Won','Lost'].includes(l.status);
+        const age = daysSince(l.createdAt);
+        const ageClass = isOpen && age >= 3 ? 'balance-due' : 'balance-clear';
+        const digits = String(l.phone || '').replace(/\D/g, '');
+        const pageName = String(l.sourcePage || '').replace(/^chatbot:/, '') || '—';
+        const waBtn = isOpen ? `<a href="${waLink(l.phone, `Hello ${l.name}, this is R.R Teen Set Solution. You contacted us on our website chat about ${l.ptype || 'your requirement'}. How can we help you further? Thank you!`)}" target="_blank" rel="noopener noreferrer" class="btn-icon btn-whatsapp" title="Send WhatsApp Follow-up" aria-label="Send WhatsApp Follow-up">${ICONS.chat}</a>` : '';
+        return `<tr>
+        <td data-label="Name"><strong>${esc(l.name)}</strong></td>
+        <td data-label="Phone / City">${esc(l.phone)}<br><small>${esc(l.addr || '—')}</small></td>
+        <td data-label="Service &amp; Requirement"><strong>${esc(l.ptype || '—')}</strong><br><small>${esc(chatLeadRequirement(l) || '—')}</small></td>
+        <td data-label="Chat Page"><small>${esc(pageName)}</small></td>
+        <td data-label="Received">${esc(when)}<br><small class="mono ${ageClass}">${age}d ago</small></td>
+        <td data-label="Status">
+          <select onchange="updateChatLeadStatus('${l.id}',this.value)" class="form-select" style="padding:4px 8px;font-size:12px">
+            ${['New','Contacted','Site Visit','Quoted','Won','Lost'].map(s => `<option ${(l.status || 'New') === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td data-label="Actions" class="action-btns">
+          <a href="tel:+91${digits}" class="btn-icon" title="Call" aria-label="Call">${ICONS.phone}</a>
+          ${waBtn}
+          <button onclick="toggleChatTranscript('${l.id}')" class="btn-icon" title="View chat conversation" aria-label="View chat conversation">${ICONS.list}</button>
+          <button onclick="convertLeadToQuotation('${l.id}')" class="btn-icon" title="Convert to Quotation" aria-label="Convert to Quotation">${ICONS.fileText}</button>
+          <button onclick="delChatLead('${l.id}')" class="btn-icon btn-danger" title="Delete" aria-label="Delete">${ICONS.trash}</button>
+        </td></tr>
+        <tr id="chat-transcript-${l.id}" style="display:none"><td colspan="7" style="background:rgba(255,255,255,.03)">
+          <div style="font-size:12px;color:#94a3b8;margin-bottom:6px">CHAT CONVERSATION</div>
+          <div style="white-space:pre-wrap;font-size:13px;line-height:1.6">${l.chatTranscript ? esc(l.chatTranscript) : 'Conversation not saved for this lead (only available for leads captured after this feature was added).'}</div>
+        </td></tr>`;
+      }).join('');
+  renderPaginationControls('chat-leads-pagination', 'chat-leads', page, totalPages, total);
+};
+
+window.toggleChatTranscript = id => {
+  const row = document.getElementById('chat-transcript-' + id);
+  if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+};
+
+window.updateChatLeadStatus = async (id, status) => {
+  await updateLeadStatus(id, status);
+  renderChatLeads(document.getElementById('chat-lead-search-input')?.value || '', true);
+};
+
+window.delChatLead = async id => {
+  await delLead(id); // same confirm + soft-delete as the Leads tab
+  loadChatLeads();
+};
+
+window.exportChatLeadsCSV = async () => {
+  let rows;
+  try { rows = (await fetchCached('leads', 'leads')).filter(l => !l.deleted && isChatLead(l)); }
+  catch(e) { reportError(e); toast('Failed to load data for export: ' + e.message, 'error'); return; }
+  if (!rows.length) { toast('There is no chatbot lead to export.', 'warning'); return; }
+  const csv = toCSV(rows, [
+    ['Name','name'], ['Phone','phone'], ['City','addr'], ['Service','ptype'],
+    ['Requirement', l => chatLeadRequirement(l)], ['Chat Page', l => String(l.sourcePage || '').replace(/^chatbot:/, '')],
+    ['Status','status'], ['Conversation','chatTranscript'], ['Received', l => fbDate(l.createdAt)]
+  ]);
+  downloadCSV(`chatbot_leads_${csvDate()}.csv`, csv);
+  toast('Chatbot leads CSV downloaded!', 'success');
 };
 
 // ── BULK WHATSAPP (leads) ───────────────────────────────────────

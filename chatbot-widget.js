@@ -170,14 +170,25 @@ const WORKER_URL = 'https://rrts-chatbot-v2.vikashlogistics00.workers.dev';
     try {
       await import('/lead-capture.js?v=20260919');
       if (typeof window.pushLeadToFirestore !== 'function') return;
-      const ok = await window.pushLeadToFirestore({
+      const base = {
         name: lead.name,
         phone: lead.phone,
         service: lead.service,
         city: lead.city,
         message: 'Chatbot: ' + (lead.note || 'callback requested'),
         pageSource: 'chatbot:' + (location.pathname.replace(/^\//, '') || 'index.html')
+      };
+      // Conversation + channel for the CRM's "AI Chatbot" tab. If Firestore
+      // rules reject the extra fields, retry with the plain lead so a lead is
+      // never lost over this.
+      const transcript = history.slice(-20)
+        .map(h => (h.role === 'user' ? 'Visitor: ' : 'Bot: ') + h.text)
+        .join('\n').slice(0, 3000);
+      let ok = await window.pushLeadToFirestore({
+        ...base,
+        extra: { channel: 'AI Chatbot', chatNote: lead.note || '', chatTranscript: transcript }
       });
+      if (!ok) ok = await window.pushLeadToFirestore(base);
       if (ok) {
         try { sessionStorage.setItem('rrts_chat_lead', lead.phone); } catch (e) {}
       }

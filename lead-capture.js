@@ -62,6 +62,7 @@ window.pushLeadToFirestore = async function(data) {
     notesParts.push('(via ' + (data.pageSource || 'website') + ')');
 
     await addDoc(collection(db, 'leads'), {
+      ...(data.extra || {}), // optional extra fields (e.g. chatbot transcript); spread FIRST so it can never override the core fields below
       name: data.name,
       phone: data.phone,
       email: data.email || '',
