@@ -432,7 +432,7 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 #chatbot-header { background:linear-gradient(135deg,var(--navy) 0%,var(--steel) 65%,#2d4a8a 100%); padding:16px 18px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; position:relative; overflow:hidden; }
 #chatbot-header::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 90% -20%, rgba(92,169,255,.25), transparent 60%); pointer-events:none; }
 #chatbot-header-title { display:flex; align-items:center; gap:11px; position:relative; }
-#chatbot-avatar { width:40px; height:40px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:5px; box-shadow:0 3px 10px rgba(0,0,0,.2); }
+#chatbot-avatar { width:40px; height:40px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:0; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,.2); }
 #chatbot-avatar img { width:100%; height:100%; object-fit:contain; }
 #chatbot-name { font-size:14px; font-weight:800; color:#fff; letter-spacing:.2px; }
 #chatbot-status { font-size:11px; color:rgba(255,255,255,.68); display:flex; align-items:center; gap:5px; margin-top:3px; font-weight:500; }
