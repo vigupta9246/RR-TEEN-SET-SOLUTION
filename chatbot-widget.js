@@ -168,7 +168,7 @@ const WORKER_URL = 'https://rrts-chatbot-v2.vikashlogistics00.workers.dev';
       if (sessionStorage.getItem('rrts_chat_lead') === lead.phone) return; // already saved this session
     } catch (e) { /* storage blocked — continue */ }
     try {
-      await import('/lead-capture.js?v=20260919');
+      await import('/lead-capture.js?v=20261004');
       if (typeof window.pushLeadToFirestore !== 'function') return;
       const base = {
         name: lead.name,
