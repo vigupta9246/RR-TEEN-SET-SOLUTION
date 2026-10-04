@@ -12,7 +12,7 @@
  * open by default on every page.
  */
 
-const WORKER_URL = 'https://rrts-chatbot.vikashlogistics00.workers.dev';
+const WORKER_URL = 'https://rrts-chatbot-v2.vikashlogistics00.workers.dev';
 
 (function () {
   const WELCOME_MSG = "Namaste! 👋 Main R.R Teen Set Solution ka AI assistant hoon. Tin shed, industrial shed, PEB structure ya prefab warehouse ke baare mein kuch bhi pooch sakte hain.";
