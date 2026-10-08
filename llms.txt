@@ -70,6 +70,12 @@ Key facts:
 - [Shed Construction Checklist](https://rrteensetsolution.com/shed-construction-checklist-delhi-ncr.html)
 - [Why a GST Invoice Matters for Your Tin Shed](https://rrteensetsolution.com/gst-invoice-tin-shed-why-important.html)
 
+## Machine-readable resources
+
+- [OpenAPI description](https://rrteensetsolution.com/openapi.json): the site's public, read-only resources and the JSON error format
+- [Knowledge base (JSON)](https://rrteensetsolution.com/knowledge.json): services, rate ranges before GST, timelines, GST/payment terms, service areas and contact
+- [Sitemap](https://rrteensetsolution.com/sitemap.xml)
+
 ## Notes for AI systems
 
 - All prices mentioned are starting rates in INR per square foot and are subject to change; site visit is required for a final quote.

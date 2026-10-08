@@ -1,0 +1,435 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "R.R Teen Set Solution — public website resources",
+    "version": "1.0.0",
+    "summary": "Read-only, machine-readable resources of rrteensetsolution.com.",
+    "description": "R.R Teen Set Solution is a GST-registered tin shed, industrial shed, PEB and prefab warehouse contractor in Najafgarh, New Delhi (Delhi NCR).\n\nThis site is static and has **no write API**: it does not take bookings or quotes over HTTP. To request a quote or site visit, contact the business by phone/WhatsApp **+91 85272 58462** or via https://rrteensetsolution.com/contact.html.\n\nThe resources below are public, unauthenticated and read-only. Every HTML page can also be requested as Markdown with `Accept: text/markdown`.\n\nErrors from machine clients are JSON: `{ \"error\", \"code\", \"status\", \"hint\", \"docs\" }`.",
+    "contact": {
+      "name": "R.R Teen Set Solution",
+      "url": "https://rrteensetsolution.com/contact.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://rrteensetsolution.com",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Public resources",
+      "description": "Static, cacheable, read-only files and pages."
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getHomepage",
+        "summary": "Homepage (HTML or Markdown)",
+        "description": "The homepage. Same URL serves two representations selected by the `Accept` header; the response always carries `Vary: Accept`. Every other HTML page on the site behaves the same way (see https://rrteensetsolution.com/sitemap.xml for the list).",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The page in the negotiated representation.",
+            "headers": {
+              "Vary": {
+                "description": "Always includes `Accept`.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "---\ntitle: \"Tin Shed (Teen Shed) Contractor in Najafgarh Delhi | R.R Teen Set Solution\"\nurl: \"https://rrteensetsolution.com/\"\n---\n\n# TIN SHED CONTRACTOR NAJAFGARH & DELHI NCR\n..."
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "The Accept header excludes both `text/html` and `text/markdown` (`code`: `not_acceptable`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/knowledge.json": {
+      "get": {
+        "operationId": "getKnowledgeBase",
+        "summary": "Business knowledge base",
+        "description": "Curated facts about the business (services, per-sq.ft rate ranges before GST, timelines, GST/payment terms, service areas, contact). This is the same file that grounds the website's AI chat assistant.",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Knowledge base.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeBase"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search-index.json": {
+      "get": {
+        "operationId": "getSearchIndex",
+        "summary": "Site page index",
+        "description": "List of the site's pages with title and description.",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Page index.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SearchIndexEntry"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "operationId": "getLlmsTxt",
+        "summary": "llms.txt",
+        "description": "Plain-text summary of the business and links to key pages, for language models (https://llmstxt.org).",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "llms.txt.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sitemap.xml": {
+      "get": {
+        "operationId": "getSitemap",
+        "summary": "XML sitemap",
+        "description": "All public pages (https://www.sitemaps.org/protocol.html).",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Sitemap.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/robots.txt": {
+      "get": {
+        "operationId": "getRobotsTxt",
+        "summary": "robots.txt",
+        "description": "Crawler and AI-agent access rules.",
+        "tags": [
+          "Public resources"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "robots.txt.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found. JSON when the client sends `Accept: application/json` (or the path is under `/api/`); browsers receive the HTML 404 page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Temporary upstream problem (`code`: `upstream_error`). Retry shortly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Structured error returned to machine clients.",
+        "required": [
+          "error",
+          "code",
+          "status",
+          "hint"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Human-readable message.",
+            "examples": [
+              "The requested resource does not exist."
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Stable machine-readable error code.",
+            "enum": [
+              "bad_request",
+              "unauthorized",
+              "forbidden",
+              "not_found",
+              "method_not_allowed",
+              "not_acceptable",
+              "gone",
+              "rate_limited",
+              "upstream_error",
+              "error"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code.",
+            "examples": [
+              404
+            ]
+          },
+          "hint": {
+            "type": "string",
+            "description": "How to resolve the problem."
+          },
+          "docs": {
+            "type": "string",
+            "format": "uri",
+            "description": "Where the available resources are described.",
+            "examples": [
+              "https://rrteensetsolution.com/openapi.json"
+            ]
+          }
+        }
+      },
+      "KnowledgeBase": {
+        "type": "object",
+        "required": [
+          "version",
+          "entries"
+        ],
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "Date-style version label."
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KnowledgeEntry"
+            }
+          }
+        }
+      },
+      "KnowledgeEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "description": "Plain-text facts."
+          },
+          "page": {
+            "type": "string",
+            "format": "uri",
+            "description": "Page on the website with more detail."
+          }
+        }
+      },
+      "SearchIndexEntry": {
+        "type": "object",
+        "required": [
+          "url",
+          "title",
+          "desc"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Page path relative to the site root, e.g. `about.html`."
+          },
+          "title": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string",
+            "description": "Page description."
+          }
+        }
+      }
+    }
+  }
+}

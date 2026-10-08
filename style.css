@@ -251,6 +251,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .wcard:hover { transform:translateY(-7px) scale(1.015); box-shadow:var(--shadow-accent); border-color:rgba(241,60,32,.25); }
 .wcard-icon { font-size:32px; margin-bottom:14px; }
 .wcard h4   { font-size:18px; color:var(--text); margin-bottom:10px; }
+.wcard h3   { font-size:18px; letter-spacing:.5px; color:var(--text); margin-bottom:10px; } /* same look as .wcard h4 (homepage uses h3 for sequential heading order) */
 .wcard p    { font-size:13.5px; color:var(--text-muted); line-height:1.7; }
 
 .tcard { background:var(--bg-card); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); border:1px solid var(--border); transition:all var(--t); }
@@ -314,6 +315,7 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .pstep { text-align:center; padding:16px 10px; position:relative; z-index:1; }
 .pnum  { width:68px; height:68px; background:linear-gradient(135deg,var(--sky),var(--blue)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-size:24px; color:#fff; margin:0 auto 14px; box-shadow:0 6px 20px rgba(92,113,176,.3); }
 .pstep h4 { font-size:14px; color:var(--text); margin-bottom:6px; font-family:var(--font-h); }
+.pstep h3 { font-size:14px; letter-spacing:.5px; color:var(--text); margin-bottom:6px; font-family:var(--font-h); } /* same look as .pstep h4 */
 .pstep p  { font-size:12px; color:var(--text-muted); line-height:1.6; }
 
 /* ═══════════════════════════════════════════════════════
@@ -377,6 +379,7 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 .footer-grid  { display:grid; grid-template-columns:2.2fr 1fr 1fr 1.2fr; gap:40px; margin-bottom:40px; }
 .footer-about p { font-size:13px; color:rgba(239,226,186,.55); line-height:1.8; margin-top:14px; max-width:270px; }
 .footer-col h5  { font-family:var(--font-h); font-size:15px; color:#fff; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; }
+.footer-col h3  { font-family:var(--font-h); font-size:15px; color:#fff; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; } /* same look as .footer-col h5 */
 .footer-col ul  { list-style:none; display:flex; flex-direction:column; gap:9px; }
 .footer-col ul li a { color:rgba(239,226,186,.55); font-size:13px; transition:color var(--t); }
 .footer-col ul li a:hover { color:var(--accent-2); }
