@@ -101,8 +101,8 @@
           <p>We use essential cookies to make our site work. With your consent, we may also use analytics and marketing cookies to improve your experience and show relevant content. <a href="cookie-policy.html" class="cc-link">Cookie Policy</a> · <a href="privacy-policy.html" class="cc-link">Privacy Policy</a></p>
         </div>
         <div class="cc-banner-actions">
-          <button id="cc-manage" class="cc-btn cc-btn-ghost" aria-label="Manage cookie preferences">Manage Preferences</button>
-          <button id="cc-reject" class="cc-btn cc-btn-outline" aria-label="Reject non-essential cookies">Reject All</button>
+          <button id="cc-manage" class="cc-btn cc-btn-ghost" >Manage Preferences</button>
+          <button id="cc-reject" class="cc-btn cc-btn-outline" title="Reject non-essential cookies">Reject All</button>
           <button id="cc-accept" class="cc-btn cc-btn-primary" aria-label="Accept all cookies">Accept All</button>
         </div>
       </div>`;

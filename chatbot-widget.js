@@ -44,7 +44,7 @@ const WORKER_URL = 'https://rrts-chatbot-v2.vikashlogistics00.workers.dev';
 
   function buildUI() {
     const btn = el(`
-      <button id="chatbot-fab" aria-label="Chat with us" title="Chat with us">
+      <button id="chatbot-fab" aria-label="AI chat - chat with us" title="Chat with us">
         <svg viewBox="0 0 24 24" fill="none" id="chatbot-icon-chat">
           <path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8c-1.1 0-2.2-.2-3.1-.6L4 21l1.7-4.8C4.6 14.9 4 13.5 4 12z" fill="white"/>
           <circle cx="8.5" cy="12" r="1.15" fill="#1565c0"/>
