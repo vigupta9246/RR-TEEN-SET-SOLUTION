@@ -224,27 +224,32 @@
     (function(){
       var slides=document.querySelectorAll('.hslide');
       var dots=document.querySelectorAll('.hdot');
-      var cur=0;
+      var cur=0, timer=null;
+      function loadSlide(i){
+        var s=slides[i], bg=s&&s.getAttribute('data-bg');
+        if(bg){ s.style.backgroundImage="url('"+bg+"')"; s.removeAttribute('data-bg'); }
+      }
       function goTo(n){
         slides[cur].classList.remove('active');
         dots[cur].classList.remove('active');
         cur=(n+slides.length)%slides.length;
+        loadSlide(cur);
+        loadSlide((cur+1)%slides.length); /* only fetch the next slide, not all 8 at once */
         slides[cur].classList.add('active');
         dots[cur].classList.add('active');
       }
-      dots.forEach(function(d,i){d.addEventListener('click',function(){goTo(i);});});
-      setInterval(function(){goTo(cur+1);},3000);
-
-      // Lazy-load remaining slide backgrounds after first paint so they
-      // don't compete with the critical above-fold content on mobile.
-      function loadDeferredSlides(){
-        slides.forEach(function(s){
-          var bg = s.getAttribute('data-bg');
-          if (bg) { s.style.backgroundImage = "url('" + bg + "')"; s.removeAttribute('data-bg'); }
-        });
+      /* Autoplay starts on first interaction (or after 15s) so later full-screen slides
+         don't become late LCP candidates and the first paint stays stable. */
+      function start(){
+        if(timer) return;
+        loadSlide(1);
+        timer=setInterval(function(){goTo(cur+1);},3000);
       }
-      if (document.readyState === 'complete') { loadDeferredSlides(); }
-      else { window.addEventListener('load', loadDeferredSlides); }
+      dots.forEach(function(d,i){d.addEventListener('click',function(){start();goTo(i);});});
+      ['scroll','pointerdown','keydown','touchstart','mousemove'].forEach(function(ev){
+        window.addEventListener(ev,start,{once:true,passive:true});
+      });
+      setTimeout(start,15000);
     })();
   </script>
 
