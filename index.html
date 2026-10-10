@@ -360,23 +360,44 @@
   </a>
 </div>
 
-<!-- Trusted By / Client Companies -->
-<section style="padding:56px 5% 60px;background:var(--bg-alt)">
-  <div class="section-center" style="margin-bottom:36px"><div class="tag">Trusted By</div><h2 class="section-title">Companies We've <span>Worked With</span></h2></div>
-  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:24px;max-width:900px;margin:0 auto">
-    <div style="background:var(--bg-card,#fff);border:1.5px solid var(--border);border-radius:14px;padding:22px 36px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:220px;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-accent)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
-      <picture><source srcset="images/clients/aaj-supply-chain.webp" type="image/webp"><img src="images/clients/aaj-supply-chain.png" alt="AAJ Supply Chain Management Pvt. Ltd — client of R.R Teen Set Solution" style="max-height:56px;width:auto;object-fit:contain" loading="lazy" width="289" height="110"></picture>
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-top:12px;text-align:center;letter-spacing:.2px">AAJ Supply Chain Management Pvt. Ltd.</div>
-    </div>
-    <div style="background:var(--bg-card,#fff);border:1.5px solid var(--border);border-radius:14px;padding:22px 36px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:220px;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-accent)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
-      <picture><source srcset="images/clients/bharat-photon.webp" type="image/webp"><img src="images/clients/bharat-photon.png" alt="BPE Innovation Pvt. Ltd. (Bharat Photon) — client of R.R Teen Set Solution" style="max-height:56px;width:auto;object-fit:contain" loading="lazy" width="148" height="110"></picture>
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-top:12px;text-align:center;letter-spacing:.2px">BPE Innovation Pvt. Ltd.</div>
-    </div>
-    <div style="background:var(--bg-card,#fff);border:1.5px solid var(--border);border-radius:14px;padding:22px 36px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:220px;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-accent)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
-      <picture><source srcset="images/clients/pmv-maltings.webp" type="image/webp"><img src="images/clients/pmv-maltings.png" alt="PMV Maltings Pvt. Ltd. — client of R.R Teen Set Solution" style="max-height:56px;width:auto;object-fit:contain" loading="lazy" width="139" height="106"></picture>
-      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-top:12px;text-align:center;letter-spacing:.2px">PMV Maltings Pvt. Ltd.</div>
-    </div>
+<!-- Trusted By / Client Companies (auto-scrolling logo slider, right to left) -->
+<section style="padding:56px 0 60px;background:var(--bg-alt)">
+  <style>.tb-marquee{position:relative;overflow:hidden;max-width:1200px;margin:0 auto;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.tb-track{display:flex;width:max-content;padding:8px 0}
+.tb-group{display:flex;gap:20px;padding-right:20px}
+.tb-card{flex:0 0 auto;box-sizing:border-box;width:230px;height:128px;padding:16px 24px 12px;background:var(--bg-card,#fff);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .3s,box-shadow .3s}
+.tb-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-accent)}
+.tb-card img{max-height:52px;max-width:100%;width:auto;height:auto;object-fit:contain}
+.tb-card span{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:10px;text-align:center;line-height:1.3}
+.tb-marquee.is-live .tb-track{animation:tb-scroll var(--tb-dur,30s) linear infinite;will-change:transform}
+.tb-marquee.is-live:hover .tb-track,.tb-marquee.is-live:focus-within .tb-track{animation-play-state:paused}
+@keyframes tb-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tb-marquee:not(.is-live){-webkit-mask-image:none;mask-image:none}
+.tb-marquee:not(.is-live) .tb-track,.tb-marquee:not(.is-live) .tb-group{width:auto;flex-wrap:wrap;justify-content:center}
+@media(max-width:600px){.tb-card{width:190px;height:116px;padding:14px 16px 10px}.tb-card img{max-height:44px}}
+@media(prefers-reduced-motion:reduce){.tb-marquee.is-live .tb-track{animation:none;width:auto;flex-wrap:wrap;justify-content:center}.tb-marquee.is-live .tb-group{flex-wrap:wrap;justify-content:center}.tb-marquee.is-live .tb-group[aria-hidden]{display:none}.tb-marquee{-webkit-mask-image:none;mask-image:none}}</style>
+  <div class="section-center" style="margin-bottom:32px;padding:0 5%"><div class="tag">Trusted By</div><h2 class="section-title">Companies We've <span>Worked With</span></h2></div>
+  <div class="tb-marquee" id="tb-marquee" role="region" aria-label="Companies we have worked with">
+    <div class="tb-track"><div class="tb-group"><div class="tb-card"><picture><source srcset="images/clients/aaj-supply-chain.webp" type="image/webp"><img src="images/clients/aaj-supply-chain.png" alt="AAJ Supply Chain Management Pvt. Ltd — client of R.R Teen Set Solution" loading="lazy" width="289" height="110"></picture><span>AAJ Supply Chain Management Pvt. Ltd.</span></div><div class="tb-card"><picture><source srcset="images/clients/bharat-photon.webp" type="image/webp"><img src="images/clients/bharat-photon.png" alt="BPE Innovation Pvt. Ltd. (Bharat Photon) — client of R.R Teen Set Solution" loading="lazy" width="148" height="110"></picture><span>BPE Innovation Pvt. Ltd.</span></div><div class="tb-card"><picture><source srcset="images/clients/pmv-maltings.webp" type="image/webp"><img src="images/clients/pmv-maltings.png" alt="PMV Maltings Pvt. Ltd. — client of R.R Teen Set Solution" loading="lazy" width="139" height="106"></picture><span>PMV Maltings Pvt. Ltd.</span></div></div></div>
   </div>
+  <script>(function(){
+  var m=document.getElementById('tb-marquee'); if(!m) return;
+  var track=m.querySelector('.tb-track'), g=track.querySelector('.tb-group'), orig=g.innerHTML, t;
+  function build(){
+    m.classList.remove('is-live');
+    track.querySelectorAll('.tb-group[aria-hidden]').forEach(function(n){n.remove();});
+    g.innerHTML=orig;
+    var gw=g.scrollWidth, need=m.clientWidth, reps=Math.max(1,Math.ceil(need/gw));
+    for(var i=1;i<reps;i++) g.insertAdjacentHTML('beforeend',orig);
+    var g2=g.cloneNode(true); g2.setAttribute('aria-hidden','true');
+    g2.querySelectorAll('img').forEach(function(im){im.alt='';});
+    track.appendChild(g2);
+    m.style.setProperty('--tb-dur',(g.scrollWidth/45).toFixed(1)+'s');
+    m.classList.add('is-live');
+  }
+  build();
+  window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(build,250);});
+})();</script>
 </section>
 
 <section style="background:var(--bg-alt)">
