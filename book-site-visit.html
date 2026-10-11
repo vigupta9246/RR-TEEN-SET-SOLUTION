@@ -34,6 +34,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Book a Free Site Visit | Tin Shed & PEB Delhi NCR | R.R Teen Set">
+<meta name="twitter:description" content="Book a free site visit in 1 minute. Pick a date and time — we measure your site and give a written quote.">
 <meta name="twitter:image" content="https://rrteensetsolution.com/images/og-default.jpg">
 <link rel="canonical" href="https://rrteensetsolution.com/book-site-visit.html">
 <link rel="sitemap" type="application/xml" href="sitemap.xml">
@@ -72,6 +74,7 @@
 .bk-lead{font-size:16px;line-height:1.8;color:rgba(255,255,255,.84);max-width:540px;margin-bottom:20px}
 .bk-chips{display:flex;flex-wrap:wrap;gap:10px}
 .bk-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:800;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16)}
+.bk-chip[hidden]{display:none}
 .bk-chip svg{width:16px;height:16px;fill:none;stroke:#ffb86b;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .bk-rise{animation:bkRise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0s)}
 @keyframes bkRise{from{transform:translateY(22px)}to{transform:none}}
@@ -84,13 +87,16 @@
 @media(min-width:900px){
  .bk-hero-in{grid-template-columns:1.05fr .95fr}
  .bk-art{display:block;position:relative;padding:18px;border-radius:26px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 70px rgba(0,0,0,.4)}
- .bk-art svg{display:block;width:100%;height:auto}
+ .bk-art>svg{display:block;width:100%;height:auto}
  .bk-art-chip{position:absolute;display:flex;align-items:center;gap:8px;padding:10px 15px;border-radius:12px;background:rgba(12,24,48,.92);border:1px solid rgba(255,255,255,.2);font-size:13px;font-weight:800;color:#fff}
- .bk-art-chip.a{left:-22px;bottom:34px}.bk-art-chip.b{right:-14px;top:26px}
+ .bk-art-chip svg{width:16px;height:16px;flex:0 0 auto;fill:none;stroke:#ffb86b;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+ .bk-art-chip{white-space:nowrap}
+ .bk-art-chip.a{left:-22px;bottom:-18px}.bk-art-chip.b{right:-14px;top:26px}
 }
 /* ---------- layout ---------- */
-.bk-main{position:relative;z-index:2;max-width:1180px;margin:-70px auto 0;padding:0 5% 64px;display:grid;grid-template-columns:1fr;gap:26px;align-items:start}
-@media(min-width:960px){.bk-main{grid-template-columns:1.25fr .75fr;gap:32px}}
+.bk-main{position:relative;z-index:2;max-width:1180px;margin:-70px auto 0;padding:0 5% 64px;display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-items:start}
+.bk-main>*{min-width:0}
+@media(min-width:960px){.bk-main{grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:32px}}
 .bk-card{background:var(--bk-surface);border:1.5px solid var(--bk-line);border-radius:24px;box-shadow:var(--shadow-lg);padding:26px 22px 28px}
 @media(min-width:600px){.bk-card{padding:34px 36px 36px}}
 /* progress */
@@ -141,8 +147,8 @@
 /* date strip */
 .bk-dates{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 2px 12px;margin:0 -2px;scrollbar-width:thin}
 .bk-date{position:relative;flex:0 0 auto;scroll-snap-align:start;cursor:pointer}
-.bk-date span{display:flex;flex-direction:column;align-items:center;justify-content:center;width:72px;padding:12px 0 11px;border-radius:16px;border:1.5px solid var(--bk-line);background:var(--bk-surface);transition:all .25s}
-.bk-date em{font-style:normal;font-size:11.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--bk-mut)}
+.bk-date span{display:flex;flex-direction:column;align-items:center;justify-content:center;width:78px;padding:12px 0 11px;border-radius:16px;border:1.5px solid var(--bk-line);background:var(--bk-surface);transition:all .25s}
+.bk-date em{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.5px;white-space:nowrap;text-transform:uppercase;color:var(--bk-mut)}
 .bk-date strong{font-family:var(--font-h);font-weight:400;font-size:30px;line-height:1.1;color:var(--bk-ink)}
 .bk-date small{font-size:11.5px;font-weight:700;color:var(--bk-mut)}
 .bk-date:hover span{border-color:#d6341b;transform:translateY(-3px)}
@@ -208,7 +214,7 @@
 @keyframes bkConf{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
 /* sidebar */
 .bk-side{display:grid;gap:18px}
-@media(min-width:960px){.bk-side{position:sticky;top:calc(var(--nav-h) + 20px)}}
+@media(min-width:960px) and (min-height:900px){.bk-side{position:sticky;top:calc(var(--nav-h) + 20px)}}
 .bk-panel{background:var(--bk-surface);border:1.5px solid var(--bk-line);border-radius:22px;padding:24px 22px}
 .bk-panel h3{font-family:var(--font-h);font-weight:400;font-size:26px;letter-spacing:1px;color:var(--bk-ink);margin-bottom:14px}
 .bk-tl{list-style:none;position:relative;display:grid;gap:18px;counter-reset:t}
@@ -379,7 +385,7 @@ body{background:#faf5ea}
         <legend>Almost done &mdash; your details</legend>
         <div class="bk-sum" id="bk-sum"></div>
         <div class="bk-field" id="f-name"><label for="bk-name">Your name</label><input type="text" id="bk-name" name="name" autocomplete="name" placeholder="Full name" maxlength="60" aria-describedby="e-name"><div class="bk-err" id="e-name">Please enter your name.</div></div>
-        <div class="bk-field" id="f-phone"><label for="bk-phone">Mobile number</label><div class="bk-ph"><b>+91</b><input type="tel" id="bk-phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" maxlength="14" aria-describedby="e-phone"></div><div class="bk-err" id="e-phone">Enter a valid 10-digit mobile number.</div></div>
+        <div class="bk-field" id="f-phone"><label for="bk-phone">Mobile number</label><div class="bk-ph"><b>+91</b><input type="tel" id="bk-phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" maxlength="18" aria-describedby="e-phone"></div><div class="bk-err" id="e-phone">Enter a valid 10-digit mobile number.</div></div>
         <div class="bk-field"><label for="bk-note">Anything we should know? <span style="text-transform:none;letter-spacing:0;font-weight:600">(optional)</span></label><textarea id="bk-note" name="note" maxlength="300" placeholder="e.g. Terrace 20 x 30 ft, need parking shed before monsoon"></textarea></div>
         <div class="bk-hp" aria-hidden="true"><label>Leave this empty<input type="text" id="bk-hp" tabindex="-1" autocomplete="off"></label></div>
         <p class="bk-consent">By booking, you agree that we may call or WhatsApp you about this visit. We do not share your details.</p>
@@ -476,7 +482,7 @@ body{background:#faf5ea}
     $('#bk-sum').innerHTML='<div><small>Service</small>'+esc(s.dataset.label)+'</div><div><small>Location</small>'+esc(c.value+(a?' - '+a:''))+'</div><div><small>Date</small>'+esc(dt.dataset.long)+'</div><div><small>Time</small>'+esc(sl.dataset.time)+'</div>';
   }
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-  function show(n,back){
+  function show(n,back,init){
     cur=n;
     steps.forEach(function(s,i){var on=(i+1)===n;s.hidden=!on;s.classList.remove('is-in','is-back');if(on){void s.offsetWidth;s.classList.add('is-in');if(back)s.classList.add('is-back')}});
     $('#bk-sn').textContent=n; $('#bk-st').textContent=NAMES[n-1];
@@ -486,6 +492,7 @@ body{background:#faf5ea}
     $('#bk-next-t').textContent=(n===TOTAL)?'Confirm My Free Visit':'Continue';
     if(n===TOTAL)summary();
     refresh();
+    if(init)return; /* first paint: keep the page at the top so the hero is seen */
     var lg=steps[n-1].querySelector('legend'); lg.setAttribute('tabindex','-1'); try{lg.focus({preventScroll:true})}catch(e){}
     var card=$('#bk-card'),r=card.getBoundingClientRect();
     if(r.top<0||r.top>window.innerHeight*.45)card.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});
@@ -572,9 +579,9 @@ body{background:#faf5ea}
     try{
       var p=new URLSearchParams(location.search),sv=p.get('service'),ct=p.get('city');
       if(ct){var c=$$('input[name="city"]').filter(function(i){return i.value.toLowerCase()===ct.toLowerCase()})[0];if(c)c.checked=true}
-      if(sv){var i=form.querySelector('input[name="svc"][value="'+sv.replace(/[^a-z]/g,'')+'"]');if(i){i.checked=true;show(2,false);return}}
+      if(sv){var i=form.querySelector('input[name="svc"][value="'+sv.replace(/[^a-z]/g,'')+'"]');if(i){i.checked=true;show(2,false,true);return}}
     }catch(e){}
-    show(1,false);
+    show(1,false,true);
   })();
   /* reveal sidebar panels */
   var els=$$('.bk-rv');
