@@ -11,7 +11,7 @@ Key facts:
 
 ## Core Pages
 
-- [Home](https://rrteensetsolution.com/index.html): Overview of the company, services, rates, and service areas
+- [Home](https://rrteensetsolution.com/): Overview of the company, services, rates, and service areas
 - [About Us](https://rrteensetsolution.com/about.html): Company background, proprietor Subhash Kumar, experience
 - [All Services](https://rrteensetsolution.com/services.html): Full list of fabrication services offered
 - [Projects](https://rrteensetsolution.com/projects.html): Completed project gallery
