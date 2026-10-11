@@ -73,7 +73,8 @@
     '.bi-pager button:hover:not([disabled]){border-color:var(--blue,#4056a1)}' +
     '.bi-pager button.on{background:var(--navy,#16264f);border-color:var(--navy,#16264f);color:#fff}' +
     '.bi-pager button[disabled]{opacity:.4;cursor:default}' +
-    '@media(max-width:640px){.bi-chips{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}}';
+    '.bi-chips::-webkit-scrollbar{display:none}' +
+    '@media(max-width:640px){.bi-wrap{margin-bottom:22px}.bi-search{margin-bottom:12px}.bi-search input{padding:11px 40px 11px 14px;font-size:14px}.bi-chips{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;margin:0 -5%;padding:2px 5% 4px;-webkit-overflow-scrolling:touch}.bi-chip{padding:6px 12px;font-size:12px;flex:0 0 auto}.bi-status{margin-top:10px;font-size:12px}.bi-pager{gap:6px;margin-top:26px}.bi-pager button{min-width:36px;height:36px;padding:0 10px;font-size:13px}}';
   document.head.appendChild(style);
 
   /* Controls */
@@ -98,8 +99,9 @@
   empty.innerHTML = 'Koi article nahi mila. <a role="button" tabindex="0">Filters reset karein</a>';
   grid.appendChild(empty);
 
-  var pager = document.createElement('nav');
+  var pager = document.createElement('div');
   pager.className = 'bi-pager';
+  pager.setAttribute('role', 'navigation');
   pager.setAttribute('aria-label', 'Blog pages');
   grid.parentNode.insertBefore(pager, grid.nextSibling);
 
