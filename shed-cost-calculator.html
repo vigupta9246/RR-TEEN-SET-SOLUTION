@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>(function(){try{var t=localStorage.getItem("rr_theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -47,8 +48,8 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20261008">
-<link rel="stylesheet" href="cookie-consent.css?v=20261008">
+<link rel="stylesheet" href="style.css?v=20261011">
+<link rel="stylesheet" href="cookie-consent.css?v=20261011">
 <link rel="stylesheet" href="exit-intent.css?v=1">
 <meta name="geo.region" content="IN-DL">
 <meta name="geo.placename" content="Najafgarh, Delhi">
@@ -660,6 +661,26 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 
 /* Rate slider hint text */
 .rate-hint{font-size:10.5px;color:rgba(255,255,255,.5);margin:-2px 0 20px;text-align:center}
+
+/* dark mode */
+html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!important}
+[data-theme="dark"] .calc-page-hero{background:linear-gradient(160deg,#161b22 0%,#1c2333 60%,#161b22 100%)}
+[data-theme="dark"] .calc-hero-h1,[data-theme="dark"] .stype-name,[data-theme="dark"] .addon-name{color:#e6edf3}
+[data-theme="dark"] .calc-hero-sub,[data-theme="dark"] .slider-label{color:#b6c2d1}
+[data-theme="dark"] .calc-hero-stats,[data-theme="dark"] .stype-card,[data-theme="dark"] .slider-block,[data-theme="dark"] .addon-card{background:#1c2333;border-color:#30363d;box-shadow:none}
+[data-theme="dark"] .stype-card.active{background:rgba(255,111,0,.1);border-color:#ff6f00}
+[data-theme="dark"] .addon-card.active{background:rgba(255,111,0,.1);border-color:#ff6f00}
+[data-theme="dark"] .calc-stat{border-right-color:#30363d}
+[data-theme="dark"] .calc-stat-lbl,[data-theme="dark"] .stype-rate,[data-theme="dark"] .addon-price,[data-theme="dark"] .lead-trust-line,[data-theme="dark"] .preview-title,[data-theme="dark"] .calc-reset-btn{color:#9aa4b2}
+[data-theme="dark"] .stype-card.active .stype-rate,[data-theme="dark"] .addon-card.active .addon-price{color:#ff9a4d}
+[data-theme="dark"] .preview-wrap{background:linear-gradient(160deg,#161b22 0%,#1c2333 100%);border-color:rgba(255,140,60,.3)}
+[data-theme="dark"] #sl-loc{background:#161b22!important;border-color:#30363d!important;color:#e6edf3!important}
+[data-theme="dark"] #sl-loc option{background:#161b22;color:#e6edf3}
+[data-theme="dark"] .addon-check{background:#161b22;border-color:#4a5568}
+[data-theme="dark"] .calc-progress-track{background:rgba(255,255,255,.1)}
+[data-theme="dark"] .value-tier.tier-budget{color:#4ade80}
+[data-theme="dark"] .value-tier.tier-best{color:#ffc266}
+[data-theme="dark"] .value-tier.tier-premium{color:#9db0ff}
 </style>
 </head>
 <body>
@@ -721,7 +742,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
     </li>
     <li><a href="contact.html" class="nav-cta">Get Quote</a></li>
   </ul>
-  <button id="theme-btn" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle Dark Mode"><svg class="icon"><use href="#i-moon"></use></svg></button>
+  <button id="theme-btn" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Dark mode"><svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.4 14.6A8.5 8.5 0 0 1 9.4 3.6a8.5 8.5 0 1 0 11 11z"/></svg><svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3L7 7M17 17l1.7 1.7M18.7 5.3L17 7M7 17l-1.7 1.7"/></svg></button>
   <button class="hamburger" id="ham-btn" aria-label="Open Menu" aria-expanded="false" aria-controls="mob-menu">
     <span></span><span></span><span></span>
   </button>
@@ -1210,7 +1231,7 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-<script src="main.js?v=20260921" defer></script><script src="site-search.js?v=1"></script>
+<script src="main.js?v=20261011" defer></script><script src="site-search.js?v=1"></script>
 <script src="cookie-consent.js?v=20261008" defer></script>
 
 <!-- ══════════════════════════════════════════════════════════════════

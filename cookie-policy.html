@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>(function(){try{var t=localStorage.getItem("rr_theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}})()</script>
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -45,7 +46,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="cookie-consent.css?v=20261008">
+  <link rel="stylesheet" href="cookie-consent.css?v=20261011">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: #f8f9fc; color: #1a1f36; line-height: 1.7; }
@@ -131,7 +132,24 @@
     .contact-box p { font-size: 14px; color: #374151; margin-bottom: 6px; }
 
     footer { text-align: center; padding: 28px 24px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7ef; background: white; }
-  </style>
+  
+/* dark mode */
+[data-theme="dark"] body{background:#0d1117;color:#d0d7de}
+[data-theme="dark"] .toc,[data-theme="dark"] .contact-box,[data-theme="dark"] .effective-date,[data-theme="dark"] footer,[data-theme="dark"] .cookie-table,[data-theme="dark"] .cookie-table-wrap{background:#161b22;border-color:#30363d}
+[data-theme="dark"] .toc h3,[data-theme="dark"] .effective-date,[data-theme="dark"] footer{color:#9aa4b2}
+[data-theme="dark"] .toc li a,[data-theme="dark"] .back-link{color:#8fa5e8}
+[data-theme="dark"] .policy-section h2{color:#e6edf3;border-bottom-color:#30363d}
+[data-theme="dark"] .policy-section p,[data-theme="dark"] .policy-section li,[data-theme="dark"] .contact-box p,[data-theme="dark"] .cookie-table td{color:#c3ccd6}
+[data-theme="dark"] .policy-section strong,[data-theme="dark"] .contact-box strong,[data-theme="dark"] .cookie-name{color:#e6edf3}
+[data-theme="dark"] .info-box,[data-theme="dark"] .info-box strong{color:#a8c5ff}
+[data-theme="dark"] .info-box{background:rgba(37,99,235,.14);border-color:rgba(96,165,250,.35)}
+[data-theme="dark"] .warning-box{background:rgba(217,119,6,.14);border-color:rgba(252,211,77,.35);color:#fcd34d}
+[data-theme="dark"] .cookie-table td{border-bottom-color:#30363d}
+[data-theme="dark"] .cookie-table tr:hover td{background:#1c2333}
+[data-theme="dark"] .badge-necessary{background:rgba(5,150,105,.2);color:#6ee7b7}
+[data-theme="dark"] .badge-analytics{background:rgba(59,130,246,.2);color:#93c5fd}
+[data-theme="dark"] .badge-marketing{background:rgba(217,119,6,.2);color:#fcd34d}
+</style>
 </head>
 <body>
 

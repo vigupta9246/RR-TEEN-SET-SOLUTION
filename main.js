@@ -9,22 +9,28 @@
    1. DARK MODE
 ════════════════════════════════════════════════════════════ */
 (function(){
-  var KEY = 'rr_theme';
-  function get(){ return localStorage.getItem(KEY) || (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'); }
-  function apply(t){
-    document.documentElement.setAttribute('data-theme',t);
-    localStorage.setItem(KEY,t);
-    var b=document.getElementById('theme-btn');
-    if(b) b.textContent = t==='dark'?'☀️':'🌙';
+  var KEY = 'rr_theme', root = document.documentElement, mq = window.matchMedia ? matchMedia('(prefers-color-scheme:dark)') : null;
+  function stored(){ try { return localStorage.getItem(KEY); } catch(e){ return null; } }
+  function current(){ return stored() || (mq && mq.matches ? 'dark' : 'light'); }
+  function paint(t){
+    root.setAttribute('data-theme', t);
+    var b = document.getElementById('theme-btn');
+    if (b){ b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false'); b.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'); b.title = t === 'dark' ? 'Light mode' : 'Dark mode'; }
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0d1117' : '#0a1628');
   }
-  apply(get());
-  document.addEventListener('DOMContentLoaded',function(){
-    apply(get());
-    var b=document.getElementById('theme-btn');
-    if(b) b.addEventListener('click',function(){
-      apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+  paint(current());
+  document.addEventListener('DOMContentLoaded', function(){
+    paint(current());
+    var b = document.getElementById('theme-btn');
+    if (b) b.addEventListener('click', function(){
+      var t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(KEY, t); } catch(e){}
+      paint(t);
     });
   });
+  /* follow the phone/computer setting until the visitor picks a theme themselves */
+  if (mq && mq.addEventListener) mq.addEventListener('change', function(e){ if (!stored()) paint(e.matches ? 'dark' : 'light'); });
 })();
 
 /* ════════════════════════════════════════════════════════════

@@ -270,3 +270,6 @@ body.cc-modal-open { overflow: hidden; }
 
 /* Print */
 @media print { #cc-banner, #cc-modal-overlay { display: none !important; } }
+
+/* dark mode */
+[data-theme="dark"]{--cc-bg:#161b22;--cc-bg-modal:#161b22;--cc-overlay:rgba(0,0,0,.65);--cc-bg-cat:#1c2333;--cc-border:#30363d;--cc-text:#e6edf3;--cc-muted:#9aa4b2;--cc-small:#8b949e;--cc-accent:#6c9bff;--cc-accent-h:#8fb4ff;--cc-lite:rgba(108,155,255,.12);--cc-shadow:0 -4px 24px rgba(0,0,0,.5);--cc-shadow-m:0 20px 60px rgba(0,0,0,.6)}

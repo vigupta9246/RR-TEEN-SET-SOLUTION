@@ -623,3 +623,67 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 #nl-msg.ok { color:#6fcf7f; }
 #nl-msg.err { color:#ff8a80; }
 @media(max-width:600px) { #newsletter-bar { padding:20px 18px; margin-bottom:32px; } .nl-inner { flex-direction:column; align-items:stretch; } #nl-form { flex-direction:column; } #nl-email { min-width:0; } }
+
+/* ===================== DARK MODE LAYER (v2) ===================== */
+[data-theme="dark"]{color-scheme:dark;--blue-t:#8fa5e8;--accent-t:#ff7a5c}
+/* theme toggle icon */
+.theme-toggle{position:relative;overflow:hidden;color:#16264f;-webkit-tap-highlight-color:transparent}
+.theme-toggle svg{position:absolute;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .55s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
+.theme-toggle .ic-sun{opacity:0;transform:rotate(-90deg) scale(.3)}
+.theme-toggle .ic-moon{opacity:1;transform:none}
+.theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.theme-toggle:active svg{transform:scale(.88)}
+[data-theme="dark"] .theme-toggle{color:#fbbf24;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+[data-theme="dark"] .theme-toggle:hover{background:rgba(255,255,255,.16);color:#fcd34d}
+[data-theme="dark"] .theme-toggle .ic-sun{opacity:1;transform:none}
+[data-theme="dark"] .theme-toggle .ic-moon{opacity:0;transform:rotate(90deg) scale(.3)}
+/* navigation */
+[data-theme="dark"] nav{background:rgba(13,17,23,.94);box-shadow:0 2px 18px rgba(0,0,0,.55)}
+[data-theme="dark"] .nav-links a,[data-theme="dark"] .dropdown a{color:#e6edf3}
+[data-theme="dark"] .nav-links a:hover,[data-theme="dark"] .nav-links a.active,[data-theme="dark"] .dropdown a:hover,[data-theme="dark"] #mob-menu a:hover{color:var(--accent-t)}
+[data-theme="dark"] .dropdown{background:#161b22;border-color:#30363d;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+[data-theme="dark"] .dropdown a:hover{background:rgba(255,255,255,.06)}
+[data-theme="dark"] .logo-img-wrap{background:#fff;border-radius:10px;padding:3px 8px}
+[data-theme="dark"] .logo-tag{color:var(--accent-t)}
+/* headings, tags, links that used brand blue / orange as text */
+[data-theme="dark"] .section-title span,[data-theme="dark"] .btn-outline,[data-theme="dark"] .scard-link,[data-theme="dark"] .tcard-badge,[data-theme="dark"] summary::after,[data-theme="dark"] #chatbot-footer a,[data-theme="dark"] .icn-phone,[data-theme="dark"] .tag:not(.tag-dark):not(.tag-accent){color:var(--blue-t)}
+[data-theme="dark"] .btn-outline{border-color:var(--blue-t)}
+[data-theme="dark"] .tag:not(.tag-dark):not(.tag-accent){background:rgba(143,165,232,.1);border-color:rgba(143,165,232,.28)}
+[data-theme="dark"] .tag-accent,[data-theme="dark"] .price-accent,[data-theme="dark"] .icn-pin,[data-theme="dark"] .icn-mail{color:var(--accent-t)}
+[data-theme="dark"] .icn-gst,[data-theme="dark"] .icn-mobile,[data-theme="dark"] .icn-person{color:#a9b8e8}
+/* chatbot */
+[data-theme="dark"] #chatbot-panel,[data-theme="dark"] #chatbot-input-row,[data-theme="dark"] #chatbot-footer{background:#161b22;border-color:#30363d}
+[data-theme="dark"] #chatbot-messages{background:linear-gradient(180deg,#0d1117,#131a24)}
+[data-theme="dark"] .chatbot-msg-bot{background:#1c2333;color:#e6edf3}
+[data-theme="dark"] #chatbot-typing,[data-theme="dark"] .chatbot-qr-chip{background:#1c2333;color:#e6edf3;border-color:#30363d}
+[data-theme="dark"] .chatbot-qr-chip:hover{background:#26324a}
+[data-theme="dark"] #chatbot-input{background:#0d1117;color:#e6edf3;border-color:#30363d}
+[data-theme="dark"] #chatbot-footer{color:#9aa4b2}
+/* blog + city pages (page-level CSS hard-coded dark text on light panels) */
+[data-theme="dark"] .blog-body h2,[data-theme="dark"] .city-body h2{color:var(--text);border-left-color:#5c8dff}
+[data-theme="dark"] .blog-body h3,[data-theme="dark"] .city-body h3,[data-theme="dark"] .related-link,[data-theme="dark"] .blog-tag{color:#8fb4ff}
+[data-theme="dark"] .blog-body p,[data-theme="dark"] .blog-body li,[data-theme="dark"] .city-body p,[data-theme="dark"] .city-body li{color:#b6c2d1}
+[data-theme="dark"] .blog-body strong,[data-theme="dark"] .city-body strong,[data-theme="dark"] .price-box h3,[data-theme="dark"] .related-posts h3,[data-theme="dark"] .blog-highlight p,[data-theme="dark"] .city-highlight p{color:var(--text)}
+[data-theme="dark"] .blog-highlight,[data-theme="dark"] .city-highlight{background:linear-gradient(135deg,rgba(64,86,161,.28),rgba(64,86,161,.14));border-left-color:#5c8dff}
+[data-theme="dark"] .blog-warning{background:rgba(255,111,0,.1)}
+[data-theme="dark"] .blog-warning p{color:#ffd8a8}
+[data-theme="dark"] .price-box,[data-theme="dark"] .city-rate,[data-theme="dark"] .related-posts{background:var(--bg-card);border-color:var(--border)}
+[data-theme="dark"] .price-row,[data-theme="dark"] .city-rate-row{border-bottom-color:var(--border)}
+[data-theme="dark"] .price-row .price,[data-theme="dark"] .city-rate-row .price{color:#ff9a4d}
+[data-theme="dark"] .related-link{background:var(--bg-alt);border-color:var(--border)}
+[data-theme="dark"] .related-link:hover{border-color:#8fb4ff}
+[data-theme="dark"] .blog-tag{background:rgba(64,86,161,.22);border-color:rgba(143,180,255,.25)}
+[data-theme="dark"] .img-suggestion{background:var(--bg-card);border-color:#3a4768}
+[data-theme="dark"] .img-suggestion p{color:#9aa4b2}
+[data-theme="dark"] .proj-filter-chip:not(.active){background:var(--bg-card);color:var(--text);border-color:var(--border)}
+/* inline styles written directly in the HTML */
+[data-theme="dark"] [style*="color:#0a1628"],[data-theme="dark"] [style*="color: #0a1628"],[data-theme="dark"] [style*="color:#16264f"],[data-theme="dark"] [style*="color:var(--navy)"],[data-theme="dark"] [style*="color:#1e2f5b"]{color:var(--text)!important}
+[data-theme="dark"] [style*="background:#fff;"],[data-theme="dark"] [style*="background:#ffffff"],[data-theme="dark"] [style*="background: #fff"]{background:var(--bg-card)!important}
+[data-theme="dark"] [style*="color:var(--blue)"],[data-theme="dark"] [style*="color:#4056a1"]{color:var(--blue-t)!important}
+[data-theme="dark"] [style*="color:var(--accent)"]{color:var(--accent-t)!important}
+/* photos: slightly softer so they do not glare on dark backgrounds */
+[data-theme="dark"] .proj-item img,[data-theme="dark"] .scard img,[data-theme="dark"] .tcard img{filter:brightness(.92)}
+/* hamburger menu icon: was hard-coded dark navy, invisible on the dark nav */
+[data-theme="dark"] .hamburger span{background:#e6edf3}
+[data-theme="dark"] .hamburger:active{background:rgba(255,255,255,.1)}
+@media (prefers-reduced-motion:reduce){.theme-toggle svg{transition:none}}
