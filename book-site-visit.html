@@ -388,7 +388,7 @@ body{background:#faf5ea}
         <div class="bk-field" id="f-phone"><label for="bk-phone">Mobile number</label><div class="bk-ph"><b>+91</b><input type="tel" id="bk-phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" maxlength="18" aria-describedby="e-phone"></div><div class="bk-err" id="e-phone">Enter a valid 10-digit mobile number.</div></div>
         <div class="bk-field"><label for="bk-note">Anything we should know? <span style="text-transform:none;letter-spacing:0;font-weight:600">(optional)</span></label><textarea id="bk-note" name="note" maxlength="300" placeholder="e.g. Terrace 20 x 30 ft, need parking shed before monsoon"></textarea></div>
         <div class="bk-hp" aria-hidden="true"><label>Leave this empty<input type="text" id="bk-hp" tabindex="-1" autocomplete="off"></label></div>
-        <p class="bk-consent">By booking, you agree that we may call or WhatsApp you about this visit. We do not share your details.</p>
+        <p class="bk-consent">By booking, you agree that we may call, SMS or WhatsApp you about this visit. We do not share your details.</p>
         <div class="bk-msg" id="bk-msg" role="alert"></div>
       </fieldset>
 
@@ -449,6 +449,7 @@ body{background:#faf5ea}
   var NAMES=['Service','Location','Schedule','Details'];
   var SLOT={m:[9,12],a:[12,15],e:[15,18]};
   var WA='918527258462';
+  var SMS_URL='https://rrts-sms.vikashlogistics00.workers.dev'; /* confirmation SMS Worker (workers/sms-worker.js) */
   var nextBtn=$('#bk-next-btn'), backBtn=$('#bk-back');
   function pad(n){return (n<10?'0':'')+n}
   function checked(n){return form.querySelector('input[name="'+n+'"]:checked')}
@@ -557,6 +558,12 @@ body{background:#faf5ea}
     var card=$('#bk-card'); card.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});
     try{if(window.gtag)gtag('event','generate_lead',{event_category:'site_visit',event_label:d.svc,value:1})}catch(e){}
   }
+  /* Confirmation SMS: only when the booking really reached the CRM; never blocks or alters the booking flow. */
+  function sendSms(d){
+    if(!SMS_URL)return;
+    try{fetch(SMS_URL,{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,
+      body:JSON.stringify({name:d.name,phone:d.phone,ref:d.ref,date:d.date,slot:d.slotKey})}).catch(function(){})}catch(e){}
+  }
   function fieldErr(id,on){var f=$('#'+id); if(f)f.classList.toggle('has-err',on)}
   function submitFinal(){
     var okName=$('#bk-name').value.trim().length>=2, okPhone=/^[6-9]\d{9}$/.test(phoneDigits($('#bk-phone').value));
@@ -565,7 +572,7 @@ body{background:#faf5ea}
     if(!okPhone){$('#bk-phone').focus();return}
     if($('#bk-hp').value){return} /* bot */
     var d=collect(); nextBtn.classList.add('load'); nextBtn.disabled=true; $('#bk-msg').classList.remove('show');
-    save(d).then(function(ok){finish(d,ok)});
+    save(d).then(function(ok){if(ok)sendSms(d);finish(d,ok)});
   }
   $('#bk-name').addEventListener('input',function(){fieldErr('f-name',false)});
   $('#bk-phone').addEventListener('input',function(){fieldErr('f-phone',false)});

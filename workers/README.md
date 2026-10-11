@@ -1,6 +1,6 @@
 # Cloudflare Workers for rrteensetsolution.com
 
-Two single-file Workers (no dependencies, no build step). Paste each into the Cloudflare dashboard
+Single-file Workers (no dependencies, no build step). Paste each into the Cloudflare dashboard
 (**Workers & Pages → Create → Create Worker → Edit code**). **Do not connect them to Git** — a Git-connected
 Worker is overwritten by the website's static files on every push.
 
@@ -8,6 +8,7 @@ Worker is overwritten by the website's static files on every push.
 |---|---|---|
 | `edge-worker.js` | `rrts-edge` | Runs in front of the site. `Accept: text/markdown` → page as Markdown (`Vary: Accept`, q-values, 406); JSON errors for machines. |
 | `chatbot-worker.js` | `rrts-chatbot-v2` | AI chat proxy (Gemini). Needs Secret `GEMINI_API_KEY`. Answers from `/knowledge.json`. Structured JSON errors. |
+| `sms-worker.js` | `rrts-sms` | Booking confirmation SMS via [httpSMS](https://httpsms.com) (our Android phone). Called by `book-site-visit.html` only after the lead is saved. Text is built server-side; one SMS per number per 24 h; rate-limited. |
 
 These files contain no secrets (the API key lives in a Cloudflare Secret).
 
@@ -44,6 +45,25 @@ curl -sS -i https://rrteensetsolution.com/robots.txt
 # Agent user-agents reach the homepage (expect 200, not a challenge page)
 for ua in GPTBot ClaudeBot ChatGPT-User PerplexityBot Applebot-Extended; do
   curl -sS -o /dev/null -w "$ua %{http_code}\n" -A "$ua" https://rrteensetsolution.com/; done
+```
+
+## Deploy `sms-worker.js` (booking confirmation SMS)
+1. **httpSMS**: create an account at httpsms.com, install the Android app on the office phone (sign in with the API key, allow SMS permission, disable battery optimisation for the app, keep the phone on and online). Copy the API key from httpsms.com/settings.
+2. Cloudflare dashboard -> **Workers & Pages -> Create Worker**, name it exactly `rrts-sms`, paste `sms-worker.js`, **Deploy**. (Do not connect it to Git.)
+3. **Storage & Databases -> KV -> Create** a namespace (e.g. `rrts-sms-limits`). Worker -> **Settings -> Bindings -> Add -> KV namespace**, variable name `SMS_LIMITS`.
+4. Worker -> **Settings -> Variables and Secrets**:
+   - Secret `HTTPSMS_API_KEY` = the httpSMS API key
+   - Variable `SMS_FROM` = the phone's number with country code, e.g. `+919876543210`
+   - Variable `SMS_DAILY_CAP` (optional, default 20)
+5. The site already calls `https://rrts-sms.vikashlogistics00.workers.dev`. If the Worker gets a different URL, change `SMS_URL` in `book-site-visit.html`.
+
+Without the secret, variable or KV binding the Worker answers `503 not_configured` and **no SMS is sent**; bookings are never affected.
+
+Test (replace the number and use a Mon-Sat date within 60 days; this sends a real SMS):
+```sh
+curl -sS -i -X POST https://rrts-sms.vikashlogistics00.workers.dev/ \
+  -H 'Origin: https://rrteensetsolution.com' -H 'Content-Type: application/json' \
+  -d '{"name":"Test","phone":"98XXXXXXXX","ref":"RR-TEST","date":"2026-10-14","slot":"a"}'
 ```
 
 ## Tests
