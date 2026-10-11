@@ -17,6 +17,7 @@ Key facts:
 - [Projects](https://rrteensetsolution.com/projects.html): Completed project gallery
 - [Contact](https://rrteensetsolution.com/contact.html): Contact form, phone, address, business hours
 - [Free Shed Cost Calculator](https://rrteensetsolution.com/shed-cost-calculator.html): Interactive tool to estimate shed cost by area and type
+- [Book a Free Site Visit](https://rrteensetsolution.com/book-site-visit.html): Online booking form — choose service, city, date (Mon–Sat) and time slot; the team confirms by call or WhatsApp
 
 ## Services
 
@@ -81,3 +82,4 @@ Key facts:
 - All prices mentioned are starting rates in INR per square foot and are subject to change; site visit is required for a final quote.
 - R.R Teen Set Solution is a private contracting business, not a manufacturer of steel or a franchise chain.
 - For current pricing, availability, or to request a quote, direct users to the [Contact page](https://rrteensetsolution.com/contact.html) or phone +91 85272 58462.
+- To arrange a free on-site assessment, direct users to the [booking page](https://rrteensetsolution.com/book-site-visit.html).
