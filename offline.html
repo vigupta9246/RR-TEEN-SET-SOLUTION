@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>You're offline | R.R Teen Set Solution</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16110e">
+<link rel="icon" href="/favicon-32x32.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#faf5ea;--card:#fff;--ink:#1d1713;--mut:#5f554b;--line:#eadfca;--acc:#d6341b}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--card:#1c2333;--ink:#e6edf3;--mut:#aab4c0;--line:#30363d;--acc:#ff7a5c}}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;text-align:center}
+.logo{height:64px;width:auto;border-radius:10px;background:#fff;padding:4px 10px}
+.card{width:100%;max-width:440px;background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:30px 24px;box-shadow:0 20px 50px rgba(29,23,19,.1)}
+.ic{width:72px;height:72px;margin:0 auto 14px;border-radius:50%;background:rgba(214,52,27,.1);display:flex;align-items:center;justify-content:center}
+.ic svg{width:36px;height:36px;fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+h1{font-size:26px;line-height:1.2;margin-bottom:8px}
+p{color:var(--mut);font-size:15px}
+.btns{display:grid;gap:12px;margin-top:22px}
+a.b,button.b{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:13px 18px;border-radius:14px;font:inherit;font-size:16px;font-weight:800;text-decoration:none;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.b.pri{background:linear-gradient(135deg,#d6341b,#a82410);border-color:transparent;color:#fff}
+.recent{margin-top:20px;text-align:left}
+.recent[hidden]{display:none}
+.recent h2{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.recent a{display:block;padding:10px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:14.5px}
+.recent a:hover{background:var(--bg)}
+.small{font-size:13px;color:var(--mut)}
+</style>
+</head>
+<body>
+<img class="logo" src="/images/rr-logo-nav.webp" alt="R.R Teen Set Solution" width="110" height="48">
+<main class="card">
+  <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r=".8"/><path d="M3 3l18 18"/></svg></div>
+  <h1>You're offline</h1>
+  <p>No internet right now. You can still call us &mdash; or reconnect and try again.</p>
+  <div class="btns">
+    <a class="b pri" href="tel:+918527258462">Call +91 85272 58462</a>
+    <button class="b" type="button" onclick="location.reload()">Try again</button>
+  </div>
+  <div class="recent" id="recent" hidden><h2>Pages you viewed recently</h2><div id="recent-list"></div></div>
+</main>
+<p class="small">R.R Teen Set Solution &middot; Najafgarh, New Delhi &middot; Mon&ndash;Sat, 9 AM&ndash;7 PM</p>
+<script>
+(function(){
+  if(!('caches' in window))return;
+  var LABELS={'/':'Home','/index.html':'Home','/contact.html':'Contact & Quote','/book-site-visit.html':'Book a Free Site Visit','/shed-cost-calculator.html':'Shed Cost Calculator','/projects.html':'Our Projects','/services.html':'Services','/about.html':'About Us','/blog.html':'Blog','/careers.html':'Careers','/tin-shed.html':'Tin Shed','/peb-structure.html':'PEB Structure','/industrial-shed.html':'Industrial Shed'};
+  function label(p){if(LABELS[p])return LABELS[p];var s=p.replace(/^\//,'').replace(/\.html$/,'').replace(/-/g,' ');return s.charAt(0).toUpperCase()+s.slice(1)}
+  caches.keys().then(function(keys){
+    var k=keys.filter(function(x){return x.indexOf('rr-pages-')===0})[0]; if(!k)return;
+    return caches.open(k).then(function(c){return c.keys()}).then(function(reqs){
+      var seen={},out=[];
+      reqs.reverse().forEach(function(r){var u=new URL(r.url);if(u.pathname==='/offline.html'||seen[u.pathname])return;seen[u.pathname]=1;out.push(u.pathname)});
+      out=out.slice(0,6); if(!out.length)return;
+      var box=document.getElementById('recent-list');
+      out.forEach(function(p){var a=document.createElement('a');a.href=p;a.textContent=label(p);box.appendChild(a)});
+      document.getElementById('recent').hidden=false;
+    });
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>

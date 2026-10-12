@@ -1,11 +1,89 @@
 {
-  "name": "R.R Teen Set Solution",
+  "id": "/",
+  "name": "R.R Teen Set Solution — Tin Shed & PEB Contractor",
   "short_name": "RR Teen Set",
-  "icons": [
-    { "src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
-  ],
+  "description": "Get a free quote, book a free site visit or call R.R Teen Set Solution — tin shed, PEB and steel structure contractor in Delhi NCR.",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "start_url": "/?utm_source=pwa&utm_medium=homescreen",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
   "theme_color": "#0a1628",
-  "background_color": "#0a1628",
-  "display": "standalone"
+  "categories": [
+    "business",
+    "construction"
+  ],
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Free Site Visit",
+      "short_name": "Book Visit",
+      "description": "Pick a date and time for a free site visit",
+      "url": "/book-site-visit.html?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Get Free Quote",
+      "short_name": "Free Quote",
+      "url": "/contact.html?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Shed Cost Calculator",
+      "short_name": "Calculator",
+      "url": "/shed-cost-calculator.html?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Our Projects",
+      "short_name": "Projects",
+      "url": "/projects.html?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

@@ -541,3 +541,104 @@ function scrollVideoSlider(sliderId, direction){
     addBackToTop();
   }
 })();
+
+/* ─────────────────────────────────────────────────────
+   PWA: service worker + "Add to Home Screen" prompt
+   - registers /sw.js after the page has loaded (idle)
+   - Android/desktop Chrome: our own Install bar (after the visitor has engaged, never over the cookie banner)
+   - iPhone Safari: shows the "Share → Add to Home Screen" steps
+   - "Not now" hides it for 14 days; installing hides it for good
+───────────────────────────────────────────────────── */
+(function () {
+  var w = window, d = document;
+  var DELAY = 25000, SNOOZE_DAYS = 14;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function track(name, p) { try { if (w.gtag) w.gtag('event', name, p || {}); } catch (e) {} }
+
+  if ('serviceWorker' in navigator) {
+    w.addEventListener('load', function () {
+      var go = function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); };
+      if ('requestIdleCallback' in w) w.requestIdleCallback(go, { timeout: 5000 }); else setTimeout(go, 2500);
+    });
+  }
+
+  var standalone = (w.matchMedia && w.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  if (standalone || store('rr_pwa_installed') === '1') return;
+
+  var ua = navigator.userAgent;
+  var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var iosSafari = ios && /safari/i.test(ua) && !/crios|fxios|edgios|opios|android/i.test(ua);
+  var deferred = null, bar = null, engaged = false, timer = null, ticks = 0;
+  var reduce = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function snoozed() { var t = parseInt(store('rr_pwa_snooze') || '0', 10) || 0; return Date.now() < t; }
+  function cookieBannerOpen() { var c = d.getElementById('cc-banner'); return !!(c && c.classList.contains('cc-visible')); }
+  function canShow() { return (deferred || iosSafari) && !bar && !snoozed() && !cookieBannerOpen(); }
+
+  var SHARE = '<svg class="pwa-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+
+  function hide(permanentSnooze) {
+    if (!bar) return;
+    var b = bar; bar = null; b.classList.remove('show');
+    setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, reduce ? 0 : 500);
+    if (permanentSnooze) store('rr_pwa_snooze', String(Date.now() + SNOOZE_DAYS * 864e5));
+  }
+  function show(force) {
+    if (bar || (!force && !canShow()) || !(deferred || iosSafari)) return;
+    var isIos = !deferred;
+    bar = d.createElement('div'); bar.className = 'pwa-bar'; bar.id = 'pwa-bar';
+    bar.setAttribute('role', 'dialog'); bar.setAttribute('aria-label', 'Add the app to your phone');
+    bar.innerHTML = '<img class="pwa-ic" src="/android-chrome-192x192.png" width="48" height="48" alt="">' +
+      '<div class="pwa-tx"><b>Add R.R Teen Set to your phone</b><span>' +
+      (isIos ? 'Tap ' + SHARE + ' then &ldquo;Add to Home Screen&rdquo;.' : 'One tap to call, get a quote or book a free site visit.') +
+      '</span></div><div class="pwa-ac">' + (isIos ? '' : '<button type="button" class="pwa-go">Install</button>') +
+      '<button type="button" class="pwa-no">' + (isIos ? 'Got it' : 'Not now') + '</button></div>';
+    d.body.appendChild(bar);
+    void bar.offsetWidth; bar.classList.add('show');
+    track('pwa_prompt_shown', { platform: isIos ? 'ios' : 'android_desktop' });
+    var go = bar.querySelector('.pwa-go');
+    if (go) go.addEventListener('click', install);
+    bar.querySelector('.pwa-no').addEventListener('click', function () { track('pwa_prompt_dismissed'); hide(true); });
+  }
+  function install() {
+    if (!deferred) return;
+    var p = deferred; deferred = null; hide(false);
+    try {
+      p.prompt();
+      (p.userChoice || Promise.resolve({})).then(function (c) {
+        track('pwa_install_choice', { outcome: c && c.outcome });
+        if (c && c.outcome === 'accepted') store('rr_pwa_installed', '1'); else store('rr_pwa_snooze', String(Date.now() + SNOOZE_DAYS * 864e5));
+        refreshLink();
+      });
+    } catch (e) {}
+  }
+  function schedule() {
+    if (timer) return;
+    timer = setInterval(function () {
+      ticks++;
+      if (engaged && canShow()) { clearInterval(timer); show(false); }
+      else if (ticks > 20) clearInterval(timer);
+    }, 8000);
+  }
+  function refreshLink() {
+    var li = d.getElementById('pwa-li'); if (!li) return;
+    li.hidden = !(deferred || iosSafari);
+  }
+  function onEngage() { engaged = true; }
+  ['scroll', 'touchstart', 'pointerdown', 'keydown'].forEach(function (ev) { w.addEventListener(ev, onEngage, { once: true, passive: true }); });
+
+  w.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); deferred = e; refreshLink();
+    setTimeout(function () { schedule(); }, DELAY);
+  });
+  w.addEventListener('appinstalled', function () {
+    store('rr_pwa_installed', '1'); deferred = null; hide(false); refreshLink(); track('pwa_installed');
+  });
+  function wireLink() {
+    var a = d.getElementById('pwa-link'); if (!a) return;
+    a.addEventListener('click', function (ev) { ev.preventDefault(); if (deferred) install(); else show(true); });
+    refreshLink();
+  }
+  if (iosSafari) { setTimeout(schedule, DELAY); }
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', wireLink); else wireLink();
+})();
