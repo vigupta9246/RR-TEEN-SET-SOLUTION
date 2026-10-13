@@ -218,7 +218,7 @@ const form = $('#rv-form');
 const rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FACES = ['\u2B50', '\u{1F61E}', '\u{1F615}', '\u{1F642}', '\u{1F60A}', '\u{1F929}'];
 const LABELS = ['Tap a star to rate', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent!'];
-let rating = 0, photoUrl = null, photoBusy = false, rid = genId(), saving = false;
+let rating = 0, photoUrl = null, photoBusy = false, rid = genId(), saving = false, timedOutBefore = false;
 
 function genId() {
   const b = new Uint32Array(3); crypto.getRandomValues(b);
@@ -339,9 +339,16 @@ form.addEventListener('submit', async e => {
   try {
     await withTimeout(fbSaveReview(payload), 15000);
   } catch (err) {
-    saving = false; btn.disabled = false; btn.classList.remove('load'); $('#rv-submit-t').textContent = 'Submit Review';
-    alertMsg(err.message === 'timeout' ? 'This is taking longer than usual. Check your internet and tap Submit again \u2014 or WhatsApp us your review.' : 'We could not save your review right now. Please try again, or WhatsApp us your review directly.');
-    return;
+    // A retry re-uses the same review id. If an earlier attempt already reached the server, the
+    // second write is an "update" which the rules deny for the public (permission-denied) - the
+    // review is already saved in that case, so treat it as success instead of showing an error.
+    const alreadySaved = timedOutBefore && err && err.code === 'permission-denied';
+    if (!alreadySaved) {
+      if (err && err.message === 'timeout') timedOutBefore = true;
+      saving = false; btn.disabled = false; btn.classList.remove('load'); $('#rv-submit-t').textContent = 'Submit Review';
+      alertMsg(err && err.message === 'timeout' ? 'This is taking longer than usual. Check your internet and tap Submit again \u2014 or WhatsApp us your review.' : 'We could not save your review right now. Please try again, or WhatsApp us your review directly.');
+      return;
+    }
   }
   try { sessionStorage.setItem('rv_last', String(Date.now())); } catch (x) {}
   if (v.phone) withTimeout(fbPushLead({ name: v.name, phone: '+91 ' + v.phone.slice(0, 5) + ' ' + v.phone.slice(5), city: v.city, service: v.type || 'Other', message: 'REVIEW SUBMITTED [' + rid + '] ' + rating + '/5 - contact kept only to verify the review, not a sales lead', pageSource: 'testimonial-submit' }), 8000).catch(() => {});
@@ -355,7 +362,7 @@ function showDone(v) {
   $('#rv-done').scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'center' });
 }
 $('#rv-again').addEventListener('click', () => {
-  form.reset(); rating = 0; photoUrl = null; rid = genId(); upCount(); setRating(0); $('#rv-face').textContent = FACES[0];
+  form.reset(); rating = 0; photoUrl = null; rid = genId(); timedOutBefore = false; upCount(); setRating(0); $('#rv-face').textContent = FACES[0];
   $('#rv-prev').hidden = true; photoMsg(''); const b = $('#rv-submit'); b.disabled = false; b.classList.remove('load'); $('#rv-submit-t').textContent = 'Submit Review';
   $('#rv-done').hidden = true; form.hidden = false; form.scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'start' });
 });
