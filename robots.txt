@@ -6,6 +6,7 @@ User-agent: *
 Disallow: /quotation-system.html
 Disallow: /testimonials-admin.html
 Disallow: /workers/
+Disallow: /tools/
 Allow: /
 
 # AI agents, AI search and answer engines — explicitly welcome (same rules as above)
@@ -23,6 +24,7 @@ User-agent: Applebot-Extended
 Disallow: /quotation-system.html
 Disallow: /testimonials-admin.html
 Disallow: /workers/
+Disallow: /tools/
 Allow: /
 
 Sitemap: https://rrteensetsolution.com/sitemap.xml

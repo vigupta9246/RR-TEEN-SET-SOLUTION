@@ -1,0 +1,7 @@
+{
+  "name": "company-profile-build",
+  "private": true,
+  "description": "Builds the company profile PDF from brochure.html",
+  "scripts": { "build": "node build.js && python3 finish.py" },
+  "devDependencies": { "puppeteer-core": "^25.13.0" }
+}

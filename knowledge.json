@@ -1,5 +1,5 @@
 {
- "version": "2026-10-04",
+ "version": "2026-10-13",
  "entries": [
   {
    "id": "company",
@@ -90,6 +90,12 @@
    "title": "Other services",
    "text": "Agricultural sheds (poultry, dairy, crop storage), prefab factory sheds, prefab buildings, prefab sheds, MS fabrication (trusses, columns, purlins), end-to-end shed fabrication and installation.",
    "page": "https://rrteensetsolution.com/services.html"
+  },
+  {
+   "id": "company-profile",
+   "title": "Company profile PDF",
+   "text": "A company profile (brochure) PDF can be downloaded from company-profile.html; the direct file is rr-teen-set-solution-company-profile.pdf (8 pages, about 1 MB, updated October 2026). It covers who we are, services, materials, typical build timelines, how a project runs, GST and payment terms, project photos, service areas and contact details. It does not list prices; for a planning estimate use the free cost calculator, and the written quotation follows the free site visit.",
+   "page": "https://rrteensetsolution.com/company-profile.html"
   },
   {
    "id": "calculator",

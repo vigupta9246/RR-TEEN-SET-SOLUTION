@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<title>R.R Teen Set Solution — Company Profile</title>
+<meta name="author" content="R.R Teen Set Solution">
+<meta name="description" content="Company profile of R.R Teen Set Solution: tin shed, industrial shed, PEB structure and roofing contractor, Najafgarh, Delhi NCR.">
+<style>
+/* Fonts: Bebas Neue + Nunito, the same families as the website (SIL Open Font License, see fonts/OFL-*.txt) */
+@font-face{font-family:"Bebas Neue";src:url("fonts/BebasNeue-Regular.ttf") format("truetype");font-weight:400}
+@font-face{font-family:"Nunito";src:url("fonts/Nunito-Regular.ttf") format("truetype");font-weight:400}
+@font-face{font-family:"Nunito";src:url("fonts/Nunito-SemiBold.ttf") format("truetype");font-weight:600}
+@font-face{font-family:"Nunito";src:url("fonts/Nunito-Bold.ttf") format("truetype");font-weight:700}
+@font-face{font-family:"Nunito";src:url("fonts/Nunito-ExtraBold.ttf") format("truetype");font-weight:800}
+
+@page{size:A4;margin:0}
+:root{
+  --navy:#16264f; --blue:#4056a1; --signal:#f13c20; --ink:#0a1628; --muted:#4b5a6e;
+  --sand:#efe2ba; --sand-soft:#f7f1de; --rule:#cfd6e6;
+  --m:18mm; /* page margin */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:"Nunito",sans-serif;font-size:9.4pt;line-height:1.5;color:var(--ink);font-weight:400;font-variant-numeric:lining-nums}
+a{color:inherit;text-decoration:none}
+
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:#fff;break-after:page;page-break-after:always}
+.page:last-child{break-after:auto;page-break-after:auto}
+.inner{position:absolute;left:var(--m);right:var(--m);top:var(--m);bottom:24mm}
+
+/* title strip, like the title block on a drawing sheet */
+.strip{position:absolute;left:var(--m);right:var(--m);bottom:9mm;border-top:.3mm solid var(--navy);padding-top:2mm;display:flex;justify-content:space-between;font-size:7.4pt;color:var(--muted);letter-spacing:.1mm}
+.strip b{color:var(--navy);font-weight:800}
+
+h1{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:36pt;line-height:1;color:var(--navy);letter-spacing:.2mm;margin-bottom:3.5mm}
+h2{font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:19pt;line-height:1.05;color:var(--navy);letter-spacing:.15mm}
+.lead{font-size:11.2pt;line-height:1.5;color:#1f2d47;max-width:150mm;margin-bottom:6mm;text-wrap:pretty}
+p+p{margin-top:2.4mm}
+.muted{color:var(--muted)}
+figure img{display:block;width:100%;height:100%;object-fit:cover}
+figcaption{font-size:7.6pt;color:var(--muted);margin-top:1.4mm;line-height:1.35}
+
+/* ───────── 1  COVER ───────── */
+.cover{background:var(--navy)}
+.cover .photo{position:absolute;left:0;right:0;top:0;height:178mm}
+.cover .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.cover .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(22,38,79,.82) 0%,rgba(22,38,79,0) 46%)}
+.cover .logo{position:absolute;left:16mm;top:14mm;background:#fff;padding:3.2mm 5mm;border-radius:1.6mm}
+.cover .logo img{display:block;width:46mm;height:auto}
+.dim{position:absolute;left:16mm;right:16mm;top:158mm;height:0}
+.dim i{position:absolute;display:block;background:var(--signal)}
+.dim .ln{left:0;right:0;top:-.35mm;height:.7mm}
+.dim .t1,.dim .t2{top:-3.2mm;width:.7mm;height:6.4mm}
+.dim .t1{left:0}.dim .t2{right:0}
+.dim span{position:absolute;left:50%;top:-4.2mm;transform:translateX(-50%);background:var(--navy);color:#fff;font-weight:800;font-size:10pt;padding:1.1mm 4.4mm;white-space:nowrap}
+.cover .title{position:absolute;left:16mm;right:16mm;top:187mm}
+.cover h1{font-size:66pt;line-height:.92;color:#fff;letter-spacing:.4mm;margin:0 0 4mm}
+.cover .tag{font-size:13pt;line-height:1.4;color:#dce3f6;max-width:150mm;text-wrap:balance}
+.cover .facts{position:absolute;left:16mm;right:16mm;bottom:30mm;display:flex;border-top:.3mm solid rgba(255,255,255,.35)}
+.cover .facts div{flex:1;padding:4.4mm 0 0}
+.cover .facts div+div{padding-left:6mm;border-left:.3mm solid rgba(255,255,255,.35)}
+.cover .facts b{display:block;font-family:"Bebas Neue",sans-serif;font-weight:400;font-size:30pt;line-height:1;color:#fff}
+.cover .facts span{display:block;font-size:8.6pt;color:#b9c4e6;margin-top:1mm}
+.cover .foot{position:absolute;left:16mm;right:16mm;bottom:12mm;display:flex;justify-content:space-between;font-size:8.6pt;color:#b9c4e6}
+
+/* ───────── 2  WHO WE ARE ───────── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+.two p{margin:0}
+.banner{height:76mm;margin:7mm 0 0}
+.glance{margin-top:9mm}
+.glance h2{margin-bottom:2.2mm}
+.kv{width:100%;border-collapse:collapse}
+.kv th,.kv td{text-align:left;vertical-align:top;padding:2.1mm 0;border-top:.2mm solid var(--rule)}
+.kv tr:last-child th,.kv tr:last-child td{border-bottom:.2mm solid var(--rule)}
+.kv th{width:46mm;font-weight:600;color:var(--muted);padding-right:4mm}
+.kv td{font-weight:800;color:var(--ink)}
+
+/* ───────── 3  WHAT WE BUILD ───────── */
+.svc{display:grid;grid-template-columns:1fr 1fr;column-gap:10mm;row-gap:6.2mm;margin-top:1mm}
+.svc section{border-top:.5mm solid var(--navy);padding-top:2.2mm}
+.svc p{font-size:9pt;line-height:1.46;margin-top:1.4mm}
+.svc .spec{font-weight:800;color:var(--blue);font-size:8.4pt;margin-top:1.6mm}
+.strip2{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:9mm}
+.strip2 figure{height:auto}
+.strip2 .im{height:66mm}
+
+/* ───────── 4  MATERIALS ───────── */
+.mat{display:grid;grid-template-columns:1.05fr .95fr;gap:9mm;margin-top:1mm}
+.specbox{background:var(--sand-soft);border-left:1.2mm solid var(--navy);padding:4mm 5mm}
+.specbox h2{font-size:15pt;margin-bottom:1.6mm}
+.specbox dl{display:grid;grid-template-columns:30mm 1fr;row-gap:1.6mm;font-size:8.8pt}
+.specbox dt{color:var(--muted);font-weight:600}
+.specbox dd{font-weight:800}
+.opts{margin-top:3.2mm;columns:2;column-gap:6mm;font-size:8.8pt;list-style:none}
+.opts li{break-inside:avoid;padding:.9mm 0;border-top:.2mm solid var(--rule)}
+.tl{margin-top:8mm}
+.tl h2{margin-bottom:2.4mm}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{background:var(--navy);color:#fff;text-align:left;font-weight:700;font-size:8.6pt;padding:2.1mm 3mm}
+.tbl td{padding:2.4mm 3mm;border-bottom:.2mm solid var(--rule);vertical-align:top;font-size:9pt}
+.tbl td:first-child{font-weight:800;color:var(--navy);width:42mm}
+.tbl td b{display:block;font-weight:800;color:var(--ink)}
+.tbl td small{display:block;font-size:7.6pt;color:var(--muted)}
+.note{font-size:8.2pt;color:var(--muted);margin-top:2.4mm}
+.perm{margin-top:7mm;border-top:.5mm solid var(--navy);padding-top:3mm}
+.perm h2{font-size:15pt;margin-bottom:1.4mm}
+.perm p{max-width:150mm}
+.supp{margin-top:7mm;display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+.supp h2{font-size:15pt;margin-bottom:1.4mm}
+
+/* ───────── 5  HOW A PROJECT RUNS ───────── */
+.run{display:grid;grid-template-columns:1fr 56mm;gap:10mm;margin-top:1mm}
+.steps{list-style:none;position:relative}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:3.35mm;top:8mm;bottom:-7.4mm;width:.3mm;background:var(--rule)}
+.steps li{position:relative;padding-left:12mm;margin-bottom:8.4mm}
+.steps li:last-child{margin-bottom:0}
+.steps .n{position:absolute;left:0;top:0;width:7mm;height:7mm;background:var(--navy);color:#fff;font-family:"Bebas Neue",sans-serif;font-size:13pt;line-height:7mm;text-align:center}
+.steps h2{font-size:15pt;margin-bottom:.6mm}
+.steps p{font-size:9pt;line-height:1.46}
+.run figure .im{height:150mm}
+.bill{margin-top:11mm;display:grid;grid-template-columns:1fr 1fr;gap:9mm;border-top:.5mm solid var(--navy);padding-top:3mm}
+.bill h2{font-size:15pt;margin-bottom:1.4mm}
+.bill p{font-size:9pt}
+
+/* ───────── 6  PROJECT PHOTOS ───────── */
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:6mm 6mm}
+.gal .wide{grid-column:1/3}
+.gal .im{height:52mm}
+.gal .wide .im{height:78mm}
+
+/* ───────── 7  WHERE WE WORK ───────── */
+.area td,.area th{font-size:8.6pt}
+.area .grp td{background:var(--sand-soft);font-family:"Bebas Neue",sans-serif;font-size:11pt;letter-spacing:.2mm;color:var(--navy);padding:1.4mm 3mm;border-bottom:.2mm solid var(--rule)}
+.area td{padding:1.9mm 3mm}
+.area td:first-child{width:34mm}
+
+/* ───────── 8  CONTACT ───────── */
+.contact .top{display:grid;grid-template-columns:1fr 46mm;gap:10mm;align-items:start}
+.qr{border:.3mm solid var(--navy);padding:4.8mm 4.8mm 3mm;text-align:center;background:#fff}
+.qr img{display:block;width:100%;height:auto}
+.qr span{display:block;margin-top:2mm;font-size:8pt;font-weight:800;color:var(--navy);line-height:1.3}
+.block{width:100%;border-collapse:collapse;margin-top:12mm;border:.4mm solid var(--navy)}
+.block th,.block td{text-align:left;padding:2.3mm 3.4mm;border-bottom:.2mm solid var(--navy);font-size:9.4pt;vertical-align:top}
+.block tr:last-child th,.block tr:last-child td{border-bottom:0}
+.block th{width:42mm;background:var(--sand-soft);font-weight:700;color:var(--muted);border-right:.2mm solid var(--navy)}
+.block td{font-weight:800}
+.tools{margin-top:11mm}
+.tools h2{font-size:15pt;margin-bottom:1.2mm}
+.end{position:absolute;left:0;right:0;bottom:0;height:62mm;background:var(--navy);color:#cfd8f1;padding:10mm var(--m) 0}
+.end p{font-size:8.2pt;line-height:1.55;max-width:160mm}
+.end b{color:#fff}
+.end .sig{display:block;font-family:"Bebas Neue",sans-serif;font-size:18pt;color:#fff;letter-spacing:.3mm;margin-bottom:2.6mm}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PAGE 1 — COVER ═══════════ -->
+<section class="page cover">
+  <div class="photo"><img src="img/cover.jpg" alt="Steel truss framing of a rooftop shed under construction"></div>
+  <div class="logo"><img src="img/logo.png" alt="R.R Teen Set Solution"></div>
+  <div class="dim"><i class="ln"></i><i class="t1"></i><i class="t2"></i><span>PEB spans up to 90 m</span></div>
+  <div class="title">
+    <h1>Company Profile</h1>
+    <p class="tag">Tin sheds, industrial sheds, PEB structures and roofing across Delhi NCR.</p>
+  </div>
+  <div class="facts">
+    <div><b>2016</b><span>Serving Delhi NCR since</span></div>
+    <div><b>500+</b><span>Projects completed</span></div>
+    <div><b>5.0</b><span>Rating on IndiaMART</span></div>
+  </div>
+  <div class="foot"><span>Najafgarh, New Delhi</span><span>rrteensetsolution.com</span></div>
+</section>
+
+<!-- ═══════════ PAGE 2 — WHO WE ARE ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>Who we are</h1>
+    <p class="lead">A fabrication and installation contractor. Every project is supervised from site survey to handover.</p>
+    <div class="two">
+      <p>R.R Teen Set Solution is a GST-registered tin shed (teen shed), steel structure, PEB and fabrication contractor based in Najafgarh, New Delhi. We have been serving Delhi NCR since 2016.</p>
+      <p>We build for homes, shops, factories and warehouses. We are a contractor: we fabricate and install. We are not a steel manufacturer or a franchise.</p>
+    </div>
+    <figure class="banner"><img src="img/banner.jpg" alt="Steel portal frame of a shed extension"><figcaption>Shed extension structure: steel portal frame.</figcaption></figure>
+    <div class="glance">
+      <h2>At a glance</h2>
+      <table class="kv">
+        <tr><th>Serving Delhi NCR</th><td>Since 2016</td></tr>
+        <tr><th>Projects completed</th><td>500+</td></tr>
+        <tr><th>Customer rating</th><td>5.0 on IndiaMART (verified supplier)</td></tr>
+        <tr><th>Project size we take</th><td>100 sq.ft to 1,00,000+ sq.ft</td></tr>
+        <tr><th>Registration</th><td>GST-registered, GSTIN 07DJCPK0635M1Z5</td></tr>
+        <tr><th>Office</th><td>Najafgarh, New Delhi 110043</td></tr>
+        <tr><th>Working hours</th><td>Monday to Saturday, 9 AM to 7 PM</td></tr>
+        <tr><th>Response time</th><td>Enquiries are answered in about 2 hours</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 2 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 3 — WHAT WE BUILD ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>What we build</h1>
+    <p class="lead">Steel sheds and structures, fabricated and installed by our own team.</p>
+    <div class="svc">
+      <section>
+        <h2>Tin shed fabrication</h2>
+        <p>Residential, commercial and industrial tin sheds with IS-grade GI sheets: terrace sheds, car parking sheds and shop-front sheds.</p>
+      </section>
+      <section>
+        <h2>Industrial shed</h2>
+        <p>Factory and manufacturing sheds with an MS frame and earthquake-resistant design. Fire exits, ventilation and fire-retardant coating can be planned at design stage.</p>
+        <p class="spec">Up to 60 m clear span<br>EOT crane support from 2 to 10 ton</p>
+      </section>
+      <section>
+        <h2>PEB structure</h2>
+        <p>Pre-engineered buildings, faster to build than RCC. Span, height, roof slope, colour, ventilation and mezzanine can all be customised.</p>
+        <p class="spec">Up to 90 m span<br>Designed to IS 800 and IS 1893 (seismic)</p>
+      </section>
+      <section>
+        <h2>Prefab warehouse</h2>
+        <p>Weather-proof warehouses for logistics, storage and cold storage. Loading bays, dock levelers and wide gates can be planned at design stage.</p>
+        <p class="spec">Forklift-compatible<br>Clear height 7 to 12 m</p>
+      </section>
+      <section>
+        <h2>Roofing, repair and waterproofing</h2>
+        <p>Terrace, commercial and industrial roofing. Repair of leaking, rusted or storm-damaged roofs, and monsoon waterproofing.</p>
+      </section>
+      <section>
+        <h2>Agricultural and other structures</h2>
+        <p>Agricultural sheds for poultry, dairy and crop storage, prefab factory sheds, prefab buildings and MS fabrication such as trusses, columns and purlins.</p>
+      </section>
+    </div>
+    <div class="strip2">
+      <figure><div class="im"><img src="img/f.jpg" alt="Red-oxide primed steel frame under construction"></div><figcaption>Steel frame fabrication: red-oxide primed, under construction.</figcaption></figure>
+      <figure><div class="im"><img src="img/g.jpg" alt="Galvanized steel PEB structure at an industrial site"></div><figcaption>Large-span PEB structure: galvanized steel, industrial site.</figcaption></figure>
+    </div>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 3 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 4 — MATERIALS AND TIMELINES ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>Materials and build quality</h1>
+    <p class="lead">One documented material specification for the whole project, given to you in writing.</p>
+    <div class="mat">
+      <div>
+        <p>We use IS-grade certified structural steel with an anti-rust coating. Roofing sheets are corrugated GI, colour-coated or insulated panels.</p>
+        <p>The specification below is typical. The exact specification for your project is written into the quotation.</p>
+        <h2 style="margin-top:5mm;font-size:15pt">Optional add-ons</h2>
+        <ul class="opts" style="margin-top:1.6mm">
+          <li>Insulation sheet</li><li>Turbo ventilator</li><li>Side windows</li><li>Sliding door</li><li>Anti-rust coating</li><li>Colour options (15+ colours)</li>
+        </ul>
+      </div>
+      <div class="specbox">
+        <h2>Typical specification</h2>
+        <dl>
+          <dt>Main pole</dt><dd>4 × 4 inch, 10 gauge</dd>
+          <dt>Purlins</dt><dd>2.5 × 2.5 inch, 12 gauge</dd>
+          <dt>Coating</dt><dd>One coat of anti-rust black paint</dd>
+          <dt>Roofing sheets</dt><dd>Corrugated GI, colour-coated or insulated panels</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="tl">
+      <h2>Typical build timelines</h2>
+      <table class="tbl">
+        <tr><th>Structure</th><th>Small</th><th>Medium</th><th>Large</th></tr>
+        <tr><td>Tin shed</td><td><b>7 to 12 days</b><small>500 to 1,000 sq.ft</small></td><td><b>15 to 21 days</b><small>1,000 to 5,000 sq.ft</small></td><td><b>25 to 35 days</b><small>Large industrial</small></td></tr>
+        <tr><td>PEB structure</td><td><b>25 to 35 days</b><small>Up to 5,000 sq.ft</small></td><td><b>35 to 55 days</b><small>5,000 to 20,000 sq.ft</small></td><td><b>50 to 80 days</b><small>Large projects</small></td></tr>
+        <tr><td>Prefab warehouse</td><td><b>15 to 20 days</b><small>Up to 3,000 sq.ft</small></td><td><b>20 to 35 days</b><small>3,000 to 10,000 sq.ft</small></td><td><b>35 to 55 days</b><small>Large projects</small></td></tr>
+      </table>
+      <p class="note">Timelines are estimates and are confirmed after the site visit. A written timeline commitment is given before work starts.</p>
+    </div>
+    <div class="supp">
+      <div>
+        <h2>Warranty</h2>
+        <p>Standard workmanship warranty on fabrication and installation. Where applicable, the manufacturer warranty on sheeting is passed through to you. Terms are confirmed for each project.</p>
+      </div>
+      <div>
+        <h2>After-sales support</h2>
+        <p>Raise a ticket on the Support page of our website for quality, delay, billing or GST, and warranty issues. Billing queries are usually resolved in 24 to 48 hours and site-visit issues in 3 to 7 days.</p>
+      </div>
+    </div>
+    <div class="perm">
+      <h2>Permissions and documents</h2>
+      <p>Most residential and small commercial tin sheds inside your own plot need no separate permission. Large industrial sheds, or rooftop terrace sheds in Delhi, may fall under DDA or MCD norms, and our team guides you on this during planning.</p>
+      <p>For an industrial shed, keep the plot layout (naksha) and land documents ready. Approvals are discussed at the site visit.</p>
+    </div>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 4 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 5 — HOW A PROJECT RUNS ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>How a project runs</h1>
+    <p class="lead">From first call to handover, in the order it happens.</p>
+    <div class="run">
+      <ol class="steps">
+        <li><span class="n">1</span><h2>Enquiry</h2><p>Call, WhatsApp or use the website. We answer in about 2 hours, Monday to Saturday, 9 AM to 7 PM.</p></li>
+        <li><span class="n">2</span><h2>Free site visit</h2><p>No charge and no obligation, anywhere in Delhi NCR. Our team looks at and measures your site.</p></li>
+        <li><span class="n">3</span><h2>Written quotation</h2><p>Shared on WhatsApp within 24 hours of the site visit. A same-day quote is possible for urgent projects.</p></li>
+        <li><span class="n">4</span><h2>Specification and timeline in writing</h2><p>The material specification and a timeline commitment are given in writing before work starts.</p></li>
+        <li><span class="n">5</span><h2>Fabrication and installation</h2><p>Supervised from site survey to handover.</p></li>
+        <li><span class="n">6</span><h2>Handover and support</h2><p>Standard workmanship warranty, and a support team for any issue after handover.</p></li>
+      </ol>
+      <figure><div class="im"><img src="img/tall.jpg" alt="Mobile cranes erecting a large-span steel structure"></div><figcaption>Large-span steel erection: crane-assisted installation, industrial site.</figcaption></figure>
+    </div>
+    <div class="bill">
+      <div>
+        <h2>GST and invoicing</h2>
+        <p>A proper GST invoice on every project, useful for B2B and government work. Quoted rates are before GST. GST is 18% for commercial and industrial sheds; some agricultural structures may qualify for a lower rate, confirmed at the site visit.</p>
+      </div>
+      <div>
+        <h2>Payment terms</h2>
+        <p>Typically 50% advance and 50% on completion. Large projects can be milestone-based: booking advance, payment at material delivery and balance on completion.</p>
+        <p>We accept bank transfer, UPI, NEFT and cheque.</p>
+      </div>
+    </div>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 5 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 6 — PROJECT PHOTOGRAPHS ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>Project photographs</h1>
+    <p class="lead">Photographs from our project gallery.</p>
+    <div class="gal">
+      <figure class="wide"><div class="im"><img src="img/a.jpg" alt="Large-span industrial warehouse shed with blue colour cladding"></div><figcaption>Industrial warehouse shed: large span, blue colour cladding.</figcaption></figure>
+      <figure><div class="im"><img src="img/b.jpg" alt="Commercial shed with rolling shutters"></div><figcaption>Commercial shed with rolling shutters.</figcaption></figure>
+      <figure><div class="im"><img src="img/c.jpg" alt="Completed prefab warehouse with a large entry gate"></div><figcaption>Prefab warehouse: completed project, large entry gate.</figcaption></figure>
+      <figure><div class="im"><img src="img/d.jpg" alt="Open truss shed with a wide-span truss roof"></div><figcaption>Open truss shed structure: wide-span truss roof, open sides.</figcaption></figure>
+      <figure><div class="im"><img src="img/e.jpg" alt="Open-air PEB agricultural canopy shed"></div><figcaption>Agricultural canopy shed: open-air PEB, farm application.</figcaption></figure>
+    </div>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 6 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 7 — WHERE WE WORK ═══════════ -->
+<section class="page">
+  <div class="inner">
+    <h1>Where we work</h1>
+    <p class="lead">Free site visits in Delhi, Noida, Gurgaon, Faridabad and Ghaziabad. We also take projects in the wider NCR and in nearby towns of Haryana, Uttar Pradesh and Rajasthan.</p>
+    <table class="tbl area">
+      <tr><th>City</th><th>Areas we serve</th></tr>
+      <tr class="grp"><td colspan="2">Delhi</td></tr>
+      <tr><td>Bawana</td><td>DSIIDC industrial sectors</td></tr>
+      <tr><td>Dwarka</td><td>All sectors, Sector 1 to Sector 29</td></tr>
+      <tr><td>Narela</td><td>DSIIDC industrial sectors</td></tr>
+      <tr class="grp"><td colspan="2">Uttar Pradesh</td></tr>
+      <tr><td>Noida</td><td>All sectors, Sector 1 to Sector 168, and Noida Extension</td></tr>
+      <tr><td>Greater Noida</td><td>Surajpur, Ecotech, Site A to C, Yamuna Expressway Industrial Area</td></tr>
+      <tr><td>Ghaziabad</td><td>Sahibabad Industrial Area, Vaishali, Indirapuram, Vasundhara, Loni</td></tr>
+      <tr><td>Meerut</td><td>Delhi-Meerut Expressway corridor</td></tr>
+      <tr class="grp"><td colspan="2">Haryana</td></tr>
+      <tr><td>Gurugram</td><td>Udyog Vihar, Sector 37, Basai Road, IMT Manesar</td></tr>
+      <tr><td>Manesar</td><td>IMT Manesar</td></tr>
+      <tr><td>Faridabad</td><td>Sector 24 and 25 Industrial Area, Ballabgarh, NIT, Faridabad-Palwal Road belt</td></tr>
+      <tr><td>Palwal</td><td>IMT Palwal, Hodal, NH-19 belt</td></tr>
+      <tr><td>Sonipat</td><td>Kundli Industrial Area, NH-44 belt</td></tr>
+      <tr><td>Kundli</td><td>Kundli and Rai Industrial Area</td></tr>
+      <tr><td>Panipat</td><td>Textile, handloom and warehousing units</td></tr>
+      <tr><td>Karnal</td><td>Industrial Estate, NH-44 belt</td></tr>
+      <tr><td>Rohtak</td><td>Industrial estate and surrounding rural belt</td></tr>
+      <tr><td>Bahadurgarh</td><td>Manufacturing units near the Tikri border</td></tr>
+      <tr><td>Rewari</td><td>IMT Bawal, Dharuhera, Rewari town, NH-48 belt</td></tr>
+      <tr class="grp"><td colspan="2">Rajasthan</td></tr>
+      <tr><td>Bhiwadi</td><td>RIICO industrial area</td></tr>
+    </table>
+    <p class="note">Your city is not listed? Call us and we will confirm coverage by phone.</p>
+  </div>
+  <div class="strip"><span><b>R.R Teen Set Solution</b> &nbsp;Company Profile</span><span>Page 7 of 8</span></div>
+</section>
+
+<!-- ═══════════ PAGE 8 — CONTACT ═══════════ -->
+<section class="page contact">
+  <div class="inner">
+    <div class="top">
+      <div>
+        <h1>Book a free site visit</h1>
+        <p class="lead" style="margin-bottom:0">No charge and no obligation. Choose a date and time, Monday to Saturday, and our team confirms by call or WhatsApp.</p>
+      </div>
+      <div class="qr"><img src="img/qr-book-visit.svg" alt="QR code for rrteensetsolution.com/book-site-visit.html"><span>Scan to book a visit</span></div>
+    </div>
+    <table class="block">
+      <tr><th>Phone / WhatsApp</th><td><a href="tel:+918527258462">+91 85272 58462</a></td></tr>
+      <tr><th>Email</th><td><a href="mailto:info@rrteensetsolution.com">info@rrteensetsolution.com</a></td></tr>
+      <tr><th>Website</th><td><a href="https://rrteensetsolution.com/">rrteensetsolution.com</a></td></tr>
+      <tr><th>Office</th><td>Najafgarh, New Delhi 110043</td></tr>
+      <tr><th>Working hours</th><td>Monday to Saturday, 9 AM to 7 PM</td></tr>
+      <tr><th>GSTIN</th><td>07DJCPK0635M1Z5</td></tr>
+      <tr><th>This document</th><td>Company profile, October 2026</td></tr>
+    </table>
+    <div class="tools">
+      <h2>Free shed cost calculator</h2>
+      <p>Choose the shed type, enter the dimensions and add-ons, and get an instant planning estimate at <a href="https://rrteensetsolution.com/shed-cost-calculator.html"><b>rrteensetsolution.com/shed-cost-calculator.html</b></a>. The final cost is confirmed only after the site visit.</p>
+    </div>
+  </div>
+  <div class="end">
+    <span class="sig">R.R Teen Set Solution</span>
+    <p><b>About the information in this document.</b> It was prepared in October 2026. Specifications and timelines are indicative and are confirmed in writing after the free site visit. Prices are not listed here because they depend on size, span, height, material and location; a written quotation follows the site visit.</p>
+  </div>
+</section>
+
+</body>
+</html>
