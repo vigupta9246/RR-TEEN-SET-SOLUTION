@@ -85,13 +85,23 @@
     if (!fuseInstance) return;
     var results = fuseInstance.search(query, { limit: 8 });
     if (!results.length) {
-      resultsBox.innerHTML = '<div class="ss-empty">No results for "' + query.replace(/</g, '&lt;') + '"</div>';
+      resultsBox.innerHTML = '<div class="ss-empty">No results for "' + escHtml(query) + '"</div>';
       return;
     }
     resultsBox.innerHTML = results.map(function (r) {
       var item = r.item;
-      return '<a class="ss-result" href="' + item.url + '"><h4>' + item.title + '</h4><p>' + item.desc + '</p></a>';
+      return '<a class="ss-result" href="' + escHtml(safeUrl(item.url)) + '"><h4>' + escHtml(item.title) + '</h4><p>' + escHtml(item.desc) + '</p></a>';
     }).join('');
+  }
+
+  function escHtml(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function safeUrl(u) {
+    u = String(u || '');
+    return /^(\/|[a-z0-9._-]+\.html|https:\/\/rrteensetsolution\.com\/)/i.test(u) ? u : '/';
   }
 
   function openSearch() {

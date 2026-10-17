@@ -2,7 +2,7 @@
    - pages: network first (always fresh when online), cached copy + offline page when not
    - same-origin css/js/images: stale-while-revalidate (instant repeat visits)
    - Google Fonts cached; everything else (Firebase, analytics, YouTube, forms) is never touched */
-const VERSION = 'v1';
+const VERSION = 'v2'; // bumped: purges any previously cached private pages
 const PREFIX = 'rr-';
 const C_STATIC = PREFIX + 'static-' + VERSION;
 const C_PAGES  = PREFIX + 'pages-' + VERSION;
@@ -11,6 +11,15 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE = [OFFLINE_URL, '/android-chrome-192x192.png', '/images/rr-logo-nav.webp', '/favicon-32x32.png'];
 const MAX_PAGES = 40, MAX_STATIC = 120, MAX_FONTS = 30, NAV_TIMEOUT = 6000;
 const STATIC_RE = /\.(?:css|js|png|jpe?g|webp|avif|gif|svg|ico|woff2?|json|webmanifest)$/i;
+
+
+// SECURITY: never keep private pages or token-bearing links (customer portal, employee attendance, CRM)
+// in the on-device cache - shared phones would otherwise leave them readable offline.
+const PRIVATE_PATH_RE = /^\/(quotation-system|testimonials-admin)\.html$/i;
+function isPrivateRequest(url) {
+  return PRIVATE_PATH_RE.test(url.pathname) || url.searchParams.has('token') || url.searchParams.has('p') ||
+         url.searchParams.has('portal') || url.searchParams.has('att');
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -82,6 +91,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin === self.location.origin) {
     if (url.pathname === '/sw.js' || url.pathname.indexOf('/cdn-cgi/') === 0) return;
+    if (isPrivateRequest(url)) return;                       // straight to network, never cached
     if (req.mode === 'navigate') { event.respondWith(handleNavigation(event)); return; }
     if (STATIC_RE.test(url.pathname)) { event.respondWith(staleWhileRevalidate(event, C_STATIC, MAX_STATIC)); }
     return;

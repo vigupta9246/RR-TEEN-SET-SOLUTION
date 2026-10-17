@@ -34,7 +34,9 @@ const firebaseConfig = {
   appId: "1:871289668592:web:6bda2d9f255e61294f1335",
   measurementId: "G-N28CZBQ66C"
 };
+import { enableAppCheck } from "/appcheck-init.js?v=1";
 const app = initializeApp(firebaseConfig);
+await enableAppCheck(app);
 const db = getFirestore(app);
 
 // Website "Service Required" dropdown text → CRM's ld-ptype values.
@@ -92,6 +94,34 @@ window.pushLeadToFirestore = async function(data) {
    markup, so this builds that UI inline the first time it's needed.
 ──────────────────────────────────────────────────────────── */
 const WHATSAPP_NUM = '918527258462';
+
+/* ── Bot trap (cheap, invisible): a hidden "website" field humans never see + a minimum fill time.
+      Real protection is the Firestore rules + App Check; this just stops the dumbest spam. ── */
+const PAGE_LOADED_AT = Date.now();
+function injectHoneypots() {
+  document.querySelectorAll('form[onsubmit*="handleEnquiry"]').forEach(function (f) {
+    if (f.querySelector('input[name="_hp"]')) return;
+    const i = document.createElement('input');
+    i.type = 'text'; i.name = '_hp'; i.tabIndex = -1; i.autocomplete = 'off';
+    i.setAttribute('aria-hidden', 'true');
+    i.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0';
+    f.appendChild(i);
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', injectHoneypots);
+else injectHoneypots();
+function looksLikeBot(form) {
+  const hp = form.querySelector('input[name="_hp"]');
+  if (hp && hp.value) return true;
+  if (Date.now() - PAGE_LOADED_AT < 2500) return true;            // no human fills a form in 2.5 s
+  try {                                                            // max 1 enquiry / 20 s per browser tab
+    const last = Number(sessionStorage.getItem('rrts_last_enq') || 0);
+    if (Date.now() - last < 20000) return true;
+    sessionStorage.setItem('rrts_last_enq', String(Date.now()));
+  } catch (e) { /* storage blocked - ignore */ }
+  return false;
+}
+
 
 function ensureFeedbackEls(form) {
   const wrap = form.parentNode; // append outside <form> so hiding the form doesn't hide these too
@@ -152,10 +182,13 @@ window.handleEnquiry = async function(event) {
   error.style.display = 'none';
 
   // Save to CRM — never blocks the customer-facing flow if this fails.
-  await window.pushLeadToFirestore({
-    name, phone: phoneDigits, service, area, city, message,
-    pageSource: location.pathname.replace(/^\//, '') || 'index.html'
-  });
+  // Bots get the same "success" screen but nothing is written.
+  if (!looksLikeBot(form)) {
+    await window.pushLeadToFirestore({
+      name, phone: phoneDigits, service, area, city, message,
+      pageSource: location.pathname.replace(/^\//, '') || 'index.html'
+    });
+  }
 
   form.style.display = 'none';
   success.style.display = 'block';

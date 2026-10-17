@@ -7,6 +7,7 @@ Disallow: /quotation-system.html
 Disallow: /testimonials-admin.html
 Disallow: /workers/
 Disallow: /tools/
+Disallow: /firebase/
 Allow: /
 
 # AI agents, AI search and answer engines — explicitly welcome (same rules as above)
@@ -25,6 +26,7 @@ Disallow: /quotation-system.html
 Disallow: /testimonials-admin.html
 Disallow: /workers/
 Disallow: /tools/
+Disallow: /firebase/
 Allow: /
 
 Sitemap: https://rrteensetsolution.com/sitemap.xml

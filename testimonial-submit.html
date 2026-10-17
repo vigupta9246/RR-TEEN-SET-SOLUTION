@@ -187,7 +187,7 @@
     <div class="gst-pill">GST: 07DJCPK0635M1Z5</div>
   </div>
 </footer>
-<script src="main.js?v=20261012"></script><script src="site-search.js?v=1"></script><script type="module" src="site-tracker.js?v=20260919"></script><script type="module" src="newsletter.js?v=2"></script><script src="chatbot-widget.js?v=20261008" defer></script>
+<script src="main.js?v=20261012"></script><script src="site-search.js?v=2"></script><script type="module" src="site-tracker.js?v=20261015"></script><script type="module" src="newsletter.js?v=3"></script><script src="chatbot-widget.js?v=20261008" defer></script>
 
 <script type="module">
 const CFG = {
@@ -202,14 +202,14 @@ function fbInit() {
   return fbP || (fbP = Promise.all([
     import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
     import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-  ]).then(([app, fs]) => ({ fs, db: fs.getFirestore(app.initializeApp(CFG)) })).catch(e => { fbP = null; throw e; }));
+  ]).then(async ([app, fs]) => { const a = app.initializeApp(CFG); try { await (await import('/appcheck-init.js?v=1')).enableAppCheck(a); } catch (e) { /* optional */ } return { fs, db: fs.getFirestore(a) }; }).catch(e => { fbP = null; throw e; }));
 }
 async function fbSaveReview(p) {
   const { fs, db } = await fbInit();
   await fs.setDoc(fs.doc(db, 'testimonials', p.reviewId), { ...p, createdAt: fs.serverTimestamp() });
 }
 async function fbPushLead(d) {           // phone goes to the private CRM leads list, never into the public review document
-  await import('./lead-capture.js?v=20261004');
+  await import('./lead-capture.js?v=20261015');
   if (window.pushLeadToFirestore) await window.pushLeadToFirestore(d);
 }
 /*FB-END*/

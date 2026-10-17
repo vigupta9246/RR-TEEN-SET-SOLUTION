@@ -33,7 +33,9 @@ const firebaseConfig = {
   appId: "1:871289668592:web:6bda2d9f255e61294f1335",
   measurementId: "G-N28CZBQ66C"
 };
+import { enableAppCheck } from "/appcheck-init.js?v=1";
 const app = initializeApp(firebaseConfig, 'site-tracker');
+await enableAppCheck(app);
 const db = getFirestore(app);
 
 const currentPage = () => location.pathname.replace(/^\//, '') || 'index.html';

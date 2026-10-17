@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "yobjqcf0im");
-</script>
-
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="shortcut icon" href="favicon.ico">
@@ -17,6 +9,8 @@
 <meta name="theme-color" content="#20262c">
 
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="strict-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>R.R Teen Set Solution — Quotation System</title>
 <script>
@@ -48,9 +42,9 @@
      only touched inside generateRealPDF(), never at parse time, so there's
      no need to block the initial page render on ~500KB of script the user
      may not even need this session (PDF download/share is a later action). -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="/lib-jspdf.umd.min.js"></script>
+<script defer src="/lib-html2canvas.min.js"></script>
+<script defer src="/lib-qrcode.min.js"></script>
 <!-- Error monitoring (Sentry). Replace SENTRY_DSN below with your project's
      DSN from sentry.io (free tier is enough) — until then this loads but
      sends nothing, and the app works exactly as before either way. -->
@@ -2138,7 +2132,9 @@ const firebaseConfig = {
   measurementId: "G-N28CZBQ66C"
 };
 
+import { enableAppCheck } from "/appcheck-init.js?v=1";
 const app = initializeApp(firebaseConfig);
+await enableAppCheck(app);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
@@ -3405,7 +3401,7 @@ window.generateAttendanceLink = async (id) => {
 // protection against the exact sharing this is meant to prevent.
 window.setWorkerPin = async (id) => {
   const w = allLabour.find(x=>x.id===id); if (!w) return;
-  const pin = String(Math.floor(1000 + Math.random()*9000));
+  const pin = String(1000 + (crypto.getRandomValues(new Uint32Array(1))[0] % 9000)); // CSPRNG, not Math.random
   try {
     await setDoc(doc(db,'labourPins',id), { pin, updatedAt: serverTimestamp() });
     await confirmDialog(

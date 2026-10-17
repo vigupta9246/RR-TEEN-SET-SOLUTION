@@ -62,6 +62,7 @@
         ]);
         const existing = getApps();
         const app = existing.length ? existing[0] : initializeApp(firebaseConfig);
+        if (!existing.length) { try { await (await import('/appcheck-init.js?v=1')).enableAppCheck(app); } catch (e) { /* optional */ } }
         const db = getFirestore(app);
         const id = email.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
         await setDoc(doc(db, 'newsletter_signups', id), {
