@@ -17,6 +17,7 @@ Key facts:
 - [Projects](https://rrteensetsolution.com/projects.html): Completed project gallery
 - [Contact](https://rrteensetsolution.com/contact.html): Contact form, phone, address, business hours
 - [Free Shed Cost Calculator](https://rrteensetsolution.com/shed-cost-calculator.html): Interactive tool to estimate shed cost by area and type
+- [PEB Cost Calculator](https://rrteensetsolution.com/peb-cost-calculator.html): Interactive tool to estimate PEB (pre-engineered building) cost per sq ft and total range by length, span, eave height, cladding and crane
 - [Book a Free Site Visit](https://rrteensetsolution.com/book-site-visit.html): Online booking form — choose service, city, date (Mon–Sat) and time slot; the team confirms by call or WhatsApp
 - [Company Profile (PDF)](https://rrteensetsolution.com/company-profile.html): 8-page company profile for download (direct file: https://rrteensetsolution.com/rr-teen-set-solution-company-profile.pdf) — services, materials, build timelines, process, service areas and contact; no prices
 
