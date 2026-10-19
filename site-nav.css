@@ -99,3 +99,18 @@ nav[aria-label="Main Navigation"].scrolled { box-shadow: 0 4px 24px rgba(10,22,4
 [data-theme="dark"] .dropdown a:hover{background:rgba(255,255,255,.06)}
 [data-theme="dark"] .logo-img-wrap{background:#fff;border-radius:10px;padding:3px 8px}
 [data-theme="dark"] .logo-tag{color:var(--accent-t)}
+/* hamburger icon (copied from style.css): hard-coded dark navy would be invisible on the dark nav */
+[data-theme="dark"] .hamburger span{background:#e6edf3}
+[data-theme="dark"] .hamburger:active{background:rgba(255,255,255,.1)}
+/* site search (site-search.js hard-codes dark navy icon and a white modal) */
+[data-theme="dark"] #site-search-btn{color:#e6edf3}
+[data-theme="dark"] #site-search-btn:hover{background:rgba(255,255,255,.12)}
+[data-theme="dark"] #site-search-box{background:#161b22;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+[data-theme="dark"] #site-search-input-row{border-bottom-color:#30363d}
+[data-theme="dark"] #site-search-input{background:transparent;color:#e6edf3}
+[data-theme="dark"] #site-search-input::placeholder{color:#8b96a5}
+[data-theme="dark"] #site-search-input-row svg,[data-theme="dark"] #site-search-close{color:#9aa4b2}
+[data-theme="dark"] .ss-result{border-bottom-color:#21262d}
+[data-theme="dark"] .ss-result:hover{background:#1c2333}
+[data-theme="dark"] .ss-result h4{color:#e6edf3}
+[data-theme="dark"] .ss-result p,[data-theme="dark"] .ss-empty{color:#9aa4b2}
