@@ -127,6 +127,11 @@ a{color:var(--blue)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
 .brand{display:flex;align-items:center;background:#fff;border-radius:10px;padding:4px 10px}
 .brand img{height:46px;width:auto}
+.brandwrap{display:flex;align-items:center;gap:12px;min-width:0}
+.logo-tag{font-size:10.5px;color:#c9301a;text-transform:uppercase;letter-spacing:.6px;line-height:1.35;max-width:160px;font-weight:800}
+[data-theme="dark"] .logo-tag{color:#FF8A70}
+@media (max-width:640px){.brandwrap{gap:8px}.logo-tag{font-size:8.5px;letter-spacing:.4px;max-width:105px}}
+@media (max-width:350px){.logo-tag{display:none}}
 .nav{display:flex;gap:6px;align-items:center;list-style:none}
 .hb{display:flex;align-items:center;gap:8px}
 .icon-btn{width:42px;height:42px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer}
@@ -382,7 +387,7 @@ footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="index.html" aria-label="R.R Teen Set Solution home"><img src="images/rr-logo-original.png" alt="R.R Teen Set Solution logo" width="400" height="174"></a>
+    <div class="brandwrap"><a class="brand" href="index.html" aria-label="R.R Teen Set Solution home"><img src="images/rr-logo-original.png" alt="R.R Teen Set Solution logo" width="400" height="174"></a><span class="logo-tag">Steel &amp; Shed Experts · Delhi NCR</span></div>
     <nav aria-label="Main">
     <ul class="nav" id="nav">
       <li><a href="services.html">Services</a></li>
