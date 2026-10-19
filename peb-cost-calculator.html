@@ -309,6 +309,17 @@ footer .g{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:30px}
 footer h2{font-family:var(--f-head);color:var(--on-panel);font-size:1.05rem;margin-bottom:10px}
 footer a{color:var(--on-panel2);text-decoration:none;display:block;padding:3px 0}
 footer a:hover{color:#fff}
+footer #newsletter-bar{width:min(1140px,calc(100% - 40px));margin:0 auto 32px;padding:20px 24px;border:1px solid rgba(159,176,230,.25);border-radius:14px;background:rgba(255,255,255,.05)}
+footer .nl-inner{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
+footer .nl-text{flex:1 1 260px;display:flex;flex-direction:column;gap:2px}
+footer .nl-text strong{color:var(--on-panel);font-family:var(--f-head);font-size:1.05rem}
+footer .nl-text span{font-size:14px}
+footer #nl-form{display:flex;gap:10px;flex-wrap:wrap;flex:1 1 300px}
+footer #nl-email{flex:1 1 180px;min-width:0;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(159,176,230,.35);background:rgba(255,255,255,.08);color:#fff;font:500 15px var(--f-body)}
+footer #nl-email::placeholder{color:rgba(255,255,255,.55)}
+footer #nl-form button{padding:11px 20px;border:0;border-radius:10px;background:#F13C20;color:#fff;font:700 15px var(--f-body);cursor:pointer}
+footer #nl-form button:disabled{opacity:.6;cursor:default}
+footer #nl-msg{flex-basis:100%;margin:0;font-size:13.5px;min-height:1em}
 footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-top:16px;font-size:13.5px}
 
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--panel);color:var(--on-panel);display:none;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(159,176,230,.3)}
@@ -473,8 +484,8 @@ footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-
 
     <aside class="result" aria-label="Estimated PEB cost">
       <p class="k">Estimated PEB cost</p>
-      <div class="price" id="price">Rs 0</div>
-      <p class="perft" id="perft"></p>
+      <div class="price" id="price">Rs 12.5 to 16.0 lakh</div>
+      <p class="perft" id="perft">About Rs 250 to 320 per sq ft</p>
       <p class="sr-only" id="live" role="status" aria-live="polite"></p>
 
       <div class="stage">
@@ -683,7 +694,7 @@ footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-
 
 <aside class="quick" aria-label="Quick actions">
 <div class="dock" id="dock">
-  <div><div class="dk">Estimated PEB cost</div><div class="dp" id="dock-p">Rs 0</div></div>
+  <div><div class="dk">Estimated PEB cost</div><div class="dp" id="dock-p">Rs 12.5 to 16.0 lakh</div></div>
   <a class="btn" href="#quote">Free quote</a>
 </div>
 <div class="fabs">
@@ -947,6 +958,7 @@ $('q-send').addEventListener('click',sendLead);
 </script>
 <script type="module" src="lead-capture.js?v=20261015"></script>
 <script type="module" src="site-tracker.js?v=20261015"></script>
+<script type="module" src="newsletter.js?v=3"></script>
 <script src="cookie-consent.js?v=20261008" defer></script>
 </body>
 </html>
