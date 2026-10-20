@@ -51,7 +51,7 @@ body.cc-modal-open { overflow: hidden; }
 #cc-banner.cc-hiding   { transform: translateY(100%); }
 
 .cc-banner-inner {
-  background: #fff;
+  background: var(--cc-bg);
   border-top: 1px solid var(--cc-border);
   box-shadow: var(--cc-shadow);
   padding: 16px 28px;
@@ -273,3 +273,4 @@ body.cc-modal-open { overflow: hidden; }
 
 /* dark mode */
 [data-theme="dark"]{--cc-bg:#161b22;--cc-bg-modal:#161b22;--cc-overlay:rgba(0,0,0,.65);--cc-bg-cat:#1c2333;--cc-border:#30363d;--cc-text:#e6edf3;--cc-muted:#9aa4b2;--cc-small:#8b949e;--cc-accent:#6c9bff;--cc-accent-h:#8fb4ff;--cc-lite:rgba(108,155,255,.12);--cc-shadow:0 -4px 24px rgba(0,0,0,.5);--cc-shadow-m:0 20px 60px rgba(0,0,0,.6)}
+[data-theme="dark"] .cc-btn-primary{color:#0d1117}

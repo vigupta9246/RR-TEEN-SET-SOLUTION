@@ -49,9 +49,9 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="cookie-consent.css?v=20261011">
-<link rel="stylesheet" href="chatbot-widget.css?v=1">
-<link rel="stylesheet" href="site-nav.css?v=1">
+<link rel="stylesheet" href="cookie-consent.css?v=20261019">
+<link rel="stylesheet" href="chatbot-widget.css?v=2">
+<link rel="stylesheet" href="site-nav.css?v=2">
 
 <script type="application/ld+json">
 {
@@ -320,7 +320,7 @@ footer .nl-text span{font-size:14px}
 footer #nl-form{display:flex;gap:10px;flex-wrap:wrap;flex:1 1 300px}
 footer #nl-email{flex:1 1 180px;min-width:0;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(159,176,230,.35);background:rgba(255,255,255,.08);color:#fff;font:500 15px var(--f-body)}
 footer #nl-email::placeholder{color:rgba(255,255,255,.55)}
-footer #nl-form button{padding:11px 20px;border:0;border-radius:10px;background:#F13C20;color:#fff;font:700 15px var(--f-body);cursor:pointer}
+footer #nl-form button{padding:11px 20px;border:0;border-radius:10px;background:#D4351B;color:#fff;font:700 15px var(--f-body);cursor:pointer}
 footer #nl-form button:disabled{opacity:.6;cursor:default}
 footer #nl-msg{flex-basis:100%;margin:0;font-size:13.5px;min-height:1em}
 footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-top:16px;font-size:13.5px}
@@ -387,6 +387,15 @@ footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-
 }
 .fabs .c{background:#1731B5}
 [data-theme="dark"] .steps li::before{color:#050A22}
+.cmp .fl{min-width:max-content}
+@media (max-width:640px){
+  table{min-width:0}
+  caption{padding:12px 12px}
+  th,td{padding:11px 9px;font-size:14.5px}
+  th{font-size:13px}
+  summary{padding-right:56px}
+}
+body:has(#mob-menu.open) .dock,body:has(#mob-menu.open) .fabs{display:none}
 </style>
 </head>
 <body>
@@ -991,7 +1000,7 @@ $('q-send').addEventListener('click',sendLead);
 <script type="module" src="lead-capture.js?v=20261015"></script>
 <script type="module" src="site-tracker.js?v=20261015"></script>
 <script type="module" src="newsletter.js?v=3"></script>
-<script src="site-nav.js?v=1" defer></script>
+<script src="site-nav.js?v=2" defer></script>
 <script src="site-search.js?v=2" defer></script>
 <script src="chatbot-widget.js?v=20261008" defer></script>
 <script src="cookie-consent.js?v=20261008" defer></script>
