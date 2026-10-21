@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var footerContact = document.querySelector('.footer-contact');
     if(footerContact){
       var gbpLine = document.createElement('p');
-      gbpLine.innerHTML = '<span>\u2B50</span> <a href="'+GBP_URL+'" target="_blank" rel="noopener" style="color:#4285f4;font-weight:600">View on Google Maps</a>';
+      gbpLine.innerHTML = '<span>\u2B50</span> <a href="'+GBP_URL+'" target="_blank" rel="noopener" style="color:#8ab4f8;font-weight:600">View on Google Maps</a>';
       footerContact.appendChild(gbpLine);
     }
 
