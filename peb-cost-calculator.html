@@ -560,7 +560,7 @@ body:has(#mob-menu.open) .dock,body:has(#mob-menu.open) .fabs{display:none}
       <p class="fine" id="splitnote" style="margin-top:8px"></p>
 
       <a class="btn block" href="#quote" id="cta-main">Get this quote checked, free</a>
-      <div class="acts"><button class="btn alt" type="button" id="copy">Copy link</button><button class="btn alt" type="button" id="print">Print estimate</button></div>
+      <div class="acts"><button class="btn alt" type="button" id="pdf" style="grid-column:1/-1">Download PDF estimate</button><button class="btn alt" type="button" id="copy">Copy link</button><button class="btn alt" type="button" id="print">Print estimate</button></div>
       <p class="fine">Planning estimate only. Final price comes after a site visit, soil details, loads and drawings.</p>
     </aside>
   </div>
@@ -942,6 +942,20 @@ $('copy').addEventListener('click',function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(done,function(){window.prompt('Copy this link',u)})}else{window.prompt('Copy this link',u)}
 });
 $('print').addEventListener('click',function(){window.print()});
+/* ---- PDF estimate: jsPDF and the generator load only when the button is pressed ---- */
+function loadScript(src){return new Promise(function(res,rej){var t=document.createElement('script');t.src=src;t.onload=res;t.onerror=function(){rej(new Error(src))};document.head.appendChild(t)})}
+$('pdf').addEventListener('click',function(){
+  var b=$('pdf'),label='Download PDF estimate';
+  if(b.disabled)return;
+  b.disabled=true;b.textContent='Preparing your PDF...';
+  var s=read(),r=calc(s),lo=$('loc');
+  var libs=window.jspdf?Promise.resolve():loadScript('lib-jspdf.umd.min.js?v=4.2.1');
+  libs.then(function(){return window.RRPebPdf?0:loadScript('peb-estimate-pdf.js?v=1')})
+  .then(function(){return window.RRPebPdf.download({s:s,r:r,names:NAMES,tierLabel:RATES[r.tier][2],locLabel:lo.options[lo.selectedIndex].text,url:stateUrl()})})
+  .then(function(){b.textContent='PDF downloaded';try{if(typeof gtag==='function')gtag('event','peb_pdf_download',{area:r.area})}catch(e){}})
+  .catch(function(){b.textContent='Could not create the PDF, please try again'})
+  .then(function(){setTimeout(function(){b.textContent=label;b.disabled=false},2200)});
+});
 
 /* ---- first paint: draw the frame once ---- */
 (function init(){
