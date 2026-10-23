@@ -396,6 +396,24 @@ footer .legal{margin-top:28px;border-top:1px solid rgba(159,176,230,.2);padding-
   summary{padding-right:56px}
 }
 body:has(#mob-menu.open) .dock,body:has(#mob-menu.open) .fabs{display:none}
+.glrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.grp .glrow .gl{margin-bottom:0}
+.geo{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:6px 13px;border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--blue);font:700 13px var(--f-body);cursor:pointer;white-space:nowrap}
+.geo:hover{border-color:var(--blue)}
+.geo svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.geo.busy{cursor:progress;opacity:.85}
+.geo.busy svg{animation:geospin .9s linear infinite}
+.geo.is-ok{border-color:#1E965A;color:#1E965A}
+.geo-note{margin:9px 2px 0;font-size:13.5px;line-height:1.5;color:var(--ink2)}
+.geo-note.is-ok{color:#1A7F4B}
+.geo-note.is-err{color:#C0392B}
+[data-theme="dark"] .geo.is-ok{border-color:#2F9E6A;color:#5BD99A}
+[data-theme="dark"] .geo-note.is-ok{color:#5BD99A}
+[data-theme="dark"] .geo-note.is-err{color:#FF8F85}
+@keyframes geospin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.geo.busy svg{animation:none}}
+@media (max-width:380px){.glrow{flex-wrap:wrap}}
+@media print{.glrow .geo,.geo-note{display:none}}
 </style>
 </head>
 <body>
@@ -514,7 +532,10 @@ body:has(#mob-menu.open) .dock,body:has(#mob-menu.open) .fabs{display:none}
       </fieldset>
 
       <div class="grp">
-        <label class="gl" for="loc">Site location</label>
+        <div class="glrow">
+          <label class="gl" for="loc">Site location</label>
+          <button type="button" class="geo" id="geo" aria-describedby="geo-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.4A7 7 0 0 1 19 9.6C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.6" r="2.6"/></svg><span id="geo-t">Use my location</span></button>
+        </div>
         <select id="loc">
           <option value="1">Delhi / Najafgarh</option>
           <option value="1.05">Gurugram / Manesar</option>
@@ -523,6 +544,7 @@ body:has(#mob-menu.open) .dock,body:has(#mob-menu.open) .fabs{display:none}
           <option value="1.07">Ghaziabad</option>
           <option value="1.10">Outside Delhi NCR</option>
         </select>
+        <p class="geo-note" id="geo-note" role="status" aria-live="polite">Picks the nearest area using your device. Your location is not stored or sent anywhere.</p>
       </div>
 
       <div class="grp tg">
@@ -942,6 +964,48 @@ $('copy').addEventListener('click',function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(done,function(){window.prompt('Copy this link',u)})}else{window.prompt('Copy this link',u)}
 });
 $('print').addEventListener('click',function(){window.print()});
+/* ---- Site location auto-detect: the nearest NCR area is worked out on the device. No network call, nothing stored or sent. ---- */
+(function(){
+  var btn=$('geo'),txt=$('geo-t'),note=$('geo-note'),sel=$('loc');
+  if(!btn||!sel)return;
+  var IDLE=txt.textContent,HINT=note.textContent,NCR_MAX_KM=55;
+  var Z=[['1','Delhi / Najafgarh',28.6139,77.2090],['1','Delhi / Najafgarh',28.6092,76.9798],['1','Delhi / Najafgarh',28.8528,77.0929],['1','Delhi / Najafgarh',28.6928,76.9155],
+    ['1.05','Gurugram / Manesar',28.4595,77.0266],['1.05','Gurugram / Manesar',28.3540,76.9360],
+    ['1.03','Noida / Greater Noida',28.5355,77.3910],['1.03','Noida / Greater Noida',28.4744,77.5040],
+    ['1.03','Noida / Greater Noida',28.6280,77.3640],['1.03','Noida / Greater Noida',28.5700,77.3210],
+    ['1.02','Faridabad / Ballabhgarh',28.4089,77.3178],['1.02','Faridabad / Ballabhgarh',28.3387,77.3190],
+    ['1.07','Ghaziabad',28.6692,77.4538],['1.07','Ghaziabad',28.6460,77.3700],['1.07','Ghaziabad',28.8330,77.5740]];
+  function km(a,b,c,d){var R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p,t=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.atan2(Math.sqrt(t),Math.sqrt(1-t))}
+  function adj(v){var p=Math.round((+v-1)*100);return p>0?'adds '+p+' percent to the base rate':'uses the base rate'}
+  function ping(r){try{if(typeof gtag==='function')gtag('event','peb_location_detect',{result:r})}catch(e){}}
+  function say(cls,msg){note.className='geo-note'+(cls?' '+cls:'');note.textContent=msg}
+  function idle(){btn.classList.remove('busy','is-ok');btn.removeAttribute('aria-busy');btn.disabled=false;txt.textContent=IDLE}
+  function fail(msg,tag){idle();say('is-err',msg);ping(tag)}
+  function apply(value){for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===value){if(sel.selectedIndex!==i){sel.selectedIndex=i;sel.dispatchEvent(new Event('change',{bubbles:true}))}return true}}return false}
+  btn.addEventListener('click',function(){
+    if(btn.disabled)return;
+    if(!navigator.geolocation||(window.isSecureContext===false)){fail('This browser cannot share your location. Please choose your area from the list.','unsupported');return}
+    btn.disabled=true;btn.classList.add('busy');btn.setAttribute('aria-busy','true');txt.textContent='Detecting...';say('','Waiting for your device location. Allow access if your browser asks.');
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var la=pos.coords.latitude,lo=pos.coords.longitude,best=null,bd=1e9;
+      Z.forEach(function(z){var d=km(la,lo,z[2],z[3]);if(d<bd){bd=d;best=z}});
+      var out=bd>NCR_MAX_KM,val=out?'1.10':best[0],name=out?'Outside Delhi NCR':best[1];
+      apply(val);
+      idle();btn.classList.add('is-ok');txt.textContent='Location set';
+      var rough=pos.coords.accuracy>20000?' Your device gave only an approximate position, so please check it.':'';
+      say('is-ok',out?'You look to be outside Delhi NCR, so the outside-NCR rate applies (adds 10 percent). You can change it in the list.'+rough
+        :'Nearest area: '+name+(Math.round(bd)>=1?', about '+Math.round(bd)+' km from its centre':'')+'. This '+adj(val)+'. You can change it in the list.'+rough);
+      ping(out?'outside':'zone_'+val);
+    },function(err){
+      if(err&&err.code===1)fail('Location access is blocked. Allow it in your browser settings, or choose your area from the list.','denied');
+      else if(err&&err.code===3)fail('Detecting took too long. Please try again, or choose your area from the list.','timeout');
+      else fail('Could not read your location. Please choose your area from the list.','unavailable');
+    },{enableHighAccuracy:false,timeout:10000,maximumAge:0});
+  });
+  /* a manual choice replaces the detected state */
+  sel.addEventListener('change',function(e){if(e.isTrusted){btn.classList.remove('is-ok');txt.textContent=IDLE;say('',HINT)}});
+})();
+
 /* ---- PDF estimate: jsPDF and the generator load only when the button is pressed ---- */
 function loadScript(src){return new Promise(function(res,rej){var t=document.createElement('script');t.src=src;t.onload=res;t.onerror=function(){rej(new Error(src))};document.head.appendChild(t)})}
 $('pdf').addEventListener('click',function(){
