@@ -156,6 +156,7 @@
 }
 .proj-item:hover .proj-overlay-text { transform: translateY(0); }
 .proj-overlay-text h4 {
+  color: #fff;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 18px; letter-spacing: 1px;
   margin-bottom: 2px;
@@ -173,7 +174,11 @@
 .proj-item:nth-child(6)  { grid-column: span 4; min-height: 240px; }
 .proj-item:nth-child(7)  { grid-column: span 6; min-height: 220px; }
 .proj-item:nth-child(8)  { grid-column: span 6; min-height: 220px; }
-.proj-item:nth-child(9)  { grid-column: span 12; min-height: 200px; }
+.proj-item:nth-child(9)  { grid-column: span 12; min-height: 200px; aspect-ratio: 21/9; }
+.proj-item:nth-child(n+10) { grid-column: span 4; aspect-ratio: 4/3; }
+.proj-item:nth-child(22) { grid-column: span 4; aspect-ratio: auto; height: clamp(220px, 27vw, 340px); }
+.proj-item:nth-child(23) { grid-column: span 8; aspect-ratio: auto; height: clamp(220px, 27vw, 340px); }
+.proj-item:nth-child(24) { grid-column: span 12; aspect-ratio: 1280/571; }
 
 /* CTA section */
 .proj-cta {
@@ -223,7 +228,9 @@
   .proj-item:nth-child(6)  { grid-column: span 2; min-height: 160px; }
   .proj-item:nth-child(7)  { grid-column: span 1; min-height: 160px; }
   .proj-item:nth-child(8)  { grid-column: span 1; min-height: 160px; }
-  .proj-item:nth-child(9)  { grid-column: span 2; min-height: 160px; }
+  .proj-item:nth-child(9)  { grid-column: span 2; min-height: 160px; aspect-ratio: 16/9; }
+  .proj-item:nth-child(n+10) { grid-column: span 1; aspect-ratio: 4/3; min-height: 0; }
+  .proj-item:nth-child(22), .proj-item:nth-child(23), .proj-item:nth-child(24) { grid-column: span 2; height: auto; aspect-ratio: 16/9; }
   .proj-cta { padding: 36px 24px; border-radius: 14px; }
   .proj-overlay { opacity: 1; }
 }
@@ -636,6 +643,28 @@
         <div class="proj-overlay-text">
           <h4>Chimney Spiral Staircase</h4>
           <p>Steel stairs &amp; platform fabrication · PMV Maltings, Pataudi</p>
+        </div>
+      </div></a>
+    </div>
+
+    <!-- Photo 23: Industrial shed interior - steel truss frame, insulated roof sheeting, profile sheet walls -->
+    <div class="proj-item" data-cat="industrial">
+      <a class="glightbox" href="images/project-022.jpg" data-gallery="projects" data-title="Industrial Shed Interior — Steel truss frame · Insulated roof &amp; profile sheet walls"><picture><source srcset="images/project-022.webp" type="image/webp"><img src="images/project-022.jpg" alt="Inside an industrial shed with steel truss frame, insulated roof sheeting and profile sheet walls — R.R Teen Set Solution" width="1400" height="625" loading="lazy"></picture>
+      <div class="proj-overlay">
+        <div class="proj-overlay-text">
+          <h4>Industrial Shed Interior</h4>
+          <p>Steel truss frame · Insulated roof &amp; profile sheet walls</p>
+        </div>
+      </div></a>
+    </div>
+
+    <!-- Photo 24: Rooftop sheet cladding on commercial building -->
+    <div class="proj-item" data-cat="rooftop">
+      <a class="glightbox" href="images/project-023.jpg" data-gallery="projects" data-title="Rooftop Sheet Cladding — Profile sheet roofing &amp; wall cladding · Commercial building"><picture><source srcset="images/project-023.webp" type="image/webp"><img src="images/project-023.jpg" alt="Profile sheet roofing and cladding on the top of a commercial building — R.R Teen Set Solution" width="1280" height="571" loading="lazy"></picture>
+      <div class="proj-overlay">
+        <div class="proj-overlay-text">
+          <h4>Rooftop Sheet Cladding</h4>
+          <p>Profile sheet roofing &amp; wall cladding · Commercial building</p>
         </div>
       </div></a>
     </div>
