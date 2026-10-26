@@ -23,7 +23,7 @@
   --cc-shadow-m: 0 20px 60px rgba(0,0,0,.15), 0 8px 24px rgba(0,0,0,.08);
   --cc-r:        12px;
   --cc-r-sm:     8px;
-  --cc-font:     -apple-system,'Inter','Segoe UI',sans-serif;
+  --cc-font:     -apple-system,'Nunito','Segoe UI',sans-serif;
   --cc-t:        280ms cubic-bezier(.4,0,.2,1);
 }
 
@@ -215,14 +215,14 @@ body.cc-modal-open { overflow: hidden; }
 }
 .cc-category-desc { font-size: 12px; color: var(--cc-muted); line-height: 1.55; }
 .cc-examples {
-  font-size: 11px; color: var(--cc-small); margin-top: 5px;
+  font-size: 12px; color: var(--cc-small); margin-top: 5px;
   display: inline-block; background: rgba(0,0,0,.04);
   padding: 3px 8px; border-radius: 4px;
 }
 
 /* Badges */
 .cc-badge {
-  font-size: 9.5px; font-weight: 700; padding: 2px 7px;
+  font-size: 11px; font-weight: 700; padding: 2px 7px;
   border-radius: 50px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
 }
 .cc-badge-required { background: var(--cc-success-bg); color: #065f46; }
@@ -249,7 +249,7 @@ body.cc-modal-open { overflow: hidden; }
 .cc-track-on .cc-toggle-thumb,
 .cc-toggle-input:checked + .cc-toggle-track .cc-toggle-thumb { transform: translateX(20px); }
 .cc-toggle-label {
-  font-size: 9.5px; font-weight: 700; color: var(--cc-muted);
+  font-size: 12px; font-weight: 700; color: var(--cc-muted);
   text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
 }
 

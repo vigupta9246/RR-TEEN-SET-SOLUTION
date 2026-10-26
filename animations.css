@@ -39,7 +39,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Sub-headings & labels */
 .tag, .stat-lbl, .logo-tag, .feat-list li,
 nav .nav-links a, .section-subtitle {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: var(--font-b, 'Nunito', sans-serif);
   font-size: 12.5px;
   letter-spacing: 0.06em;
   font-weight: 600;
@@ -461,7 +461,7 @@ nav.scrolled {
 
 .feat-list li:hover {
   transform: translateX(6px);
-  color: #d79922 !important;
+  color: var(--gold-text, #9a6a0a) !important;
 }
 
 /* ============================================================
