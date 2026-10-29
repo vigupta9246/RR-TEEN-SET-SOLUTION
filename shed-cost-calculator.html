@@ -376,6 +376,10 @@ input[type=range].calc-slider{width:100%;accent-color:#ff6f00;height:4px;cursor:
 .cc-dot-mat{background:#ff6f00}
 .cc-dot-lab{background:#4056a1}
 .cc-dot-add{background:#25D366}
+.result-wrap .cc-title{color:#c9d3e6}
+.result-wrap .cc-item{color:#dbe5f6}
+.result-wrap .cc-item b{color:#fff}
+@media(max-width:640px){.slider-header{padding-right:58px}}
 .rb-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px}
 .rb-lbl{font-size:11px;color:rgba(255,255,255,.5);margin:0 0 4px;text-transform:uppercase;letter-spacing:.5px}
 .rb-val{font-size:15px;font-weight:700;color:#ffffff;margin:0}
@@ -765,14 +769,14 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 <!-- HERO -->
 <section class="calc-page-hero">
   <div class="calc-hero-inner">
-    <div class="calc-hero-badge"><svg class="icon"><use href="#i-calc"></use></svg> Free Tool · No Signup Required</div>
+    <div class="calc-hero-badge"><svg aria-hidden="true" class="icon"><use href="#i-calc"></use></svg> Free Tool · No Signup Required</div>
     <h1 class="calc-hero-h1">SHED COST<br><span>CALCULATOR</span></h1>
     <p class="calc-hero-sub">Apne tin shed (Teen Shed) ka estimated cost seconds mein jaanein. Dimensions enter karein, type chunein — instant estimate milegi. Delhi NCR ke liye bilkul accurate.</p>
     
     <div class="calc-hero-stats">
       <div class="calc-stat"><span class="calc-stat-num">500+</span><span class="calc-stat-lbl">Projects complete</span></div>
       <div class="calc-stat"><span class="calc-stat-num">8+</span><span class="calc-stat-lbl">Saal ka experience</span></div>
-      <div class="calc-stat"><span class="calc-stat-num">5.0 <svg class="icon icon-solid" style="width:.6em;height:.6em;color:#ff8c00"><use href="#i-star"></use></svg></span><span class="calc-stat-lbl">Google rating</span></div>
+      <div class="calc-stat"><span class="calc-stat-num">5.0 <svg aria-hidden="true" class="icon icon-solid" style="width:.6em;height:.6em;color:#ff8c00"><use href="#i-star"></use></svg></span><span class="calc-stat-lbl">Google rating</span></div>
       <div class="calc-stat"><span class="calc-stat-num">FREE</span><span class="calc-stat-lbl">Site visit</span></div>
     </div>
   </div>
@@ -781,10 +785,10 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 <!-- TRUST STRIP — animated counters -->
 <section class="trust-strip">
   <div class="trust-grid" id="trust-grid">
-    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-tag"></use></svg><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
-    <div class="trust-item"><svg class="icon"><use href="#i-pin"></use></svg><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
-    <div class="trust-item"><svg class="icon"><use href="#i-clock"></use></svg><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
-    <div class="trust-item"><svg class="icon icon-solid"><use href="#i-star"></use></svg><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
+    <div class="trust-item"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-tag"></use></svg><span class="trust-num" data-count="500" data-suffix="+">0</span><span class="trust-lbl">Projects Delivered</span></div>
+    <div class="trust-item"><svg aria-hidden="true" class="icon"><use href="#i-pin"></use></svg><span class="trust-num" data-count="20" data-suffix="+">0</span><span class="trust-lbl">Cities Served</span></div>
+    <div class="trust-item"><svg aria-hidden="true" class="icon"><use href="#i-clock"></use></svg><span class="trust-num" data-count="98" data-suffix="%">0</span><span class="trust-lbl">On-Time Delivery</span></div>
+    <div class="trust-item"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><span class="trust-num" data-count="49" data-suffix="" data-decimal="1">0</span><span class="trust-lbl">Client Rating / 5</span></div>
   </div>
 </section>
 
@@ -797,22 +801,22 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <div class="stype-grid" id="stype-grid">
     <div class="stype-card active" onclick="calcSelect('tin')">
       <span class="stype-badge">Popular</span>
-      <span class="stype-icon"><svg class="icon"><use href="#i-shed-tin"></use></svg></span>
+      <span class="stype-icon"><svg aria-hidden="true" class="icon"><use href="#i-shed-tin"></use></svg></span>
       <span class="stype-name">Tin Shed</span>
       <span class="stype-rate">₹150–220 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('industrial')">
-      <span class="stype-icon"><svg class="icon"><use href="#i-shed-industrial"></use></svg></span>
+      <span class="stype-icon"><svg aria-hidden="true" class="icon"><use href="#i-shed-industrial"></use></svg></span>
       <span class="stype-name">Industrial Shed</span>
       <span class="stype-rate">₹200–300 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('peb')">
-      <span class="stype-icon"><svg class="icon"><use href="#i-shed-peb"></use></svg></span>
+      <span class="stype-icon"><svg aria-hidden="true" class="icon"><use href="#i-shed-peb"></use></svg></span>
       <span class="stype-name">PEB Structure</span>
       <span class="stype-rate">₹250–450 / sqft</span>
     </div>
     <div class="stype-card" onclick="calcSelect('warehouse')">
-      <span class="stype-icon"><svg class="icon"><use href="#i-shed-warehouse"></use></svg></span>
+      <span class="stype-icon"><svg aria-hidden="true" class="icon"><use href="#i-shed-warehouse"></use></svg></span>
       <span class="stype-name">Prefab Warehouse</span>
       <span class="stype-rate">₹240–340 / sqft</span>
     </div>
@@ -820,7 +824,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 
   <!-- COMPARE 2 SHED TYPES -->
   <button class="compare-toggle-btn" id="cmp-toggle-btn" onclick="toggleCompare()">
-    <span><svg class="icon"><use href="#i-scale"></use></svg> Compare 2 shed types</span><span class="cmp-chev">▼</span>
+    <span><svg aria-hidden="true" class="icon"><use href="#i-scale"></use></svg> Compare 2 shed types</span><span class="cmp-chev">▼</span>
   </button>
   <div class="compare-panel" id="compare-panel">
     <div class="compare-inner">
@@ -841,13 +845,13 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
       </div>
       <div class="compare-cards">
         <div class="cmp-card" id="cmp-card-a">
-          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
+          <span class="cmp-win-badge"><svg aria-hidden="true" class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
           <p class="cmp-lbl" id="cmp-lbl-a">Tin Shed</p>
           <span class="cmp-price" id="cmp-price-a">₹0</span>
           <span class="cmp-rate" id="cmp-rate-a">₹0–0/sqft</span>
         </div>
         <div class="cmp-card" id="cmp-card-b">
-          <span class="cmp-win-badge"><svg class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
+          <span class="cmp-win-badge"><svg aria-hidden="true" class="icon icon-solid" style="width:9px;height:9px"><use href="#i-tag"></use></svg>Cheaper</span>
           <p class="cmp-lbl" id="cmp-lbl-b">PEB Structure</p>
           <span class="cmp-price" id="cmp-price-b">₹0</span>
           <span class="cmp-rate" id="cmp-rate-b">₹0–0/sqft</span>
@@ -861,7 +865,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <p class="calc-step-label" data-num="2">Live 3D preview</p>
   <div class="preview-wrap" id="preview-wrap">
     <div class="preview-top">
-      <span class="preview-title"><svg class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
+      <span class="preview-title"><svg aria-hidden="true" class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
       <span class="preview-dim" id="pdim">50 × 40 ft</span>
     </div>
     <div class="preview-addon-chips" id="preview-addon-chips"></div>
@@ -872,10 +876,10 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
       </div>
     </div>
     <div class="preview-controls">
-      <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg class="icon"><use href="#i-rotate"></use></svg></button>
-      <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
-      <span class="pv-hint"><svg class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
-      <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+      <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
+      <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg aria-hidden="true" class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
+      <span class="pv-hint"><svg aria-hidden="true" class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
+      <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
     </div>
     <div class="preview-view-presets" id="preview-view-presets">
       <button type="button" class="pv-preset-btn" onclick="setCameraPreset('front')">Front</button>
@@ -889,16 +893,16 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <p class="calc-step-label" data-num="3">Dimensions enter karein</p>
   <div style="margin-bottom:28px">
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-h"></use></svg> Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
-      <input type="range" class="calc-slider" id="sl-len" min="20" max="200" value="50" step="5" oninput="calcDraw();calcResult()">
+      <div class="slider-header"><span class="slider-label"><svg aria-hidden="true" class="icon"><use href="#i-ruler-h"></use></svg> Length</span><span class="slider-val" id="sv-len">50 ft</span></div>
+      <input type="range" class="calc-slider" id="sl-len" aria-label="Shed length in feet" min="20" max="200" value="50" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-ruler-v"></use></svg> Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
-      <input type="range" class="calc-slider" id="sl-wid" min="20" max="150" value="40" step="5" oninput="calcDraw();calcResult()">
+      <div class="slider-header"><span class="slider-label"><svg aria-hidden="true" class="icon"><use href="#i-ruler-v"></use></svg> Width</span><span class="slider-val" id="sv-wid">40 ft</span></div>
+      <input type="range" class="calc-slider" id="sl-wid" aria-label="Shed width in feet" min="20" max="150" value="40" step="5" oninput="calcDraw();calcResult()">
     </div>
     <div class="slider-block">
-      <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-height"></use></svg> Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
-      <input type="range" class="calc-slider" id="sl-ht" min="10" max="40" value="14" step="1" oninput="calcDraw();calcResult()">
+      <div class="slider-header"><span class="slider-label"><svg aria-hidden="true" class="icon"><use href="#i-height"></use></svg> Height</span><span class="slider-val" id="sv-ht">14 ft</span></div>
+      <input type="range" class="calc-slider" id="sl-ht" aria-label="Shed height in feet" min="10" max="40" value="14" step="1" oninput="calcDraw();calcResult()">
     </div>
   </div>
 
@@ -908,7 +912,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
     <span id="geo-btn-text">Auto-detect my location</span>
   </button>
-  <select id="sl-loc" onchange="calcResult()" style="width:100%;font-size:13px;margin-bottom:28px;box-sizing:border-box">
+  <select id="sl-loc" aria-label="Location" onchange="calcResult()" style="width:100%;font-size:13px;margin-bottom:28px;box-sizing:border-box">
     <option value="1">Delhi / Najafgarh</option>
     <option value="1.05">Gurgaon / Manesar</option>
     <option value="1.03">Noida / Greater Noida</option>
@@ -920,8 +924,8 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <!-- STEP 5: Rate — every visitor can set their own known local rate, live -->
   <p class="calc-step-label" data-num="5">Apna rate set karein</p>
   <div class="slider-block" style="margin-bottom:6px">
-    <div class="slider-header"><span class="slider-label"><svg class="icon"><use href="#i-tag"></use></svg> ₹ per sq.ft</span><span class="slider-val" id="sv-rate">₹185</span></div>
-    <input type="range" class="calc-slider" id="sl-rate" min="80" max="450" value="185" step="5" oninput="onRateSlide()">
+    <div class="slider-header"><span class="slider-label"><svg aria-hidden="true" class="icon"><use href="#i-tag"></use></svg> ₹ per sq.ft</span><span class="slider-val" id="sv-rate">₹185</span></div>
+    <input type="range" class="calc-slider" id="sl-rate" aria-label="Rate per square foot in rupees" min="80" max="450" value="185" step="5" oninput="onRateSlide()">
   </div>
   <p class="rate-hint" id="rate-hint">Suggested range for Tin Shed: ₹150–220/sqft</p>
 
@@ -929,25 +933,25 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <p class="calc-step-label" data-num="6">Add-ons chunein (optional)</p>
   <div class="addon-grid" id="addon-grid">
     <div class="addon-card" data-addon="windows" onclick="toggleAddon('windows')">
-      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-check"><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></span>
       <span class="addon-text"><span class="addon-name">Extra Windows</span><span class="addon-price">+₹450/window · qty 2</span></span>
     </div>
     <div class="addon-card" data-addon="doors" onclick="toggleAddon('doors')">
-      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-check"><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></span>
       <span class="addon-text"><span class="addon-name">Extra Door</span><span class="addon-price">+₹3,500 flat</span></span>
     </div>
     <div class="addon-card" data-addon="insulation" onclick="toggleAddon('insulation')">
-      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-check"><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></span>
       <span class="addon-text"><span class="addon-name">Roof Insulation</span><span class="addon-price">+₹35/sqft</span></span>
     </div>
     <div class="addon-card" data-addon="flooring" onclick="toggleAddon('flooring')">
-      <span class="addon-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+      <span class="addon-check"><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></span>
       <span class="addon-text"><span class="addon-name">PCC Flooring</span><span class="addon-price">+₹55/sqft</span></span>
     </div>
   </div>
 
   <!-- RESET -->
-  <button type="button" class="calc-reset-btn" onclick="resetCalculator()"><svg class="icon"><use href="#i-refresh"></use></svg> Reset karein, shuru se</button>
+  <button type="button" class="calc-reset-btn" onclick="resetCalculator()"><svg aria-hidden="true" class="icon"><use href="#i-refresh"></use></svg> Reset karein, shuru se</button>
 
   <!-- RESULT -->
   <div class="result-wrap">
@@ -984,8 +988,8 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
       </div>
       <div class="emi-toggle-row">
         <button type="button" class="emi-toggle-btn" id="emi-toggle-btn" onclick="toggleEMI()">
-          <span class="emi-toggle-btn-lbl"><svg class="icon"><use href="#i-bank"></use></svg> EMI mein pao — dekhein monthly kitna</span>
-          <svg class="icon emi-toggle-chevron" id="emi-chevron"><use href="#i-arrow-right"></use></svg>
+          <span class="emi-toggle-btn-lbl"><svg aria-hidden="true" class="icon"><use href="#i-bank"></use></svg> EMI mein pao — dekhein monthly kitna</span>
+          <svg aria-hidden="true" class="icon emi-toggle-chevron" id="emi-chevron"><use href="#i-arrow-right"></use></svg>
         </button>
         <div class="emi-panel" id="emi-panel">
           <div class="emi-panel-inner">
@@ -1007,32 +1011,32 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   </div>
 
   <!-- PDF DOWNLOAD CTA -->
-  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
+  <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
 
   <!-- EMAIL QUOTE — save for later -->
-  <button class="xbtn xbtn-pdf" id="email-quote-btn" onclick="emailQuote()" style="margin-top:8px;background:#fff;border:1.5px solid #4056a1;color:#4056a1"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Email Karke Save Kar Lein</span></button>
+  <button class="xbtn xbtn-pdf" id="email-quote-btn" onclick="emailQuote()" style="margin-top:8px;background:#fff;border:1.5px solid #4056a1;color:#4056a1"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Email Karke Save Kar Lein</span></button>
 
   <!-- LEAD CAPTURE FORM -->
   <div class="lead-wrap">
-    <p class="lead-title"><svg class="icon"><use href="#i-mail"></use></svg> Detailed quote email/WhatsApp pe chahiye?</p>
+    <p class="lead-title"><svg aria-hidden="true" class="icon"><use href="#i-mail"></use></svg> Detailed quote email/WhatsApp pe chahiye?</p>
     <p class="lead-sub">Apna naam aur number daalo — hum 2 ghante mein detailed quote bhejenge. Free!</p>
     <div id="lead-form-area">
       <div class="lead-fields">
         <div class="lf-field" id="lf-name-wrap">
-          <input type="text" id="lf-name" placeholder="Aapka naam" style="width:100%">
+          <input type="text" id="lf-name" aria-label="Aapka naam" placeholder="Aapka naam" style="width:100%">
           <span class="lf-error">Naam daalna zaroori hai</span>
         </div>
         <div class="lf-field" id="lf-phone-wrap">
-          <input type="tel" id="lf-phone" placeholder="+91 phone number" style="width:100%">
+          <input type="tel" id="lf-phone" aria-label="Aapka phone number" placeholder="+91 phone number" style="width:100%">
           <span class="lf-error" id="lf-phone-error">10-digit valid number daalein</span>
         </div>
       </div>
       <p class="lf-saved-hint" id="lf-saved-hint" style="display:none">Aapke pehle ke inputs restore ho gaye hain</p>
-      <p class="lead-trust-line"><svg class="icon"><use href="#i-check-circle"></use></svg> Aapka number safe hai, spam nahi karenge · 2 ghante mein reply guaranteed</p>
-      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon"><svg class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
+      <p class="lead-trust-line"><svg aria-hidden="true" class="icon"><use href="#i-check-circle"></use></svg> Aapka number safe hai, spam nahi karenge · 2 ghante mein reply guaranteed</p>
+      <button class="xbtn xbtn-submit" id="lead-submit-btn" onclick="submitLead()"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-mail"></use></svg></span><span class="xbtn-label">Free Quote Bhejo</span><span class="xbtn-arrow">→</span></button>
     </div>
     <div class="lead-success" id="lead-success">
-      <div class="lead-success-icon"><svg class="icon"><use href="#i-check-circle"></use></svg></div>
+      <div class="lead-success-icon"><svg aria-hidden="true" class="icon"><use href="#i-check-circle"></use></svg></div>
       <p class="lead-success-msg">Request send ho gayi!</p>
       <p class="lead-success-sub">Hum <strong>2 ghante mein</strong> aapko WhatsApp/call karenge.</p>
     </div>
@@ -1040,19 +1044,19 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 
   <!-- SHARE TOOL -->
   <div class="share-wrap">
-    <p class="share-title"><svg class="icon"><use href="#i-link"></use></svg> Is tool ko share karein</p>
+    <p class="share-title"><svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg> Is tool ko share karein</p>
     <p class="share-sub">Apne contacts ko bhi yeh free calculator share karein</p>
     <div class="share-btns">
-      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe share</span></button>
-      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon"><svg class="icon"><use href="#i-link"></use></svg></span><span class="xbtn-label">Link copy karein</span></button>
+      <button class="xbtn xbtn-wa xbtn-sm" onclick="shareWA()"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe share</span></button>
+      <button class="xbtn xbtn-call xbtn-sm" onclick="copyLink()"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg></span><span class="xbtn-label">Link copy karein</span></button>
     </div>
-    <p class="copy-confirm" id="copy-confirm"><svg class="icon" style="width:11px;height:11px"><use href="#i-check-circle"></use></svg> Link copied!</p>
+    <p class="copy-confirm" id="copy-confirm"><svg aria-hidden="true" class="icon" style="width:11px;height:11px"><use href="#i-check-circle"></use></svg> Link copied!</p>
   </div>
 
   <!-- WHATSAPP + CALL CTA -->
-  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
-  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon"><svg class="icon"><use href="#i-phone"></use></svg></span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
-  <p class="cta-disclaimer"><svg class="icon"><use href="#i-warning"></use></svg> Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
+  <a id="cta-wa-btn" href="#" target="_blank" rel="noopener" class="xbtn xbtn-wa"><span class="xbtn-dot"></span><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-whatsapp"></use></svg></span><span class="xbtn-label">WhatsApp pe seedha baat karein</span><span class="xbtn-arrow">→</span></a>
+  <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg></span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
+  <p class="cta-disclaimer"><svg aria-hidden="true" class="icon"><use href="#i-warning"></use></svg> Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
 
 </div>
 </section>
@@ -1087,25 +1091,25 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
       <div class="testi-track" id="testi-track">
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <div class="testi-stars"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">Calculator se turant estimate mil gaya, aur final quote bhi usi range mein aayi. Poora process transparent tha — GST invoice bhi time pe mil gayi.</p>
           <div class="testi-person"><div class="testi-avatar">RK</div><div><p class="testi-name">Rajesh Kumar</p><p class="testi-meta">Industrial Shed · Gurugram</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <div class="testi-stars"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">15 din mein tin shed complete ho gaya, jaisa promise kiya tha waisa hi. Team professional hai aur site visit bhi free mein turant kar diya.</p>
           <div class="testi-person"><div class="testi-avatar">SV</div><div><p class="testi-name">Sunita Verma</p><p class="testi-meta">Tin Shed · Noida</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <div class="testi-stars"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">PEB structure ke liye 3 companies se quote liya tha, R.R Teen Set Solution ka pricing sabse fair aur clear tha. Quality bhi top-notch hai.</p>
           <div class="testi-person"><div class="testi-avatar">AM</div><div><p class="testi-name">Anil Malik</p><p class="testi-meta">PEB Structure · Faridabad</p></div></div>
         </div>
         <div class="testi-card">
           <span class="testi-quote-mark">"</span>
-          <div class="testi-stars"><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg><svg class="icon icon-solid"><use href="#i-star"></use></svg></div>
+          <div class="testi-stars"><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg><svg aria-hidden="true" class="icon icon-solid"><use href="#i-star"></use></svg></div>
           <p class="testi-text">Warehouse ke liye bulk quotation chahiye thi, WhatsApp pe hi sab detail mil gayi. Highly recommended for genuine pricing.</p>
           <div class="testi-person"><div class="testi-avatar">PS</div><div><p class="testi-name">Priya Sharma</p><p class="testi-meta">Prefab Warehouse · Ghaziabad</p></div></div>
         </div>
@@ -1166,7 +1170,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     <div class="footer-col"><h5>Pages</h5><ul>
       <li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li>
       <li><a href="services.html">All Services</a></li><li><a href="projects.html">Projects</a></li>
-      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html"><svg class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
+      <li><a href="shed-cost-calculator.html">Cost Calculator</a></li><li><a href="shed-cost-calculator.html"><svg aria-hidden="true" class="icon" style="width:13px;height:13px;margin-right:2px"><use href="#i-calc"></use></svg>Calculator</a></li>
     <li><a href="contact.html">Contact</a></li>
     </ul></div>
     <div class="footer-col"><h5>Services</h5><ul>
@@ -1178,12 +1182,12 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     </ul></div>
     <div class="footer-col"><h5>Contact</h5>
       <div class="footer-contact">
-        <p><span><svg class="icon"><use href="#i-pin"></use></svg></span> New Delhi, India</p>
-        <p><span><svg class="icon"><use href="#i-phone"></use></svg></span> <a href="tel:+918527258462">+91 85272 58462</a></p>
-        <p><span><svg class="icon"><use href="#i-mail"></use></svg></span> <a href="mailto:info@rrteensetsolution.com">info@rrteensetsolution.com</a></p>
-        <p><span><svg class="icon"><use href="#i-whatsapp"></use></svg></span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
-        <p><span><svg class="icon"><use href="#i-clock"></use></svg></span> Mon–Sat: 9AM–7PM</p>
-        <p><span><svg class="icon"><use href="#i-bank"></use></svg></span> GST: 07DJCPK0635M1Z5</p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-pin"></use></svg></span> New Delhi, India</p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg></span> <a href="tel:+918527258462">+91 85272 58462</a></p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-mail"></use></svg></span> <a href="mailto:info@rrteensetsolution.com">info@rrteensetsolution.com</a></p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-whatsapp"></use></svg></span> <a href="https://api.whatsapp.com/send?phone=918527258462">WhatsApp</a></p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-clock"></use></svg></span> Mon–Sat: 9AM–7PM</p>
+        <p><span><svg aria-hidden="true" class="icon"><use href="#i-bank"></use></svg></span> GST: 07DJCPK0635M1Z5</p>
       </div>
     </div>
   <div class="footer-col" style="grid-column:1/-1;border-top:1px solid rgba(239,226,186,.15);padding-top:20px;margin-top:4px">
@@ -1227,8 +1231,8 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 
 <!-- FLOATING BUTTONS -->
 <div class="fab-wrap">
-  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us"><svg class="icon"><use href="#i-phone"></use></svg></a>
-  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp"><svg class="icon"><use href="#i-whatsapp"></use></svg></a>
+  <a href="tel:+918527258462" class="fab-btn fab-call" aria-label="Call us"><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg></a>
+  <a href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener" class="fab-btn fab-wa" aria-label="WhatsApp"><svg aria-hidden="true" class="icon"><use href="#i-whatsapp"></use></svg></a>
 </div>
 
 <script src="/lib-jspdf.umd.min.js" defer></script>
@@ -1280,7 +1284,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
       THREE=await import('./vendor/three/three.module.min.js');
     }catch(e){
       var loading=document.getElementById('preview-loading');
-      if(loading)loading.innerHTML='<span style="font-size:12px;color:rgba(10,22,40,.5);padding:0 20px;text-align:center">3D preview couldn\'t load ? the calculator below still works fine.</span>';
+      if(loading)loading.innerHTML='<span style="font-size:12px;color:rgba(10,22,40,.5);padding:0 20px;text-align:center">3D preview couldn\'t load. The calculator below still works fine.</span>';
       return;
     }
     shedEngine=buildShedEngine(THREE);
@@ -2165,7 +2169,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 
     /* Base structure cost from rate x area x location */
     var baseLo=Math.round(rate*area*loc*0.96),baseHi=Math.round(rate*area*loc*1.04);
-    var mLo=Math.round(baseLo*0.78),mHi=Math.round(baseHi*0.80);
+    var mLo=Math.round(baseLo*0.79),mHi=Math.round(baseHi*0.79); /* same share at both ends so labour low <= labour high */
     var addons=addonCostFor(area);
     var lLo=(baseLo-mLo)+addons,lHi=(baseHi-mHi)+addons; /* labour + misc + add-ons */
     var lo=baseLo+addons,hi=baseHi+addons;
@@ -2284,7 +2288,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     var r=R[curType];
     var rate=+document.getElementById('sl-rate').value||Math.round((r.low+r.high)/2);
     var baseLo=Math.round(rate*area*loc*0.96),baseHi=Math.round(rate*area*loc*1.04);
-    var mLo=Math.round(baseLo*0.78),mHi=Math.round(baseHi*0.80);
+    var mLo=Math.round(baseLo*0.79),mHi=Math.round(baseHi*0.79); /* same share at both ends so labour low <= labour high */
     var addonTotal=addonCostFor(area);
     var lLo=(baseLo-mLo)+addonTotal,lHi=(baseHi-mHi)+addonTotal;
     var lo=baseLo+addonTotal,hi=baseHi+addonTotal;
