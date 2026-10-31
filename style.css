@@ -649,7 +649,8 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 [data-theme="dark"] .nav-links a:hover,[data-theme="dark"] .nav-links a.active,[data-theme="dark"] .dropdown a:hover,[data-theme="dark"] #mob-menu a:hover{color:var(--accent-t)}
 [data-theme="dark"] .dropdown{background:#161b22;border-color:#30363d;box-shadow:0 18px 40px rgba(0,0,0,.6)}
 [data-theme="dark"] .dropdown a:hover{background:rgba(255,255,255,.06)}
-[data-theme="dark"] .logo-img-wrap{background:#fff;border-radius:10px;padding:3px 8px}
+[data-theme="dark"] .logo-img-wrap{background:url(images/rr-logo-dark.png) center/contain no-repeat;border-radius:0;padding:0}
+[data-theme="dark"] .logo-img-wrap .logo-img{opacity:0}
 [data-theme="dark"] .logo-tag{color:var(--accent-t)}
 /* headings, tags, links that used brand blue / orange as text */
 [data-theme="dark"] .section-title span,[data-theme="dark"] .btn-outline,[data-theme="dark"] .scard-link,[data-theme="dark"] .tcard-badge,[data-theme="dark"] summary::after,[data-theme="dark"] #chatbot-footer a,[data-theme="dark"] .icn-phone,[data-theme="dark"] .tag:not(.tag-dark):not(.tag-accent){color:var(--blue-t)}
