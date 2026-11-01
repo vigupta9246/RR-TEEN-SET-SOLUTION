@@ -125,7 +125,8 @@ nav.scrolled { box-shadow: 0 4px 24px rgba(10,22,40,.15); }
 .logo-box  { width:40px; height:40px; background:linear-gradient(135deg,var(--sky),var(--blue)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-size:17px; color:#fff; flex-shrink:0; }
 .logo-name { font-family:var(--font-h); font-size:20px; color:var(--navy,#0a1628); letter-spacing:1.5px; line-height:1; }
 .logo-tag  { font-size:11px; color:#c9301a; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; }
-.logo-img-wrap { background:transparent; border-radius:0; padding:0; display:flex; align-items:center; flex-shrink:0; box-shadow:none; }
+.logo-img-wrap { background:url(images/rr-logo-transparent.png) center/contain no-repeat; border-radius:0; padding:0; display:flex; align-items:center; flex-shrink:0; box-shadow:none; }
+.logo-img-wrap .logo-img { opacity:0; }
 .logo-img { height:58px; width:auto; display:block; object-fit:contain; }
 @media (max-width: 768px) {
   .logo-img-wrap { padding:0; }
