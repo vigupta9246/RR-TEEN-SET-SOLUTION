@@ -254,6 +254,23 @@ section{background:#ffffff!important}
 /* Main wrapper */
 .calc-main{max-width:540px;margin:0 auto;padding:40px 0 80px}
 
+
+/* ── Desktop two-column layout: inputs left, live preview + estimate right ── */
+.calc-main{display:flex;flex-direction:column}
+.calc-left,.calc-right{display:contents}
+.cg1{order:1}.cg2{order:2}.cg3{order:3}.cg4{order:4}.cg5{order:5}
+@media(min-width:1024px){
+  .calc-main{max-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:48px;align-items:start;padding-top:48px}
+  .calc-left,.calc-right{display:block;min-width:0}
+  .calc-right{position:static}
+  .cg{order:0}
+  .calc-after{grid-column:1 / -1;max-width:560px;width:100%;margin:8px auto 0}
+  .cg2 .preview-wrap{margin-bottom:18px}
+  .cg4 .result-wrap{margin-bottom:0}
+}
+@media(min-width:1024px) and (min-height:980px){
+  .calc-right{position:sticky;top:78px}
+}
 /* Step labels */
 .calc-step-label{font-size:11px;font-weight:800;color:#ff6f00;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
 .calc-step-label::before{content:attr(data-num);width:20px;height:20px;background:linear-gradient(135deg,#ff6f00,#ff8c00);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px rgba(255,111,0,.4)}
@@ -796,6 +813,8 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
 <section style="padding:40px 5% 0;background:#ffffff">
 <div class="calc-main">
 
+  <div class="calc-left">
+  <div class="cg cg1">
   <!-- STEP 1: Shed Type -->
   <p class="calc-step-label" data-num="1">Shed type chunein</p>
   <div class="stype-grid" id="stype-grid">
@@ -861,34 +880,8 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     </div>
   </div>
 
-  <!-- STEP 2: 3D Preview -->
-  <p class="calc-step-label" data-num="2">Live 3D preview</p>
-  <div class="preview-wrap" id="preview-wrap">
-    <div class="preview-top">
-      <span class="preview-title"><svg aria-hidden="true" class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
-      <span class="preview-dim" id="pdim">50 × 40 ft</span>
-    </div>
-    <div class="preview-addon-chips" id="preview-addon-chips"></div>
-    <div class="preview-tilt-stage" id="preview-tilt-stage">
-      <div class="preview-tilt-inner" id="preview-tilt-inner">
-        <canvas id="pshed" aria-label="3D preview of your shed, updates live as you set dimensions"></canvas>
-        <div class="preview-loading" id="preview-loading"><span class="preview-spinner"></span></div>
-      </div>
-    </div>
-    <div class="preview-controls">
-      <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
-      <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg aria-hidden="true" class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
-      <span class="pv-hint"><svg aria-hidden="true" class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
-      <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
-    </div>
-    <div class="preview-view-presets" id="preview-view-presets">
-      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('front')">Front</button>
-      <button type="button" class="pv-preset-btn is-active" onclick="setCameraPreset('iso')">3/4</button>
-      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('side')">Side</button>
-      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('top')">Top</button>
-    </div>
   </div>
-
+  <div class="cg cg3">
   <!-- STEP 3: Sliders -->
   <p class="calc-step-label" data-num="3">Dimensions enter karein</p>
   <div style="margin-bottom:28px">
@@ -953,6 +946,40 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <!-- RESET -->
   <button type="button" class="calc-reset-btn" onclick="resetCalculator()"><svg aria-hidden="true" class="icon"><use href="#i-refresh"></use></svg> Reset karein, shuru se</button>
 
+  </div>
+  </div><!-- /calc-left -->
+  <div class="calc-right">
+  <div class="cg cg2">
+  <!-- STEP 2: 3D Preview -->
+  <p class="calc-step-label" data-num="2">Live 3D preview</p>
+  <div class="preview-wrap" id="preview-wrap">
+    <div class="preview-top">
+      <span class="preview-title"><svg aria-hidden="true" class="icon"><use href="#i-cube"></use></svg> Real-time shed shape</span>
+      <span class="preview-dim" id="pdim">50 × 40 ft</span>
+    </div>
+    <div class="preview-addon-chips" id="preview-addon-chips"></div>
+    <div class="preview-tilt-stage" id="preview-tilt-stage">
+      <div class="preview-tilt-inner" id="preview-tilt-inner">
+        <canvas id="pshed" aria-label="3D preview of your shed, updates live as you set dimensions"></canvas>
+        <div class="preview-loading" id="preview-loading"><span class="preview-spinner"></span></div>
+      </div>
+    </div>
+    <div class="preview-controls">
+      <button class="pv-rotate-btn" onclick="rotateView(-1)" aria-label="Rotate left"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
+      <button class="pv-auto-toggle" id="pv-auto-toggle" onclick="toggleAutoRotate()" aria-label="Pause auto-rotate"><svg aria-hidden="true" class="icon" id="pv-auto-icon"><use href="#i-pause"></use></svg></button>
+      <span class="pv-hint"><svg aria-hidden="true" class="icon"><use href="#i-drag"></use></svg> Ghumaake dekho</span>
+      <button class="pv-rotate-btn pv-rotate-r" onclick="rotateView(1)" aria-label="Rotate right"><svg aria-hidden="true" class="icon"><use href="#i-rotate"></use></svg></button>
+    </div>
+    <div class="preview-view-presets" id="preview-view-presets">
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('front')">Front</button>
+      <button type="button" class="pv-preset-btn is-active" onclick="setCameraPreset('iso')">3/4</button>
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('side')">Side</button>
+      <button type="button" class="pv-preset-btn" onclick="setCameraPreset('top')">Top</button>
+    </div>
+  </div>
+
+  </div>
+  <div class="cg cg4">
   <!-- RESULT -->
   <div class="result-wrap">
     <div class="result-inner">
@@ -1010,6 +1037,9 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
     </div>
   </div>
 
+  </div>
+  </div><!-- /calc-right -->
+  <div class="cg cg5 calc-after">
   <!-- PDF DOWNLOAD CTA -->
   <button class="xbtn xbtn-pdf" id="pdf-download-btn" onclick="downloadQuotePDF()"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-pdf"></use></svg></span><span class="xbtn-label">PDF Quote Download Karein</span></button>
 
@@ -1058,6 +1088,7 @@ html[data-theme="dark"] body,html[data-theme="dark"] section{background:#0d1117!
   <a href="tel:+918527258462" class="xbtn xbtn-call"><span class="xbtn-icon"><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg></span><span class="xbtn-label">Call करें — +91 85272 58462</span></a>
   <p class="cta-disclaimer"><svg aria-hidden="true" class="icon"><use href="#i-warning"></use></svg> Yeh estimate sirf guidance ke liye hai. Actual cost site visit ke baad confirm hogi. GST extra. Free site visit available — Delhi NCR mein.</p>
 
+  </div>
 </div>
 </section>
 
