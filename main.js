@@ -100,9 +100,10 @@ document.addEventListener('DOMContentLoaded',function(){
     groups[parentKey] = groups[parentKey] || 0;
     var idx = groups[parentKey]++;
     var delay = reduceMotion ? 0 : Math.min(idx,7) * 70;
-    el.style.opacity='0.01';
+    // Slide-in only, no opacity change: text below the fold stays fully opaque,
+    // so accessibility checkers (PageSpeed/axe) don't flag it as low-contrast.
     el.style.transform='translateY(18px) scale(.98)';
-    el.style.transition='opacity .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms, transform .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms';
+    el.style.transition='transform .55s cubic-bezier(.25,.8,.25,1) '+delay+'ms';
     io.observe(el);
   });
 });
