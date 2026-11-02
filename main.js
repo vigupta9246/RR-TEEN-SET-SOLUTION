@@ -87,7 +87,11 @@ document.addEventListener('DOMContentLoaded',function(){
   },{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
   var groups={};
   var vh = window.innerHeight || document.documentElement.clientHeight;
-  document.querySelectorAll('.scard,.wcard,.tcard,.pstep,.gallery-item').forEach(function(el){
+  // Read every position first, then write styles, so the browser lays the page out once
+  // instead of once per card (avoids "forced reflow").
+  var revealEls=[].slice.call(document.querySelectorAll('.scard,.wcard,.tcard,.pstep,.gallery-item'));
+  var belowFold=revealEls.map(function(el){ return el.getBoundingClientRect().top >= vh; });
+  revealEls.forEach(function(el,i){
     // Already visible in the initial viewport (common on a short mobile
     // screen right under the hero) - never hide it at all. It's already
     // shown, there's no scroll happening yet to "reveal" it from, and
@@ -95,7 +99,7 @@ document.addEventListener('DOMContentLoaded',function(){
     // pointless and, if that element is the page's LCP candidate, enough
     // to make Chrome's LCP tracking report "NO_LCP" (a known Chromium bug:
     // animating the eventual LCP element from opacity:0 breaks the trace).
-    if (el.getBoundingClientRect().top < vh) return;
+    if (!belowFold[i]) return;
     var parentKey = el.parentElement ? (el.parentElement.className||'g') : 'g';
     groups[parentKey] = groups[parentKey] || 0;
     var idx = groups[parentKey]++;
