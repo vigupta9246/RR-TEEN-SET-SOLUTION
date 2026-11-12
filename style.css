@@ -739,3 +739,16 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 .ic-fill{fill:currentColor}
 .wcard-icon{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:rgba(64,86,161,.10);color:#3a4f9a;font-size:28px}
 .wcard-icon .ic{width:28px;height:28px}
+
+/* Balanced card grids: no lonely last-row card */
+@media(min-width:1025px){
+  .grid-auto:has(>:nth-child(6):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(6):last-child),.grid-auto:has(>:nth-child(9):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(9):last-child){grid-template-columns:repeat(3,1fr)!important}
+  .grid-auto:has(>:nth-child(10):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(10):last-child){grid-template-columns:repeat(2,1fr)!important}
+}
+@media(min-width:1200px){
+  .grid-auto:has(>:nth-child(10):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(10):last-child),.grid-auto:has(>:nth-child(5):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(5):last-child){grid-template-columns:repeat(5,1fr)!important}
+}
+@media(min-width:601px) and (max-width:1024px){
+  .grid-auto:has(>:nth-child(4):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(4):last-child),.grid-auto:has(>:nth-child(5):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(5):last-child),.grid-auto:has(>:nth-child(6):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(6):last-child),.grid-auto:has(>:nth-child(9):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(9):last-child),.grid-auto:has(>:nth-child(10):last-child),div[style*="grid-template-columns:repeat(auto-fit"]:has(>:nth-child(10):last-child){grid-template-columns:repeat(2,1fr)!important}
+  .process-grid>:last-child:nth-child(odd),.grid-auto>:last-child:nth-child(odd),.grid-3>:last-child:nth-child(odd),.grid-4>:last-child:nth-child(odd){grid-column:1/-1}
+}
