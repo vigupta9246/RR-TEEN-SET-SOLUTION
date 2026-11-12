@@ -274,3 +274,22 @@ body.cc-modal-open { overflow: hidden; }
 /* dark mode */
 [data-theme="dark"]{--cc-bg:#161b22;--cc-bg-modal:#161b22;--cc-overlay:rgba(0,0,0,.65);--cc-bg-cat:#1c2333;--cc-border:#30363d;--cc-text:#e6edf3;--cc-muted:#9aa4b2;--cc-small:#8b949e;--cc-accent:#6c9bff;--cc-accent-h:#8fb4ff;--cc-lite:rgba(108,155,255,.12);--cc-shadow:0 -4px 24px rgba(0,0,0,.5);--cc-shadow-m:0 20px 60px rgba(0,0,0,.6)}
 [data-theme="dark"] .cc-btn-primary{color:#0d1117}
+
+/* ===== v3: compact floating card (does not cover hero) ===== */
+#cc-banner{left:16px;right:auto;bottom:16px;max-width:400px;width:calc(100% - 32px)}
+.cc-banner-inner{flex-direction:column;align-items:stretch;gap:12px;padding:16px 18px;border:1px solid var(--cc-border);border-radius:16px;box-shadow:0 12px 40px rgba(14,26,58,.22)}
+.cc-banner-icon{display:none}
+.cc-banner-text strong{font-size:14px}
+.cc-banner-text p{font-size:12.5px;line-height:1.5}
+.cc-banner-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cc-banner-actions .cc-btn{padding:11px 12px;font-size:13px}
+.cc-banner-actions .cc-btn-primary{background:#16264f;border-color:#16264f}
+.cc-banner-actions #cc-manage{grid-column:1/-1;order:3;padding:2px}
+@media(max-width:700px){
+ #cc-banner{left:10px;right:10px;bottom:10px;width:auto;max-width:none}
+ .cc-banner-inner{padding:12px 14px;gap:10px}
+ .cc-banner-text p{display:none}
+ .cc-banner-text strong{margin:0;font-weight:600;font-size:13px}
+ .cc-banner-text strong::after{content:" — site chalane ke liye zaroori cookies. Analytics aapki marzi se.";font-weight:400;color:var(--cc-muted)}
+ .cc-banner-actions .cc-btn-primary{flex:none;order:2}
+}
