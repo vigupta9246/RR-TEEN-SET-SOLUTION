@@ -733,3 +733,9 @@ footer { background:var(--navy); border-top:2px solid rgba(215,153,34,.35); padd
 [data-theme="dark"] .icn-clock,[data-theme="dark"] .icn-star{color:var(--accent-2)}
 [data-theme="dark"] .icn-whatsapp{color:var(--green)}
 [data-theme="dark"] .feat-list li:hover{color:var(--accent-2)!important}
+
+/* Vector icons (replace emoji) */
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;display:inline-block}
+.ic-fill{fill:currentColor}
+.wcard-icon{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:rgba(64,86,161,.10);color:#3a4f9a;font-size:28px}
+.wcard-icon .ic{width:28px;height:28px}

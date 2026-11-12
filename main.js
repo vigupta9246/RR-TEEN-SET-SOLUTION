@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded',function(){
         var directLis = navLinks.querySelectorAll(':scope > li');
         var lastLi = directLis.length ? directLis[directLis.length - 1] : null;
         var li = document.createElement('li');
-        li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600">🧮 Calculator</a>';
+        li.innerHTML = '<a href="shed-cost-calculator.html" style="color:#ff6f00;font-weight:600"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#calculator"/></svg> Calculator</a>';
         if(lastLi){
           navLinks.insertBefore(li, lastLi);
         } else {
