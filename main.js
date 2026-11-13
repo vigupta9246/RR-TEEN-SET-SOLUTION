@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded',function(){
       // Button loading state
       var btn = document.getElementById('submit-btn');
       var origTxt = btn.textContent;
-      btn.textContent = 'Bhej rahe hain...';
+      btn.textContent = 'Sending...';
       btn.disabled = true;
 
       // Build form data for Formspree
@@ -191,17 +191,17 @@ document.addEventListener('DOMContentLoaded',function(){
 
           // WhatsApp is a tap, not an auto-popup (popup blockers kill window.open after an async call)
           var waLines = [
-            'Namaste R.R Teen Set Solution! Maine website par quotation request bheji hai.','',
-            'Naam: '+name,
+            'Hello R.R Teen Set Solution! I have sent a quotation request through your website.','',
+            'Name: '+name,
             'Phone: '+phone,
             'Service: '+svc,
             area?'Area: '+area+' sq.ft':'',
             city?'City: '+city:'',
-            msg?'Zaroorat: '+msg:'','',
-            'Site ki photo bhej raha hoon.'
+            msg?'Requirements: '+msg:'','',
+            'I am sending photos of the site.'
           ].filter(Boolean).join('\n');
           var wa = successDiv && successDiv.querySelector('a[href*="whatsapp"]');
-          if(wa){ wa.href='https://api.whatsapp.com/send?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(waLines); wa.textContent='WhatsApp par site ki photo bhejo'; }
+          if(wa){ wa.href='https://api.whatsapp.com/send?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(waLines); wa.textContent='Send site photos on WhatsApp'; }
           if(successDiv && successDiv.scrollIntoView) successDiv.scrollIntoView({behavior:'smooth',block:'center'});
 
         } else {
