@@ -32,3 +32,6 @@
  .h2-stats li{padding:0 0 0 16px}
  .h2-stats li:nth-child(odd){padding-left:0;border-left:0}
 }
+.h2-trust{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0;padding-top:18px;border-top:1px solid rgba(255,255,255,.2);font:600 13.5px/1.5 var(--font-b);color:rgba(255,255,255,.85)}
+.h2-trust .ic{width:18px;height:18px;color:#f5b638;flex-shrink:0}
+@media(max-width:680px){.hero2{padding-bottom:44px}.h2-trust{font-size:13px}}
