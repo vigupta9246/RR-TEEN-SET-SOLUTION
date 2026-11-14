@@ -1,10 +1,8 @@
 # R.R Teen Set Solution — crawler and AI-agent access policy
 # Public pages are open to search engines, answer engines and AI agents.
-# Internal tools and Worker source/tests are not for indexing.
+# Internal tools and Worker source/tests are not for indexing. Admin/tool HTML pages carry noindex (left crawlable so the tag is read).
 
 User-agent: *
-Disallow: /quotation-system.html
-Disallow: /testimonials-admin.html
 Disallow: /workers/
 Disallow: /tools/
 Disallow: /firebase/
@@ -22,8 +20,6 @@ User-agent: Perplexity-User
 User-agent: Google-Extended
 User-agent: Applebot
 User-agent: Applebot-Extended
-Disallow: /quotation-system.html
-Disallow: /testimonials-admin.html
 Disallow: /workers/
 Disallow: /tools/
 Disallow: /firebase/
