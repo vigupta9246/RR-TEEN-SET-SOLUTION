@@ -290,6 +290,6 @@ body.cc-modal-open { overflow: hidden; }
  .cc-banner-inner{padding:12px 14px;gap:10px}
  .cc-banner-text p{display:none}
  .cc-banner-text strong{margin:0;font-weight:600;font-size:13px}
- .cc-banner-text strong::after{content:" — site chalane ke liye zaroori cookies. Analytics aapki marzi se.";font-weight:400;color:var(--cc-muted)}
+ .cc-banner-text strong::after{content:" — essential cookies keep the site working. Analytics is your choice.";font-weight:400;color:var(--cc-muted)}
  .cc-banner-actions .cc-btn-primary{flex:none;order:2}
 }
