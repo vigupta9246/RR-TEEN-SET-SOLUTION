@@ -119,6 +119,18 @@ document.addEventListener('DOMContentLoaded',function(){
 (function(){
   var FORMSPREE_ID = 'xkoappra';
   var WHATSAPP_NUM = '918527258462';
+  // Free WhatsApp alert to the owner via CallMeBot. Leave the key empty to switch it off.
+  // The key can only send messages to this one number. Activate once: see the steps in the pull request.
+  var CALLMEBOT_KEY = '';
+  function notifyOwnerWhatsApp(l){
+    if(!CALLMEBOT_KEY) return;
+    try{
+      var text=['New website enquiry','Name: '+l.name,'Phone: '+l.phone,'Type: '+l.svc,
+        l.area?'Area: '+l.area+' sq.ft':'', l.city?'City: '+l.city:'', l.msg?'Notes: '+l.msg:''].filter(Boolean).join('\n').slice(0,700);
+      var url='https://api.callmebot.com/whatsapp.php?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(text)+'&apikey='+encodeURIComponent(CALLMEBOT_KEY);
+      fetch(url,{mode:'no-cors',keepalive:true}).catch(function(){});
+    }catch(e){}
+  }
 
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.getElementById('enquiry-form');
@@ -155,6 +167,8 @@ document.addEventListener('DOMContentLoaded',function(){
           area: area, city: city, message: msg, pageSource: location.pathname.replace(/^\//, '') || 'index.html'
         });
       }
+
+      notifyOwnerWhatsApp({name:name,phone:phone,svc:svc,area:area,city:city,msg:msg});
 
       // Button loading state
       var btn = document.getElementById('submit-btn');
