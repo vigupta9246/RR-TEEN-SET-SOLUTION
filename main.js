@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded',function(){
         var inp = form.querySelector('[name="'+field+'"]'); if(!inp) return;
         inp.style.borderColor='#f44336'; inp.focus();
         var s = inp.parentNode.querySelector('.err-msg');
-        if(!s){ s=document.createElement('span'); s.className='err-msg'; s.style.cssText='font-size:11px;color:#f44336;margin-top:3px;display:block'; inp.parentNode.appendChild(s); }
+        if(!s){ s=document.createElement('span'); s.className='err-msg'; s.style.cssText='font-size:13px;font-weight:600;color:#b42318;margin-top:4px;display:block'; inp.parentNode.appendChild(s); }
         s.textContent=txt; setTimeout(function(){ inp.style.borderColor=''; s.textContent=''; }, 3000);
       }
       if(!name){ showErr('name','Please enter your name'); return; }
