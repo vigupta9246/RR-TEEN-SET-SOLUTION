@@ -67,7 +67,7 @@
 <meta name="geo.position" content="28.6092;76.9798">
 <meta name="ICBM" content="28.6092, 76.9798">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do you offer a free site visit?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! We offer a free site visit anywhere in Delhi NCR, including Delhi, Noida, Gurgaon, Faridabad and Ghaziabad. No charge, no obligation. Call us to fix a date."}}, {"@type": "Question", "name": "How soon will I get the quote?", "acceptedAnswer": {"@type": "Answer", "text": "You will receive a detailed quotation on WhatsApp within 24 hours of the site visit. Same-day quotes are possible for urgent projects."}}, {"@type": "Question", "name": "What is the minimum project size?", "acceptedAnswer": {"@type": "Answer", "text": "We accept projects from 100 sq.ft to 1,00,000+ sq.ft, from small residential sheds to large industrial complexes."}}, {"@type": "Question", "name": "What are the payment terms?", "acceptedAnswer": {"@type": "Answer", "text": "Typically 50% advance and 50% on completion. Large projects can use milestone-based payments. We accept bank transfer, UPI, NEFT and cheque."}}, {"@type": "Question", "name": "Will I get a GST invoice?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, absolutely. GST No: 07DJCPK0635M1Z5. We issue a proper GST invoice on every project, suitable for B2B and government tenders."}}]}</script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Outfit:wght@600;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="get-free-quote.css?v=20261116"></head><body class="gq-page"><nav aria-label="Main Navigation">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="get-free-quote.css?v=20261117"></head><body class="gq-page"><nav aria-label="Main Navigation">
   <div class="logo">
     <div class="logo-img-wrap"><img src="images/rr-logo-original.png" alt="R.R Teen Set Solution Logo" class="logo-img" width="400" height="174"></div><div class="logo-tag">Steel &amp; Shed Experts · Delhi NCR</div>
   </div>
@@ -112,85 +112,90 @@
   <a href="contact.html">Contact Us</a>
   <a href="contact.html" class="mob-cta-btn"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#clipboard-list"/></svg> Get Free Quote →</a>
 </div>
-<div class="page-hero"><div><div class="breadcrumb"><a href="/">Home</a><span>›</span><span>Get Free Quote</span></div><h1>YOUR SHED PRICE IN 30 SECONDS</h1><p>Pick the shed type, set the size and see a starting estimate instantly. Free site visit and written quotation within 24 hours.</p></div></div>
+<section class="gq3">
+  <div class="gq3-wrap">
+    <header class="gq3-head">
+      <h1>Get a shed estimate</h1>
+      <p>Set the size and see the structure drawn to your dimensions, with a starting price. We confirm it with a free site visit and a written quotation within 24 hours.</p>
+    </header>
 
-<section class="gq2">
-  <div class="gq2-wrap">
-    <div class="gq2-card">
-      <div id="form-success" class="gq2-msg ok" style="display:none">
-        <div class="gq2-msg-ic"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#circle-check"/></svg></div>
-        <h3>We have received your request!</h3>
-        <ol class="q-next"><li><span><b>Within 2 hours</b> we call you</span></li><li><span>Free <b>site visit</b> (measurements, location, access)</span></li><li><span><b>Within 24 hours</b> a written quotation</span></li></ol>
-        <a class="gq2-wa" href="https://api.whatsapp.com/send?phone=918527258462&text=Hello!%20I%20sent%20an%20enquiry%20through%20your%20website." target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#message-circle"/></svg> Also message us on WhatsApp</a>
+    <div class="gq3-msgs">
+<div id="form-success" class="gq3-msg ok" style="display:none">
+          <h2>We have received your request.</h2>
+          <ol class="q-next"><li><span><b>Within 2 hours</b> we call you</span></li><li><span>Free <b>site visit</b>: measurements, location, access</span></li><li><span><b>Within 24 hours</b> a written quotation</span></li></ol>
+          <a class="gq3-wa" href="https://api.whatsapp.com/send?phone=918527258462&text=Hello!%20I%20sent%20an%20enquiry%20through%20your%20website." target="_blank" rel="noopener">Message us on WhatsApp</a>
+        </div>
+        <div id="form-error" class="gq3-msg bad" style="display:none">
+          <h2>We could not send your request.</h2>
+          <p>Check your connection and try again, or reach us directly on WhatsApp.</p>
+          <a class="gq3-wa" href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener">Open WhatsApp</a>
+        </div>
+</div>
+    <form id="enquiry-form" class="gq3-sheet" novalidate>
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="service" id="f-service" value="Tin Shed Fabrication">
+      <input type="hidden" name="area" id="f-area" value="1200">
+
+      <div class="gq3-draw"><div class="gq3-draw-in">
+        <svg id="gq-svg" viewBox="0 0 640 360" role="img" aria-label="Indicative elevation and plan of the shed at your dimensions"></svg>
+        <p class="gq3-note">Indicative drawing at your dimensions, not to engineering scale.</p>
+        <dl class="gq3-title">
+          <div><dt>Structure</dt><dd id="t-type">Tin shed</dd></div>
+          <div><dt>Size</dt><dd id="t-size">40 × 30 × 12 ft</dd></div>
+          <div><dt>Floor area</dt><dd id="t-area">1,200 sq.ft</dd></div>
+          <div class="est"><dt>Estimate incl. 18% GST</dt><dd id="q-tot">₹2,12,400 – ₹3,11,520</dd><small id="q-l1">1,200 sq.ft × ₹150–220</small></div>
+        </dl>
+      </div></div>
+
+      <div class="gq3-ctl">
+        <fieldset class="gq3-type">
+          <legend>Structure</legend>
+          <label class="on"><input type="radio" name="stype" value="Tin Shed Fabrication" data-k="tin" checked><b>Tin shed</b><span>Sheet roof on a steel frame</span></label>
+          <label><input type="radio" name="stype" value="Industrial Shed" data-k="ind"><b>Industrial shed</b><span>Factories and workshops</span></label>
+          <label><input type="radio" name="stype" value="Prefab Warehouse" data-k="wh"><b>Prefab warehouse</b><span>Storage, built fast</span></label>
+          <label><input type="radio" name="stype" value="PEB Structure" data-k="peb"><b>PEB structure</b><span>Wide clear spans</span></label>
+        </fieldset>
+
+        <fieldset class="gq3-dims">
+          <legend>Dimensions</legend>
+          <div class="gq3-dim"><label for="f-len">Length</label><div class="gq3-step"><button type="button" data-t="f-len" data-s="-5" aria-label="Decrease length">−</button><input id="f-len" type="number" inputmode="numeric" min="10" max="500" value="40"><em>ft</em><button type="button" data-t="f-len" data-s="5" aria-label="Increase length">+</button></div></div>
+          <div class="gq3-dim"><label for="f-wid">Width</label><div class="gq3-step"><button type="button" data-t="f-wid" data-s="-5" aria-label="Decrease width">−</button><input id="f-wid" type="number" inputmode="numeric" min="10" max="150" value="30"><em>ft</em><button type="button" data-t="f-wid" data-s="5" aria-label="Increase width">+</button></div></div>
+          <div class="gq3-dim"><label for="f-hgt">Height at eaves</label><div class="gq3-step"><button type="button" data-t="f-hgt" data-s="-1" aria-label="Decrease height">−</button><input id="f-hgt" type="number" inputmode="numeric" min="8" max="45" value="12"><em>ft</em><button type="button" data-t="f-hgt" data-s="1" aria-label="Increase height">+</button></div></div>
+          <div class="gq3-presets"><span>Common sizes</span><button type="button" data-l="30" data-w="20">Small shop 30 × 20</button><button type="button" data-l="60" data-w="40">Workshop 60 × 40</button><button type="button" data-l="100" data-w="50">Godown 100 × 50</button></div>
+        </fieldset>
+
+        <fieldset class="gq3-who">
+          <legend>Who should we call?</legend>
+          <div class="gq3-f"><label for="f-name">Name</label><input type="text" name="name" autocomplete="name" id="f-name" placeholder="Ramesh Kumar" required></div>
+          <div class="gq3-f"><label for="f-phone">Phone or WhatsApp number</label><input type="tel" name="phone" inputmode="numeric" autocomplete="tel" id="f-phone" placeholder="98765 43210" required></div>
+          <details class="gq3-more"><summary>Add city or requirements</summary>
+            <div class="gq3-f"><label for="f-city">City or area</label><input type="text" name="city" id="f-city" autocomplete="address-level2" placeholder="Najafgarh, Dwarka, Noida"></div>
+            <div class="gq3-f"><label for="f-msg">Requirements</label><textarea name="message" id="f-msg" placeholder="Parking, crane, sheet type, deadline"></textarea></div>
+          </details>
+        </fieldset>
+        <button type="submit" id="submit-btn" class="gq3-submit">Request free site visit</button>
+        <p class="gq3-fine">No advance payment. We visit first, then send a written quotation with GST. Prefer to talk? <a href="tel:+918527258462">+91 85272 58462</a> or <a href="https://api.whatsapp.com/send?phone=918527258462&text=Hello%21%20I%20need%20a%20shed%20quote.%20I%20am%20sending%20a%20photo%20of%20the%20site." target="_blank" rel="noopener">send a site photo on WhatsApp</a>.</p>
       </div>
-      <div id="form-error" class="gq2-msg bad" style="display:none">
-        <h3><svg class="ic" aria-hidden="true"><use href="images/icons.svg#triangle-alert"/></svg> Could not send your request</h3>
-        <p>Something went wrong. Please contact us directly on WhatsApp:</p>
-        <a class="gq2-wa" href="https://api.whatsapp.com/send?phone=918527258462" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#message-circle"/></svg> WhatsApp Now</a>
-      </div>
+    </form>
 
-      <form id="enquiry-form" novalidate>
-        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
-        <input type="hidden" name="service" id="f-service" value="Tin Shed Fabrication">
-
-        <div class="gq2-q"><span class="gq2-n">1</span><h2>What are you building?</h2></div>
-        <div class="gq2-tiles" role="radiogroup" aria-label="Type of shed">
-          <button type="button" role="radio" aria-checked="true" class="on" data-v="Tin Shed Fabrication"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#house"/></svg><b>Tin Shed</b><small>Roof & sheds</small></button>
-          <button type="button" role="radio" aria-checked="false" data-v="Industrial Shed"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#factory"/></svg><b>Industrial</b><small>Factory shed</small></button>
-          <button type="button" role="radio" aria-checked="false" data-v="Prefab Warehouse"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#warehouse"/></svg><b>Warehouse</b><small>Prefab</small></button>
-          <button type="button" role="radio" aria-checked="false" data-v="PEB Structure"><svg class="ic" aria-hidden="true"><use href="images/icons.svg#building-2"/></svg><b>PEB</b><small>Steel structure</small></button>
-        </div>
-
-        <div class="gq2-q"><span class="gq2-n">2</span><h2>How big is the area?</h2></div>
-        <div class="gq2-area">
-          <div class="gq2-big"><input type="number" name="area" id="f-area" inputmode="numeric" min="0" value="1000" aria-label="Area in square feet"><span>sq.ft</span></div>
-          <input type="range" id="f-range" min="200" max="10000" step="100" value="1000" aria-label="Area slider">
-          <div class="gq2-chips"><button type="button" data-a="500">500</button><button type="button" data-a="1000">1,000</button><button type="button" data-a="2000">2,000</button><button type="button" data-a="5000">5,000</button></div>
-        </div>
-
-        <div class="gq2-price" id="q-est" aria-live="polite">
-          <div class="gq2-p-l">Estimated total, with GST</div>
-          <div class="gq2-p-v" id="q-tot">₹1,77,000 – ₹2,59,600</div>
-          <div class="gq2-p-s"><span id="q-l1">1,000 sq.ft × ₹150–220</span> <i>+</i> <span>GST 18%</span></div>
-          <div class="gq2-p-n">Starting estimate only. The final rate depends on design and location, and is confirmed in your written quotation after the free site visit.</div>
-          <span id="q-base" hidden></span><span id="q-gst" hidden></span>
-        </div>
-
-        <div class="gq2-q"><span class="gq2-n">3</span><h2>Where should we call you?</h2></div>
-        <div class="gq2-f"><label for="f-name">Your name</label><input type="text" name="name" autocomplete="name" id="f-name" placeholder="Ramesh Kumar" required></div>
-        <div class="gq2-f"><label for="f-phone">Phone / WhatsApp</label><input type="tel" name="phone" inputmode="numeric" autocomplete="tel" id="f-phone" placeholder="98765 43210" required></div>
-        <details class="gq2-more">
-          <summary>Add city or requirements (optional)</summary>
-          <div class="gq2-f"><label for="f-city">City / area</label><input type="text" name="city" id="f-city" autocomplete="address-level2" placeholder="Najafgarh, Dwarka, Noida..."></div>
-          <div class="gq2-f"><label for="f-msg">Special requirements</label><textarea name="message" id="f-msg" placeholder="e.g. height, parking, sheet type..."></textarea></div>
-        </details>
-
-        <button type="submit" id="submit-btn" class="gq2-submit">Get my free site visit →</button>
-        <ul class="gq2-trust"><li><svg class="ic" aria-hidden="true"><use href="images/icons.svg#shield-check"/></svg>No advance needed</li><li><svg class="ic" aria-hidden="true"><use href="images/icons.svg#shield-check"/></svg>No spam</li><li><svg class="ic" aria-hidden="true"><use href="images/icons.svg#shield-check"/></svg>Proper GST bill</li></ul>
-        <p class="gq2-alt">In a hurry? <a href="tel:+918527258462">Call +91 85272 58462</a> or <a href="https://api.whatsapp.com/send?phone=918527258462&text=Hello%21%20I%20need%20a%20shed%20quote.%20I%20am%20sending%20a%20photo%20of%20the%20site." target="_blank" rel="noopener">send a site photo on WhatsApp</a>.</p>
-      </form>
-    </div>
-
-    <div class="gq2-proof">
-      <div><b>5.0</b><span>Google rating<br>(34 reviews)</span></div>
-      <div><b>500+</b><span>Projects<br>completed</span></div>
-      <div><b>8+</b><span>Years in<br>business</span></div>
-    </div>
-
-    <div class="gq2-how">
-      <h2>What happens next</h2>
-      <ol class="gq-steps">
-        <li><b>We call you</b><span>Within 2 hours, to understand your requirement.</span></li>
-        <li><b>Free site visit</b><span>We measure the site and check access, height and ground.</span></li>
-        <li><b>Written quotation</b><span>Within 24 hours of the visit: size, steel gauge, sheet, GST and payment schedule.</span></li>
-      </ol>
-      <div class="gq-photos">
+    <div class="gq3-lower">
+      <section class="gq3-next">
+        <h2>After you submit</h2>
+        <ol>
+          <li><b>We call you</b><span>Within 2 hours, to understand the requirement.</span></li>
+          <li><b>We visit the site</b><span>Free. We measure, and check access, height and ground.</span></li>
+          <li><b>You get it in writing</b><span>Within 24 hours of the visit: size, steel gauge, sheet, GST and payment schedule.</span></li>
+        </ol>
+      </section>
+      <aside class="gq3-facts"><p><b>5.0</b> on Google from 34 reviews</p><p><b>500+</b> projects across Delhi NCR</p><p><b>8+</b> years fabricating sheds</p></aside>
+      <div class="gq3-pics">
         <picture><img src="images/project-000.webp" alt="Tin shed roofing project completed by R.R Teen Set Solution in Delhi NCR" width="400" height="300" loading="lazy"></picture>
         <picture><img src="images/project-003.webp" alt="Steel structure shed built by R.R Teen Set Solution" width="400" height="300" loading="lazy"></picture>
       </div>
     </div>
   </div>
 </section>
+<div class="gq3-bar" id="gq-bar"><div><small>Estimate incl. GST</small><b id="bar-tot"></b></div><a href="#f-name" id="bar-go">Request visit</a></div>
 
 <!-- Service Area Map -->
 
@@ -348,4 +353,4 @@
 </div>
 <script type="module" src="lead-capture.js?v=20261015"></script><script src="main.js?v=20261114"></script><script src="site-search.js?v=2"></script><script type="module" src="site-tracker.js?v=20261015"></script><script type="module" src="newsletter.js?v=3"></script><script src="chatbot-widget.js?v=20261008" defer></script>
 <script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>
-<script src="gq-quote.js?v=20261116" defer></script></body></html>
+<script src="gq-quote.js?v=20261117" defer></script></body></html>
