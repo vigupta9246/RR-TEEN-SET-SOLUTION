@@ -2,7 +2,7 @@
   var svg=document.getElementById('gq-svg'); if(!svg)return;
   var L=document.getElementById('f-len'),W=document.getElementById('f-wid'),H=document.getElementById('f-hgt'),
       area=document.getElementById('f-area'),svc=document.getElementById('f-service'),form=document.getElementById('enquiry-form');
-  var LO=150,HI=220,GST=.18,kind='tin',NS='http://www.w3.org/2000/svg';
+  var RATES={tin:[150,220],ind:[200,300],wh:[240,340],peb:[250,450]},GST=.18,kind='tin',NS='http://www.w3.org/2000/svg';
   function inr(n){return '₹'+Math.round(n).toLocaleString('en-IN');}
   function num(el,min,max,def){var v=parseFloat(el.value);if(!v||v<min)v=v>0?min:def;return Math.min(v,max);}
   function e(t,a,txt){var n=document.createElementNS(NS,t);for(var k in a)n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;return n;}
@@ -50,7 +50,7 @@
       g.appendChild(e('path',{d:zz,'stroke-width':1,stroke:'#52606d'}));
     }
     if(kind==='peb'){ [[ox,yl],[ox+W_,yl]].forEach(function(p,ix){
-        g.appendChild(e('polygon',{points:[p[0],p[1]+4,p[0]+(ix?-1:1)*W_*.14,ridge+ (yl-ridge)*.72,p[0],p[1]+30].join(' '),fill:'#d9dee3','stroke-width':1.5}));});
+        g.appendChild(e('polygon',{points:[p[0],p[1]+4,p[0]+(ix?-1:1)*W_*.14,ridge+ (yl-ridge)*.72,p[0],Math.min(p[1]+30,gy)].join(' '),fill:'#d9dee3','stroke-width':1.5}));});
     }
     if(kind==='wh'){var dw=Math.min(W_*.3,70);g.appendChild(e('rect',{x:ox+W_/2-dw/2,y:gy-Math.min(hs*.75,60),width:dw,height:Math.min(hs*.75,60),fill:'#fff','stroke-width':1.5}));
       for(var r=1;r<6;r++)g.appendChild(e('line',{x1:ox+W_/2-dw/2,y1:gy-Math.min(hs*.75,60)+r*Math.min(hs*.75,60)/6,x2:ox+W_/2+dw/2,y2:gy-Math.min(hs*.75,60)+r*Math.min(hs*.75,60)/6,stroke:GAL,'stroke-width':1}));}
@@ -63,7 +63,7 @@
     var hx=ox-34;
     dg.appendChild(e('line',{x1:hx,y1:gy,x2:hx,y2:yl})); dg.appendChild(e('line',{x1:hx-8,y1:gy,x2:ox-4,y2:gy})); dg.appendChild(e('line',{x1:hx-8,y1:yl,x2:ox-4,y2:yl}));
     tick(dg,hx,gy);tick(dg,hx,yl);
-    var th=e('text',{x:hx-7,y:(gy+yl)/2,'text-anchor':'middle',stroke:'none',transform:'rotate(-90 '+(hx-7)+' '+((gy+yl)/2)+')'},Math.round(h)+' ft eave'); dg.appendChild(th);
+    var th=e('text',{x:hx-7,y:(gy+yl)/2,'text-anchor':'middle',stroke:'none',transform:'rotate(-90 '+(hx-7)+' '+((gy+yl)/2)+')'},(hs<90?Math.round(h)+' ft':Math.round(h)+' ft eave')); dg.appendChild(th);
     // plan inset
     var pw=Math.min(150,70*l/w), ph=pw*w/l; if(ph>70){ph=70;pw=ph*l/w;}
     var px0=16,py0=18;
@@ -74,14 +74,16 @@
     var pd=e('g',{fill:DIM,'font-family':'IBM Plex Mono, monospace','font-size':FS()*.85,'font-weight':600}); svg.appendChild(pd);
     pd.appendChild(e('text',{x:px0,y:py0+ph+FS()*1.1},'Plan  '+Math.round(l)+' × '+Math.round(w)+' ft'));
   }
+  function note(L,W,H){var el=document.getElementById('gq-clamp');if(!el)return;var o=[];[[L,'length',500],[W,'width',150],[H,'height',45]].forEach(function(x){if(parseFloat(x[0].value)>x[2])o.push(x[1]+' (max '+x[2]+' ft)');});el.textContent=o.length?'Online estimate covers up to 500 \u00d7 150 \u00d7 45 ft. For a larger '+o.join(' and ')+', call us on +91 85272 58462.':'';}
   var names={tin:'Tin shed',ind:'Industrial shed',wh:'Prefab warehouse',peb:'PEB structure'};
   function upd(){
-    var l=num(L,10,500,40),w=num(W,10,150,30),h=num(H,8,45,12),a=l*w;
+    var l=num(L,10,500,40),w=num(W,10,150,30),h=num(H,8,45,12),a=l*w,LO=RATES[kind][0],HI=RATES[kind][1];
+    note(L,W,H);
     area.value=Math.round(a);
     document.getElementById('t-type').textContent=names[kind];
     document.getElementById('t-size').textContent=Math.round(l)+' × '+Math.round(w)+' × '+Math.round(h)+' ft';
     document.getElementById('t-area').textContent=Math.round(a).toLocaleString('en-IN')+' sq.ft';
-    document.getElementById('q-l1').textContent=Math.round(a).toLocaleString('en-IN')+' sq.ft × ₹150–220 + 18% GST';
+    document.getElementById('q-l1').textContent=Math.round(a).toLocaleString('en-IN')+' sq.ft × ₹'+LO+'–'+HI+' + 18% GST';
     document.getElementById('q-tot').textContent=inr(a*LO*(1+GST))+' – '+inr(a*HI*(1+GST));
     var bt=document.getElementById('bar-tot'); if(bt)bt.textContent=inr(a*LO*(1+GST))+' \u2013 '+inr(a*HI*(1+GST));
     draw(l,w,h);
@@ -92,13 +94,30 @@
   [].forEach.call(document.querySelectorAll('.gq3-type input'),function(r){r.addEventListener('change',function(){
     [].forEach.call(document.querySelectorAll('.gq3-type label'),function(x){x.classList.remove('on');});
     r.parentNode.classList.add('on');svc.value=r.value;kind=r.dataset.k;upd();});});
-  // add the drawn dimensions to the enquiry message (runs before the shared submit handler)
+  // add the drawn dimensions to the message for this submit only; the customer's own text is restored right after
   form.addEventListener('submit',function(){
     var m=form.querySelector('[name="message"]'); if(!m)return;
+    var orig=m.value;
     var tag='Size: '+Math.round(num(L,10,500,40))+' x '+Math.round(num(W,10,150,30))+' x '+Math.round(num(H,8,45,12))+' ft (L x W x eave height)';
-    m.value=tag+(m.value.replace(/^Size:[^\n]*\n?/,'').trim()?'\n'+m.value.replace(/^Size:[^\n]*\n?/,'').trim():'');
+    m.value=tag+(orig.trim()?'\n'+orig.trim():'');
+    setTimeout(function(){m.value=orig;},0);
   });
-  window.addEventListener('resize',upd);
-  form.addEventListener('submit',function(){var bar=document.getElementById('gq-bar');if(bar)setTimeout(function(){if(document.getElementById('form-success').style.display!=='none')bar.style.display='none';},1500);});
+  var lastNarrow=null,rq=0;window.addEventListener('resize',function(){var n=(svg.getBoundingClientRect().width||640)<520;if(n===lastNarrow)return;lastNarrow=n;cancelAnimationFrame(rq);rq=requestAnimationFrame(upd);});
+  var bar=document.getElementById('gq-bar'),ok=document.getElementById('form-success'),er=document.getElementById('form-error');
+  function watch(el,fn){if(!el||!window.MutationObserver)return;new MutationObserver(fn).observe(el,{attributes:true,attributeFilter:['style']});}
+  watch(ok,function(){if(ok.style.display!=='none'){if(bar)bar.style.display='none';ok.setAttribute('tabindex','-1');ok.focus({preventScroll:true});}});
+  watch(er,function(){if(er.style.display!=='none'&&er.scrollIntoView)er.scrollIntoView({behavior:'smooth',block:'center'});});
+  // the bar is only useful while the form's own submit button is off screen; hide it while typing or when the button is visible,
+  // and never re-show it in the middle of a tap on the button
+  if(bar){
+    var typing=false,btnVisible=false,t=0;
+    function sync(){bar.classList.toggle('away',typing||btnVisible);}
+    form.addEventListener('focusin',function(e){var x=e.target;if(x.tagName==='TEXTAREA'||(x.tagName==='INPUT'&&/^(text|tel|number)$/.test(x.type))){typing=true;sync();}});
+    form.addEventListener('focusout',function(){clearTimeout(t);t=setTimeout(function(){if(!form.contains(document.activeElement)||!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){typing=false;sync();}},400);});
+    if(window.IntersectionObserver){new IntersectionObserver(function(en){btnVisible=en[0].isIntersecting;sync();},{threshold:.6}).observe(document.getElementById('submit-btn'));}
+  }
+  // restore state if the browser restored a checked radio (back navigation, reload)
+  var chk=document.querySelector('.gq3-type input:checked');
+  if(chk){kind=chk.dataset.k;svc.value=chk.value;[].forEach.call(document.querySelectorAll('.gq3-type label'),function(x){x.classList.toggle('on',x.contains(chk));});}
   upd();
 })();
