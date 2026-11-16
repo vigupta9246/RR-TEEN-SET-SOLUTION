@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var WHATSAPP_NUM = '918527258462';
   // Free instant alert to the owner's Telegram through a small Cloudflare Worker (tools/lead-alert-worker.js).
   // The bot token lives only in the Worker, never in this public site. Paste the Worker URL here to switch the alert on.
-  var ALERT_URL = '';
+  var ALERT_URL = 'https://rr-lead-alert.vikashlogistics00.workers.dev/';
   function notifyOwnerWhatsApp(l){
     if(!ALERT_URL) return;
     try{
