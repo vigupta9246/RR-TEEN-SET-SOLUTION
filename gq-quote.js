@@ -75,6 +75,7 @@
     pd.appendChild(e('text',{x:px0,y:py0+ph+FS()*1.1},'Plan  '+Math.round(l)+' × '+Math.round(w)+' ft'));
   }
   function note(L,W,H){var el=document.getElementById('gq-clamp');if(!el)return;var o=[];[[L,'length',500],[W,'width',150],[H,'height',45]].forEach(function(x){if(parseFloat(x[0].value)>x[2])o.push(x[1]+' (max '+x[2]+' ft)');});el.textContent=o.length?'Online estimate covers up to 500 \u00d7 150 \u00d7 45 ft. For a larger '+o.join(' and ')+', call us on +91 85272 58462.':'';}
+  var lead=null;
   var names={tin:'Tin shed',ind:'Industrial shed',wh:'Prefab warehouse',peb:'PEB structure'};
   function upd(){
     var l=num(L,10,500,40),w=num(W,10,150,30),h=num(H,8,45,12),a=l*w,LO=RATES[kind][0],HI=RATES[kind][1];
@@ -98,6 +99,7 @@
   form.addEventListener('submit',function(){
     var m=form.querySelector('[name="message"]'); if(!m)return;
     var orig=m.value;
+    lead={name:(form.querySelector('[name="name"]').value||'').trim(),svc:svc.value,l:Math.round(num(L,10,500,40)),w:Math.round(num(W,10,150,30)),h:Math.round(num(H,8,45,12)),city:(form.querySelector('[name="city"]').value||'').trim()};
     var tag='Size: '+Math.round(num(L,10,500,40))+' x '+Math.round(num(W,10,150,30))+' x '+Math.round(num(H,8,45,12))+' ft (L x W x eave height)';
     m.value=tag+(orig.trim()?'\n'+orig.trim():'');
     setTimeout(function(){m.value=orig;},0);
@@ -105,7 +107,17 @@
   var lastNarrow=null,rq=0;window.addEventListener('resize',function(){var n=(svg.getBoundingClientRect().width||640)<520;if(n===lastNarrow)return;lastNarrow=n;cancelAnimationFrame(rq);rq=requestAnimationFrame(upd);});
   var bar=document.getElementById('gq-bar'),ok=document.getElementById('form-success'),er=document.getElementById('form-error');
   function watch(el,fn){if(!el||!window.MutationObserver)return;new MutationObserver(fn).observe(el,{attributes:true,attributeFilter:['style']});}
-  watch(ok,function(){if(ok.style.display!=='none'){if(bar)bar.style.display='none';ok.setAttribute('tabindex','-1');ok.focus({preventScroll:true});}});
+  watch(ok,function(){if(ok.style.display!=='none'){if(bar)bar.style.display='none';ok.setAttribute('tabindex','-1');ok.focus({preventScroll:true});openWa();}});
+  function openWa(){
+    var d=document.getElementById('gq-wa');if(!d||!lead||typeof d.showModal!=='function'||d.open)return;
+    var t='Hello R.R Teen Set Solution, I just sent an enquiry on your website.\n'+(lead.name?'Name: '+lead.name+'\n':'')+'Structure: '+lead.svc+'\nSize: '+lead.l+' x '+lead.w+' x '+lead.h+' ft (L x W x eave height)\n'+(lead.city?'City: '+lead.city+'\n':'')+'I will send photos of the site here.';
+    document.getElementById('gq-wa-prev').textContent=t;
+    document.getElementById('gq-wa-go').href='https://api.whatsapp.com/send?phone=918527258462&text='+encodeURIComponent(t);
+    try{d.showModal();}catch(e){}
+  }
+  (function(){var d=document.getElementById('gq-wa');if(!d)return;
+    d.addEventListener('click',function(e){if(e.target===d)d.close();});
+    document.getElementById('gq-wa-go').addEventListener('click',function(){setTimeout(function(){d.close();},300);});})();
   watch(er,function(){if(er.style.display!=='none'&&er.scrollIntoView)er.scrollIntoView({behavior:'smooth',block:'center'});});
   // the bar is only useful while the form's own submit button is off screen; hide it while typing or when the button is visible,
   // and never re-show it in the middle of a tap on the button
