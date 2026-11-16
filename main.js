@@ -122,13 +122,22 @@ document.addEventListener('DOMContentLoaded',function(){
   // Free WhatsApp alert to the owner via CallMeBot. Leave the key empty to switch it off.
   // The key can only send messages to this one number. Activate once: see the steps in the pull request.
   var CALLMEBOT_KEY = '';
+  // Free Telegram alert to the owner (official Bot API). Leave empty to switch it off.
+  // The bot token can only send messages to this one chat. Set both values to turn it on.
+  var TG_TOKEN = '', TG_CHAT = '';
   function notifyOwnerWhatsApp(l){
-    if(!CALLMEBOT_KEY) return;
+    if(!CALLMEBOT_KEY && !(TG_TOKEN && TG_CHAT)) return;
     try{
       var text=['New website enquiry','Name: '+l.name,'Phone: '+l.phone,'Type: '+l.svc,
         l.area?'Area: '+l.area+' sq.ft':'', l.city?'City: '+l.city:'', l.msg?'Notes: '+l.msg:''].filter(Boolean).join('\n').slice(0,700);
-      var url='https://api.callmebot.com/whatsapp.php?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(text)+'&apikey='+encodeURIComponent(CALLMEBOT_KEY);
-      fetch(url,{mode:'no-cors',keepalive:true}).catch(function(){});
+      if(CALLMEBOT_KEY){
+        var url='https://api.callmebot.com/whatsapp.php?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(text)+'&apikey='+encodeURIComponent(CALLMEBOT_KEY);
+        fetch(url,{mode:'no-cors',keepalive:true}).catch(function(){});
+      }
+      if(TG_TOKEN && TG_CHAT){
+        var tg='https://api.telegram.org/bot'+encodeURIComponent(TG_TOKEN)+'/sendMessage?chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text);
+        fetch(tg,{mode:'no-cors',keepalive:true}).catch(function(){});
+      }
     }catch(e){}
   }
 
