@@ -119,25 +119,13 @@ document.addEventListener('DOMContentLoaded',function(){
 (function(){
   var FORMSPREE_ID = 'xkoappra';
   var WHATSAPP_NUM = '918527258462';
-  // Free WhatsApp alert to the owner via CallMeBot. Leave the key empty to switch it off.
-  // The key can only send messages to this one number. Activate once: see the steps in the pull request.
-  var CALLMEBOT_KEY = '';
-  // Free Telegram alert to the owner (official Bot API). Leave empty to switch it off.
-  // The bot token can only send messages to this one chat. Set both values to turn it on.
-  var TG_TOKEN = '', TG_CHAT = '';
+  // Free instant alert to the owner's Telegram through a small Cloudflare Worker (tools/lead-alert-worker.js).
+  // The bot token lives only in the Worker, never in this public site. Paste the Worker URL here to switch the alert on.
+  var ALERT_URL = '';
   function notifyOwnerWhatsApp(l){
-    if(!CALLMEBOT_KEY && !(TG_TOKEN && TG_CHAT)) return;
+    if(!ALERT_URL) return;
     try{
-      var text=['New website enquiry','Name: '+l.name,'Phone: '+l.phone,'Type: '+l.svc,
-        l.area?'Area: '+l.area+' sq.ft':'', l.city?'City: '+l.city:'', l.msg?'Notes: '+l.msg:''].filter(Boolean).join('\n').slice(0,700);
-      if(CALLMEBOT_KEY){
-        var url='https://api.callmebot.com/whatsapp.php?phone='+WHATSAPP_NUM+'&text='+encodeURIComponent(text)+'&apikey='+encodeURIComponent(CALLMEBOT_KEY);
-        fetch(url,{mode:'no-cors',keepalive:true}).catch(function(){});
-      }
-      if(TG_TOKEN && TG_CHAT){
-        var tg='https://api.telegram.org/bot'+encodeURIComponent(TG_TOKEN)+'/sendMessage?chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text);
-        fetch(tg,{mode:'no-cors',keepalive:true}).catch(function(){});
-      }
+      fetch(ALERT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:l.name,phone:l.phone,svc:l.svc,area:l.area,city:l.city,msg:(l.msg||'').slice(0,400)}),keepalive:true}).catch(function(){});
     }catch(e){}
   }
 
