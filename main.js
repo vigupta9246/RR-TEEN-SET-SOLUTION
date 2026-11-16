@@ -119,6 +119,15 @@ document.addEventListener('DOMContentLoaded',function(){
 (function(){
   var FORMSPREE_ID = 'xkoappra';
   var WHATSAPP_NUM = '918527258462';
+  // Free instant alert to the owner's Telegram through a small Cloudflare Worker (tools/lead-alert-worker.js).
+  // The bot token lives only in the Worker, never in this public site. Paste the Worker URL here to switch the alert on.
+  var ALERT_URL = 'https://rr-lead-alert.vikashlogistics00.workers.dev/';
+  function notifyOwnerWhatsApp(l){
+    if(!ALERT_URL) return;
+    try{
+      fetch(ALERT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:l.name,phone:l.phone,svc:l.svc,area:l.area,city:l.city,msg:(l.msg||'').slice(0,400)}),keepalive:true}).catch(function(){});
+    }catch(e){}
+  }
 
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.getElementById('enquiry-form');
@@ -155,6 +164,8 @@ document.addEventListener('DOMContentLoaded',function(){
           area: area, city: city, message: msg, pageSource: location.pathname.replace(/^\//, '') || 'index.html'
         });
       }
+
+      notifyOwnerWhatsApp({name:name,phone:phone,svc:svc,area:area,city:city,msg:msg});
 
       // Button loading state
       var btn = document.getElementById('submit-btn');

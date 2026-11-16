@@ -128,3 +128,14 @@ body.gq-page .fab-wrap{display:none!important}
  .gq3-bar a{flex:none;font-size:18px;padding:10px 12px}
  body.gq-page{padding-bottom:64px}
 }
+
+.gq3-dlg{border:2px solid #1f2933;padding:0;max-width:min(460px,calc(100vw - 32px));width:100%;background:#fff;color:#1f2933;box-shadow:6px 6px 0 #9aa5b1}
+.gq3-dlg::backdrop{background:rgba(31,41,51,.65)}
+.gq3-dlg-in{padding:22px 20px 18px;margin:0}
+.gq3-dlg h2{font:700 26px/1.1 'Barlow Condensed',var(--font-b);margin:0 0 8px;letter-spacing:.005em;text-transform:none;color:#1f2933}
+.gq3-dlg p{font:400 15px/1.55 var(--font-b);color:#52606d;margin:0 0 12px}
+.gq3-dlg-prev{white-space:pre-wrap;word-break:break-word;background:#f3f5f7;border:1.5px solid #c5ccd3;padding:10px 12px;margin:0 0 14px;font:500 13.5px/1.55 'IBM Plex Mono',monospace;color:#1f2933;max-height:30vh;overflow:auto}
+.gq3-dlg-go{display:block;text-align:center;background:#f4b400;color:#1f2933!important;border:2px solid #1f2933;box-shadow:3px 3px 0 #1f2933;padding:14px;font:700 22px 'Barlow Condensed',var(--font-b);text-decoration:none;letter-spacing:.02em}
+.gq3-dlg-go:focus-visible,.gq3-dlg-no:focus-visible{outline:3px solid #1f2933;outline-offset:2px;box-shadow:0 0 0 6px #f4b400}
+.gq3-dlg-no{display:block;width:100%;margin-top:12px;background:none;border:0;padding:12px;font:600 15px var(--font-b);color:#52606d;text-decoration:underline;cursor:pointer;min-height:44px}
+.gq3-dlg{margin:auto!important;max-height:calc(100vh - 32px);overflow:auto}
