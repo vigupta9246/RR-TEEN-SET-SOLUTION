@@ -39,6 +39,7 @@
     var m = function (c) { return Math.max(0, Math.min(255, Math.round(k >= 0 ? c + (255 - c) * k : c * (1 + k)))); };
     return 'rgb(' + m(r) + ',' + m(g) + ',' + m(b) + ')';
   }
+  function INK() { return getComputedStyle(document.documentElement).getPropertyValue('--av-ink').trim() || '#16264f'; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   /* ---------- geometry ---------- */
@@ -209,7 +210,7 @@
     var k = Math.min((vw - padL - padR) / W, (vh - padT - padB) / top), ox = padL + ((vw - padL - padR) - W * k) / 2, gy = vh - padB;
     svg.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
     var X = function (y) { return ox + y * k; }, Z = function (z) { return gy - z * k; };
-    var ink = '#16264f', base = COLOURS[S.colour][1];
+    var ink = INK(), base = COLOURS[S.colour][1];
     el('rect', { x: ox - 30, y: gy, width: W * k + 60, height: 6, fill: 'rgba(120,120,120,.35)' }, svg);
     if (S.walls === 'closed') {
       var d = 'M' + f1(X(0)) + ',' + f1(Z(0));
@@ -262,7 +263,7 @@
     var k = Math.min((vw - padL - padR) / L, (vh - padT - padB) / top), ox = padL + ((vw - padL - padR) - L * k) / 2, gy = vh - padB;
     svg.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
     var X = function (x) { return ox + x * k; }, Z = function (z) { return gy - z * k; };
-    var ink = '#16264f', base = COLOURS[S.colour][1];
+    var ink = INK(), base = COLOURS[S.colour][1];
     el('rect', { x: ox - 30, y: gy, width: L * k + 60, height: 6, fill: 'rgba(120,120,120,.35)' }, svg);
     var sideH = (S.roof === 'lean' || S.roof === 'cant') ? S.E : S.E;
     if (S.walls !== 'open') {
@@ -382,18 +383,19 @@
   }
   function load() {
     try {
-      var h = location.hash.replace('#', ''); if (!h) return;
+      var h = location.hash.replace('#', ''); if (!h) return false;
       h.split('&').forEach(function (kv) {
         var a = kv.split('='), k = a[0], v = decodeURIComponent(a[1] || '');
         if (KEYS.indexOf(k) < 0) return;
-        if (['L', 'W', 'E', 'slope', 'bay', 'doors', 'spans', 'ins', 'vent', 'win', 'rust'].indexOf(k) >= 0) S[k] = +v;
+        if (['L', 'W', 'E', 'slope', 'bay', 'doors', 'spans', 'ins', 'vent', 'win', 'rust'].indexOf(k) >= 0) { if (v === '' || !isFinite(+v)) throw 0; S[k] = +v; }
         else if (k === 'cars') S.cars = v === '1';
         else S[k] = v;
       });
       if (!PRESETS[S.p] || !ROOFS[S.roof] || !GRADES[S.grade] || !COLOURS[S.colour] || !SLOPES[S.slope]) throw 0;
       S.L = clamp(S.L, 8, 250); S.W = clamp(S.W, 6, 120); S.E = clamp(S.E, 7, 45); S.bay = clamp(S.bay, 8, 35);
       S.doors = clamp(S.doors, 0, 4); S.spans = clamp(S.spans, 2, 4);
-    } catch (e) { S.p = 'warehouse'; }
+      return true;
+    } catch (e) { return false; }
   }
 
   /* ---------- UI ---------- */
@@ -426,7 +428,7 @@
   }
   function setView(v) {
     S.view = v;
-    [].forEach.call(document.querySelectorAll('.sd-tabs button'), function (b) { b.setAttribute('aria-selected', b.dataset.v === v ? 'true' : 'false'); });
+    [].forEach.call(document.querySelectorAll('.sd-tabs button'), function (b) { b.setAttribute('aria-selected', b.dataset.v === v ? 'true' : 'false'); b.tabIndex = b.dataset.v === v ? 0 : -1; });
     [].forEach.call(document.querySelectorAll('.sd-view'), function (d) { d.classList.toggle('on', d.dataset.v === v); });
   }
   function init() {
@@ -449,14 +451,21 @@
     $('i-slope').addEventListener('change', function (e) { S.slope = +e.target.value; render(); });
     ['ins', 'vent', 'win', 'rust'].forEach(function (k) { $('c-' + k).addEventListener('change', function (e) { S[k] = e.target.checked ? 1 : 0; render(); }); });
     $('cars-chk').addEventListener('change', function (e) { S.cars = e.target.checked; render(); });
-    [].forEach.call(document.querySelectorAll('.sd-tabs button'), function (b) { b.addEventListener('click', function () { setView(b.dataset.v); }); });
+    var tabs = [].slice.call(document.querySelectorAll('.sd-tabs button'));
+    tabs.forEach(function (b, i) {
+      b.id = 'tab-' + b.dataset.v; b.setAttribute('aria-controls', 'view-' + b.dataset.v);
+      b.addEventListener('click', function () { setView(b.dataset.v); });
+      b.addEventListener('keydown', function (e) {
+        var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : -1;
+        if (j < 0) return; j = (j + tabs.length) % tabs.length; tabs[j].focus(); setView(tabs[j].dataset.v); e.preventDefault();
+      });
+    });
     $('print').addEventListener('click', function () { window.print(); });
     $('copy').addEventListener('click', function () {
       var b = $('copy'), done = function () { b.textContent = 'Link copied'; setTimeout(function () { b.textContent = 'Copy design link'; }, 1800); };
       if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done, done); else done();
     });
-    load();
-    if (!location.hash) { applyPreset('warehouse'); } else { syncControls(); render(); }
+    if (load()) { syncControls(); render(); } else { applyPreset('warehouse'); }
     setView('3d');
     if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', render); }
     new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
