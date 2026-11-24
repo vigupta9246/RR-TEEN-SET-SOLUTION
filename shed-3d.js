@@ -83,11 +83,17 @@ if (hasGL) {
     root = new THREE.Group(); scene.add(root);
     bindUI(); resize();
     if (window.ResizeObserver) new ResizeObserver(resize).observe(host); else addEventListener('resize', resize);
+    if (window.matchMedia) matchMedia('(min-width:901px) and (min-height:700px)').addEventListener && matchMedia('(min-width:901px) and (min-height:700px)').addEventListener('change', resize);
     setSun();
+  }
+  function fitDist() {
+    var v = THREE.MathUtils.degToRad(camera.fov / 2), hh = Math.atan(Math.tan(v) * camera.aspect);
+    return Math.max(fitR / Math.sin(v), fitR / Math.sin(hh)) * 0.78;
   }
   function resize() {
     if (!renderer || !host.clientWidth) return;
-    var w = host.clientWidth, h = Math.max(260, Math.min(Math.round(w * 0.62), window.innerHeight * 0.72));
+    var w = host.clientWidth, big = window.matchMedia('(min-width:901px) and (min-height:700px)').matches,
+      h = big ? Math.max(300, Math.min(Math.round(w * 0.62), window.innerHeight - 390)) : Math.max(260, Math.min(Math.round(w * 0.62), window.innerHeight * 0.72));
     canvas.style.height = h + 'px'; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
   }
 
@@ -240,7 +246,7 @@ if (hasGL) {
     var sc = sun.shadow.camera; sc.left = -Rr; sc.right = Rr; sc.top = Rr; sc.bottom = -Rr; sc.near = 1; sc.far = Rr * 6; sc.updateProjectionMatrix();
     fitR = Math.sqrt(L * L + W * W + Math.pow(Mo.top, 2)) / 2;
     target.set(0, Mo.top * 0.32, 0);
-    var fitD = fitR / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.12;
+    var fitD = fitDist();
     if (!userMoved || d.animate) dist = fitD;
     setSun();
     return base;
@@ -337,7 +343,7 @@ if (hasGL) {
     });
     $('gl-rot').addEventListener('click', function () { autoRot = !autoRot; userMoved = false; this.setAttribute('aria-pressed', autoRot ? 'true' : 'false'); kick(); });
     $('gl-rot').setAttribute('aria-pressed', autoRot ? 'true' : 'false');
-    $('gl-reset').addEventListener('click', function () { userMoved = false; yaw = 0.85; pitch = 0.3; if (last) { dist = fitR / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.12; } kick(); });
+    $('gl-reset').addEventListener('click', function () { userMoved = false; yaw = 0.85; pitch = 0.3; if (last) { dist = fitDist(); } kick(); });
     $('gl-top').addEventListener('click', function () { userMoved = true; pitch = 1.45; kick(); });
     $('gl-sun').addEventListener('input', function (e) { sunT = e.target.value / 100; setSun(); kick(); });
     $('gl-save').addEventListener('click', function () {

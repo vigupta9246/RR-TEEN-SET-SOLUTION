@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20261112d"><link rel="stylesheet" href="article-v2.css?v=2"><link rel="stylesheet" href="shed-designer.css?v=4">
+<link rel="stylesheet" href="style.css?v=20261112d"><link rel="stylesheet" href="article-v2.css?v=2"><link rel="stylesheet" href="shed-designer.css?v=6">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Shed Design Tool", "url": "https://rrteensetsolution.com/shed-design-tool.html", "applicationCategory": "DesignApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "description": "Design your own shed online. Pick a terrace cover, car parking, godown, workshop or warehouse, set size, roof and colour, see 3D, front, side and plan drawings, and get a cost estimate.", "provider": {"@type": "Organization", "name": "R.R Teen Set Solution", "url": "https://rrteensetsolution.com/"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is the shed design tool free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is free to use, needs no sign-up, and works on a phone. You can print the drawings or send the design to us on WhatsApp."}}, {"@type": "Question", "name": "Can I design a car parking shed?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Choose Car parking, set the length and depth, and the tool shows how many cars fit at about 9 by 18 ft each. A cantilever roof keeps the space free of columns on the open side."}}, {"@type": "Question", "name": "How accurate is the cost estimate?", "acceptedAnswer": {"@type": "Answer", "text": "It is a planning figure from our per sq ft ranges for each shed type, with add-ons and 18% GST shown. Soil, access, height, sections and sheet choice move the final price, so we confirm it after a free site visit."}}, {"@type": "Question", "name": "Are these drawings ready for construction?", "acceptedAnswer": {"@type": "Answer", "text": "No. They show shape, size and layout so you can decide what you want and discuss it. A structural design for your site is made after the visit."}}, {"@type": "Question", "name": "What sizes can I design?", "acceptedAnswer": {"@type": "Answer", "text": "Length from 8 to 250 ft, width from 6 to 120 ft and eave height from 7 to 45 ft, with single slope, gable, cantilever, raised ridge and multi-span roofs."}}, {"@type": "Question", "name": "How do I save or share my design?", "acceptedAnswer": {"@type": "Answer", "text": "The page link updates as you change the design. Use Copy design link to keep it or send it to someone, or send it on WhatsApp for a quote."}}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://rrteensetsolution.com/"}, {"@type": "ListItem", "position": 2, "name": "Shed Design Tool", "item": "https://rrteensetsolution.com/shed-design-tool.html"}]}</script>
@@ -107,6 +107,7 @@
 <label class="sd-chk"><input type="checkbox" id="c-win"> Windows</label>
 <label class="sd-chk"><input type="checkbox" id="c-rust"> Anti-rust coating</label>
 </fieldset>
+<fieldset><legend>Notes on this design</legend><ul class="sd-warn" id="o-warn"></ul><p style="font-size:13px;color:var(--av-muted);line-height:1.55;margin:10px 0 0" id="o-basis"></p><p style="font-size:13px;color:var(--av-muted);line-height:1.55;margin:8px 0 0">Roof sheet area about <b id="o-sheet">0</b> sq ft. Drawings show shape and layout only and are not structural drawings. The estimate is a planning figure and not a quotation.</p></fieldset>
 </aside>
 <section class="sd-main" aria-label="Your design">
 <p class="sd-print-head" id="o-print-t"></p>
@@ -125,10 +126,8 @@
 <div class="sd-card"><b id="o-bays">0</b><small id="o-cols">columns</small></div>
 <div class="sd-card"><b id="o-extra">0</b><small id="o-extra-l">rise of the roof</small></div>
 </div>
-<div class="sd-cost"><div><div id="o-title" style="font-weight:800;margin-bottom:4px"></div><div class="big" id="o-range"></div><small id="o-gst"></small><small id="o-basis"></small></div>
+<div class="sd-cost"><div><div id="o-title" style="font-weight:800;margin-bottom:4px"></div><div class="big" id="o-range"></div><small id="o-gst"></small></div>
 <div class="sd-act"><a class="sd-wa" id="wa" href="https://wa.me/918527258462" target="_blank" rel="noopener">Send on WhatsApp</a><button class="sd-ghost" id="print" type="button">Print / save PDF</button><button class="sd-ghost" id="copy" type="button">Copy design link</button></div></div>
-<ul class="sd-warn" id="o-warn"></ul>
-<p class="ts" style="font-size:13px;color:var(--av-muted);margin-top:12px">Roof sheet area about <b id="o-sheet">0</b> sq ft. Drawings show shape and layout only and are not structural drawings. The estimate is a planning figure and not a quotation.</p>
 </section>
 </div>
 <section class="sd-info">
@@ -140,7 +139,7 @@
 </section>
 </main>
 <script src="shed-designer.js?v=3" defer></script>
-<script type="module" src="shed-3d.js?v=2"></script>
+<script type="module" src="shed-3d.js?v=4"></script>
 <footer>
   <div class="footer-grid">
     <div class="footer-about">

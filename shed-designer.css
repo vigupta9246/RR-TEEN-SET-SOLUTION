@@ -90,3 +90,14 @@
   .sd-gl-ui button[aria-pressed=true]{background:#f13c20;color:#fff}
   .sd-cards{grid-template-columns:repeat(2,1fr)}
 }
+
+@media (min-width:901px) and (min-height:700px){
+  .sd-main{position:sticky;top:84px;align-self:start}
+  .sd-cards{margin:10px 0;gap:8px}
+  .sd-card{padding:8px 12px}.sd-card b{font-size:24px}.sd-card small{font-size:12px}
+  .sd-cost{grid-template-columns:1fr auto;align-items:center;padding:12px 16px;gap:10px 16px}
+  .sd-cost .big{font-size:28px}
+}
+html,body{overflow-x:clip!important}
+.sd-ctl legend{float:left;width:100%}
+.sd-ctl legend+*{clear:both}
