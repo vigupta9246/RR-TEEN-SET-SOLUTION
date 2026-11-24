@@ -399,7 +399,7 @@
   }
 
   /* ---------- UI ---------- */
-  var timer;
+  var timer, animNext = true;
   function render() {
     var M = model(), E = estimate(M);
     draw3d(M); drawFront(M); drawSide(M); drawPlan(M); summary(M, E);
@@ -407,6 +407,8 @@
     var wa = $('wa'); wa.href = 'https://wa.me/918527258462?text=' + encodeURIComponent(specText(M, E));
     $('o-print-t').textContent = PRESETS[S.p].name + ', ' + S.L + ' x ' + S.W + ' ft. Planning design by R.R Teen Set Solution, +91 85272 58462';
     clearTimeout(timer); timer = setTimeout(save, 250);
+    var an = animNext; animNext = false;
+    window.dispatchEvent(new CustomEvent('shed:render', { detail: { S: S, M: M, E: E, ds: doorSpec(), cg: carGrid(), colour: COLOURS[S.colour][1], animate: an, zAt: zAt, name: PRESETS[S.p].name } }));
   }
   function syncControls() {
     [['L', 'L'], ['W', 'W'], ['E', 'E'], ['bay', 'bay']].forEach(function (p) { $('i-' + p[0]).value = S[p[1]]; $('r-' + p[0]).textContent = S[p[1]] + ' ft'; });
@@ -430,6 +432,7 @@
     S.view = v;
     [].forEach.call(document.querySelectorAll('.sd-tabs button'), function (b) { b.setAttribute('aria-selected', b.dataset.v === v ? 'true' : 'false'); b.tabIndex = b.dataset.v === v ? 0 : -1; });
     [].forEach.call(document.querySelectorAll('.sd-view'), function (d) { d.classList.toggle('on', d.dataset.v === v); });
+    window.dispatchEvent(new CustomEvent('shed:view', { detail: { v: v } }));
   }
   function init() {
     var pc = $('presets'), cw = $('colours'), roofSel = $('i-roof'), slSel = $('i-slope'), gr = $('i-grade');
@@ -447,11 +450,12 @@
     ['L', 'W', 'E', 'bay', 'doors', 'spans'].forEach(function (k) {
       $('i-' + k).addEventListener('input', function (e) { S[k] = +e.target.value; syncControls(); render(); });
     });
-    [['i-roof', 'roof'], ['i-walls', 'walls'], ['i-grade', 'grade']].forEach(function (p) { $(p[0]).addEventListener('change', function (e) { S[p[1]] = e.target.value; syncControls(); render(); }); });
+    [['i-roof', 'roof'], ['i-walls', 'walls'], ['i-grade', 'grade']].forEach(function (p) { $(p[0]).addEventListener('change', function (e) { animNext = p[1] !== 'grade'; S[p[1]] = e.target.value; syncControls(); render(); }); });
     $('i-slope').addEventListener('change', function (e) { S.slope = +e.target.value; render(); });
     ['ins', 'vent', 'win', 'rust'].forEach(function (k) { $('c-' + k).addEventListener('change', function (e) { S[k] = e.target.checked ? 1 : 0; render(); }); });
     $('cars-chk').addEventListener('change', function (e) { S.cars = e.target.checked; render(); });
     var tabs = [].slice.call(document.querySelectorAll('.sd-tabs button'));
+    if (!(window.ShedGL && window.ShedGL.ok)) tabs = tabs.filter(function (b) { return b.dataset.v !== 'real'; });
     tabs.forEach(function (b, i) {
       b.id = 'tab-' + b.dataset.v; b.setAttribute('aria-controls', 'view-' + b.dataset.v);
       b.addEventListener('click', function () { setView(b.dataset.v); });
@@ -466,7 +470,9 @@
       if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done, done); else done();
     });
     if (load()) { syncControls(); render(); } else { applyPreset('warehouse'); }
-    setView('3d');
+    var gl = window.ShedGL && window.ShedGL.ok;
+    if (!gl) { var t = document.querySelector('.sd-tabs [data-v="real"]'), pn = $('view-real'); if (t) t.remove(); if (pn) pn.remove(); }
+    setView(gl ? 'real' : '3d');
     if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', render); }
     new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
