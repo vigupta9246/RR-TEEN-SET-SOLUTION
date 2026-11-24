@@ -47,8 +47,8 @@ if (hasGL) {
     steel: new THREE.MeshStandardMaterial({ color: 0x5a6574, metalness: .25, roughness: .55 }),
     steelDk: new THREE.MeshStandardMaterial({ color: 0x39414d, metalness: .25, roughness: .5 }),
     plate: new THREE.MeshStandardMaterial({ color: 0x8a919b, metalness: .7, roughness: .4 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x2f62b3, map: ribTex, metalness: .08, roughness: .5, side: THREE.DoubleSide }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xdfe3e8, map: ribTex, metalness: .05, roughness: .65, side: THREE.DoubleSide }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x2f62b3, map: ribTex, metalness: 0, roughness: .8, side: THREE.DoubleSide }),
+    wall: new THREE.MeshStandardMaterial({ color: 0xdfe3e8, map: ribTex, metalness: 0, roughness: .85, side: THREE.DoubleSide }),
     door: new THREE.MeshStandardMaterial({ color: 0x59616d, metalness: .4, roughness: .55 }),
     glass: new THREE.MeshStandardMaterial({ color: 0x8cc4ee, metalness: .1, roughness: .1, transparent: true, opacity: .65 }),
     vent: new THREE.MeshStandardMaterial({ color: 0xd5dbe2, metalness: .8, roughness: .3 }),
@@ -88,7 +88,7 @@ if (hasGL) {
   function resize() {
     if (!renderer || !host.clientWidth) return;
     var w = host.clientWidth, h = Math.max(260, Math.min(Math.round(w * 0.62), window.innerHeight * 0.72));
-    host.style.height = h + 'px'; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    canvas.style.height = h + 'px'; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
   }
 
   /* ---------- helpers ---------- */
