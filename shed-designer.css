@@ -77,3 +77,16 @@
 @media (max-width:520px){.sd-sun input{width:70px}.sd-gl-ui button{padding:8px 10px;font-size:12px}}
 .sd-grid>*{min-width:0}
 .sd,.sd-main,.sd-stage,.sd-views{max-width:100%}
+
+.sd section,.sd aside,.sd-main.sd-main,.sd-info.sd-info{padding:0;margin-left:0;margin-right:0}
+.sd-main.sd-main{max-width:none}
+.sd-info.sd-info{padding:0;margin-top:34px}
+@media (max-width:640px){
+  .sd{padding-left:14px;padding-right:14px}
+  .sd-gl{overflow:visible;background:none;cursor:default}
+  .sd-gl canvas{border-radius:0;background:linear-gradient(#7fb9ea 0%,#bfe0f6 45%,#e6eef2 62%,#c9cdb5 100%)}
+  .sd-gl-ui{position:static;padding:8px;background:var(--av-panel);border-top:1px solid var(--av-line)}
+  .sd-gl-ui button,.sd-sun{background:var(--av-ink);color:var(--av-paper);backdrop-filter:none}
+  .sd-gl-ui button[aria-pressed=true]{background:#f13c20;color:#fff}
+  .sd-cards{grid-template-columns:repeat(2,1fr)}
+}
