@@ -101,3 +101,6 @@
 html,body{overflow-x:clip!important}
 .sd-ctl legend{float:left;width:100%}
 .sd-ctl legend+*{clear:both}
+
+.sd-info ol,.sd-info ul{padding-left:24px;margin:0 0 14px}
+.sd-info li{margin-bottom:6px}
