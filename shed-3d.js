@@ -252,14 +252,25 @@ if (hasGL) {
     return base;
   }
   function makeCar(color, cx, cz) {
-    var g = new THREE.Group(), body = new THREE.MeshStandardMaterial({ color: color, metalness: .55, roughness: .35 });
-    var low = mesh(new THREE.BoxGeometry(6, 1.9, 15), body); low.position.y = 1.9; g.add(low);
-    var cab = mesh(new THREE.BoxGeometry(5.2, 1.7, 7.6), body); cab.position.set(0, 3.65, -.8); g.add(cab);
-    var win = mesh(new THREE.BoxGeometry(5.3, 1.1, 6.6), M.glass); win.position.set(0, 3.7, -.8); win.castShadow = false; g.add(win);
-    [[-2.8, 4.6], [2.8, 4.6], [-2.8, -4.6], [2.8, -4.6]].forEach(function (w) {
-      var wh = mesh(new THREE.CylinderGeometry(1.15, 1.15, .8, 16), M.tyre); wh.rotation.z = Math.PI / 2; wh.position.set(w[0], 1.15, w[1]); g.add(wh);
+    var g = new THREE.Group(), body = new THREE.MeshStandardMaterial({ color: color, metalness: .1, roughness: .45 });
+    var ex = function (pts, depth, bev) {
+      var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); for (var i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]); sh.closePath();
+      var geo = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: bev > 0, bevelThickness: bev, bevelSize: bev, bevelSegments: 2 });
+      geo.translate(0, 0, -depth / 2); return geo;
+    };
+    var lower = mesh(ex([[-7.2, 1.3], [-7.2, 3.0], [-6.0, 3.4], [-2.6, 3.5], [2.8, 3.5], [6.2, 3.2], [7.2, 2.6], [7.2, 1.3]], 5.2, .4), body);
+    lower.rotation.y = Math.PI / 2; g.add(lower);
+    var glass = mesh(ex([[-3.4, 3.5], [-2.3, 5.0], [1.7, 5.0], [3.3, 3.5]], 5.0, .15), M.glass); glass.rotation.y = Math.PI / 2; glass.castShadow = false; g.add(glass);
+    var roofC = mesh(ex([[-2.6, 5.0], [1.9, 5.0], [1.9, 5.25], [-2.6, 5.25]], 4.9, .1), body); roofC.rotation.y = Math.PI / 2; g.add(roofC);
+    [[-2.9, 4.6], [2.9, 4.6], [-2.9, -4.4], [2.9, -4.4]].forEach(function (w) {
+      var wh = mesh(new THREE.CylinderGeometry(1.35, 1.35, .9, 18), M.tyre); wh.rotation.z = Math.PI / 2; wh.position.set(w[0], 1.35, w[1]); g.add(wh);
+      var hub = mesh(new THREE.CylinderGeometry(.7, .7, .95, 12), M.plate); hub.rotation.z = Math.PI / 2; hub.position.set(w[0], 1.35, w[1]); hub.castShadow = false; g.add(hub);
     });
-    g.position.set(cx, 0.15, cz); g.rotation.y = 0; return g;
+    [-1.8, 1.8].forEach(function (x) {
+      var hl = box(1.1, .5, .2, new THREE.MeshStandardMaterial({ color: 0xfff4c2, emissive: 0x665c30 }), false); hl.position.set(x, 2.7, 7.65); g.add(hl);
+      var tl = box(1.1, .5, .2, new THREE.MeshStandardMaterial({ color: 0xc01818, emissive: 0x400000 }), false); tl.position.set(x, 2.7, -7.65); g.add(tl);
+    });
+    g.position.set(cx, 0.15, cz); return g;
   }
   function makePerson() {
     var g = new THREE.Group();
