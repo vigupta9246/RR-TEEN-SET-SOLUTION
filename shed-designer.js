@@ -343,8 +343,9 @@
     set('o-basis', E.g.n + ' at ₹' + E.g.lo + ' to ₹' + E.g.hi + ' per sq ft' + (E.items.length ? ', plus ' + E.items.join(', ') : '') + (E.doors ? ', plus ' + E.doors + ' sliding door' + (E.doors > 1 ? 's' : '') + ' at ₹20,000' : '') + '. Planning figure before site visit.');
     /* warnings */
     var w = [], bad = [];
-    if (S.roof === 'cant' && S.W > 20) w.push('A cantilever this deep needs heavy columns and footings. It is usually priced higher than the figure above, and the final price comes after the design.');
-    if (S.roof === 'cant') w.push('Cantilever and parking roofs are priced after design, as the column and footing size set the cost.');
+    if (S.roof === 'cant') w.push(S.W > 20 ? 'A cantilever this deep needs heavy columns and footings, and is usually priced higher than the figure above. The final price comes after the design.' : 'Cantilever and parking roofs are priced after design, as the column and footing size set the cost.');
+    if (S.cars && S.E > 12) w.push('Cars need about 7 ft of clearance. An eave of ' + S.E + ' ft adds steel cost without adding parking space.');
+    if (S.grade === 'tin' && S.E > 20) w.push('An eave of ' + S.E + ' ft is tall for a tin shed frame. Check this with us before you decide.');
     if (S.grade === 'tin' && S.W > 30) w.push('A span of ' + S.W + ' ft is wide for a tin shed frame. Consider the industrial shed or prefab option.');
     if (S.grade === 'ind' && S.W > 50) w.push('A span of ' + S.W + ' ft is wide for an industrial shed. A prefab warehouse or PEB frame usually suits better.');
     if (S.grade === 'tin' && S.bay > 20) w.push('A bay of ' + S.bay + ' ft is long for light sections. Check purlin sizes with us.');
