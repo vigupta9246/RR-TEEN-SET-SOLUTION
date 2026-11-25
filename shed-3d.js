@@ -81,7 +81,7 @@ if (hasGL) {
     scene.add(sun); scene.add(sun.target);
     var g = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), M.ground); g.rotation.x = -Math.PI / 2; g.position.y = -0.02; g.receiveShadow = true; scene.add(g);
     root = new THREE.Group(); scene.add(root);
-    bindUI(); resize();
+    bindUI(); setupMini(); resize();
     if (window.ResizeObserver) new ResizeObserver(resize).observe(host); else addEventListener('resize', resize);
     if (window.matchMedia) matchMedia('(min-width:901px) and (min-height:700px)').addEventListener && matchMedia('(min-width:901px) and (min-height:700px)').addEventListener('change', resize);
     setSun();
@@ -324,7 +324,16 @@ if (hasGL) {
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
     camera.position.set(target.x + dist * cp * Math.sin(yaw), target.y + dist * sp, target.z + dist * cp * Math.cos(yaw));
     camera.lookAt(target); renderer.render(scene, camera);
+    if (miniOn && mini && (++tick % 6 === 0)) { try { miniCtx.drawImage(canvas, 0, 0, miniC.width, miniC.height); } catch (e) {} }
     raf = requestAnimationFrame(frame);
+  }
+  /* small live preview shown on phones while the big view is scrolled out of sight */
+  var mini = null, miniC = null, miniCtx = null, miniOn = false, tick = 0;
+  function lakh(n) { return n >= 1e5 ? (n / 1e5).toFixed(1).replace('.0', '') + ' L' : Math.round(n / 1000) + 'k'; }
+  function setupMini() {
+    mini = $('mini'); if (!mini || !window.IntersectionObserver) return; miniC = $('mini-c'); miniCtx = miniC.getContext('2d');
+    new IntersectionObserver(function (en) { miniOn = !en[0].isIntersecting && innerWidth <= 900; mini.hidden = !(miniOn && active); }, { threshold: 0.05 }).observe(document.querySelector('.sd-stage'));
+    mini.addEventListener('click', function () { var r = document.querySelector('.sd-stage').getBoundingClientRect(); window.scrollTo({ top: window.scrollY + r.top - 78, behavior: reduce ? 'auto' : 'smooth' }); });
   }
   function kick() { if (!raf && active) raf = requestAnimationFrame(frame); }
 
@@ -368,7 +377,8 @@ if (hasGL) {
   var pending = null, scheduled = false;
   function applyRender() {
     scheduled = false; if (!pending || !inited) return;
-    last = pending; pending = null; build(last); if (last.animate && !reduce) startAnim(); else if (parts) applyAnim(1);
+    last = pending; pending = null; build(last);
+    if ($('mini-p')) $('mini-p').textContent = '₹' + lakh(last.E.lo) + ' to ' + lakh(last.E.hi) + ' + GST'; if (last.animate && !reduce) startAnim(); else if (parts) applyAnim(1);
     kick();
   }
   window.addEventListener('shed:render', function (e) {
@@ -376,7 +386,7 @@ if (hasGL) {
     if (!scheduled) { scheduled = true; requestAnimationFrame(applyRender); }
   });
   window.addEventListener('shed:view', function (e) {
-    active = e.detail.v === 'real';
+    active = e.detail.v === 'real'; if (mini) mini.hidden = !(miniOn && active);
     if (active) { init(); resize(); if (pending) applyRender(); else if (!last && window.__lastShed) { } kick(); }
     else if (raf) { cancelAnimationFrame(raf); raf = 0; }
   });
