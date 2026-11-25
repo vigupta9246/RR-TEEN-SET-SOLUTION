@@ -293,3 +293,17 @@ body.cc-modal-open { overflow: hidden; }
  .cc-banner-text strong::after{content:" — essential cookies keep the site working. Analytics is your choice.";font-weight:400;color:var(--cc-muted)}
  .cc-banner-actions .cc-btn-primary{flex:none;order:2}
 }
+
+/* ===== v4: bottom bar on desktop (the floating card covered the hero buttons) + dark-mode button contrast ===== */
+@media(min-width:701px){
+ #cc-banner{left:0;right:0;bottom:0;max-width:none;width:auto}
+ .cc-banner-inner{flex-direction:row;align-items:center;gap:20px;border-width:1px 0 0;border-radius:0;padding:12px 120px 12px 28px;box-shadow:0 -6px 24px rgba(14,26,58,.14)}
+ .cc-banner-text{flex:1;min-width:0}
+ .cc-banner-text p{font-size:12.5px;line-height:1.45;margin:2px 0 0}
+ .cc-banner-actions{width:auto;display:flex;gap:8px;flex-shrink:0}
+ .cc-banner-actions .cc-btn{padding:10px 16px}
+ .cc-banner-actions #cc-manage{grid-column:auto;order:0;padding:2px 8px}
+}
+[data-theme="dark"] .cc-banner-actions .cc-btn-primary,[data-theme="dark"] #cc-banner .cc-btn-primary{background:#6c9bff;border-color:#6c9bff;color:#0d1117}
+[data-theme="dark"] .cc-banner-actions .cc-btn-primary:hover{background:#8fb4ff;border-color:#8fb4ff}
+[data-theme="dark"] .cc-btn-outline{color:#cfe0ff;border-color:#4b5563}
